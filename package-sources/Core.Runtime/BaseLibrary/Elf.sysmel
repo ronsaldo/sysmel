@@ -1,0 +1,240 @@
+public global Elf32::Addr := UInt32.
+public global Elf32::Off := UInt32.
+public global Elf32::Half := UInt16.
+public global Elf32::Word := UInt32.
+public global Elf32::Sword := Int32.
+
+public global Elf64::Addr := UInt64.
+public global Elf64::Off := UInt64.
+public global Elf64::Half := UInt16.
+public global Elf64::Word := UInt32.
+public global Elf64::Sword := Int32.
+public global Elf64::Xword := UInt64.
+public global Elf64::Sxword := Int64.
+
+public global Elf::Ident::Magic0 := 0sz.
+public global Elf::Ident::Magic1 := 1sz.
+public global Elf::Ident::Magic2 := 2sz.
+public global Elf::Ident::Magic3 := 3sz.
+public global Elf::Ident::Class := 4sz.
+public global Elf::Ident::Data := 5sz.
+public global Elf::Ident::Version := 6sz.
+public global Elf::Ident::OSAbi := 7sz.
+public global Elf::Ident::AbiVersion := 8sz.
+public global Elf::Ident::NIdent := 16sz.
+
+public global Elf::Ident::Class32 := 1u8.
+public global Elf::Ident::Class64 := 2u8.
+
+public global Elf::Ident::Data2LSB := 1u8.
+public global Elf::Ident::Data2MSB := 2u8.
+
+public global Elf::Ident::CurrentVersion := 1u8.
+public global Elf::CurrentVersion := 1u32.
+
+public global Elf::Machine::I386 := 3u16.
+public global Elf::Machine::ARM := 40u16.
+public global Elf::Machine::X86_64 := 62u16.
+public global Elf::Machine::AARCH64 := 183u16.
+public global Elf::Machine::RISCV := 243u16.
+
+public global Elf::Flags::RISCV::RVC := 16r0001 u32.
+
+public global Elf::Flags::RISCV::FloatAbiSoft := 16r0000 u32.
+public global Elf::Flags::RISCV::FloatAbiSingle := 16r0002 u32.
+public global Elf::Flags::RISCV::FloatAbiDouble := 16r0004 u32.
+public global Elf::Flags::RISCV::FloatAbiQuad := 16r0006 u32.
+
+public global Elf::Flags::RISCV::RVE := 16r0008 u32.
+public global Elf::Flags::RISCV::TSO := 16r0010 u32.
+
+public global Elf::SectionHeaderType::Null := 0u32.
+public global Elf::SectionHeaderType::Progbits := 1u32.
+public global Elf::SectionHeaderType::Symtab := 2u32.
+public global Elf::SectionHeaderType::Strtab := 3u32.
+public global Elf::SectionHeaderType::Rela := 4u32.
+public global Elf::SectionHeaderType::Hash := 5u32.
+public global Elf::SectionHeaderType::Dynamic := 6u32.
+public global Elf::SectionHeaderType::Note := 7u32.
+public global Elf::SectionHeaderType::Nobits := 8u32.
+public global Elf::SectionHeaderType::Rel := 9u32.
+public global Elf::SectionHeaderType::Shlib := 10u32.
+public global Elf::SectionHeaderType::Dynsym := 11u32.
+
+public global Elf::SectionHeaderFlag::Write := 16r01 u32.
+public global Elf::SectionHeaderFlag::Alloc := 16r02 u32.
+public global Elf::SectionHeaderFlag::ExecInstr := 16r04 u32.
+public global Elf::SectionHeaderFlag::Merge := 16r10 u32.
+public global Elf::SectionHeaderFlag::Strings := 16r20 u32.
+public global Elf::SectionHeaderFlag::InfoLink := 16r40 u32.
+public global Elf::SectionHeaderFlag::Group := 16r200 u32.
+public global Elf::SectionHeaderFlag::TLS := 16r400 u32.
+
+public global Elf::SymbolTableBind::Local := 0u8.
+public global Elf::SymbolTableBind::Global := 1u8.
+public global Elf::SymbolTableBind::Weak := 2u8.
+
+public global Elf::SymbolTableType::Notype := 0u8.
+public global Elf::SymbolTableType::Object := 1u8.
+public global Elf::SymbolTableType::Func := 2u8.
+public global Elf::SymbolTableType::Section := 3u8.
+public global Elf::SymbolTableType::File := 4u8.
+public global Elf::SymbolTableType::Common := 5u8.
+public global Elf::SymbolTableType::TLS := 6u8.
+
+public global Elf::Type::None := 0u16.
+public global Elf::Type::Rel := 1u16.
+public global Elf::Type::Exec := 2u16.
+public global Elf::Type::Dyn := 3u16.
+public global Elf::Type::Core := 4u16.
+
+public global Elf::I386::Rel::None := 0u32.
+public global Elf::I386::Rel::A32 := 1u32.
+public global Elf::I386::Rel::PC32 := 2u32.
+
+public global Elf::X86_64::Rel::None := 0u32.
+public global Elf::X86_64::Rel::A64 := 1u32.
+public global Elf::X86_64::Rel::PC32 := 2u32.
+public global Elf::X86_64::Rel::GOT32 := 3u32.
+public global Elf::X86_64::Rel::PLT32 := 4u32.
+public global Elf::X86_64::Rel::GOTPCREL := 9u32.
+public global Elf::X86_64::Rel::A32 := 10u32.
+public global Elf::X86_64::Rel::A32S := 11u32.
+public global Elf::X86_64::Rel::A16 := 12u32.
+public global Elf::X86_64::Rel::PC16 := 13u32.
+public global Elf::X86_64::Rel::A8 := 14u32.
+public global Elf::X86_64::Rel::PC8 := 15u32.
+public global Elf::X86_64::Rel::TPOff64 := 18u32.
+public global Elf::X86_64::Rel::TPOff32 := 23u32.
+
+public final struct Elf32::Header definition: {
+    public field ident => UInt8[Elf::Ident::NIdent].
+    public field type => Elf32::Half.
+    public field machine => Elf32::Half.
+    public field version => Elf32::Word.
+    public field entry => Elf32::Addr.
+    public field programHeaderOffset => Elf32::Off.
+    public field sectionHeaderOffset => Elf32::Off.
+    public field flags => Elf32::Word.
+    public field elfHeaderSize => Elf32::Half.
+    public field programHeaderEntrySize => Elf32::Half.
+    public field programHeaderEntryNumber => Elf32::Half.
+    public field sectionHeaderEntrySize => Elf32::Half.
+    public field sectionHeaderEntryNumber => Elf32::Half.
+    public field sectionNameStringStringTableIndex => Elf32::Half.
+}.
+
+public final struct Elf64::Header definition: {
+    public field ident => UInt8[Elf::Ident::NIdent].
+    public field type => Elf64::Half.
+    public field machine => Elf64::Half.
+    public field version => Elf64::Word.
+    public field entry => Elf64::Addr.
+    public field programHeaderOffset => Elf64::Off.
+    public field sectionHeaderOffset => Elf64::Off.
+    public field flags => Elf64::Word.
+    public field elfHeaderSize => Elf64::Half.
+    public field programHeaderEntrySize => Elf64::Half.
+    public field programHeaderEntryNumber => Elf64::Half.
+    public field sectionHeaderEntrySize => Elf64::Half.
+    public field sectionHeaderEntryNumber => Elf64::Half.
+    public field sectionNameStringStringTableIndex => Elf64::Half.
+}.
+
+public final struct Elf32::SectionHeader definition: {
+    public field name => Elf32::Word.
+    public field type => Elf32::Word.
+    public field flags => Elf32::Word.
+    public field addr => Elf32::Addr.
+    public field offset => Elf32::Off.
+    public field size => Elf32::Word.
+    public field link => Elf32::Word.
+    public field info => Elf32::Word.
+    public field addrAlign => Elf32::Word.
+    public field entrySize => Elf32::Word.
+}.
+
+public final struct Elf64::SectionHeader definition: {
+    public field name => Elf64::Word.
+    public field type => Elf64::Word.
+    public field flags => Elf64::Xword.
+    public field addr => Elf64::Addr.
+    public field offset => Elf64::Off.
+    public field size => Elf64::Xword.
+    public field link => Elf64::Word.
+    public field info => Elf64::Word.
+    public field addrAlign => Elf64::Xword.
+    public field entrySize => Elf64::Xword.
+}.
+
+public final struct Elf32::Symbol definition: {
+    public field name => Elf32::Word.
+    public field value => Elf32::Addr.
+    public field size => Elf32::Word.
+    public field info => UInt8.
+    public field other => UInt8.
+    public field sectionHeaderIndex => Elf32::Half.
+
+    public method bind: (bind: UInt8) type: (type: UInt8) ::=> Void := {
+        info := (bind << 4u8) | type
+    }.
+
+    public method makeSectionSymbol => Void := {
+        self bind: Elf::SymbolTableBind::Local type: Elf::SymbolTableType::Section
+    }.
+}.
+
+public final struct Elf64::Symbol definition: {
+    public field name => Elf64::Word.
+    public field info => UInt8.
+    public field other => UInt8.
+    public field sectionHeaderIndex => Elf64::Half.
+    public field value => Elf64::Addr.
+    public field size => Elf64::Xword.
+
+    public method bind: (bind: UInt8) type: (type: UInt8) ::=> Void := {
+        info := (bind << 4u8) | type
+    }.
+
+    public method makeSectionSymbol => Void := {
+        self bind: Elf::SymbolTableBind::Local type: Elf::SymbolTableType::Section
+    }.
+}.
+
+public final class Elf32::Rel definition: {
+    public field offset => Elf32::Addr.
+    public field info => Elf32::Word.
+
+    public method symbol: (symbol: UInt32) type: (type: UInt32) ::=> Void := {
+        info := (symbol << 8u32) | type
+    }.
+}.
+
+public final class Elf64::Rel definition: {
+    public field offset => Elf64::Addr.
+    public field info => Elf64::Xword.
+
+    public method symbol: (symbol: UInt32) type: (type: UInt32) ::=> Void := {
+        info := (symbol asUInt64 << 32u64) | type asUInt64
+    }.
+}.
+
+public final class Elf32::Rela definition: {
+    public field offset => Elf32::Addr.
+    public field info => Elf32::Word.
+    public field addend => Elf32::Sword.
+
+    public method symbol: (symbol: UInt32) type: (type: UInt32) ::=> Void := {
+        info := (symbol << 8u32) | type
+    }.
+}.
+
+public final class Elf64::Rela definition: {
+    public field offset => Elf64::Addr.
+    public field info => Elf64::Xword.
+    public field addend => Elf64::Sxword.
+
+    public method symbol: (symbol: UInt32) type: (type: UInt32) ::=> Void := {
+        info := (symbol asUInt64 << 32u64) | type asUInt64
+    }.
+}.

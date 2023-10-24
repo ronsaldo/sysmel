@@ -90,8 +90,8 @@ public final class AsmX86CompilationTarget superclass: AsmAbstractX86Compilation
     public override method usesElfRelStyleRelocations => Boolean
         := true.
 
-    public override method convertRelocationIntoElf32Rel: (relocation: AsmObjectCodeRelocation) withSymbolTable: (symbolTable: Elf32::SymbolTable) ::=> Elf32::Rel
-        := relocation convertIntoX86RelWithSymbolTable: symbolTable.
+    public override method convertRelocationIntoElf32Rel: (relocation: AsmObjectCodeRelocation) withSymbolTable: (symbolTable: Elf32::SymbolTable) ::=> Elf32::RelObject
+        := relocation convertIntoX86RelObjectWithSymbolTable: symbolTable.
 
     public override method convertCoffRelocationTypeOf: (relocation: AsmObjectCodeRelocation) ::=> UInt16
         := relocation x86::coffRelocationType.
@@ -141,8 +141,8 @@ public final class AsmX86_64CompilationTarget superclass: AsmAbstractX86Compilat
     public override method dwarf::stackPointerRegister => UInt8 := 7u8. ## rsp
     public override method dwarf::framePointerRegister => UInt8 := 6u8. ## rbp
 
-    public override method convertRelocationIntoElf64Rela: (relocation: AsmObjectCodeRelocation) withSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::Rela
-        := relocation convertIntoX86_64RelaWithSymbolTable: symbolTable.
+    public override method convertRelocationIntoElf64Rela: (relocation: AsmObjectCodeRelocation) withSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::RelaObject
+        := relocation convertIntoX86_64RelaObjectWithSymbolTable: symbolTable.
 
     public override method convertCoffRelocationTypeOf: (relocation: AsmObjectCodeRelocation) ::=> UInt16
         := relocation x86_64::coffRelocationType.
@@ -1529,10 +1529,10 @@ let instructionTemplateTable := #{
 }.
 
 AsmObjectCodeRelocation extend: {
-    public abstract method convertIntoX86RelWithSymbolTable: (symbolTable: Elf32::SymbolTable) ::=> Elf32::Rel
+    public abstract method convertIntoX86RelObjectWithSymbolTable: (symbolTable: Elf32::SymbolTable) ::=> Elf32::RelObject
         := self subclassResponsibility.
 
-    public abstract method convertIntoX86_64RelaWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::Rela
+    public abstract method convertIntoX86_64RelaObjectWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::RelaObject
         := self subclassResponsibility.
 
     public abstract method x86::coffRelocationType => UInt16
@@ -1546,14 +1546,14 @@ AsmObjectCodeRelocation extend: {
 }.
 
 AsmObjectCodeRelocationRelativeInt32 extend: {
-    public override method convertIntoX86RelWithSymbolTable: (symbolTable: Elf32::SymbolTable) ::=> Elf32::Rel
-        := Elf32::Rel new
+    public override method convertIntoX86RelObjectWithSymbolTable: (symbolTable: Elf32::SymbolTable) ::=> Elf32::RelObject
+        := Elf32::RelObject new
             offset: offset asUInt32;
             symbol: (symbolTable indexOfSymbol: symbol) type: Elf::I386::Rel::PC32;
             yourself.
 
-    public override method convertIntoX86_64RelaWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::Rela
-        := Elf64::Rela new
+    public override method convertIntoX86_64RelaObjectWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::RelaObject
+        := Elf64::RelaObject new
             offset: offset asUInt64;
             symbol: (symbolTable indexOfSymbol: symbol) type: Elf::X86_64::Rel::PC32;
             addend: addend asInt64 + symbol privateAddend;
@@ -1577,8 +1577,8 @@ AsmObjectCodeRelocationRelativeInt32 extend: {
 }.
 
 AsmObjectCodeRelocationRelativeInt32AtPLT extend: {
-    public override method convertIntoX86_64RelaWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::Rela
-        := Elf64::Rela new
+    public override method convertIntoX86_64RelaObjectWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::RelaObject
+        := Elf64::RelaObject new
             offset: offset asUInt64;
             symbol: (symbolTable indexOfSymbol: symbol) type: Elf::X86_64::Rel::PLT32;
             addend: addend asInt64 + symbol privateAddend;
@@ -1595,8 +1595,8 @@ AsmObjectCodeRelocationRelativeInt32AtPLT extend: {
 }.
 
 AsmObjectCodeRelocationRelativeInt32AtGOT extend: {
-    public override method convertIntoX86_64RelaWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::Rela
-        := Elf64::Rela new
+    public override method convertIntoX86_64RelaObjectWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::RelaObject
+        := Elf64::RelaObject new
             offset: offset asUInt64;
             symbol: (symbolTable indexOfSymbol: symbol) type: Elf::X86_64::Rel::GOTPCREL;
             addend: addend asInt64 + symbol privateAddend;
@@ -1613,8 +1613,8 @@ AsmObjectCodeRelocationRelativeInt32AtGOT extend: {
 }.
 
 AsmObjectCodeRelocationTPOffset32 extend: {
-    public override method convertIntoX86_64RelaWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::Rela
-        := Elf64::Rela new
+    public override method convertIntoX86_64RelaObjectWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::RelaObject
+        := Elf64::RelaObject new
             offset: offset asUInt64;
             symbol: (symbolTable indexOfSymbol: symbol) type: Elf::X86_64::Rel::TPOff32;
             addend: addend asInt64 + symbol privateAddend;
@@ -1622,8 +1622,8 @@ AsmObjectCodeRelocationTPOffset32 extend: {
 }.
 
 AsmObjectCodeRelocationTPOffset64 extend: {
-    public override method convertIntoX86_64RelaWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::Rela
-        := Elf64::Rela new
+    public override method convertIntoX86_64RelaObjectWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::RelaObject
+        := Elf64::RelaObject new
             offset: offset asUInt64;
             symbol: (symbolTable indexOfSymbol: symbol) type: Elf::X86_64::Rel::TPOff64;
             addend: addend asInt64 + symbol privateAddend;
@@ -1647,8 +1647,8 @@ AsmObjectCodeRelocationAbsoluteInt32 extend: {
 }.
 
 AsmObjectCodeRelocationSectionRelativeInt32 extend: {
-    public override method convertIntoX86_64RelaWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::Rela
-        := Elf64::Rela new
+    public override method convertIntoX86_64RelaObjectWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::RelaObject
+        := Elf64::RelaObject new
             offset: offset asUInt64;
             symbol: (symbolTable indexOfSymbol: symbol) type: Elf::X86_64::Rel::A32;
             addend: addend asInt64 + symbol privateAddend;
@@ -1662,8 +1662,8 @@ AsmObjectCodeRelocationSectionRelativeInt32 extend: {
 }.
 
 AsmObjectCodeRelocationAbsoluteInt64 extend: {
-    public override method convertIntoX86_64RelaWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::Rela
-        := Elf64::Rela new
+    public override method convertIntoX86_64RelaObjectWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::RelaObject
+        := Elf64::RelaObject new
             offset: offset asUInt64;
             symbol: (symbolTable indexOfSymbol: symbol) type: Elf::X86_64::Rel::A64;
             addend: addend asInt64 + symbol privateAddend;
@@ -1682,8 +1682,8 @@ AsmObjectCodeRelocationAbsoluteInt64 extend: {
 }.
 
 AsmObjectCodeRelocationSectionRelativeInt64 extend: {
-    public override method convertIntoX86_64RelaWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::Rela
-        := Elf64::Rela new
+    public override method convertIntoX86_64RelaObjectWithSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::RelaObject
+        := Elf64::RelaObject new
             offset: offset asUInt64;
             symbol: (symbolTable indexOfSymbol: symbol) type: Elf::X86_64::Rel::A64;
             addend: addend asInt64 + symbol privateAddend;

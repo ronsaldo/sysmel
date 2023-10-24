@@ -33,6 +33,8 @@ loadSourceNamed: "CurrentImageVirtualTableSetSource.sysmel".
 
 loadSourceNamed: "ByteStream.sysmel".
 loadSourceNamed: "Exception.sysmel".
+loadSourceNamed: "Dwarf.sysmel".
+loadSourceNamed: "Elf.sysmel".
 loadSourceNamed: "IO.sysmel".
 loadSourceNamed: "FileSystem.sysmel".
 loadSourceNamed: "Math.sysmel".

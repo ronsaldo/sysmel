@@ -1,113 +1,4 @@
-public global Elf32::Addr := UInt32.
-public global Elf32::Off := UInt32.
-public global Elf32::Half := UInt16.
-public global Elf32::Word := UInt32.
-public global Elf32::Sword := Int32.
-
-public global Elf64::Addr := UInt64.
-public global Elf64::Off := UInt64.
-public global Elf64::Half := UInt16.
-public global Elf64::Word := UInt32.
-public global Elf64::Sword := Int32.
-public global Elf64::Xword := UInt64.
-public global Elf64::Sxword := Int64.
-
-public global Elf::Ident::Magic0 := 0sz.
-public global Elf::Ident::Magic1 := 1sz.
-public global Elf::Ident::Magic2 := 2sz.
-public global Elf::Ident::Magic3 := 3sz.
-public global Elf::Ident::Class := 4sz.
-public global Elf::Ident::Data := 5sz.
-public global Elf::Ident::Version := 6sz.
-public global Elf::Ident::OSAbi := 7sz.
-public global Elf::Ident::AbiVersion := 8sz.
-public global Elf::Ident::NIdent := 16sz.
-
-public global Elf::Ident::Class32 := 1u8.
-public global Elf::Ident::Class64 := 2u8.
-
-public global Elf::Ident::Data2LSB := 1u8.
-public global Elf::Ident::Data2MSB := 2u8.
-
-public global Elf::Ident::CurrentVersion := 1u8.
-public global Elf::CurrentVersion := 1u32.
-
-public global Elf::Machine::I386 := 3u16.
-public global Elf::Machine::ARM := 40u16.
-public global Elf::Machine::X86_64 := 62u16.
-public global Elf::Machine::AARCH64 := 183u16.
-public global Elf::Machine::RISCV := 243u16.
-
-public global Elf::Flags::RISCV::RVC := 16r0001 u32.
-
-public global Elf::Flags::RISCV::FloatAbiSoft := 16r0000 u32.
-public global Elf::Flags::RISCV::FloatAbiSingle := 16r0002 u32.
-public global Elf::Flags::RISCV::FloatAbiDouble := 16r0004 u32.
-public global Elf::Flags::RISCV::FloatAbiQuad := 16r0006 u32.
-
-public global Elf::Flags::RISCV::RVE := 16r0008 u32.
-public global Elf::Flags::RISCV::TSO := 16r0010 u32.
-
-public global Elf::SectionHeaderType::Null := 0u32.
-public global Elf::SectionHeaderType::Progbits := 1u32.
-public global Elf::SectionHeaderType::Symtab := 2u32.
-public global Elf::SectionHeaderType::Strtab := 3u32.
-public global Elf::SectionHeaderType::Rela := 4u32.
-public global Elf::SectionHeaderType::Hash := 5u32.
-public global Elf::SectionHeaderType::Dynamic := 6u32.
-public global Elf::SectionHeaderType::Note := 7u32.
-public global Elf::SectionHeaderType::Nobits := 8u32.
-public global Elf::SectionHeaderType::Rel := 9u32.
-public global Elf::SectionHeaderType::Shlib := 10u32.
-public global Elf::SectionHeaderType::Dynsym := 11u32.
-
-public global Elf::SectionHeaderFlag::Write := 16r01 u32.
-public global Elf::SectionHeaderFlag::Alloc := 16r02 u32.
-public global Elf::SectionHeaderFlag::ExecInstr := 16r04 u32.
-public global Elf::SectionHeaderFlag::Merge := 16r10 u32.
-public global Elf::SectionHeaderFlag::Strings := 16r20 u32.
-public global Elf::SectionHeaderFlag::InfoLink := 16r40 u32.
-public global Elf::SectionHeaderFlag::Group := 16r200 u32.
-public global Elf::SectionHeaderFlag::TLS := 16r400 u32.
-
-public global Elf::SymbolTableBind::Local := 0u8.
-public global Elf::SymbolTableBind::Global := 1u8.
-public global Elf::SymbolTableBind::Weak := 2u8.
-
-public global Elf::SymbolTableType::Notype := 0u8.
-public global Elf::SymbolTableType::Object := 1u8.
-public global Elf::SymbolTableType::Func := 2u8.
-public global Elf::SymbolTableType::Section := 3u8.
-public global Elf::SymbolTableType::File := 4u8.
-public global Elf::SymbolTableType::Common := 5u8.
-public global Elf::SymbolTableType::TLS := 6u8.
-
-public global Elf::Type::None := 0u16.
-public global Elf::Type::Rel := 1u16.
-public global Elf::Type::Exec := 2u16.
-public global Elf::Type::Dyn := 3u16.
-public global Elf::Type::Core := 4u16.
-
-public global Elf::I386::Rel::None := 0u32.
-public global Elf::I386::Rel::A32 := 1u32.
-public global Elf::I386::Rel::PC32 := 2u32.
-
-public global Elf::X86_64::Rel::None := 0u32.
-public global Elf::X86_64::Rel::A64 := 1u32.
-public global Elf::X86_64::Rel::PC32 := 2u32.
-public global Elf::X86_64::Rel::GOT32 := 3u32.
-public global Elf::X86_64::Rel::PLT32 := 4u32.
-public global Elf::X86_64::Rel::GOTPCREL := 9u32.
-public global Elf::X86_64::Rel::A32 := 10u32.
-public global Elf::X86_64::Rel::A32S := 11u32.
-public global Elf::X86_64::Rel::A16 := 12u32.
-public global Elf::X86_64::Rel::PC16 := 13u32.
-public global Elf::X86_64::Rel::A8 := 14u32.
-public global Elf::X86_64::Rel::PC8 := 15u32.
-public global Elf::X86_64::Rel::TPOff64 := 18u32.
-public global Elf::X86_64::Rel::TPOff32 := 23u32.
-
-public final class Elf32::Header superclass: ByteSerializableObject; definition: {
+public final class Elf32::HeaderObject superclass: ByteSerializableObject; definition: {
     public field ident => UInt8[Elf::Ident::NIdent].
     public field type => Elf32::Half.
     public field machine => Elf32::Half.
@@ -135,11 +26,11 @@ public final class Elf32::Header superclass: ByteSerializableObject; definition:
         
         version := Elf::CurrentVersion.
         elfHeaderSize := self __type__ validInstanceSize asUInt16.
-        sectionHeaderEntrySize := Elf32::SectionHeader validInstanceSize asUInt16.
+        sectionHeaderEntrySize := Elf32::SectionHeaderObject validInstanceSize asUInt16.
     }.
 }.
 
-public final class Elf64::Header superclass: ByteSerializableObject; definition: {
+public final class Elf64::HeaderObject superclass: ByteSerializableObject; definition: {
     public field ident => UInt8[Elf::Ident::NIdent].
     public field type => Elf64::Half.
     public field machine => Elf64::Half.
@@ -167,11 +58,11 @@ public final class Elf64::Header superclass: ByteSerializableObject; definition:
         
         version := Elf::CurrentVersion.
         elfHeaderSize := self __type__ validInstanceSize asUInt16.
-        sectionHeaderEntrySize := Elf64::SectionHeader validInstanceSize asUInt16.
+        sectionHeaderEntrySize := Elf64::SectionHeaderObject validInstanceSize asUInt16.
     }.
 }.
 
-public final class Elf32::SectionHeader superclass: ByteSerializableObject; definition: {
+public final class Elf32::SectionHeaderObject superclass: ByteSerializableObject; definition: {
     public field name => Elf32::Word.
     public field type => Elf32::Word.
     public field flags => Elf32::Word.
@@ -184,7 +75,7 @@ public final class Elf32::SectionHeader superclass: ByteSerializableObject; defi
     public field entrySize => Elf32::Word.
 }.
 
-public final class Elf64::SectionHeader superclass: ByteSerializableObject; definition: {
+public final class Elf64::SectionHeaderObject superclass: ByteSerializableObject; definition: {
     public field name => Elf64::Word.
     public field type => Elf64::Word.
     public field flags => Elf64::Xword.
@@ -197,7 +88,7 @@ public final class Elf64::SectionHeader superclass: ByteSerializableObject; defi
     public field entrySize => Elf64::Xword.
 }.
 
-public final class Elf32::Symbol superclass: ByteSerializableObject; definition: {
+public final class Elf32::SymbolObject superclass: ByteSerializableObject; definition: {
     public field name => Elf32::Word.
     public field value => Elf32::Addr.
     public field size => Elf32::Word.
@@ -214,7 +105,7 @@ public final class Elf32::Symbol superclass: ByteSerializableObject; definition:
     }.
 }.
 
-public final class Elf64::Symbol superclass: ByteSerializableObject; definition: {
+public final class Elf64::SymbolObject superclass: ByteSerializableObject; definition: {
     public field name => Elf64::Word.
     public field info => UInt8.
     public field other => UInt8.
@@ -231,7 +122,7 @@ public final class Elf64::Symbol superclass: ByteSerializableObject; definition:
     }.
 }.
 
-public final class Elf32::Rel superclass: ByteSerializableObject; definition: {
+public final class Elf32::RelObject superclass: ByteSerializableObject; definition: {
     public field offset => Elf32::Addr.
     public field info => Elf32::Word.
 
@@ -240,7 +131,7 @@ public final class Elf32::Rel superclass: ByteSerializableObject; definition: {
     }.
 }.
 
-public final class Elf64::Rel superclass: ByteSerializableObject; definition: {
+public final class Elf64::RelObject superclass: ByteSerializableObject; definition: {
     public field offset => Elf64::Addr.
     public field info => Elf64::Xword.
 
@@ -249,7 +140,7 @@ public final class Elf64::Rel superclass: ByteSerializableObject; definition: {
     }.
 }.
 
-public final class Elf32::Rela superclass: ByteSerializableObject; definition: {
+public final class Elf32::RelaObject superclass: ByteSerializableObject; definition: {
     public field offset => Elf32::Addr.
     public field info => Elf32::Word.
     public field addend => Elf32::Sword.
@@ -259,7 +150,7 @@ public final class Elf32::Rela superclass: ByteSerializableObject; definition: {
     }.
 }.
 
-public final class Elf64::Rela superclass: ByteSerializableObject; definition: {
+public final class Elf64::RelaObject superclass: ByteSerializableObject; definition: {
     public field offset => Elf64::Addr.
     public field info => Elf64::Xword.
     public field addend => Elf64::Sxword.
@@ -296,11 +187,11 @@ public final class Elf32::SymbolTable superclass: Object; definition: {
         privateSymbolDictionary := ObjectPointerDictionary new.
         publicSymbolDictionary := ObjectPointerDictionary new.
         sectionIndexTable := ObjectPointerDictionary new.
-        privateSymbols add: Elf32::Symbol new.
+        privateSymbols add: Elf32::SymbolObject new.
     }.
 
     public method addSection: (section: AsmObjectCodeSection) index: (sectionIndex: Size) ::=> Void := {
-        privateSymbols add: (Elf32::Symbol new
+        privateSymbols add: (Elf32::SymbolObject new
             sectionHeaderIndex: sectionIndex asUInt16;
             makeSectionSymbol;
             yourself).
@@ -310,7 +201,7 @@ public final class Elf32::SymbolTable superclass: Object; definition: {
     public method addSymbol: (symbol: AsmSymbol) ::=> Void := {
         symbol isPrivate ifTrue: (return: void).
 
-        let elfSymbol := Elf32::Symbol new
+        let elfSymbol := Elf32::SymbolObject new
             bind: (elfSymbolVisibilityMap at: symbol visibility) type: (elfSymbolTypeMap at: symbol type);
             value: symbol value asUInt32;
             size: symbol size asUInt32;
@@ -347,7 +238,7 @@ public final class Elf32::SymbolTable superclass: Object; definition: {
         := privateSymbols size + publicSymbols size.
 
     public method sectionSize => Size
-        := self totalSymbolCount * Elf32::Symbol validInstanceSize.
+        := self totalSymbolCount * Elf32::SymbolObject validInstanceSize.
 }.
 
 public final class Elf64::SymbolTable superclass: Object; definition: {
@@ -364,11 +255,11 @@ public final class Elf64::SymbolTable superclass: Object; definition: {
         privateSymbolDictionary := ObjectPointerDictionary new.
         publicSymbolDictionary := ObjectPointerDictionary new.
         sectionIndexTable := ObjectPointerDictionary new.
-        privateSymbols add: Elf64::Symbol new.
+        privateSymbols add: Elf64::SymbolObject new.
     }.
 
     public method addSection: (section: AsmObjectCodeSection) index: (sectionIndex: Size) ::=> Void := {
-        privateSymbols add: (Elf64::Symbol new
+        privateSymbols add: (Elf64::SymbolObject new
             sectionHeaderIndex: sectionIndex asUInt16;
             makeSectionSymbol;
             yourself).
@@ -377,7 +268,7 @@ public final class Elf64::SymbolTable superclass: Object; definition: {
 
     public method addSymbol: (symbol: AsmSymbol) ::=> Void := {
         symbol isPrivate ifTrue: (return: void).
-        let elfSymbol := Elf64::Symbol new
+        let elfSymbol := Elf64::SymbolObject new
             bind: (elfSymbolVisibilityMap at: symbol visibility) type: (elfSymbolTypeMap at: symbol type);
             value: symbol value asUInt64;
             size: symbol size asUInt64;
@@ -414,7 +305,7 @@ public final class Elf64::SymbolTable superclass: Object; definition: {
         := privateSymbols size + publicSymbols size.
 
     public method sectionSize => Size
-        := self totalSymbolCount * Elf64::Symbol validInstanceSize.
+        := self totalSymbolCount * Elf64::SymbolObject validInstanceSize.
 }.
 
 AsmObjectCodeSection extend: {
@@ -437,7 +328,7 @@ public final class AsmObjectElf32FileWriter superclass: AsmObjectFileWriter; def
     public override method encodeObjectCode: (objectCode: AsmObjectCode) ::=> ByteArray := {
         let compilationTarget := objectCode compilationTarget.
 
-        let header := Elf32::Header new
+        let header := Elf32::HeaderObject new
             type: Elf::Type::Rel;
             machine: compilationTarget elfMachine;
             flags: compilationTarget elfFlags;
@@ -457,12 +348,12 @@ public final class AsmObjectElf32FileWriter superclass: AsmObjectFileWriter; def
         ## Section headers with their corresponding data elements.
         let sectionHeaders := OrderedCollection new.
         let sectionDataElements := OrderedCollection new.
-        sectionHeaders add: Elf32::SectionHeader new. ## Null section
+        sectionHeaders add: Elf32::SectionHeaderObject new. ## Null section
         sectionDataElements add: nil.
 
         ## Emit the sections.
         objectCode sections do: {:(AsmObjectCodeSection)eachSection :: Void |
-            let sectionHeader := Elf32::SectionHeader new
+            let sectionHeader := Elf32::SectionHeaderObject new
                 name: (sectionNameStringTable addSymbol: eachSection name) asUInt32;
                 type: eachSection elfSectionType;
                 flags: eachSection elfSectionFlags;
@@ -495,12 +386,12 @@ public final class AsmObjectElf32FileWriter superclass: AsmObjectFileWriter; def
                             compilationTarget convertRelocationIntoElf32Rel: each withSymbolTable: symbolTable
                         }).
 
-                    let relSectionHeader := Elf32::SectionHeader new
+                    let relSectionHeader := Elf32::SectionHeaderObject new
                         name: (sectionNameStringTable addString: eachSection name asString -- ".rel") asUInt32;
                         type: Elf::SectionHeaderType::Rel;
-                        size: (relocations size * Elf32::Rel validInstanceSize) asUInt32;
+                        size: (relocations size * Elf32::RelObject validInstanceSize) asUInt32;
                         addrAlign: 1u32;
-                        entrySize: Elf32::Rel validInstanceSize asUInt32;
+                        entrySize: Elf32::RelObject validInstanceSize asUInt32;
                         info: sectionHeaderIndex asUInt32;
                         yourself.
 
@@ -515,12 +406,12 @@ public final class AsmObjectElf32FileWriter superclass: AsmObjectFileWriter; def
                             compilationTarget convertRelocationIntoElf32Rela: each withSymbolTable: symbolTable
                         }).
 
-                    let relaSectionHeader := Elf32::SectionHeader new
+                    let relaSectionHeader := Elf32::SectionHeaderObject new
                         name: (sectionNameStringTable addString: eachSection name asString -- ".rela") asUInt32;
                         type: Elf::SectionHeaderType::Rela;
-                        size: (relocations size * Elf32::Rela validInstanceSize) asUInt32;
+                        size: (relocations size * Elf32::RelaObject validInstanceSize) asUInt32;
                         addrAlign: 1u32;
-                        entrySize: Elf32::Rela validInstanceSize asUInt32;
+                        entrySize: Elf32::RelaObject validInstanceSize asUInt32;
                         info: sectionHeaderIndex asUInt32;
                         yourself.
 
@@ -532,7 +423,7 @@ public final class AsmObjectElf32FileWriter superclass: AsmObjectFileWriter; def
             }.
         }.
 
-        ## Symbol table.
+        ## SymbolObject table.
         {
             let tableLabel := ByteStreamEncodingLabel new.
             fileLayout
@@ -540,15 +431,15 @@ public final class AsmObjectElf32FileWriter superclass: AsmObjectFileWriter; def
                 addAll: symbolTable privateSymbols;
                 addAll: symbolTable publicSymbols.
             let symbolTableIndex := sectionHeaders size asUInt32.
-            relSectionHeaders do: {:(Elf32::SectionHeader)each :: Void |
+            relSectionHeaders do: {:(Elf32::SectionHeaderObject)each :: Void |
                 each link: symbolTableIndex 
             }.
-            sectionHeaders add: (Elf32::SectionHeader new
+            sectionHeaders add: (Elf32::SectionHeaderObject new
                 name: (sectionNameStringTable addString: ".symtab") asUInt32;
                 type: Elf::SectionHeaderType::Symtab;
                 size: symbolTable sectionSize asUInt32;
                 addrAlign: 1u32;
-                entrySize: Elf32::Symbol validInstanceSize asUInt32;
+                entrySize: Elf32::SymbolObject validInstanceSize asUInt32;
                 info: symbolTable privateSymbols size asUInt32;
                 link: sectionHeaders size asUInt32 + 1u32;
                 yourself).
@@ -562,7 +453,7 @@ public final class AsmObjectElf32FileWriter superclass: AsmObjectFileWriter; def
         ## String table.
         {
             stringTable finish.
-            sectionHeaders add: (Elf32::SectionHeader new
+            sectionHeaders add: (Elf32::SectionHeaderObject new
                 name: (sectionNameStringTable addString: ".strtab") asUInt32;
                 type: Elf::SectionHeaderType::Strtab;
                 size: stringTable size asUInt32;
@@ -574,7 +465,7 @@ public final class AsmObjectElf32FileWriter superclass: AsmObjectFileWriter; def
         ## Section name string table.
         {
             header sectionNameStringStringTableIndex: sectionHeaders size asUInt16.
-            let sectionNameStringTableHeader := Elf32::SectionHeader new
+            let sectionNameStringTableHeader := Elf32::SectionHeaderObject new
                 name: (sectionNameStringTable addString: ".shstrtab") asUInt32;
                 type: Elf::SectionHeaderType::Strtab;
                 addrAlign: 1u32;
@@ -610,7 +501,7 @@ public final class AsmObjectElf64FileWriter superclass: AsmObjectFileWriter; def
     public override method encodeObjectCode: (objectCode: AsmObjectCode) ::=> ByteArray := {
         let compilationTarget := objectCode compilationTarget.
 
-        let header := Elf64::Header new
+        let header := Elf64::HeaderObject new
             type: Elf::Type::Rel;
             machine: compilationTarget elfMachine;
             flags: compilationTarget elfFlags;
@@ -630,12 +521,12 @@ public final class AsmObjectElf64FileWriter superclass: AsmObjectFileWriter; def
         ## Section headers with their corresponding data elements.
         let sectionHeaders := OrderedCollection new.
         let sectionDataElements := OrderedCollection new.
-        sectionHeaders add: Elf64::SectionHeader new. ## Null section
+        sectionHeaders add: Elf64::SectionHeaderObject new. ## Null section
         sectionDataElements add: nil.
 
         ## Emit the sections.
         objectCode sections do: {:(AsmObjectCodeSection)eachSection :: Void |
-            let sectionHeader := Elf64::SectionHeader new
+            let sectionHeader := Elf64::SectionHeaderObject new
                 name: (sectionNameStringTable addSymbol: eachSection name) asUInt32;
                 type: eachSection elfSectionType;
                 flags: eachSection elfSectionFlags asUInt64;
@@ -671,12 +562,12 @@ public final class AsmObjectElf64FileWriter superclass: AsmObjectFileWriter; def
                             compilationTarget convertRelocationIntoElf64Rel: each withSymbolTable: symbolTable
                         }).
 
-                    let relSectionHeader := Elf64::SectionHeader new
+                    let relSectionHeader := Elf64::SectionHeaderObject new
                         name: (sectionNameStringTable addString: eachSection name asString -- ".rel") asUInt32;
                         type: Elf::SectionHeaderType::Rel;
-                        size: (relocations size * Elf64::Rel validInstanceSize) asUInt64;
+                        size: (relocations size * Elf64::RelObject validInstanceSize) asUInt64;
                         addrAlign: 1u64;
-                        entrySize: Elf64::Rel validInstanceSize asUInt64;
+                        entrySize: Elf64::RelObject validInstanceSize asUInt64;
                         info: sectionHeaderIndex asUInt32;
                         yourself.
 
@@ -691,12 +582,12 @@ public final class AsmObjectElf64FileWriter superclass: AsmObjectFileWriter; def
                             compilationTarget convertRelocationIntoElf64Rela: each withSymbolTable: symbolTable
                         }).
 
-                    let relaSectionHeader := Elf64::SectionHeader new
+                    let relaSectionHeader := Elf64::SectionHeaderObject new
                         name: (sectionNameStringTable addString: eachSection name asString -- ".rela") asUInt32;
                         type: Elf::SectionHeaderType::Rela;
-                        size: (relocations size * Elf64::Rela validInstanceSize) asUInt64;
+                        size: (relocations size * Elf64::RelaObject validInstanceSize) asUInt64;
                         addrAlign: 1u64;
-                        entrySize: Elf64::Rela validInstanceSize asUInt64;
+                        entrySize: Elf64::RelaObject validInstanceSize asUInt64;
                         info: sectionHeaderIndex asUInt32;
                         yourself.
 
@@ -711,7 +602,7 @@ public final class AsmObjectElf64FileWriter superclass: AsmObjectFileWriter; def
 
         ## No exec stack note.
         {
-            sectionHeaders add: (Elf64::SectionHeader new
+            sectionHeaders add: (Elf64::SectionHeaderObject new
                 name: (sectionNameStringTable addString: ".note.GNU-stack") asUInt32;
                 type: Elf::SectionHeaderType::Progbits;
                 addrAlign: 1u64;
@@ -719,7 +610,7 @@ public final class AsmObjectElf64FileWriter superclass: AsmObjectFileWriter; def
             sectionDataElements add: nil.
         }.
 
-        ## Symbol table.
+        ## SymbolObject table.
         {
             let tableLabel := ByteStreamEncodingLabel new.
             fileLayout
@@ -727,15 +618,15 @@ public final class AsmObjectElf64FileWriter superclass: AsmObjectFileWriter; def
                 addAll: symbolTable privateSymbols;
                 addAll: symbolTable publicSymbols.
             let symbolTableIndex := sectionHeaders size asUInt32.
-            relSectionHeaders do: {:(Elf64::SectionHeader)each :: Void |
+            relSectionHeaders do: {:(Elf64::SectionHeaderObject)each :: Void |
                 each link: symbolTableIndex 
             }.
-            sectionHeaders add: (Elf64::SectionHeader new
+            sectionHeaders add: (Elf64::SectionHeaderObject new
                 name: (sectionNameStringTable addString: ".symtab") asUInt32;
                 type: Elf::SectionHeaderType::Symtab;
                 size: symbolTable sectionSize asUInt64;
                 addrAlign: 1u64;
-                entrySize: Elf64::Symbol validInstanceSize asUInt64;
+                entrySize: Elf64::SymbolObject validInstanceSize asUInt64;
                 info: symbolTable privateSymbols size asUInt32;
                 link: sectionHeaders size asUInt32 + 1u32;
                 yourself).
@@ -749,7 +640,7 @@ public final class AsmObjectElf64FileWriter superclass: AsmObjectFileWriter; def
         ## String table.
         {
             stringTable finish.
-            sectionHeaders add: (Elf64::SectionHeader new
+            sectionHeaders add: (Elf64::SectionHeaderObject new
                 name: (sectionNameStringTable addString: ".strtab") asUInt32;
                 type: Elf::SectionHeaderType::Strtab;
                 size: stringTable size asUInt64;
@@ -761,7 +652,7 @@ public final class AsmObjectElf64FileWriter superclass: AsmObjectFileWriter; def
         ## Section name string table.
         {
             header sectionNameStringStringTableIndex: sectionHeaders size asUInt16.
-            let sectionNameStringTableHeader := Elf64::SectionHeader new
+            let sectionNameStringTableHeader := Elf64::SectionHeaderObject new
                 name: (sectionNameStringTable addString: ".shstrtab") asUInt32;
                 type: Elf::SectionHeaderType::Strtab;
                 addrAlign: 1u64;
@@ -825,15 +716,15 @@ AsmCompilationTarget extend: {
         self
     }.
 
-    public abstract method convertRelocationIntoElf32Rel: (relocation: AsmObjectCodeRelocation) withSymbolTable: (symbolTable: Elf32::SymbolTable) ::=> Elf32::Rel
+    public abstract method convertRelocationIntoElf32Rel: (relocation: AsmObjectCodeRelocation) withSymbolTable: (symbolTable: Elf32::SymbolTable) ::=> Elf32::RelObject
         := self subclassResponsibility.
 
-    public abstract method convertRelocationIntoElf32Rela: (relocation: AsmObjectCodeRelocation) withSymbolTable: (symbolTable: Elf32::SymbolTable) ::=> Elf32::Rela
+    public abstract method convertRelocationIntoElf32Rela: (relocation: AsmObjectCodeRelocation) withSymbolTable: (symbolTable: Elf32::SymbolTable) ::=> Elf32::RelaObject
         := self subclassResponsibility.
 
-    public abstract method convertRelocationIntoElf64Rel: (relocation: AsmObjectCodeRelocation) withSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::Rel
+    public abstract method convertRelocationIntoElf64Rel: (relocation: AsmObjectCodeRelocation) withSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::RelObject
         := self subclassResponsibility.
 
-    public abstract method convertRelocationIntoElf64Rela: (relocation: AsmObjectCodeRelocation) withSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::Rela
+    public abstract method convertRelocationIntoElf64Rela: (relocation: AsmObjectCodeRelocation) withSymbolTable: (symbolTable: Elf64::SymbolTable) ::=> Elf64::RelaObject
         := self subclassResponsibility.
 }.
