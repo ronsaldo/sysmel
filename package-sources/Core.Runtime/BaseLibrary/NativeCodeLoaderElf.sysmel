@@ -156,6 +156,36 @@ public class NativeCodeLoaderElf64Builder superclass: Object; definition: {
             addrAlign: nativeCodeSection alignment asUInt64.
     }.
 
+    public method addGotSection: (sectionData: Void pointer) size: (sectionSize: Size) alignment: (alignment: Size) ::=> Void := {
+        let sectionIndex := header sectionHeaderEntryNumber asSize.
+        self assert: sectionIndex < NativeCodeLoaderElfSectionCapacity.
+        header sectionHeaderEntryNumber: (sectionIndex + 1sz) asUInt16.
+
+        let sectionHeader := sectionHeaders[sectionIndex] address.
+        sectionHeader _
+            name: (self addString: ".got");
+            type: Elf::SectionHeaderType::Progbits;
+            flags: Elf::SectionHeaderFlag::Alloc asUInt64;
+            size: sectionSize asUInt64;
+            addr: (sectionData reinterpretCastTo: UIntPointer) asUInt64;
+            addrAlign: alignment asUInt64.
+    }.
+
+    public method addPltSection: (sectionData: Void pointer) size: (sectionSize: Size) alignment: (alignment: Size) ::=> Void := {
+        let sectionIndex := header sectionHeaderEntryNumber asSize.
+        self assert: sectionIndex < NativeCodeLoaderElfSectionCapacity.
+        header sectionHeaderEntryNumber: (sectionIndex + 1sz) asUInt16.
+
+        let sectionHeader := sectionHeaders[sectionIndex] address.
+        sectionHeader _
+            name: (self addString: ".plt");
+            type: Elf::SectionHeaderType::Progbits;
+            flags: (Elf::SectionHeaderFlag::Alloc | Elf::SectionHeaderFlag::ExecInstr) asUInt64;
+            size: sectionSize asUInt64;
+            addr: (sectionData reinterpretCastTo: UIntPointer) asUInt64;
+            addrAlign: alignment asUInt64
+    }.
+
     public method addNativeCodeSymbol: (nativeCodeSymbol: NativeCodeSymbol) sectionHeaderIndex: (sectionHeaderIndex: Elf64::Half)::=> Void := {
         let elfSymbolType mutable := Elf::SymbolTableType::Notype.
         let isLocal := nativeCodeSymbol isPrivate.

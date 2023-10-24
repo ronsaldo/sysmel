@@ -167,12 +167,14 @@ NativeCode definition: {
         }.
 
         ## Make the GOT and PLT tables.
+        let gotSectionSize := NativeCode::GotEntrySize * gotSymbolCount.
+        let gotTable mutable => UIntPointer pointer := nil.
+
         let pltSectionSize := NativeCode::X86_64::PltEntrySize*pltSymbolCount.
         let pltExecutablePointer mutable => Void pointer := nil.
 
         gotSymbolCount > 0sz ifTrue: {
-            let gotTable := (NativeCodeLoader::DataSegmentAllocator allocateWithSize: NativeCode::GotEntrySize alignment: NativeCode::GotEntryAlignment)
-                reinterpretCastTo: UIntPointer pointer.
+            gotTable := (NativeCodeLoader::DataSegmentAllocator allocateWithSize: gotSectionSize alignment: NativeCode::GotEntryAlignment) reinterpretCastTo: UIntPointer pointer.
             let gotTableDestinationIndex mutable := 0sz.
 
             let pltWritePointer mutable => Void pointer := nil.
@@ -309,9 +311,9 @@ NativeCode definition: {
         NativeCodeLoaderElf64Builder new
             begin;
             addNativeCode: self;
-            ##addNativeCodeSymbolTableOnly: self;
+            addGotSection: (gotTable reinterpretCastTo: Void pointer) size: gotSectionSize alignment: NativeCode::GotEntryAlignment;
+            addPltSection: pltExecutablePointer size: pltSectionSize alignment: NativeCode::X86_64::PltEntryAlignment;
             finish;
-            ##writeToFileNamed: programEntityRequestor programEntityQualifiedNameSymbol asString -- ".o";
             register
     }.
 }.
