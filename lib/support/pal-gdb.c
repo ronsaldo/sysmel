@@ -1,4 +1,5 @@
 #include "sysmel/pal.h"
+#include <stdio.h>
 
 #ifdef _MSC_VER
 #define SYSBVM_NOINLINE __declspec(noinline)
@@ -16,8 +17,18 @@ void SYSBVM_NOINLINE __jit_debug_register_code() {
 
 SYSMEL_PAL_EXTERN_C sysmel_pal_gdb_jit_descriptor_t __jit_debug_descriptor = { 1, 0, 0, 0 };
 
+SYSMEL_PAL_EXTERN_C void sysmel_pal_gdb_dumpObjectFile(sysmel_pal_gdb_jit_code_entry_t *entry, const char *filename)
+{
+    FILE *file = fopen(filename, "wb");
+    if(!file) return;
+
+    (void)fwrite(entry->symfile_addr, entry->symfile_size, 1, file);
+    fclose(file);
+}
+
 SYSMEL_PAL_EXTERN_C void sysmel_pal_gdb_registerObjectFile(sysmel_pal_gdb_jit_code_entry_t *entry)
 {
+    //sysmel_pal_gdb_dumpObjectFile(entry, "jit.o");
     entry->next_entry = __jit_debug_descriptor.first_entry;
     if(entry->next_entry)
         entry->next_entry = entry->next_entry->prev_entry;

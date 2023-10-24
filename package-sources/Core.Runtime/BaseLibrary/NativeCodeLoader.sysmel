@@ -308,9 +308,10 @@ NativeCode definition: {
 
         NativeCodeLoaderElf64Builder new
             begin;
-            addNativeCodeSymbolTableOnly: self;
+            addNativeCode: self;
+            ##addNativeCodeSymbolTableOnly: self;
             finish;
-            writeToFileNamed: programEntityRequestor programEntityQualifiedNameSymbol asString -- ".o";
+            ##writeToFileNamed: programEntityRequestor programEntityQualifiedNameSymbol asString -- ".o";
             register
     }.
 }.

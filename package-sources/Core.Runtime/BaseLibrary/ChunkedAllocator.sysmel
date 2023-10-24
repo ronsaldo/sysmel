@@ -41,7 +41,7 @@ public final struct ChunkedAllocator definition: {
 
         while: currentChunk isNotNil do: {
             (currentChunk _ remainingCapacityWithAlignment: alignment) <= alignedSize ifTrue: {
-                currentChunk
+                return: currentChunk
             }
         } continueWith: (currentChunk := currentChunk _ next).
 

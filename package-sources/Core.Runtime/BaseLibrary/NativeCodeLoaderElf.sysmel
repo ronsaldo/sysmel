@@ -163,7 +163,9 @@ public class NativeCodeLoaderElf64Builder superclass: Object; definition: {
 
         let elfSymbol mutable := Elf64::Symbol basicNew.
         elfSymbol
-            value: nativeCodeSymbol virtualAddress asUInt64;
+            value: (sectionHeaderIndex = Elf::SectionHeaderNumber::Abs
+                ifTrue: nativeCodeSymbol virtualAddress asUInt64
+                ifFalse: nativeCodeSymbol value asUInt64);
             size: nativeCodeSymbol size asUInt64;
             sectionHeaderIndex: sectionHeaderIndex.
 
@@ -283,8 +285,6 @@ public class NativeCodeLoaderElf64Builder superclass: Object; definition: {
         ## Write the section headers
         let sectionCount := header sectionHeaderEntryNumber asSize.
         sectionCount > 0sz ifTrue: {
-            memcpy(destinationPointer + header sectionHeaderOffset asIntPointer reinterpretCastTo: Void pointer, sectionHeaders address reinterpretCastTo: Void pointer, Elf64::SectionHeader valueSize * sectionCount).
-
             ## Write the sections.
             let i mutable := 0sz.
             while: (i < sectionCount) do: {
@@ -293,6 +293,14 @@ public class NativeCodeLoaderElf64Builder superclass: Object; definition: {
                     memcpy(destinationPointer + sectionHeader _ offset asIntPointer reinterpretCastTo: Void pointer, sectionHeader _ addr asUIntPointer reinterpretCastTo: Void pointer, sectionHeader _ size).
                 }
             } continueWith: (i := i + 1sz).
+
+            ## Fixup the virtual address of the metadata sections.
+            self shstrtab addr: ((destinationPointer + self shstrtab offset asIntPointer) reinterpretCastTo: UIntPointer) asUInt64.
+            self strtab addr: ((destinationPointer + self strtab offset asIntPointer) reinterpretCastTo: UIntPointer) asUInt64.
+            self symtab addr: ((destinationPointer + self symtab offset asIntPointer) reinterpretCastTo: UIntPointer) asUInt64.
+
+            ## Write the section headers.
+            memcpy(destinationPointer + header sectionHeaderOffset asIntPointer reinterpretCastTo: Void pointer, sectionHeaders address reinterpretCastTo: Void pointer, Elf64::SectionHeader valueSize * sectionCount).
         }.
     }.
 
@@ -304,7 +312,7 @@ public class NativeCodeLoaderElf64Builder superclass: Object; definition: {
     }.
 
     public method writeToFileNamed: (fileName: String) ::=> Void := {
-        ##printLine("Write jit file ", fileName).
-        ##IO::writeWholeFileNamedWithByteArray(fileName, objectFileData)
+        printLine("Write jit file ", fileName).
+        IO::writeWholeFileNamedWithByteArray(fileName, objectFileData)
     }.
 }.
