@@ -70,6 +70,10 @@ public global Elf::SectionHeaderFlag::InfoLink := 16r40 u32.
 public global Elf::SectionHeaderFlag::Group := 16r200 u32.
 public global Elf::SectionHeaderFlag::TLS := 16r400 u32.
 
+public global Elf::SectionHeaderNumber::Undef := 0 u16.
+public global Elf::SectionHeaderNumber::Abs := 16rfff1 u16.
+public global Elf::SectionHeaderNumber::Common := 16rfff2 u16.
+
 public global Elf::SymbolTableBind::Local := 0u8.
 public global Elf::SymbolTableBind::Global := 1u8.
 public global Elf::SymbolTableBind::Weak := 2u8.
@@ -139,6 +143,21 @@ public final struct Elf64::Header definition: {
     public field sectionHeaderEntrySize => Elf64::Half.
     public field sectionHeaderEntryNumber => Elf64::Half.
     public field sectionNameStringStringTableIndex => Elf64::Half.
+
+    public method setupFormatData => Void := {
+        ident
+            at: Elf::Ident::Magic0 put: 16r7f u8;
+            at: Elf::Ident::Magic1 put: 'E' asUInt8;
+            at: Elf::Ident::Magic2 put: 'L' asUInt8;
+            at: Elf::Ident::Magic3 put: 'F' asUInt8;
+            at: Elf::Ident::Class put: Elf::Ident::Class64;
+            at: Elf::Ident::Data put: Elf::Ident::Data2LSB;
+            at: Elf::Ident::Version put: Elf::Ident::CurrentVersion.
+        
+        version := Elf::CurrentVersion.
+        elfHeaderSize := Elf64::Header valueSize asUInt16.
+        sectionHeaderEntrySize := Elf64::SectionHeader valueSize asUInt16.
+    }
 }.
 
 public final struct Elf32::SectionHeader definition: {

@@ -1,0 +1,310 @@
+public global NativeCodeLoaderElfSectionCapacity := 32sz.
+
+public class NativeCodeLoaderSymbolFile superclass: Object; definition: {
+    public field previous => NativeCodeLoaderSymbolFile.
+    public field next => NativeCodeLoaderSymbolFile.
+    public field symbolFileData => ByteArray.
+    public field gdbJitEntry => GdbJitInterfaceEntry.
+
+    public method setupWithData: (newSymbolFileData: ByteArray) ::=> Void := {
+        symbolFileData := newSymbolFileData.
+        gdbJitEntry
+            symbolFileAddress: symbolFileData __rawContentsPointer__;
+            symbolFileSize: symbolFileData size asUInt64
+    }.
+
+    public method register => Void := {
+        self assert: previous isNil.
+        self assert: next isNil.
+
+        NativeCodeLoaderElf::Mutex lock.
+
+        previous := NativeCodeLoaderElf::Last.
+        NativeCodeLoaderElf::Last ifNotNil: {
+            NativeCodeLoaderElf::Last next: self.
+            NativeCodeLoaderElf::Last := self.
+        } ifNil: {
+            NativeCodeLoaderElf::First := NativeCodeLoaderElf::Last := self
+        }.
+
+        sysmel_pal_gdb_registerObjectFile(gdbJitEntry address).
+
+        NativeCodeLoaderElf::Mutex unlock.
+    }.
+}.
+
+## FIXME: Make these session local.
+public global NativeCodeLoaderElf::Mutex mutable := SysmelPAL::Mutex basicNew.
+public global NativeCodeLoaderElf::First mutable => NativeCodeLoaderSymbolFile := nil.
+public global NativeCodeLoaderElf::Last mutable => NativeCodeLoaderSymbolFile := nil.
+
+public class NativeCodeLoaderElf64Builder superclass: Object; definition: {
+    public field header => Elf64::Header.
+    public field sectionHeaders => Elf64::SectionHeader[NativeCodeLoaderElfSectionCapacity].
+
+    public field stringTableBuilder => StringStream.
+    public field stringTableData => String.
+
+    public field localSymbolCount => Size.
+    public field localSymbolTableBuilder => ByteStream.
+    public field nonLocalSymbolTableBuilder => ByteStream.
+    public field symbolTableData => ByteArray.
+
+    public field elfMetadataSectionCount => Size.
+    public field fileSize => Size.
+
+    public field objectFileData => ByteArray.
+
+    public inline method shstrtab => Elf64::SectionHeader ref
+        := sectionHeaders[1sz].
+
+    public inline method strtab => Elf64::SectionHeader ref
+        := sectionHeaders[2sz].
+
+    public inline method symtab => Elf64::SectionHeader ref
+        := sectionHeaders[3sz].
+
+    public method begin => Void := {
+        stringTableBuilder := StringStream new.
+        stringTableBuilder nextPut: 0c8.
+
+        localSymbolTableBuilder := ByteStream new.
+        nonLocalSymbolTableBuilder := ByteStream new.
+
+        elfMetadataSectionCount := 4sz.
+
+        header
+            setupFormatData;
+            type: Elf::Type::Rel;
+            machine: Elf::Machine::X86_64;
+            sectionHeaderEntryNumber: elfMetadataSectionCount asUInt16;
+            sectionNameStringStringTableIndex: 1u16.
+
+        self shstrtab
+            name: (self addString: ".shstrtab");
+            type: Elf::SectionHeaderType::Strtab;
+            addrAlign: 1u64.
+
+        self strtab
+            name: (self addString: ".strtab");
+            type: Elf::SectionHeaderType::Strtab;
+            addrAlign: 1u64.
+
+        self symtab
+            name: (self addString: ".symtab");
+            type: Elf::SectionHeaderType::Symtab;
+            addrAlign: 1u64;
+            entrySize: Elf64::Symbol valueSize asUInt64;
+            link: 2u32.
+
+        {
+            let nullSymbol mutable := Elf64::Symbol basicNew.
+            self addLocalSymbol: nullSymbol
+        }.
+        
+    }.
+
+    public method addString: (string: String) ::=> UInt32 := {
+        string isEmpty ifTrue: {
+            0u32
+        } ifFalse: {
+            let stringIndex := stringTableBuilder size.
+            stringTableBuilder string: string.
+            stringTableBuilder nextPut: 0c8.
+            stringIndex asUInt32
+        }
+    }.
+
+    public method addStringSymbol: (symbol: StringSymbol) ::=> UInt32 := {
+        symbol size = 0sz ifTrue: {
+            0u32
+        } ifFalse: {
+            let stringIndex := stringTableBuilder size.
+            stringTableBuilder string: symbol.
+            stringTableBuilder nextPut: 0c8.
+            stringIndex asUInt32
+        }
+    }.
+
+    public method addLocalSymbol: (symbol: Elf64::Symbol ref) ::=> Void := {
+        localSymbolCount := localSymbolCount + 1sz.
+        localSymbolTableBuilder nextPutFromPointer: (symbol address reinterpretCastTo: Void pointer) size: Elf64::Symbol valueSize
+    }.
+
+    public method addNonLocalSymbol: (symbol: Elf64::Symbol ref) ::=> Void := {
+        nonLocalSymbolTableBuilder nextPutFromPointer: (symbol address reinterpretCastTo: Void pointer) size: Elf64::Symbol valueSize
+    }.
+
+    public method addNativeCodeSection: (nativeCodeSection: NativeCodeSection) ::=> Void := {
+        let sectionIndex := header sectionHeaderEntryNumber asSize.
+        self assert: sectionIndex < NativeCodeLoaderElfSectionCapacity.
+        header sectionHeaderEntryNumber: (sectionIndex + 1sz) asUInt16.
+
+        let sectionFlags mutable := 0u32.
+        nativeCodeSection isReadable ifTrue: (sectionFlags := sectionFlags | Elf::SectionHeaderFlag::Alloc).
+        nativeCodeSection isWriteable ifTrue: (sectionFlags := sectionFlags | Elf::SectionHeaderFlag::Write).
+        nativeCodeSection isExecutable ifTrue: (sectionFlags := sectionFlags | Elf::SectionHeaderFlag::ExecInstr).
+        nativeCodeSection isTLS ifTrue: (sectionFlags := sectionFlags | Elf::SectionHeaderFlag::TLS).
+
+        let sectionHeader := sectionHeaders[sectionIndex] address.
+        sectionHeader _
+            name: (self addString: nativeCodeSection name asString);
+            type: Elf::SectionHeaderType::Progbits;
+            flags: sectionFlags asUInt64;
+            size: nativeCodeSection size asUInt64;
+            addr: nativeCodeSection virtualAddress asUInt64;
+            addrAlign: nativeCodeSection alignment asUInt64.
+    }.
+
+    public method addNativeCodeSymbol: (nativeCodeSymbol: NativeCodeSymbol) sectionHeaderIndex: (sectionHeaderIndex: Elf64::Half)::=> Void := {
+        let elfSymbolType mutable := Elf::SymbolTableType::Notype.
+        let isLocal := nativeCodeSymbol isPrivate.
+        let elfSymbolBind := isLocal ifTrue: Elf::SymbolTableBind::Local ifFalse: Elf::SymbolTableBind::Global.
+
+        let elfSymbol mutable := Elf64::Symbol basicNew.
+        elfSymbol
+            value: nativeCodeSymbol virtualAddress asUInt64;
+            size: nativeCodeSymbol size asUInt64;
+            sectionHeaderIndex: sectionHeaderIndex.
+
+        switch: nativeCodeSymbol type withCases: #{
+            NativeCodeSymbol::Type::Function : {
+                elfSymbolType := Elf::SymbolTableType::Func
+            }.
+            NativeCodeSymbol::Type::Variable : {
+                elfSymbolType := Elf::SymbolTableType::Object
+            }.
+            NativeCodeSymbol::Type::Section : {
+                elfSymbolType := Elf::SymbolTableType::Section
+            }.
+            _: {
+                return: void
+            }
+        }.
+        elfSymbol bind: elfSymbolBind type: elfSymbolType.
+
+        nativeCodeSymbol name ifNotNil: {
+            elfSymbol name: (self addString: nativeCodeSymbol name asString)
+        }.
+
+        isLocal ifTrue: {
+            self addLocalSymbol: elfSymbol
+        } ifFalse: {
+            self addNonLocalSymbol: elfSymbol
+        }
+    }.
+
+    public method addNativeCode: (nativeCode: NativeCode) ::=> Void := {
+        let baseSectionIndex := header sectionHeaderEntryNumber asSize.
+        nativeCode sections do: {:(NativeCodeSection)each :: Void |
+            self addNativeCodeSection: each
+        }.
+
+        nativeCode symbolTable symbols do: {:(NativeCodeSymbol)each :: Void |
+            let sectionIndex := nativeCode sections indexOf: each section.
+            sectionIndex < 0iptr ifTrue: {return: void}.
+
+            self addNativeCodeSymbol: each sectionHeaderIndex: (baseSectionIndex + sectionIndex asSize) asUInt16
+        }.
+    }.
+
+    public method addNativeCodeSymbolTableOnly: (nativeCode: NativeCode) ::=> Void := {
+        nativeCode symbolTable symbols do: {:(NativeCodeSymbol)each :: Void |
+            each section ifNil: {return: void}.
+            each type = NativeCodeSymbol::Type::Section ifTrue: {return: void}.
+
+            self addNativeCodeSymbol: each sectionHeaderIndex: Elf::SectionHeaderNumber::Abs
+        }.
+    }.
+
+    public method finish => Void := {
+        stringTableData := stringTableBuilder asString.
+        stringTableBuilder := nil.
+
+        symbolTableData := localSymbolTableBuilder asByteArray -- nonLocalSymbolTableBuilder asByteArray.
+        localSymbolTableBuilder := nil.
+        nonLocalSymbolTableBuilder := nil.
+
+        ## Header
+        let fileOffset mutable := 0sz.
+        fileOffset := fileOffset + Elf64::Header valueSize.
+
+        ## Section headers.
+        header sectionHeaderOffset: fileOffset asUInt64.
+        let sectionCount := header sectionHeaderEntryNumber asSize.
+        fileOffset := fileOffset + (Elf64::SectionHeader valueSize * sectionCount).
+
+        ## String table.
+        let stringTableSize := stringTableData size asUInt64.
+        let stringTableAddress := (stringTableData __rawContentsPointer__ reinterpretCastTo: UIntPointer) asUInt64.
+        self shstrtab
+            size: stringTableSize;
+            addr: stringTableAddress;
+            offset: fileOffset.
+
+        self strtab
+            size: stringTableSize;
+            addr: stringTableAddress;
+            offset: fileOffset.
+        
+        fileOffset := fileOffset + stringTableSize.
+
+        ## Symbol table.
+        self symtab
+            size: symbolTableData size asUInt64;
+            addr: (symbolTableData __rawContentsPointer__ reinterpretCastTo: UIntPointer) asUInt64;
+            offset: fileOffset;
+            info: localSymbolCount asUInt32.
+
+        fileOffset := fileOffset + symbolTableData size.
+
+        ## Non-metadata sections.
+        {
+            let i mutable := elfMetadataSectionCount.
+            while: (i < sectionCount) do: {
+                sectionHeaders[i] offset: fileOffset.
+                fileOffset := fileOffset + sectionHeaders[i] size
+            } continueWith: (i := i + 1sz)
+        }.
+
+        ## End of the dump file size.
+        fileSize := fileOffset.
+
+        self assembleObjectFile
+    }.
+
+    public method assembleObjectFile ::=> Void := {
+        objectFileData := ByteArray new: fileSize.
+        let destinationPointer := objectFileData __rawContentsBytePointer__.
+
+        ## Write the header.
+        memcpy(destinationPointer reinterpretCastTo: Void pointer, header address reinterpretCastTo: Void pointer, header elfHeaderSize asSize).
+
+        ## Write the section headers
+        let sectionCount := header sectionHeaderEntryNumber asSize.
+        sectionCount > 0sz ifTrue: {
+            memcpy(destinationPointer + header sectionHeaderOffset asIntPointer reinterpretCastTo: Void pointer, sectionHeaders address reinterpretCastTo: Void pointer, Elf64::SectionHeader valueSize * sectionCount).
+
+            ## Write the sections.
+            let i mutable := 0sz.
+            while: (i < sectionCount) do: {
+                let sectionHeader := sectionHeaders[i] address.
+                sectionHeader _ size > 0u64 ifTrue: {
+                    memcpy(destinationPointer + sectionHeader _ offset asIntPointer reinterpretCastTo: Void pointer, sectionHeader _ addr asUIntPointer reinterpretCastTo: Void pointer, sectionHeader _ size).
+                }
+            } continueWith: (i := i + 1sz).
+        }.
+    }.
+
+    public method register => NativeCodeLoaderSymbolFile := {
+        NativeCodeLoaderSymbolFile new
+            setupWithData: objectFileData;
+            register;
+            yourself
+    }.
+
+    public method writeToFileNamed: (fileName: String) ::=> Void := {
+        ##printLine("Write jit file ", fileName).
+        ##IO::writeWholeFileNamedWithByteArray(fileName, objectFileData)
+    }.
+}.

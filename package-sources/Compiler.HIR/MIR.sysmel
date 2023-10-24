@@ -2760,6 +2760,10 @@ HIRBitcastInstruction extend: {
         let valueType := resultValue type.
 
         valueType ~~ type ifTrue: {
+            valueType valueSize = self type valueSize ifFalse: {
+                error(self sourcePosition printString -- ": Invalid bitcast of differing sizes.").
+            }.
+
             self assert: valueType valueSize = self type valueSize.
             self assert: valueType isPrimitiveFloatType not && self type isPrimitiveFloatType not.
             type emitMirMove: resultValue withBlockBuilder: codegen blockBuilder.

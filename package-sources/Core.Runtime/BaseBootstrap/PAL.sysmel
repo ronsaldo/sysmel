@@ -48,6 +48,13 @@ public final struct SysmelPAL::Condition definition: {
     }.
 }.
 
+public struct GdbJitInterfaceEntry definition: {
+    public field next => GdbJitInterfaceEntry pointer.
+    public field previous => GdbJitInterfaceEntry pointer.
+    public field symbolFileAddress => Void const pointer.
+    public field symbolFileSize => UInt64.
+}.
+
 public global SysmelPAL::FileHandle := SysmelPAL::File pointer.
 
 public global SysmelPAL::FileOpenFlags::ReadOnly := 1u32 << 0u32.
@@ -119,3 +126,6 @@ public externC function sysmel_pal_openLibrary(nameSize: Size, name: Char8 const
 public externC function sysmel_pal_closeLibrary(handle: Void pointer) => Void.
 public externC function sysmel_pal_getLibrarySymbol(handle: Void pointer, nameSize: Size, name: Char8 const pointer, outSymbol: Void pointer ref) => Boolean.
 public externC function sysmel_pal_getApplicationSymbol(nameSize: Size, name: Char8 const pointer, outSymbol: Void pointer ref) => Boolean.
+
+public externC function sysmel_pal_gdb_registerObjectFile(entry: GdbJitInterfaceEntry pointer) => Void.
+public externC function sysmel_pal_gdb_unregisterObjectFile(entry: GdbJitInterfaceEntry pointer) => Void.

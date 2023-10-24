@@ -1,4 +1,5 @@
 #include "pal-common.c"
+#include "pal-gdb.c"
 
 #if defined(_WIN32)
 #include "pal-windows.c"

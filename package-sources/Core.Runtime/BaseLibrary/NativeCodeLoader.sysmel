@@ -90,7 +90,7 @@ public global NativeCode::GotEntrySize := UIntPointer valueSize.
 public global NativeCode::GotEntryAlignment := UIntPointer valueAlignment.
 
 NativeCode definition: {
-    public method installForExecution => Void := {
+    public method installForExecutionOfProgramEntity: (programEntityRequestor: ProgramEntity) ::=> Void := {
         sysmel_pal_supportsMemoryWithDualMappingForJIT() ifFalse: {
             return: void
         }.
@@ -305,9 +305,16 @@ NativeCode definition: {
                 nativeCodeDefinition definition checkedEntryPoint: checkedEntryPoint virtualAddress
             }.
         }.
+
+        NativeCodeLoaderElf64Builder new
+            begin;
+            addNativeCodeSymbolTableOnly: self;
+            finish;
+            writeToFileNamed: programEntityRequestor programEntityQualifiedNameSymbol asString -- ".o";
+            register
     }.
 }.
 
 FunctionNativeCodeDefinition withSelector: #installForExecution replaceMethod: {:(FunctionNativeCodeDefinition)self :: Void |
-    self nativeCode installForExecution
+    self nativeCode installForExecutionOfProgramEntity: self definition
 } withEagerAnalysis.

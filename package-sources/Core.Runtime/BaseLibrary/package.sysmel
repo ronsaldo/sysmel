@@ -51,6 +51,7 @@ loadSourceNamed: "NativeCodeSymbol.sysmel".
 loadSourceNamed: "NativeCodeSymbolTable.sysmel".
 loadSourceNamed: "ProgramEntity.sysmel".
 loadSourceNamed: "NativeCodeLoader.sysmel".
+loadSourceNamed: "NativeCodeLoaderElf.sysmel".
 loadSourceNamed: "ProgrammingLanguage.sysmel".
 loadSourceNamed: "Utility.sysmel".
 loadSourceNamed: "SourceCode.sysmel".

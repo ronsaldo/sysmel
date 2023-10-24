@@ -55,6 +55,15 @@ ByteStream definition: {
         }
     }.
 
+    public method nextPutFromPointer: (pointer: Void const pointer) size: (byteCount: Size) ::=> Void := {
+        self ensureCapacityFor: byteCount.
+
+        memcpy((self __slotNamedAt__: #storage) __rawContentsBytePointer__ + size asIntPointer reinterpretCastTo: Void pointer,
+            pointer,
+            byteCount).
+        size := size + byteCount
+    }.
+
     public method nextPutString: (string: String) ::=> Void := {
         let stringSize := string size.
         self ensureCapacityFor: stringSize.

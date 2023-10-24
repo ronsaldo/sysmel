@@ -40,6 +40,31 @@ typedef struct sysmel_pal_condition_s
     uint64_t reserved[8];
 } sysmel_pal_condition_t;
 
+typedef enum
+{
+    SYSMEL_PAL_GDB_JIT_NOACTION = 0,
+    SYSMEL_PAL_GDB_JIT_REGISTER_FN,
+    SYSMEL_PAL_GDB_JIT_UNREGISTER_FN
+} sysmel_pal_gdb_jit_actions_t;
+
+typedef struct sysmel_pal_gdb_jit_code_entry_s
+{
+    struct sysmel_pal_gdb_jit_code_entry_s *next_entry;
+    struct sysmel_pal_gdb_jit_code_entry_s *prev_entry;
+    const char *symfile_addr;
+    uint64_t symfile_size;
+} sysmel_pal_gdb_jit_code_entry_t;
+
+typedef struct sysmel_pal_gdb_jit_descriptor_s
+{
+    uint32_t version;
+    /* This type should be jit_actions_t, but we use uint32_t
+        to be explicit about the bitwidth.  */
+    uint32_t action_flag;
+    sysmel_pal_gdb_jit_code_entry_t *relevant_entry;
+    sysmel_pal_gdb_jit_code_entry_t *first_entry;
+} sysmel_pal_gdb_jit_descriptor_t;
+
 SYSMEL_PAL_EXTERN_C void sysmel_pal_abort(void);
 
 SYSMEL_PAL_EXTERN_C void* sysmel_pal_malloc(size_t size);
@@ -91,5 +116,8 @@ SYSMEL_PAL_EXTERN_C void* sysmel_pal_openLibrary(size_t nameSize, const char *na
 SYSMEL_PAL_EXTERN_C void sysmel_pal_closeLibrary(void *handle);
 SYSMEL_PAL_EXTERN_C bool sysmel_pal_getLibrarySymbol(void *handle, size_t nameSize, const char *name, void **outSymbol);
 SYSMEL_PAL_EXTERN_C bool sysmel_pal_getApplicationSymbol(size_t nameSize, const char *name, void **outSymbol);
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_gdb_registerObjectFile(sysmel_pal_gdb_jit_code_entry_t *entry);
+SYSMEL_PAL_EXTERN_C void sysmel_pal_gdb_unregisterObjectFile(sysmel_pal_gdb_jit_code_entry_t *entry);
 
 #endif //SYSMEL_PAL_H
