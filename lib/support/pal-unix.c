@@ -10,6 +10,8 @@
 #include <assert.h>
 #include <dlfcn.h>
 
+extern void __register_frame(const void*);
+
 SYSMEL_PAL_EXTERN_C sysmel_pal_filehandle_t sysmel_pal_getStdinFileHandle(void)
 {
     return (sysmel_pal_filehandle_t)(uintptr_t)STDIN_FILENO;
@@ -279,3 +281,37 @@ SYSMEL_PAL_EXTERN_C void sysmel_pal_flushInstructionCache(size_t size, void *poi
 {
     __builtin___clear_cache(pointer, (char*)pointer + size);
 }
+
+#ifdef __APPLE__
+SYSMEL_PAL_EXTERN_C bool sysmel_pal_eh_frame_shouldRegisterFDE(void)
+{
+    return true;
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_eh_frame_registerSection(void *section)
+{
+    (void)section;
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_eh_frame_registerFDE(void *fde)
+{
+    __register_frame(fde);
+}
+
+#else
+
+SYSMEL_PAL_EXTERN_C bool sysmel_pal_eh_frame_shouldRegisterFDE(void)
+{
+    return false;
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_eh_frame_registerSection(const void *section)
+{
+    __register_frame(section);
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_eh_frame_registerFDE(const void *fde)
+{
+    (void)fde;
+}
+#endif

@@ -1633,7 +1633,7 @@ public final class Dwarf::CallFrameInformationWriter superclass: Dwarf::SectionW
         self cfa::restoreRegister: (register dwarf::registerNumberForTarget: compilationTarget) asUInt64
     }.
 
-    public method saveFramePointer: (register: AsmRegister) ::=> Void := {
+    public method saveFramePointer: (register: AsmRegister) offset: (offset: Int64) ::=> Void := {
         self assert: hasFramePointerRegister not.
         self assert: isInPrologue.
 
@@ -1641,7 +1641,7 @@ public final class Dwarf::CallFrameInformationWriter superclass: Dwarf::SectionW
 
         hasFramePointerRegister := true.
         framePointerRegister := (register dwarf::registerNumberForTarget: compilationTarget) asUInt8.
-        stackFrameSizeAtFramePointer := stackFrameSize. 
+        stackFrameSizeAtFramePointer := stackFrameSize - (offset asUInt32 *pointerSize asUInt32) asUInt32. 
         self cfa::cfaInRegister: framePointerRegister asUInt64 withFactoredOffset: stackFrameSizeAtFramePointer
     }.
 
@@ -1651,7 +1651,7 @@ public final class Dwarf::CallFrameInformationWriter superclass: Dwarf::SectionW
         self assert: hasFramePointerRegister.
 
         hasFramePointerRegister := false.
-        stackFrameSize := stackFrameSizeAtFramePointer.
+        stackFrameSize := stackFrameSizeAtFramePointer - (offset asUInt32 *pointerSize asUInt32) asUInt32.
         self
             emitPCAddress;
             cfa::cfaInRegister: compilationTarget dwarf::stackPointerRegister asUInt64 withFactoredOffset: stackFrameSize
@@ -1707,7 +1707,7 @@ AsmCallFrameInformationPopRegisterInstruction extend: {
 
 AsmCallFrameInformationSaveFramePointerInstruction extend: {
     public override method dwarf::emitWith: (writer: Dwarf::CallFrameInformationWriter) ::=> Void := {
-        writer setPCAddress: address; saveFramePointer: register
+        writer setPCAddress: address; saveFramePointer: register offset: offset
     }
 }.
 

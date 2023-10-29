@@ -89,196 +89,268 @@ public global NativeCode::X86_64::PltEntryAlignment := 8sz.
 public global NativeCode::GotEntrySize := UIntPointer valueSize.
 public global NativeCode::GotEntryAlignment := UIntPointer valueAlignment.
 
-NativeCode definition: {
-    public method installForExecutionOfProgramEntity: (programEntityRequestor: ProgramEntity) ::=> Void := {
-        sysmel_pal_supportsMemoryWithDualMappingForJIT() ifFalse: {
+public final struct NativeCodeLoader definition: {
+    public field gotSymbolCount => Size.
+    public field gotSectionSize => Size.
+    public field gotTable => UIntPointer pointer.
+    public field gotTableDestinationIndex => Size.
+
+    public field pltSymbolCount => Size.
+    public field pltSectionSize => Size.
+    public field pltExecutablePointer => Void pointer.
+    public field pltWritePointer => Void pointer.
+    public field pltTableDestinationIndex => Size.
+
+    public method installSectionFirstPass: (eachSection: NativeCodeSection) ::=> Void := {
+        ## Write the section data onto memory.
+        eachSection isLoaded ifFalse: {
             return: void
         }.
 
-        ## Write the section data onto memory.
-        sections do: {:(NativeCodeSection)eachSection :: Void |
-            eachSection isLoaded ifFalse: {
-                return: void
-            }.
-
-            ## Allocate the segment memory.
-            let writePointer mutable => Void pointer := nil.
-            let executablePointer mutable => Void pointer := nil.
-            eachSection isExecutable || eachSection isWriteable not ifTrue: {
-                (NativeCodeLoader::TextSegmentAllocator allocateWithSize: eachSection size alignment: eachSection alignment writePointerResult: writePointer executablePointerResult: executablePointer) ifFalse: {
-                    error("Failed to allocate text segment memory.")
-                }
-            } ifFalse: {
-                executablePointer := writePointer := NativeCodeLoader::DataSegmentAllocator allocateWithSize: eachSection size alignment: eachSection alignment.
-                writePointer ifNil: {
-                    error("Failed to allocate data segment memory.")
-                }
-            }.
-
-            ## Write the segment content.
-            eachSection isNoBits || eachSection data isNil ifTrue: {
-                memset(writePointer, 0i8, eachSection size)
-            } ifFalse: {
-                memcpy(writePointer, eachSection data __rawContentsPointer__, eachSection size)
-            }.
-
-            eachSection
-                virtualAddress: (executablePointer reinterpretCastTo: UIntPointer);
-                writeableVirtualAddress: (writePointer reinterpretCastTo: UIntPointer).
-        }.
-
-        ## Solve the symbol virtual addresses.
-        let gotSymbolCount mutable := 0sz.
-        let pltSymbolCount mutable := 0sz.
-
-        symbolTable symbols do: {:(NativeCodeSymbol)eachSymbol :: Void |
-            eachSymbol section ifNil: {
-                switch: eachSymbol type withCases: #{
-                    NativeCodeSymbol::Type::GCPointerTable : {
-                        let rootPointer := GarbageCollector::allocateGCRootPointer().
-                        rootPointer store: eachSymbol objectValue.
-                        eachSymbol virtualAddress: (rootPointer reinterpretCastTo: UIntPointer).
-                        eachSymbol writeableVirtualAddress: (rootPointer reinterpretCastTo: UIntPointer).
-                    }.
-                    NativeCodeSymbol::Type::GCFatPointerTable : {
-                        error("TODO: Make GC fat pointer table entry symbol")
-                    }.
-                    _: {
-                        eachSymbol virtualAddress: eachSymbol value asUIntPointer.
-                        eachSymbol name ifNotNil: {
-                            eachSymbol name solveNativeCodeSymbolVirtualAddresses: eachSymbol
-                        }
-                    }
-                }.
-
-                eachSymbol type = NativeCodeSymbol::Type::TLS ifFalse: {
-                    gotSymbolCount := gotSymbolCount + 1sz.
-                    eachSymbol type = NativeCodeSymbol::Type::Function ifTrue: {
-                        pltSymbolCount := pltSymbolCount + 1sz
-                    }
-                }.
-            } ifNotNil: {
-                eachSymbol virtualAddress: eachSymbol section virtualAddress.
-                eachSymbol writeableVirtualAddress: eachSymbol section writeableVirtualAddress.
-            }.
-
-            eachSymbol virtualAddress: eachSymbol virtualAddress + eachSymbol value asUIntPointer.
-            eachSymbol writeableVirtualAddress: eachSymbol writeableVirtualAddress + eachSymbol value asUIntPointer.
-        }.
-
-        ## Make the GOT and PLT tables.
-        let gotSectionSize := NativeCode::GotEntrySize * gotSymbolCount.
-        let gotTable mutable => UIntPointer pointer := nil.
-
-        let pltSectionSize := NativeCode::X86_64::PltEntrySize*pltSymbolCount.
-        let pltExecutablePointer mutable => Void pointer := nil.
-
-        gotSymbolCount > 0sz ifTrue: {
-            gotTable := (NativeCodeLoader::DataSegmentAllocator allocateWithSize: gotSectionSize alignment: NativeCode::GotEntryAlignment) reinterpretCastTo: UIntPointer pointer.
-            let gotTableDestinationIndex mutable := 0sz.
-
-            let pltWritePointer mutable => Void pointer := nil.
-            (pltSymbolCount = 0sz) || (NativeCodeLoader::TextSegmentAllocator allocateWithSize: pltSectionSize alignment: NativeCode::X86_64::PltEntryAlignment writePointerResult: pltWritePointer executablePointerResult: pltExecutablePointer) ifFalse: {
+        ## Allocate the segment memory.
+        let writePointer mutable => Void pointer := nil.
+        let executablePointer mutable => Void pointer := nil.
+        eachSection isExecutable || eachSection isWriteable not ifTrue: {
+            (NativeCodeLoader::TextSegmentAllocator allocateWithSize: eachSection size alignment: eachSection alignment writePointerResult: writePointer executablePointerResult: executablePointer) ifFalse: {
                 error("Failed to allocate text segment memory.")
-            }.
-
-            let pltWriteTable := pltWritePointer reinterpretCastTo: UInt8 pointer.
-            let pltExecutableTable := pltExecutablePointer reinterpretCastTo: UInt8 pointer.
-            let pltTableDestinationIndex mutable := 0sz.
-
-            symbolTable symbols do: {:(NativeCodeSymbol)eachSymbol :: Void |
-                eachSymbol section ifNotNil: {return: void}.
-                eachSymbol type = NativeCodeSymbol::Type::TLS ifTrue: {return: void}.
-
-                self assert: gotTableDestinationIndex < gotSymbolCount.
-                self assert: eachSymbol section isNil.
-                let gotEntry := gotTable + gotTableDestinationIndex asIntPointer.
-                gotEntry store: eachSymbol virtualAddress.
-                eachSymbol gotVirtualAddress: (gotEntry reinterpretCastTo: UIntPointer).
-                ##printLine(eachSymbol, " ", NativeCodeSymbol::Type::NameTable at: eachSymbol type asSize, " gotVirtualAddress ", eachSymbol gotVirtualAddress).
-
-                eachSymbol type = NativeCodeSymbol::Type::Function ifTrue: {
-                    self assert: pltTableDestinationIndex < pltSymbolCount.
-
-                    let pltOffset := NativeCode::X86_64::PltEntrySize * pltTableDestinationIndex.
-                    let pltWriteEntry := pltWriteTable + pltOffset asIntPointer.
-                    let pltExecutableEntry := pltExecutableTable + pltOffset asIntPointer.
-
-                    memcpy(pltWriteEntry reinterpretCastTo: Void pointer, NativeCode::X86_64::PltEntryCode __rawContentsPointer__, NativeCode::X86_64::PltEntrySize).
-                    let pltRipOffset := pltExecutableEntry + NativeCode::X86_64::PltEntrySize asIntPointer reinterpretCastTo: UIntPointer.
-                    let pltGotOffset := eachSymbol gotVirtualAddress - pltRipOffset.
-
-                    ##printLine("pltGotOffset ", pltGotOffset asIntPointer).
-                    ((pltWriteEntry + (NativeCode::X86_64::PltEntrySize - 4sz) asIntPointer) reinterpretCastTo: Int32 pointer)
-                        store: pltGotOffset asInt32.
-                    eachSymbol pltVirtualAddress: (pltExecutableEntry reinterpretCastTo: UIntPointer).
-                    ##printLine(eachSymbol, " ", NativeCodeSymbol::Type::NameTable at: eachSymbol type asSize, " pltVirtualAddress ", eachSymbol pltVirtualAddress).
-
-                    pltTableDestinationIndex := pltTableDestinationIndex + 1sz
-                }.
-
-                gotTableDestinationIndex := gotTableDestinationIndex + 1sz
-            }.
-
-            self assert: gotTableDestinationIndex = gotSymbolCount.
-            self assert: pltTableDestinationIndex = pltSymbolCount.
-        }.
-
-        ## Apply the relocations.
-        sections do: {:(NativeCodeSection)eachSection :: Void |
-            eachSection relocations ifNil: {return: void}.
-
-            eachSection relocations decodedRelocationsDo: {:(UInt8)type :(UInt32)symbolIndex :(UInt32)offset :(Int64)addend :: Void |
-                let symbol := symbolTable atOrNil: symbolIndex.
-                symbol ifNil: {return: void}.
-
-                let relocationVirtualAddress := eachSection virtualAddress + offset asSize.
-                let relocationTargetAddress := eachSection writeableVirtualAddress + offset asSize.
-                switch: type withCases: #{
-                    NativeCodeRelocation::Type::Relative32 : {
-                        let value := symbol virtualAddress asIntPointer + addend asIntPointer - relocationVirtualAddress asIntPointer.
-                        ##printLine(relocationVirtualAddress, "-", symbol virtualAddress, " Relative32 ", symbol, " ", value).
-                        self assert: value asInt32 asIntPointer = value.
-                        (relocationTargetAddress reinterpretCastTo: Int32 pointer) store: value asInt32
-                    }.
-                    NativeCodeRelocation::Type::TPOffset32 : {
-                        let value := symbol virtualAddress asInt32 + addend asInt32.
-                        ##printLine(relocationVirtualAddress, "-", symbol virtualAddress, " TPOffset32 ", symbol, " ", value).
-                        (relocationTargetAddress reinterpretCastTo: Int32 pointer) store: value
-                    }.
-                    NativeCodeRelocation::Type::RelativePLT32 : {
-                        self assert: symbol pltVirtualAddress ~= 0 uptr.
-                        let value := symbol pltVirtualAddress asIntPointer + addend asIntPointer - relocationVirtualAddress asIntPointer.
-                        ##printLine(relocationVirtualAddress, "-", symbol pltVirtualAddress, " RelativePLT32 ", symbol, " ", value).
-                        self assert: value asInt32 asIntPointer = value.
-                        (relocationTargetAddress reinterpretCastTo: Int32 pointer) store: value asInt32
-                    }.
-                    NativeCodeRelocation::Type::RelativeGOT32 : {
-                        self assert: symbol gotVirtualAddress ~= 0 uptr.
-                        let value := symbol gotVirtualAddress asIntPointer + addend asIntPointer - relocationVirtualAddress asIntPointer.
-                        ##printLine(relocationVirtualAddress, "-", symbol gotVirtualAddress, " RelativeGOT32 ", symbol, " ", value).
-                        self assert: value asInt32 asIntPointer = value.
-                        (relocationTargetAddress reinterpretCastTo: Int32 pointer) store: value asInt32
-                    }.
-                    _: {
-                        error("Unsupported jit relocation of type " -- (NativeCodeRelocation::Type::NameTable at: type) asString).
-                    }
-                }
+            }
+        } ifFalse: {
+            executablePointer := writePointer := NativeCodeLoader::DataSegmentAllocator allocateWithSize: eachSection size alignment: eachSection alignment.
+            writePointer ifNil: {
+                error("Failed to allocate data segment memory.")
             }
         }.
 
-        ## Flush the instruction cache.
+        ## Write the segment content.
+        eachSection isNoBits || eachSection data isNil ifTrue: {
+            memset(writePointer, 0i8, eachSection size)
+        } ifFalse: {
+            memcpy(writePointer, eachSection data __rawContentsPointer__, eachSection size)
+        }.
+
+        eachSection
+            virtualAddress: (executablePointer reinterpretCastTo: UIntPointer);
+            writeableVirtualAddress: (writePointer reinterpretCastTo: UIntPointer).
+    }.
+
+    public method installSectionsFirstPass: (sections: SequenceableCollection) ::=> Void := {
+        ## Write the section data onto memory.
+        sections do: {:(NativeCodeSection)eachSection :: Void |
+            self installSectionFirstPass: eachSection
+        }.
+    }.
+
+    public method installSymbolFirstPass: (eachSymbol: NativeCodeSymbol) ::=> Void := {
+        eachSymbol section ifNil: {
+            switch: eachSymbol type withCases: #{
+                NativeCodeSymbol::Type::GCPointerTable : {
+                    let rootPointer := GarbageCollector::allocateGCRootPointer().
+                    rootPointer store: eachSymbol objectValue.
+                    eachSymbol virtualAddress: (rootPointer reinterpretCastTo: UIntPointer).
+                    eachSymbol writeableVirtualAddress: (rootPointer reinterpretCastTo: UIntPointer).
+                }.
+                NativeCodeSymbol::Type::GCFatPointerTable : {
+                    error("TODO: Make GC fat pointer table entry symbol")
+                }.
+                _: {
+                    eachSymbol virtualAddress: eachSymbol value asUIntPointer.
+                    eachSymbol name ifNotNil: {
+                        eachSymbol name solveNativeCodeSymbolVirtualAddresses: eachSymbol
+                    }
+                }
+            }.
+
+            eachSymbol type = NativeCodeSymbol::Type::TLS ifFalse: {
+                gotSymbolCount := gotSymbolCount + 1sz.
+                eachSymbol type = NativeCodeSymbol::Type::Function ifTrue: {
+                    pltSymbolCount := pltSymbolCount + 1sz
+                }
+            }.
+        } ifNotNil: {
+            eachSymbol virtualAddress: eachSymbol section virtualAddress.
+            eachSymbol writeableVirtualAddress: eachSymbol section writeableVirtualAddress.
+        }.
+
+        eachSymbol virtualAddress: eachSymbol virtualAddress + eachSymbol value asUIntPointer.
+        eachSymbol writeableVirtualAddress: eachSymbol writeableVirtualAddress + eachSymbol value asUIntPointer.
+    }.
+
+    public method installSymbolTableFirstPass: (symbolTable: NativeCodeSymbolTable) ::=> Void := {
+        ## Solve the symbol virtual addresses.
+        symbolTable symbols do: {:(NativeCodeSymbol)eachSymbol :: Void |
+            self installSymbolFirstPass: eachSymbol
+        }.
+    }.
+
+    public method installNativeCodeFirstPass: (nativeCode: NativeCode) ::=> Void := {
+        self installSectionsFirstPass: nativeCode sections.
+        self installSymbolTableFirstPass: nativeCode symbolTable.
+    }.
+
+    public method beginBuildingGotAndPLT ::=> Void := {
+        gotSectionSize := NativeCode::GotEntrySize * gotSymbolCount.
+        pltSectionSize := NativeCode::X86_64::PltEntrySize*pltSymbolCount.
+        gotSymbolCount = 0sz ifTrue: {return: void}.
+
+        gotTable := (NativeCodeLoader::DataSegmentAllocator allocateWithSize: gotSectionSize alignment: NativeCode::GotEntryAlignment) reinterpretCastTo: UIntPointer pointer.
+        let gotTableDestinationIndex mutable := 0sz.
+
+        (pltSymbolCount = 0sz) || (NativeCodeLoader::TextSegmentAllocator allocateWithSize: pltSectionSize alignment: NativeCode::X86_64::PltEntryAlignment writePointerResult: pltWritePointer executablePointerResult: pltExecutablePointer) ifFalse: {
+            error("Failed to allocate text segment memory.")
+        }.
+    }.
+
+    public method buildGotAndPLTForSymbolTable: (symbolTable: NativeCodeSymbolTable) ::=> Void := {
+        let pltWriteTable := pltWritePointer reinterpretCastTo: UInt8 pointer.
+        let pltExecutableTable := pltExecutablePointer reinterpretCastTo: UInt8 pointer.
+
+        symbolTable symbols do: {:(NativeCodeSymbol)eachSymbol :: Void |
+            eachSymbol section ifNotNil: {return: void}.
+            eachSymbol type = NativeCodeSymbol::Type::TLS ifTrue: {return: void}.
+
+            ##self assert: gotTableDestinationIndex < gotSymbolCount.
+            ##self assert: eachSymbol section isNil.
+            let gotEntry := gotTable + gotTableDestinationIndex asIntPointer.
+            gotEntry store: eachSymbol virtualAddress.
+            eachSymbol gotVirtualAddress: (gotEntry reinterpretCastTo: UIntPointer).
+            ##printLine(eachSymbol, " ", NativeCodeSymbol::Type::NameTable at: eachSymbol type asSize, " gotVirtualAddress ", eachSymbol gotVirtualAddress).
+
+            eachSymbol type = NativeCodeSymbol::Type::Function ifTrue: {
+                ##self assert: pltTableDestinationIndex < pltSymbolCount.
+
+                let pltOffset := NativeCode::X86_64::PltEntrySize * pltTableDestinationIndex.
+                let pltWriteEntry := pltWriteTable + pltOffset asIntPointer.
+                let pltExecutableEntry := pltExecutableTable + pltOffset asIntPointer.
+
+                memcpy(pltWriteEntry reinterpretCastTo: Void pointer, NativeCode::X86_64::PltEntryCode __rawContentsPointer__, NativeCode::X86_64::PltEntrySize).
+                let pltRipOffset := pltExecutableEntry + NativeCode::X86_64::PltEntrySize asIntPointer reinterpretCastTo: UIntPointer.
+                let pltGotOffset := eachSymbol gotVirtualAddress - pltRipOffset.
+
+                ##printLine("pltGotOffset ", pltGotOffset asIntPointer).
+                ((pltWriteEntry + (NativeCode::X86_64::PltEntrySize - 4sz) asIntPointer) reinterpretCastTo: Int32 pointer)
+                    store: pltGotOffset asInt32.
+                eachSymbol pltVirtualAddress: (pltExecutableEntry reinterpretCastTo: UIntPointer).
+                ##printLine(eachSymbol, " ", NativeCodeSymbol::Type::NameTable at: eachSymbol type asSize, " pltVirtualAddress ", eachSymbol pltVirtualAddress).
+
+                pltTableDestinationIndex := pltTableDestinationIndex + 1sz
+            }.
+
+            gotTableDestinationIndex := gotTableDestinationIndex + 1sz
+        }.
+    }.
+
+    public method finishBuildingGotAndPLT => Void := {
+        ##self assert: gotTableDestinationIndex = gotSymbolCount.
+        ##self assert: pltTableDestinationIndex = pltSymbolCount.
+    }.
+
+    public method installSectionRelocations: (eachSection: NativeCodeSection) ::=> Void := {
+        eachSection relocations ifNil: {return: void}.
+
+        eachSection relocations decodedRelocationsDo: {:(UInt8)type :(UInt32)symbolIndex :(UInt32)offset :(Int64)addend :: Void |
+            let symbol := eachSection symbolTable atOrNil: symbolIndex.
+            symbol ifNil: {return: void}.
+
+            let relocationVirtualAddress := eachSection virtualAddress + offset asSize.
+            let relocationTargetAddress := eachSection writeableVirtualAddress + offset asSize.
+            switch: type withCases: #{
+                NativeCodeRelocation::Type::Relative32 : {
+                    let value := symbol virtualAddress asIntPointer + addend asIntPointer - relocationVirtualAddress asIntPointer.
+                    ##printLine(relocationVirtualAddress, "-", symbol virtualAddress, " Relative32 ", symbol, " ", value).
+                    ##self assert: value asInt32 asIntPointer = value.
+                    (relocationTargetAddress reinterpretCastTo: Int32 pointer) store: value asInt32
+                }.
+                NativeCodeRelocation::Type::TPOffset32 : {
+                    let value := symbol virtualAddress asInt32 + addend asInt32.
+                    ##printLine(relocationVirtualAddress, "-", symbol virtualAddress, " TPOffset32 ", symbol, " ", value).
+                    (relocationTargetAddress reinterpretCastTo: Int32 pointer) store: value
+                }.
+                NativeCodeRelocation::Type::RelativePLT32 : {
+                    ##self assert: symbol pltVirtualAddress ~= 0 uptr.
+                    let value := symbol pltVirtualAddress asIntPointer + addend asIntPointer - relocationVirtualAddress asIntPointer.
+                    ##printLine(relocationVirtualAddress, "-", symbol pltVirtualAddress, " RelativePLT32 ", symbol, " ", value).
+                    ##self assert: value asInt32 asIntPointer = value.
+                    (relocationTargetAddress reinterpretCastTo: Int32 pointer) store: value asInt32
+                }.
+                NativeCodeRelocation::Type::RelativeGOT32 : {
+                    ##self assert: symbol gotVirtualAddress ~= 0 uptr.
+                    let value := symbol gotVirtualAddress asIntPointer + addend asIntPointer - relocationVirtualAddress asIntPointer.
+                    ##printLine(relocationVirtualAddress, "-", symbol gotVirtualAddress, " RelativeGOT32 ", symbol, " ", value).
+                    ##self assert: value asInt32 asIntPointer = value.
+                    (relocationTargetAddress reinterpretCastTo: Int32 pointer) store: value asInt32
+                }.
+                _: {
+                    error("Unsupported jit relocation of type " -- (NativeCodeRelocation::Type::NameTable at: type) asString).
+                }
+            }
+        }
+    }.
+
+    public method installSectionsRelocations: (sections: SequenceableCollection) ::=> Void := {
+        sections do: {:(NativeCodeSection)eachSection :: Void |
+            self installSectionRelocations: eachSection
+        }.
+    }.
+
+    public method installNativeCodeSecondPass: (nativeCode: NativeCode) ::=> Void := {
+        self installSectionsRelocations: nativeCode sections
+    }.
+
+    public method flushInstructionCaches => Void := {
         pltSectionSize > 0sz ifTrue: {
             sysmel_pal_flushInstructionCache(pltSectionSize, pltExecutablePointer).
         }.
+    }.
 
+    public method installNativeCode: (nativeCode: NativeCode) ::=> Void := {
+        self installNativeCodeFirstPass: nativeCode.
+
+        self beginBuildingGotAndPLT.
+        self buildGotAndPLTForSymbolTable: nativeCode symbolTable.
+        self finishBuildingGotAndPLT.
+
+        self installNativeCodeSecondPass: nativeCode.
+        self flushInstructionCaches.
+    }.
+
+    public method installNativeCode: (nativeCode: NativeCode) withDebugInfo: (debugInfoNativeCode: NativeCode) ::=> Void := {
+        self installNativeCodeFirstPass: nativeCode.
+        self installNativeCodeFirstPass: debugInfoNativeCode.
+
+        self beginBuildingGotAndPLT.
+        self buildGotAndPLTForSymbolTable: nativeCode symbolTable.
+        self buildGotAndPLTForSymbolTable: debugInfoNativeCode symbolTable.
+        self finishBuildingGotAndPLT.
+
+        self installNativeCodeSecondPass: nativeCode.
+        self installNativeCodeSecondPass: debugInfoNativeCode.
+        self flushInstructionCaches.
+    }.
+}.
+
+NativeCodeSection definition: {
+    public method installUnwindingInfo => Void := {
+        name == #".eh_frame" ifTrue: {
+            sysmel_pal_eh_frame_shouldRegisterFDE() ifTrue: {
+                ## TODO: register the individual FDEs.
+            } ifFalse: {
+                sysmel_pal_eh_frame_registerSection(virtualAddress reinterpretCastTo: Void const pointer)
+            }.
+        }
+    }
+}.
+
+NativeCode definition: {
+    public method flushExecutableSectionInstructionCaches => Void := {
         sections do: {:(NativeCodeSection)eachSection :: Void |
             eachSection isExecutable ifTrue: {
                 let executablePointer := eachSection virtualAddress reinterpretCastTo: Void pointer.
                 sysmel_pal_flushInstructionCache(eachSection size, executablePointer).
             }
         }.
+    }.
 
+    public method applyVirtualAddressesToDefinitions => Void := {
         ## Apply the virtual addresses.
         symbolValueBindingDefinitions do: {:(SymbolValueBindingNativeCodeDefinition)eachDefinition :: Void |
             eachDefinition binding ifNil: {return: void}.
@@ -307,12 +379,33 @@ NativeCode definition: {
                 nativeCodeDefinition definition checkedEntryPoint: checkedEntryPoint virtualAddress
             }.
         }.
+    }.
+
+    public method installUnwindingInfo => Void := {
+        sections do: {:(NativeCodeSection)eachSection :: Void |
+            eachSection installUnwindingInfo
+        }
+    }.
+
+    public method installForExecutionOfProgramEntity: (programEntityRequestor: ProgramEntity) ::=> Void := {
+        sysmel_pal_supportsMemoryWithDualMappingForJIT() ifFalse: {
+            return: void
+        }.
+
+        let debugInfoNativeCode := DwarfNativeCodeDebugInformationBuilder buildForJitNativeCode: self.
+        let loader mutable := NativeCodeLoader basicNew.
+        loader installNativeCode: self withDebugInfo: debugInfoNativeCode.
+
+        self applyVirtualAddressesToDefinitions.
+        self flushExecutableSectionInstructionCaches.
+        debugInfoNativeCode installUnwindingInfo.
 
         NativeCodeLoaderElf64Builder new
             begin;
             addNativeCode: self;
-            addGotSection: (gotTable reinterpretCastTo: Void pointer) size: gotSectionSize alignment: NativeCode::GotEntryAlignment;
-            addPltSection: pltExecutablePointer size: pltSectionSize alignment: NativeCode::X86_64::PltEntryAlignment;
+            addNativeCode: debugInfoNativeCode;
+            addGotSection: (loader gotTable reinterpretCastTo: Void pointer) size: loader gotSectionSize alignment: NativeCode::GotEntryAlignment;
+            addPltSection: loader pltExecutablePointer size: loader pltSectionSize alignment: NativeCode::X86_64::PltEntryAlignment;
             finish;
             register
     }.

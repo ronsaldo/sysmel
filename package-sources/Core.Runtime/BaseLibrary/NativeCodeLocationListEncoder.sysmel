@@ -1,0 +1,54 @@
+public final class NativeCodeLocationListEncoder superclass: Object; definition: {
+    private field out => ByteStream.
+
+    public override method initialize => Void := {
+        out := ByteStream new.
+    }.
+
+    public method beginWithIntervalStart: (startPC: UInt32) end: (endPC: UInt32) ::=> Void := {
+        self assert: startPC < 16rFFFF_FFFF u32.
+        out nextPutUInt8: NativeCodeLocationList::Opcode::BeginInterval; nextPutUInt32: startPC; nextPutUInt32: endPC
+    }.
+
+    public method beginWithoutInterval ::=> Void := {
+        out nextPutUInt8: NativeCodeLocationList::Opcode::BeginNoInterval
+    }.
+
+    public method operation: (operation: UInt8) operand: (operand: Int32) ::=> Void := {
+        operand = 0i32 ifTrue: {
+            out nextPutUInt8: operation.
+            return: void
+        }.
+
+        operand asInt8 asInt32 = operand ifTrue: {
+            out nextPutUInt8: operation | (NativeCodeLocationList::OpcodeOperandSize::Size1 << 6u8); nextPutInt8: operand asInt8.
+            return: void
+        }.
+
+        operand asInt16 asInt32 = operand ifTrue: {
+            out nextPutUInt8: operation | (NativeCodeLocationList::OpcodeOperandSize::Size2 << 6u8); nextPutInt16: operand asInt16.
+            return: void
+        }.
+
+        out nextPutUInt8: operation | (NativeCodeLocationList::OpcodeOperandSize::Size4 << 6u8); nextPutInt32: operand
+    }.
+
+    public method register: (register: Int32) ::=> Void
+        := self operation: NativeCodeLocationList::Opcode::Register operand: register.
+
+    public method frameOffset: (offset: Int32) ::=> Void
+        := self operation: NativeCodeLocationList::Opcode::FrameOffset operand: offset.
+
+    public method captureVectorOffset: (offset: Int32) ::=> Void
+        := self operation: NativeCodeLocationList::Opcode::CaptureVectorOffset operand: offset.
+
+    public method finish => NativeCodeLocationList := {
+        out size = 0sz ifTrue: {
+            return: nil
+        }.
+
+        let result => AnyValue := out asByteArray.
+        (RawTuple::type:)(result, NativeCodeLocationList).
+        result
+    }.
+}.

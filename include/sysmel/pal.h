@@ -120,4 +120,8 @@ SYSMEL_PAL_EXTERN_C bool sysmel_pal_getApplicationSymbol(size_t nameSize, const 
 SYSMEL_PAL_EXTERN_C void sysmel_pal_gdb_registerObjectFile(sysmel_pal_gdb_jit_code_entry_t *entry);
 SYSMEL_PAL_EXTERN_C void sysmel_pal_gdb_unregisterObjectFile(sysmel_pal_gdb_jit_code_entry_t *entry);
 
+SYSMEL_PAL_EXTERN_C bool sysmel_pal_eh_frame_shouldRegisterFDE(void);
+SYSMEL_PAL_EXTERN_C void sysmel_pal_eh_frame_registerSection(const void *section);
+SYSMEL_PAL_EXTERN_C void sysmel_pal_eh_frame_registerFDE(const void *fde);
+
 #endif //SYSMEL_PAL_H

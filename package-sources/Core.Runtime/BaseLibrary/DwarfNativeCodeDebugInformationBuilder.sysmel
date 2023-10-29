@@ -1,0 +1,49 @@
+public class DwarfNativeCodeDebugInformationBuilder superclass: Object; definition: {
+    public field version => UInt8.
+    public field isForJIT => Boolean.
+    public field pointerSize => Size.
+    public field dwarfRegisterMap => DwarfRegisterMap.
+    public field builder => NativeCodeBuilder.
+
+    __Meta__ definition: {
+        public method buildForJitNativeCode: (jitNativeCode: NativeCode) ::=> NativeCode
+            := self new buildForJitNativeCode: jitNativeCode
+    }.
+
+    public method buildForJitNativeCode: (jitNativeCode: NativeCode) ::=> NativeCode := {
+        isForJIT := true.
+        version := 5u8.
+        pointerSize := UIntPointer valueSize.
+        builder := NativeCodeBuilder new.
+        dwarfRegisterMap := DwarfRegisterMap forCurrentPlatform.
+        self buildCallFrameInformationFor: jitNativeCode.
+        self buildLineInformationFor: jitNativeCode.
+        builder finish
+    }.
+
+    public method buildCallFrameInformationFor: (nativeCode: NativeCode) ::=> Void := {
+        (nativeCode sections anySatisfy: {:(NativeCodeSection)eachSection :: Boolean | eachSection callFrameInformations isNotEmpty }) ifFalse: {
+            return: void
+        }.
+
+        DwarfCallFrameInformationBuilder new
+            pointerSize: pointerSize;
+            codeAlignmentFactor: 1u32;
+            dataAlignmentFactor: pointerSize asInt32 negated;
+            returnAddressRegister: dwarfRegisterMap returnAddressRegister;
+            returnPointerIsPassedViaStack: dwarfRegisterMap returnPointerIsPassedViaStack;
+            dwarfRegisterMap: dwarfRegisterMap;
+            isForJIT: isForJIT;
+            setupForEhFrame;
+            targetSection: builder ehFrameSection;
+            buildFor: nativeCode
+    }.
+
+
+    public method buildLineInformationFor: (nativeCode: NativeCode) ::=> Void := {
+        (nativeCode sections anySatisfy: {:(NativeCodeSection)eachSection :: Boolean | eachSection debugSourcePositions isNotNil}) ifFalse: {
+            return: void
+        }.
+
+    }.
+}.

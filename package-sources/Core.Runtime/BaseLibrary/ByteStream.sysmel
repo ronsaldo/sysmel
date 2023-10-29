@@ -92,4 +92,47 @@ ByteStream definition: {
 
     public method asSymbol => StringSymbol
         := self asString asSymbol.
+
+    public method nextPutPadding: (paddingSize: Size) with: (paddingByte: UInt8) ::=> Void := {
+        self ensureCapacityFor: paddingSize.
+
+        let i mutable := 0sz.
+        while: (i < paddingSize) do: {
+            storage uint8At: size put: paddingByte.
+            size := size + 1sz
+        } continueWith: (i := i + 1sz).
+    }.
+
+    public method nextPutPaddingForAlignment: (alignment: Size) with: (paddingByte: UInt8) ::=> Void := {
+        let alignedSize := size alignedTo: alignment.
+        self nextPutPadding: alignedSize - size with: paddingByte
+    }.
+
+    public method nextPutUleb128: (value: UInt64) ::=> Void := {
+        let currentValue mutable := value.
+        do: {
+            let byte := (currentValue & 127u64) asUInt8.
+            currentValue := currentValue >> 7u64.
+            self nextPutUInt8: byte | (currentValue ~= 0u64 ifTrue: 128u8 ifFalse: 0u8)
+        } while: (currentValue ~= 0u64)
+    }.
+
+    public method nextPutSleb128: (value: Int64) ::=> Void := {
+        let more mutable := true.
+
+        let currentValue mutable := value.
+        while: more do: {
+            let byte mutable := (currentValue & 127i64) asInt8.
+            currentValue := currentValue >> 7i64.
+            
+            let byteHasSign := (byte & 16r40 i8) ~= 0i8.
+            ((currentValue = 0i64) && byteHasSign not) || (currentValue == -1i64 && byteHasSign) ifTrue: {
+                more := false
+            } ifFalse: {
+                byte := byte | 16r80 i8.
+            }.
+
+            self nextPutUInt8: byte asUInt8
+        }.
+    }.
 }.

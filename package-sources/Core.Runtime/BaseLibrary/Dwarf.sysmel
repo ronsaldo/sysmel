@@ -498,6 +498,22 @@
     (DW_RLE_base_address  5)
     (DW_RLE_start_end  6)
     (DW_RLE_start_length  7)
+
+    (DW_EH_PE_absptr 16r00)
+    (DW_EH_PE_uleb128 16r01)
+    (DW_EH_PE_udata2 16r02)
+    (DW_EH_PE_udata4 16r03)
+    (DW_EH_PE_udata8 16r04)
+    (DW_EH_PE_sleb128 16r09)
+    (DW_EH_PE_sdata2 16r0A)
+    (DW_EH_PE_sdata4 16r0B)
+    (DW_EH_PE_sdata8 16r0C)
+
+    (DW_EH_PE_pcrel 16r10)
+    (DW_EH_PE_textrel 16r20)
+    (DW_EH_PE_datarel 16r30)
+    (DW_EH_PE_funcrel 16r40)
+    (DW_EH_PE_aligned 16r50)
 ) do: {:(Array)constantDescription |
     let name := constantDescription first.
     let value := constantDescription second i32.

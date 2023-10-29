@@ -33,7 +33,16 @@ loadSourceNamed: "CurrentImageVirtualTableSetSource.sysmel".
 
 loadSourceNamed: "ByteStream.sysmel".
 loadSourceNamed: "Exception.sysmel".
+loadSourceNamed: "NativeCodeRelocation.sysmel".
+loadSourceNamed: "NativeCodeRelocationEncoder.sysmel".
+loadSourceNamed: "NativeCodeSymbolTableBuilder.sysmel".
+loadSourceNamed: "NativeCodeSectionBuilder.sysmel".
+loadSourceNamed: "NativeCodeBuilder.sysmel".
 loadSourceNamed: "Dwarf.sysmel".
+loadSourceNamed: "DwarfRegisterMap.sysmel".
+loadSourceNamed: "DwarfCallFrameInformationBuilder.sysmel".
+loadSourceNamed: "DwarfLineInformationBuilder.sysmel".
+loadSourceNamed: "DwarfNativeCodeDebugInformationBuilder.sysmel".
 loadSourceNamed: "Elf.sysmel".
 loadSourceNamed: "IO.sysmel".
 loadSourceNamed: "FileSystem.sysmel".
@@ -44,8 +53,9 @@ loadSourceNamed: "OrderedOffsetTable.sysmel".
 loadSourceNamed: "OrderedOffsetTableBuilder.sysmel".
 loadSourceNamed: "NativeCode.sysmel".
 loadSourceNamed: "NativeCodeCallFrameInformation.sysmel".
+loadSourceNamed: "NativeCodeCallFrameInformationEncoder.sysmel".
 loadSourceNamed: "NativeCodeLocationList.sysmel".
-loadSourceNamed: "NativeCodeRelocation.sysmel".
+loadSourceNamed: "NativeCodeLocationListEncoder.sysmel".
 loadSourceNamed: "NativeCodeSection.sysmel".
 loadSourceNamed: "NativeCodeSymbol.sysmel".
 loadSourceNamed: "NativeCodeSymbolTable.sysmel".

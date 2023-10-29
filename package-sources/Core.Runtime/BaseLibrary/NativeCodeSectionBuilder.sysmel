@@ -1,0 +1,78 @@
+public final class NativeCodeSectionBuilder superclass: Object; definition: {
+    public field section => NativeCodeSection.
+    public field relocations => NativeCodeRelocationEncoder.
+    public field symbolTableBuilder => NativeCodeSymbolTableBuilder.
+    public field byteStream => ByteStream.
+
+    public override method initialize => Void := {
+        section := NativeCodeSection new.
+        section alignment: 1sz.
+
+        relocations := NativeCodeRelocationEncoder new.
+        byteStream := ByteStream new.
+    }.
+
+    public inline method name: (name: Symbol) ::=> Void := {
+        section name: name
+    }.
+
+    public inline method flags: (flags: UInt32) ::=> Void := {
+        section flags: flags
+    }.
+
+    public method finish => NativeCodeSection
+        := section
+            data: byteStream asByteArray;
+            size: byteStream size;
+            relocations: relocations finish;
+            yourself.
+
+    public method size ::=> Size
+        := byteStream size.
+
+    public method align: (alignment: Size) ::=> Void := {
+        byteStream nextPutPaddingForAlignment: alignment with: 0u8.
+        section alignment: (section alignment max: alignment).
+    }.
+
+    public method uint8: (value: UInt8) ::=> Void
+        := byteStream nextPutUInt8: value.
+
+    public method int8: (value: Int8) ::=> Void
+        := byteStream nextPutInt8: value.
+
+    public method uint16: (value: UInt16) ::=> Void
+        := byteStream nextPutUInt16: value.
+
+    public method int16: (value: Int16) ::=> Void
+        := byteStream nextPutInt16: value.
+
+    public method uint32: (value: UInt32) ::=> Void
+        := byteStream nextPutUInt32: value.
+
+    public method uint32At: (offset: Size) put: (value: UInt32) ::=> Void
+        := byteStream storage uint32At: offset put: value.
+
+    public method int32: (value: Int32) ::=> Void
+        := byteStream nextPutInt32: value.
+
+    public method uint64: (value: UInt64) ::=> Void
+        := byteStream nextPutUInt64: value.
+
+    public method int64: (value: Int64) ::=> Void
+        := byteStream nextPutInt64: value.
+
+    public method uleb128: (value: UIntPointer) ::=> Void
+        := byteStream nextPutUleb128: value.
+
+    public method sleb128: (value: IntPointer) ::=> Void
+        := byteStream nextPutSleb128: value.
+
+    public method cstring: (value: String) ::=> Void
+        := byteStream string: value; nextPutUInt8: 0u8.
+
+    public method relativeInt32IntoSection: (targetSection: NativeCodeSection) addend: (addend: Int32) ::=> Void := {
+        relocations type: NativeCodeRelocation::Type::Relative32 symbolIndex: (symbolTableBuilder getOrCreateSymbolForSection: targetSection) offset: byteStream size asUInt32 addend32: addend.
+        self int32: 0i32
+    }.
+}.

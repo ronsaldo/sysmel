@@ -1,0 +1,281 @@
+public class DwarfCallFrameInformationBuilder superclass: Object; definition: {
+    public field targetSection => NativeCodeSectionBuilder.
+    public field isEhFrame => Boolean.
+    public field isForJIT => Boolean.
+    public field cieOffset => Size.
+    public field pointerSize => Size.
+    public field codeAlignmentFactor => UInt32.
+    public field dataAlignmentFactor => Int32.
+    public field dwarfRegisterMap => DwarfRegisterMap.
+    public field returnAddressRegister => UInt32.
+    public field returnPointerIsPassedViaStack => Boolean.
+    public field version => UInt8.
+
+    private field lastEmittedPC => UInt32.
+    private field currentPC => UInt32.
+    private field isInPrologue => Boolean.
+    private field isInEpilogue => Boolean.
+
+    private field hasFramePointerRegister => Boolean.
+    private field framePointerRegister => UInt8.
+    private field stackFrameSizeAtFramePointer => UInt32.
+    private field stackFrameSize => UInt32.
+
+    private field storedHasFramePointerRegister => Boolean.
+    private field storedFramePointerRegister => UInt8.
+    private field storedStackFrameSizeAtFramePointer => UInt32.
+    private field storedStackFrameSize => UInt32.
+
+    public override method initialize => Void := {
+        version := 5u8.
+    }.
+
+    public method setupForEhFrame => Void := {
+        isEhFrame := true.
+    }.
+
+    public method emitCIE => Void := {
+        cieOffset := targetSection size.
+        isEhFrame ifTrue: {
+             targetSection
+                uint32: 0u32; ## CIE length.
+                uint32: 0u32; ## CIE id.
+                uint8: 1u8; ## CIE version.
+                cstring: "zR";
+                uleb128: codeAlignmentFactor asUIntPointer;
+                sleb128: dataAlignmentFactor asIntPointer;
+                uleb128: returnAddressRegister asUIntPointer;
+                uleb128: 1uptr;
+                uint8: (Dwarf::DW_EH_PE_pcrel | Dwarf::DW_EH_PE_sdata4) asUInt8
+        } ifFalse: {
+            self error: "TODO: emit debug_frame cie"
+        }.
+
+        returnPointerIsPassedViaStack ifTrue: {
+            self
+                cfa::cfaInRegister: dwarfRegisterMap stackPointerRegister withFactoredOffset: 1sz;
+                cfa::registerValue: dwarfRegisterMap returnAddressRegister atOffset: 1sz.
+        }.
+
+        targetSection align: pointerSize.
+        let cieSize := targetSection size - cieOffset - 4sz.
+        targetSection uint32At: cieOffset put: cieSize asUInt32.
+    }.
+
+    public method emitFDEFor: (callFrameInformation: NativeCodeCallFrameInformation) section: (cfiSourceSection: NativeCodeSection) ::=> Void := {
+        let fdeOffset := targetSection size.
+
+        isEhFrame ifTrue: {
+            targetSection
+                uint32: 0u32; ## FDE length.
+                int32: targetSection size asInt32 - cieOffset asInt32;
+                relativeInt32IntoSection: cfiSourceSection addend: callFrameInformation startAddress asInt32;
+                uint32: callFrameInformation addressRange;
+                uleb128: 0sz
+        } ifFalse: {
+            self error: "TODO: emit debug_frame fde"
+        }.
+
+        lastEmittedPC := currentPC := callFrameInformation startAddress.
+        isInPrologue := true.
+        isInEpilogue := false.
+
+        hasFramePointerRegister := false.
+        framePointerRegister := 0u8.
+        stackFrameSizeAtFramePointer := 0u32.
+        stackFrameSize := returnPointerIsPassedViaStack ifTrue: 1u32 ifFalse: 0u32.
+
+        storedHasFramePointerRegister := hasFramePointerRegister.
+        storedFramePointerRegister := framePointerRegister.
+        storedStackFrameSizeAtFramePointer := stackFrameSizeAtFramePointer.
+        storedStackFrameSize := stackFrameSize.
+
+
+        ## Emit the CFI instructions.
+        callFrameInformation decodedInstructionsDo: {:(UInt8)opcode :(UInt8)register :(Int32)operand :: Void |
+            switch: opcode withCases: #{
+            NativeCodeCallFrameInformation::Opcode::AdvancePC : {
+                currentPC := currentPC + operand asUInt32
+            }.
+            NativeCodeCallFrameInformation::Opcode::EndPrologue : {
+                self endPrologue
+            }.
+            NativeCodeCallFrameInformation::Opcode::BeginEpilogue : {
+                self beginEpilogue
+            }.
+            NativeCodeCallFrameInformation::Opcode::EndEpilogue : {
+                self endEpilogue
+            }.
+            NativeCodeCallFrameInformation::Opcode::PushRegister : {
+                self pushRegister: register
+            }.
+            NativeCodeCallFrameInformation::Opcode::PopRegister : {
+                self popRegister: register
+            }.
+            NativeCodeCallFrameInformation::Opcode::RestoreFramePointer : {
+                self restoreFramePointer: register offset: operand
+            }.
+            NativeCodeCallFrameInformation::Opcode::SaveFramePointer : {
+                self saveFramePointer: register offset: operand
+            }.
+            NativeCodeCallFrameInformation::Opcode::StackSizeAdvance : {
+                self stackSizeAdvance: operand
+            }.
+            _: {self error: "Unsupported cfi opcode " -- opcode asString}
+            }
+        }.
+
+        ## Finish the FDE.
+        targetSection align: pointerSize.
+        let fdeSize := targetSection size - fdeOffset - 4sz.
+        targetSection uint32At: fdeOffset put: fdeSize asUInt32.
+    }.
+
+    public method cfa::cfaInRegister: (register: UInt32) withOffset: (offset: Size) ::=> Void := {
+        targetSection uint8: Dwarf::DW_OP_CFA_def_cfa asUInt8; uleb128: register asUIntPointer; uleb128: offset.
+    }.
+
+    public method cfa::cfaInRegister: (register: UInt32) withFactoredOffset: (offset: Size) ::=> Void := {
+        self cfa::cfaInRegister: register withOffset: offset * pointerSize
+    }.
+
+    public method cfa::registerValue: (register: UInt32) atOffset: (offset: Size) ::=> Void := {
+        register <= 63u32 ifTrue: {
+            targetSection uint8: (Dwarf::DW_OP_CFA_offset asUInt8 << 6u8) | register asUInt8; uleb128: offset
+        } ifFalse: {
+            targetSection uint8: Dwarf::DW_OP_CFA_offset_extended asUInt8; uleb128: register asUIntPointer; uleb128: offset
+        }
+    }.
+
+    public method cfa::restoreRegister: (register: UInt32) ::=> Void := {
+        register <= 63u32 ifTrue: {
+            targetSection uint8: (Dwarf::DW_OP_CFA_restore asUInt8 << 6u8) | register asUInt8
+        } ifFalse: {
+            targetSection uint8: Dwarf::DW_OP_CFA_restore_extended asUInt8; uleb128: register asUIntPointer
+        }
+    }.
+
+    public method emitPCAddress => Void := {
+        let advance := currentPC - lastEmittedPC.
+        advance ~= 0u32 ifTrue: {
+            let advanceFactor := advance / codeAlignmentFactor.
+            (0u32 <= advanceFactor) && (advanceFactor <= 63u32) ifTrue: {
+                targetSection uint8: (Dwarf::DW_OP_CFA_advance_loc asUInt8 << 6u8) | advanceFactor asUInt8.
+            } ifFalse: {
+                advanceFactor <= 16rFF u32 ifTrue: {
+                    targetSection uint8: Dwarf::DW_OP_CFA_advance_loc1 asUInt8; uint8: advanceFactor asUInt8
+                } ifFalse: {
+                    advanceFactor <= 16rFFFF u32 ifTrue: {
+                        targetSection uint8: Dwarf::DW_OP_CFA_advance_loc2 asUInt8; uint16: advanceFactor asUInt16
+                    } ifFalse: {
+                        targetSection uint8: Dwarf::DW_OP_CFA_advance_loc4 asUInt8; uint32: advanceFactor asUInt32
+                    }
+                }
+            }.
+
+            lastEmittedPC := currentPC.
+        }.
+    }.
+    
+    public method endPrologue ::=> Void := {
+        self assert: isInPrologue.
+        isInPrologue := false.
+    }.
+
+    public method beginEpilogue ::=> Void := {
+        self assert: isInEpilogue not.
+        isInEpilogue := true.
+        self emitPCAddress.
+        targetSection uint8: Dwarf::DW_OP_CFA_remember_state asUInt8.
+
+        storedHasFramePointerRegister := hasFramePointerRegister.
+        storedFramePointerRegister := framePointerRegister.
+        storedStackFrameSizeAtFramePointer := stackFrameSizeAtFramePointer.
+        storedStackFrameSize := stackFrameSize.
+    }.
+
+    public method endEpilogue ::=> Void := {
+        self assert: isInEpilogue.
+        isInEpilogue := false.
+        self emitPCAddress.
+        targetSection uint8: Dwarf::DW_OP_CFA_restore_state asUInt8.
+
+        hasFramePointerRegister := storedHasFramePointerRegister.
+        framePointerRegister := storedFramePointerRegister.
+        stackFrameSizeAtFramePointer := storedStackFrameSizeAtFramePointer.
+        stackFrameSize := storedStackFrameSize.
+    }.
+
+    public method pushRegister: (register: UInt8) ::=> Void := {
+        stackFrameSize := stackFrameSize + 1u32.
+        self emitPCAddress.
+        hasFramePointerRegister ifFalse: {
+            self cfa::cfaInRegister: dwarfRegisterMap stackPointerRegister withFactoredOffset: stackFrameSize asSize
+        }.
+        
+        self cfa::registerValue: (dwarfRegisterMap nativeCodeDebugRegisterToDwarf: register asInt32) atOffset: stackFrameSize asSize
+    }.
+
+    public method popRegister: (register: UInt8) ::=> Void := {
+        self assert: isInPrologue not. 
+        stackFrameSize := stackFrameSize - 1u32.
+        self emitPCAddress.
+        self cfa::restoreRegister: (dwarfRegisterMap nativeCodeDebugRegisterToDwarf: register asInt32).
+
+        hasFramePointerRegister ifFalse: {
+            self cfa::cfaInRegister: dwarfRegisterMap stackPointerRegister withFactoredOffset: stackFrameSize asSize
+        }.
+    }.
+
+    public method saveFramePointer: (register: UInt8) offset: (offset: Int32) ::=> Void := {
+        self assert: hasFramePointerRegister not.
+        self assert: isInPrologue.
+
+        self emitPCAddress.
+
+        hasFramePointerRegister := true.
+        framePointerRegister := (dwarfRegisterMap nativeCodeDebugRegisterToDwarf: register asInt32) asUInt8.
+        stackFrameSizeAtFramePointer := stackFrameSize - (offset asUInt32 *pointerSize asUInt32) asUInt32.
+        self cfa::cfaInRegister: framePointerRegister asUInt32 withFactoredOffset: stackFrameSizeAtFramePointer asSize
+    }.
+
+    public method restoreFramePointer: (register: UInt8) offset: (offset: Int32) ::=> Void := {
+        self assert: isInPrologue not.
+        self assert: isInEpilogue.
+        self assert: hasFramePointerRegister.
+
+        hasFramePointerRegister := false.
+        stackFrameSize := stackFrameSizeAtFramePointer - (offset asUInt32 *pointerSize asUInt32) asUInt32.
+        self
+            emitPCAddress;
+            cfa::cfaInRegister: dwarfRegisterMap stackPointerRegister withFactoredOffset: stackFrameSize asSize
+    }.
+
+    public method stackSizeAdvance: (increment: Int32) ::=> Void := {
+        isInPrologue ifFalse: {return: void}.
+
+        increment ~= 0i32 ifTrue: {
+            stackFrameSize := (stackFrameSize asInt32 + increment / dataAlignmentFactor abs) asUInt32.
+            hasFramePointerRegister ifFalse: {
+                self emitPCAddress.
+                self cfa::cfaInRegister: dwarfRegisterMap stackPointerRegister withFactoredOffset: stackFrameSize asSize
+            }.
+        }
+    }.
+
+    public method buildFor: (nativeCode: NativeCode) ::=> Void := {
+        self emitCIE.
+
+        ## Emit a FDE for each CFI.
+        nativeCode sections do: {:(NativeCodeSection)eachSection :: Void |
+            eachSection callFrameInformations do: {:(NativeCodeCallFrameInformation)eachCFI :: Void |
+                self emitFDEFor: eachCFI section: eachSection
+            }
+        }.
+
+        ## Null entry to mark the end.
+        isForJIT ifTrue: {
+            targetSection uint32: 0u32.
+        }.
+    }.
+}.

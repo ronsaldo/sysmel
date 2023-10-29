@@ -4,6 +4,7 @@ public global NativeCodeSection::Flags::Readable := 1u32 << 2u32.
 public global NativeCodeSection::Flags::Loaded := 1u32 << 3u32.
 public global NativeCodeSection::Flags::NoBits := 1u32 << 4u32.
 public global NativeCodeSection::Flags::Tls := 1u32 << 5u32.
+public global NativeCodeSection::Flags::Debugging := 1u32 << 6u32.
 
 NativeCodeSection definition: {
     public override method printOn: (stream: Stream) ::=> Void := {
