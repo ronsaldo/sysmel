@@ -282,24 +282,6 @@ SYSMEL_PAL_EXTERN_C void sysmel_pal_flushInstructionCache(size_t size, void *poi
     __builtin___clear_cache(pointer, (char*)pointer + size);
 }
 
-#ifdef __APPLE__
-SYSMEL_PAL_EXTERN_C bool sysmel_pal_eh_frame_shouldRegisterFDE(void)
-{
-    return true;
-}
-
-SYSMEL_PAL_EXTERN_C void sysmel_pal_eh_frame_registerSection(void *section)
-{
-    (void)section;
-}
-
-SYSMEL_PAL_EXTERN_C void sysmel_pal_eh_frame_registerFDE(void *fde)
-{
-    __register_frame(fde);
-}
-
-#else
-
 SYSMEL_PAL_EXTERN_C bool sysmel_pal_eh_frame_shouldRegisterFDE(void)
 {
     return false;
@@ -307,11 +289,18 @@ SYSMEL_PAL_EXTERN_C bool sysmel_pal_eh_frame_shouldRegisterFDE(void)
 
 SYSMEL_PAL_EXTERN_C void sysmel_pal_eh_frame_registerSection(const void *section)
 {
-    __register_frame(section);
-}
+#ifdef __APPLE__
+    uint32_t *position = (uint32_t*)section;
+    while(*position)
+    {
+        uint32_t length = position[0];
+        uint32_t cieId = position[1];
+        if(cieId)
+            __register_frame(position);
 
-SYSMEL_PAL_EXTERN_C void sysmel_pal_eh_frame_registerFDE(const void *fde)
-{
-    (void)fde;
-}
+        position = (uint8_t*)position + 4 + length;
+    }
+#else
+    __register_frame(section);
 #endif
+}

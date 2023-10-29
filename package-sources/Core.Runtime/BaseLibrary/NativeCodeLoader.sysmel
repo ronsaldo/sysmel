@@ -331,11 +331,7 @@ public final struct NativeCodeLoader definition: {
 NativeCodeSection definition: {
     public method installUnwindingInfo => Void := {
         name == #".eh_frame" ifTrue: {
-            sysmel_pal_eh_frame_shouldRegisterFDE() ifTrue: {
-                ## TODO: register the individual FDEs.
-            } ifFalse: {
-                sysmel_pal_eh_frame_registerSection(virtualAddress reinterpretCastTo: Void const pointer)
-            }.
+            sysmel_pal_eh_frame_registerSection(virtualAddress reinterpretCastTo: Void const pointer)
         }
     }
 }.

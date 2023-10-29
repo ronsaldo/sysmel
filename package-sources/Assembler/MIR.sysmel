@@ -205,6 +205,10 @@ public final class MIRModuleAsmCodeGenerator superclass: MIRAsmCodeGenerator; de
                 targetModule debugInformationGenerator: generator.
                 generator generateDebugInformationForModule: targetModule
             }.
+            asmTarget unwindInformationGenerator ifNotNil: {:(AsmObjectUnwindInformationGenerator class)generatorClass :: Void |
+                let generator := generatorClass new.
+                targetModule unwindInformationGenerator: generator.
+            }.
         }.
         
         usePerObjectSymbolsInsteadOfHeap ifFalse: {

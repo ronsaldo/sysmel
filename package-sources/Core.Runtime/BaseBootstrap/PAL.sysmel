@@ -130,6 +130,4 @@ public externC function sysmel_pal_getApplicationSymbol(nameSize: Size, name: Ch
 public externC function sysmel_pal_gdb_registerObjectFile(entry: GdbJitInterfaceEntry pointer) => Void.
 public externC function sysmel_pal_gdb_unregisterObjectFile(entry: GdbJitInterfaceEntry pointer) => Void.
 
-public externC function sysmel_pal_eh_frame_shouldRegisterFDE() => Boolean.
 public externC function sysmel_pal_eh_frame_registerSection(section: Void const pointer) => Void.
-public externC function sysmel_pal_eh_frame_registerFDE(fde: Void const pointer) => Void.

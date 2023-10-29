@@ -1902,6 +1902,7 @@ public final class AsmProgramEntity superclass: AsmObjectCodeProgramEntity; defi
     public field isDebuggingInformation => Boolean.
 
     public field debugInformationGenerator => AsmObjectDebugInformationGenerator.
+    public field unwindInformationGenerator => AsmObjectUnwindInformationGenerator.
     
     public override method initialize => Void := {
         streams := OrderedCollection new.
@@ -2121,9 +2122,17 @@ public final class AsmProgramEntity superclass: AsmObjectCodeProgramEntity; defi
                 debugInformationGenerator generateDebugLineInformationForModule: self objectCodeBuilder: objectCodeBuilder
             } printTimeToRunInMillisecondsWithTitle: "Debug line information generation".
             
+            unwindInformationGenerator ifNil: {
+                {|
+                    debugInformationGenerator generateCallFrameInformationForModule: self objectCodeBuilder: objectCodeBuilder
+                } printTimeToRunInMillisecondsWithTitle: "Debug call frame information generation".
+            }.
+        }.
+
+        unwindInformationGenerator ifNotNil: {
             {|
-                debugInformationGenerator generateCallFrameInformationForModule: self objectCodeBuilder: objectCodeBuilder
-            } printTimeToRunInMillisecondsWithTitle: "Debug call frame information generation".
+                unwindInformationGenerator generateUnwindingInformationForModule: self objectCodeBuilder: objectCodeBuilder
+            } printTimeToRunInMillisecondsWithTitle: "Unwind information generation".
         }.
 
         objectCodeBuilder finish
@@ -2228,6 +2237,11 @@ AsmObjectDebugInformationGenerator extend: {
         := self subclassResponsibility.
 
     public abstract method generateDebugInformationForModule: (module: AsmProgramEntity) sourceObjectCode: (sourceObjectCode: AsmObjectCode) ::=> Void
+        := self subclassResponsibility.
+}.
+
+AsmObjectUnwindInformationGenerator extend: {
+    public abstract method generateUnwindingInformationForModule: (module: AsmProgramEntity) objectCodeBuilder: (objectCodeBuilder: AsmObjectCodeBuilder) ::=> Void
         := self subclassResponsibility.
 }.
 

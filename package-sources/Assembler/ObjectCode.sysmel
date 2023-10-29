@@ -5,6 +5,7 @@ public final class AsmObjectCodeWriteStream superclass: AsmObjectCodeStream.
 public abstract class AsmObjectCodeRelocation superclass: Object.
 public abstract class AsmObjectFileWriter superclass: Object.
 public abstract class AsmObjectDebugInformationGenerator superclass: Object.
+public abstract class AsmObjectUnwindInformationGenerator superclass: Object.
 public final class AsmSymbol superclass: Object.
 public class AsmInstructionOperand superclass: Object.
 public class AsmRegister superclass: AsmInstructionOperand.
@@ -16,6 +17,7 @@ public abstract class AsmCompilationTarget superclass: Object; definition: {
     public field executable => Boolean.
     public field objectFileWriter => AsmObjectFileWriter.
     public field debugInformationGenerator => AsmObjectDebugInformationGenerator class.
+    public field unwindInformationGenerator => AsmObjectUnwindInformationGenerator class.
 
     public virtual method hasPositionIndependentCode => Boolean
         := false.

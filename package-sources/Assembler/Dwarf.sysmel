@@ -563,6 +563,14 @@ Dwarf::DebugInfoEntry extend: {
 }.
 
 AsmStreamBuilder extend: {
+    public method ehFrameSection ::=> AsmSectionDirective
+        := self addElement: (AsmSectionDirective new
+            name: #".eh_frame";
+            machoSectionName: #__eh_frame;
+            machoSegmentName: #__TEXT;
+            readable: true;
+            yourself).
+
     public method dwarf::debugFrameSection ::=> AsmSectionDirective
         := self addElement: (AsmSectionDirective new
             name: #".debug_frame";
@@ -1348,6 +1356,7 @@ public final class Dwarf::CallFrameInformationWriter superclass: Dwarf::SectionW
     public field dataAlignmentFactor => Int64.
     public field returnAddressRegister => UInt8.
 
+    private field cieOffset => Size.
     private field cieIsEmitted => Boolean.
     private field cfiRelocations => OrderedCollection.
     private field targetSectionSymbol => AsmSymbol.
@@ -1426,18 +1435,30 @@ public final class Dwarf::CallFrameInformationWriter superclass: Dwarf::SectionW
 
         cieIsEmitted := true.
 
+        cieOffset := out size.
         relocationBaseOffset := out size + self initialLengthSize.
         let cieBytes := self makeBytesDuring: {:: Void |
-            self
-                dwarfPointerWord: -1u64; ## CIE_id
-                byte: cieVersion; ## CIE version;
-                cstring: ""; ## Augmentation;
-                byte: self pointerSize asUInt8; ## addressSize
-                byte: 0u8; ## segment size
-                uleb128: codeAlignmentFactor asUInt64;
-                sleb128: dataAlignmentFactor asInt64 negated;
-                uleb128: returnAddressRegister asUInt64.
-
+            isEHFrame ifTrue: {
+                self
+                    dwarfPointerWord: 0u64; ## CIE_id
+                    byte: 1u8; ## CIE version;
+                    cstring: "zR"; ## Augmentation;
+                    uleb128: codeAlignmentFactor asUInt64;
+                    sleb128: dataAlignmentFactor asInt64 negated;
+                    uleb128: returnAddressRegister asUInt64;
+                    uleb128: 1uptr;
+                    byte: (Dwarf::DW_EH_PE_pcrel | Dwarf::DW_EH_PE_sdata4) asUInt8
+            } ifFalse: {
+                self
+                    dwarfPointerWord: -1u64; ## CIE_id
+                    byte: cieVersion; ## CIE version;
+                    cstring: ""; ## Augmentation;
+                    byte: self pointerSize asUInt8; ## addressSize
+                    byte: 0u8; ## segment size
+                    uleb128: codeAlignmentFactor asUInt64;
+                    sleb128: dataAlignmentFactor asInt64 negated;
+                    uleb128: returnAddressRegister asUInt64.
+            }.
             self
                 cfa::cfaInRegister: compilationTarget dwarf::stackPointerRegister asUInt64 withFactoredOffset: 1u32;
                 cfa::registerValue: compilationTarget dwarf::returnAddressRegister asUInt64 atOffset: 1u32.
@@ -1454,10 +1475,18 @@ public final class Dwarf::CallFrameInformationWriter superclass: Dwarf::SectionW
 
         relocationBaseOffset := out size + self initialLengthSize.
         let fdeBytes := self makeBytesDuring: {:: Void |
-            self
-                sectionRelativeDwarfPointer: targetSectionSymbol offset: 0i64; ## CIE
-                pointer: sectionSymbol offset: frameDescription startOffset asInt64;
-                pointerWord: (frameDescription endOffset - frameDescription startOffset) asUInt64.
+            isEHFrame ifTrue: {
+                self
+                    dword: (relocationBaseOffset - cieOffset) asUInt32;
+                    relativePointer32: sectionSymbol offset: frameDescription startOffset asInt32;
+                    dword: (frameDescription endOffset - frameDescription startOffset) asUInt32;
+                    uleb128: 0u64.
+            } ifFalse: {
+                self
+                    sectionRelativeDwarfPointer: targetSectionSymbol offset: 0i64; ## CIE
+                    pointer: sectionSymbol offset: frameDescription startOffset asInt64;
+                    pointerWord: (frameDescription endOffset - frameDescription startOffset) asUInt64.
+            }.
 
             self emitFrameDescriptionInstructions: frameDescription.
 
@@ -1502,6 +1531,15 @@ public final class Dwarf::CallFrameInformationWriter superclass: Dwarf::SectionW
                 yourself).
             self qword: 0u64
         }
+    }.
+
+    public method relativePointer32: (address: AsmSymbol) offset: (offset: Int32) ::=> Void := {
+        cfiRelocations add: (AsmObjectCodeRelocationRelativeInt32 new
+            symbol: address;
+            offset: relocationBaseOffset + out size;
+            addend: offset;
+            yourself).
+        self dword: 0u32
     }.
 
     private field lastEmittedPC => UInt64.
@@ -1852,8 +1890,28 @@ public final class Dwarf::ObjectDebugInformationGenerator superclass: AsmObjectD
         debugInfoWriter
             sourceObjectCode: sourceObjectCode;
             lineWriter: lineWriter;
-            generateCFI: true;
+            generateCFI: false;
             writeCompilationUnit: compileUnit toProgramEntity: debugInfoProgramEntity pointerSize: module compilationTarget pointerSize.
+
+        Dwarf::CallFrameInformationWriter new
+            dwarfSize: 4sz;
+            isEHFrame: true;
+            compilationTarget: debugInfoProgramEntity compilationTarget;
+            writeCallFrameInformationForSections: sourceObjectCode sections ontoStreamBuilder: (debugInfoProgramEntity newStreamBuilder ehFrameSection; yourself) pointerSize: module compilationTarget pointerSize
+    }.
+}.
+
+public final class Dwarf::ObjectUnwindInformationGenerator superclass: AsmObjectUnwindInformationGenerator; definition: {
+    public override method generateUnwindingInformationForModule: (module: AsmProgramEntity) objectCodeBuilder: (objectCodeBuilder: AsmObjectCodeBuilder) ::=> Void := {
+        Dwarf::CallFrameInformationWriter new
+            compilationTarget: module compilationTarget;
+            isEHFrame: true;
+            writeCallFrameInformationForSections: objectCodeBuilder sections
+                onto: ((objectCodeBuilder getOrCreateSectionNamed: #".eh_frame" machoSectionName: #__eh_frame machoSegmentName: #__TEXT)
+                    readable: true;
+                    alignment: module compilationTarget pointerSize;
+                    yourself)
+                pointerSize: module compilationTarget pointerSize
     }.
 }.
 
