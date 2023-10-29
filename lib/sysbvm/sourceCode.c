@@ -11,6 +11,8 @@ SYSBVM_API sysbvm_tuple_t sysbvm_sourceCode_create(sysbvm_context_t *context, sy
     result->directory = directory;
     result->name = name;
     result->language = language;
+    result->isInFile = directory ? SYSBVM_TRUE_TUPLE : SYSBVM_FALSE_TUPLE;
+    result->textSize = sysbvm_tuple_size_encode(context, sysbvm_tuple_getSizeInBytes(result->text));
     return (sysbvm_tuple_t)result;
 }
 

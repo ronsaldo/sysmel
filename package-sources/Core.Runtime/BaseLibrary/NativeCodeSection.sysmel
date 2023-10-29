@@ -50,4 +50,8 @@ NativeCodeSection definition: {
 
     public method isTLS => Boolean
         := (flags & NativeCodeSection::Flags::Tls) ~= 0u32.
+
+    public method isDebugging => Boolean
+        := (flags & NativeCodeSection::Flags::Debugging) ~= 0u32.
+
 }.

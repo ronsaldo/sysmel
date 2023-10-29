@@ -68,7 +68,7 @@ public class CLISysmelInterpreter definition: {
     }.
 
     public method evaluateString: (sourceString: String) ::=> AnyValue := {
-        let sourceCode := SourceCode text: sourceString directory: "" name: "<cli>" language: #sysmel.
+        let sourceCode := SourceCode text: sourceString name: "<cli>" language: #sysmel.
         self evaluateSourceCode: sourceCode
     }.
 

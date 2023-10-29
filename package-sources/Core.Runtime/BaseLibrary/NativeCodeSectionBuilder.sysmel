@@ -16,6 +16,14 @@ public final class NativeCodeSectionBuilder superclass: Object; definition: {
         section name: name
     }.
 
+    public inline method machoSectionName: (name: Symbol) ::=> Void := {
+        section machoSectionName: name
+    }.
+
+    public inline method machoSegmentName: (name: Symbol) ::=> Void := {
+        section machoSegmentName: name
+    }.
+
     public inline method flags: (flags: UInt32) ::=> Void := {
         section flags: flags
     }.
@@ -59,6 +67,9 @@ public final class NativeCodeSectionBuilder superclass: Object; definition: {
     public method uint64: (value: UInt64) ::=> Void
         := byteStream nextPutUInt64: value.
 
+    public method uint64At: (offset: Size) put: (value: UInt64) ::=> Void
+        := byteStream storage uint64At: offset put: value.
+
     public method int64: (value: Int64) ::=> Void
         := byteStream nextPutInt64: value.
 
@@ -74,5 +85,15 @@ public final class NativeCodeSectionBuilder superclass: Object; definition: {
     public method relativeInt32IntoSection: (targetSection: NativeCodeSection) addend: (addend: Int32) ::=> Void := {
         relocations type: NativeCodeRelocation::Type::Relative32 symbolIndex: (symbolTableBuilder getOrCreateSymbolForSection: targetSection) offset: byteStream size asUInt32 addend32: addend.
         self int32: 0i32
+    }.
+
+    public method uint32IntoSection: (targetSection: NativeCodeSection) addend: (addend: UInt32) ::=> Void := {
+        relocations type: NativeCodeRelocation::Type::Absolute32 symbolIndex: (symbolTableBuilder getOrCreateSymbolForSection: targetSection) offset: byteStream size asUInt32 addend32: addend asInt32.
+        self uint32: 0u32
+    }.
+
+    public method uint64IntoSection: (targetSection: NativeCodeSection) addend: (addend: UInt64) ::=> Void := {
+        relocations type: NativeCodeRelocation::Type::Absolute64 symbolIndex: (symbolTableBuilder getOrCreateSymbolForSection: targetSection) offset: byteStream size asUInt32 addend64: addend asInt64.
+        self uint64: 0u64
     }.
 }.

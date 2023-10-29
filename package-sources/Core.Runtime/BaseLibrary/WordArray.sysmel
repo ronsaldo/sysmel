@@ -32,7 +32,7 @@ WordArray definition: {
             ((self __uncheckedByteSlotAt__: index4 + 2sz) asUInt32 << 16u32) |
             ((self __uncheckedByteSlotAt__: index4 + 3sz) asUInt32 << 24u32)
         } ifFalse: {
-            (self __rawContentsBytePointer__ reinterpretCastTo: UInt32 const pointer) load
+            (self __rawContentsBytePointer__ + index4 asIntPointer reinterpretCastTo: UInt32 const pointer) load
         }.
     }.
 
@@ -47,7 +47,7 @@ WordArray definition: {
                 __uncheckedByteSlotAt__: index4 + 2sz put: (value >> 16u32) asUInt8;
                 __uncheckedByteSlotAt__: index4 + 3sz put: (value >> 24u32) asUInt8
         } ifFalse: {
-            (self __rawContentsBytePointer__ reinterpretCastTo: UInt32 const pointer) store: value
+            (self __rawContentsBytePointer__ + index4 asIntPointer reinterpretCastTo: UInt32 const pointer) store: value
         }
     }.
 

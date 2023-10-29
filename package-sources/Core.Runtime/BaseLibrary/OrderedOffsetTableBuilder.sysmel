@@ -32,7 +32,7 @@ OrderedOffsetTableBuilder definition: {
     }.
 
     public method finish => OrderedOffsetTable := {
-        keys isEmpty ifTrue: {
+        keys isEmpty || ((values size = 1sz) && values first isNil) ifTrue: {
             nil
         } ifFalse: {
             OrderedOffsetTable new

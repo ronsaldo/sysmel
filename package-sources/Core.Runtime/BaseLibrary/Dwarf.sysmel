@@ -472,6 +472,8 @@
     (DW_LNCT_timestamp  3)
     (DW_LNCT_size  4)
     (DW_LNCT_MD5  5)
+    (DW_LNCT_source  6)
+    (DW_LNCT_URL  7)
     (DW_LNCT_lo_user  8192)
     (DW_LNCT_hi_user  63)
     

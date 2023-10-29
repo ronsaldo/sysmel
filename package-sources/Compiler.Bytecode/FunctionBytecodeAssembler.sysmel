@@ -391,17 +391,17 @@ FunctionBytecodeAssembler definition: {
     public method call: (function: FunctionBytecodeAssemblerVectorOperand) arguments: (arguments: Array) result: (result: FunctionBytecodeAssemblerVectorOperand) ::=> FunctionBytecodeAssemblerInstruction := {
         self assert: arguments size <= 16rF sz.
         self addInstruction: (FunctionBytecodeAssemblerInstruction new
-                    standardOpcode: FunctionBytecode::Opcode::Call;
-                    operands: (Array with: result with: function) -- arguments;
-                    yourself)
+            standardOpcode: FunctionBytecode::Opcode::Call;
+            operands: (Array with: result with: function) -- arguments;
+            yourself)
     }.
 
     public method uncheckedCall: (function: FunctionBytecodeAssemblerVectorOperand) arguments: (arguments: Array) result: (result: FunctionBytecodeAssemblerVectorOperand) ::=> FunctionBytecodeAssemblerInstruction := {
         self assert: arguments size <= 16rF sz.
         self addInstruction: (FunctionBytecodeAssemblerInstruction new
-                    standardOpcode: FunctionBytecode::Opcode::UncheckedCall;
-                    operands: (Array with: result with: function) -- arguments;
-                    yourself)
+            standardOpcode: FunctionBytecode::Opcode::UncheckedCall;
+            operands: (Array with: result with: function) -- arguments;
+            yourself)
     }.
 
     public method coerceValue: (value: FunctionBytecodeAssemblerVectorOperand) toType: (targetType: FunctionBytecodeAssemblerVectorOperand) in: (result: FunctionBytecodeAssemblerVectorOperand) ::=> FunctionBytecodeAssemblerInstruction
@@ -425,9 +425,9 @@ FunctionBytecodeAssembler definition: {
     public method makeClosure: (functionDefinition: FunctionBytecodeAssemblerVectorOperand) withCaptures: (captures: Array) in: (result: FunctionBytecodeAssemblerVectorOperand) ::=> FunctionBytecodeAssemblerInstruction := {
         self assert: captures size <= 16rF sz.
         self addInstruction: (FunctionBytecodeAssemblerInstruction new
-                    standardOpcode: FunctionBytecode::Opcode::MakeClosureWithCaptures;
-                    operands: (Array with: result with: functionDefinition) -- captures;
-                    yourself)
+            standardOpcode: FunctionBytecode::Opcode::MakeClosureWithCaptures;
+            operands: (Array with: result with: functionDefinition) -- captures;
+            yourself)
     }.
 
     public method label: (name: Symbol) ::=> FunctionBytecodeAssemblerLabel
@@ -474,25 +474,25 @@ FunctionBytecodeAssembler definition: {
     public method makeArrayWithElements: (elements: Array) in: (result: FunctionBytecodeAssemblerVectorOperand) ::=> FunctionBytecodeAssemblerInstruction := {
         self assert: elements size <= 16rF sz.
         self addInstruction: (FunctionBytecodeAssemblerInstruction new
-                    standardOpcode: FunctionBytecode::Opcode::MakeArrayWithElements;
-                    operands: (Array with: result) -- elements;
-                    yourself)
+            standardOpcode: FunctionBytecode::Opcode::MakeArrayWithElements;
+            operands: (Array with: result) -- elements;
+            yourself)
     }.
 
     public method makeByteArrayWithElements: (elements: Array) in: (result: FunctionBytecodeAssemblerVectorOperand) ::=> FunctionBytecodeAssemblerInstruction := {
         self assert: elements size <= 16rF sz.
         self addInstruction: (FunctionBytecodeAssemblerInstruction new
-                    standardOpcode: FunctionBytecode::Opcode::MakeByteArrayWithElements;
-                    operands: (Array with: result) -- elements;
-                    yourself)
+            standardOpcode: FunctionBytecode::Opcode::MakeByteArrayWithElements;
+            operands: (Array with: result) -- elements;
+            yourself)
     }.
 
     public method makeDictionaryWithElements: (elements: Array) in: (result: FunctionBytecodeAssemblerVectorOperand) ::=> FunctionBytecodeAssemblerInstruction := {
         self assert: elements size <= 16rF sz.
         self addInstruction: (FunctionBytecodeAssemblerInstruction new
-                    standardOpcode: FunctionBytecode::Opcode::MakeDictionaryWithElements;
-                    operands: (Array with: result) -- elements;
-                    yourself)
+            standardOpcode: FunctionBytecode::Opcode::MakeDictionaryWithElements;
+            operands: (Array with: result) -- elements;
+            yourself)
     }.
 
     public method move: (source: FunctionBytecodeAssemblerVectorOperand) into: (destination: FunctionBytecodeAssemblerVectorOperand) ::=> FunctionBytecodeAssemblerInstruction
@@ -533,17 +533,17 @@ FunctionBytecodeAssembler definition: {
     public method sendTo: (receiver: FunctionBytecodeAssemblerVectorOperand) selector: (selector: FunctionBytecodeAssemblerVectorOperand) arguments: (arguments: Array) result: (result: FunctionBytecodeAssemblerVectorOperand) ::=> FunctionBytecodeAssemblerInstruction := {
         self assert: arguments size <= 16rF sz.
         self addInstruction: (FunctionBytecodeAssemblerInstruction new
-                    standardOpcode: FunctionBytecode::Opcode::Send;
-                    operands: (Array with: result with: selector with: receiver) -- arguments;
-                    yourself)
+            standardOpcode: FunctionBytecode::Opcode::Send;
+            operands: (Array with: result with: selector with: receiver) -- arguments;
+            yourself)
     }.
 
     public method sendTo: (receiver: FunctionBytecodeAssemblerVectorOperand) receiverLookupType: (receiverLookupType: FunctionBytecodeAssemblerVectorOperand) selector: (selector: FunctionBytecodeAssemblerVectorOperand) arguments: (arguments: Array) result: (result: FunctionBytecodeAssemblerVectorOperand) ::=> FunctionBytecodeAssemblerInstruction := {
         self assert: arguments size <= 16rF sz.
         self addInstruction: (FunctionBytecodeAssemblerInstruction new
-                    standardOpcode: FunctionBytecode::Opcode::SendWithLookup;
-                    operands: (Array with: result with: receiverLookupType with: selector with: receiver) -- arguments;
-                    yourself)
+            standardOpcode: FunctionBytecode::Opcode::SendWithLookup;
+            operands: (Array with: result with: receiverLookupType with: selector with: receiver) -- arguments;
+            yourself)
     }.
 
     public method storeValue: (value: FunctionBytecodeAssemblerVectorOperand) inPointer: (pointer: FunctionBytecodeAssemblerVectorOperand) ::=> FunctionBytecodeAssemblerInstruction

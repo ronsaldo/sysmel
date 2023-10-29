@@ -1188,6 +1188,8 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
         "directory", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.stringType,
         "name", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.stringType,
         "language", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.stringSymbolType,
+        "isInFile", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.booleanType,
+        "textSize", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.sizeType,
         "lineStartIndexTable", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.arrayType,
         NULL);
     context->roots.sourcePositionType = sysbvm_context_createIntrinsicClass(context, "SourcePosition", SYSBVM_NULL_TUPLE,

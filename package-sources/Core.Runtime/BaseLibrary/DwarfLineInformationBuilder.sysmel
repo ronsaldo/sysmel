@@ -1,2 +1,340 @@
 public class DwarfLineInformationBuilder superclass: Object; definition: {
+    public field targetSection => NativeCodeSectionBuilder.
+    public field version => UInt16.
+    public field pointerSize => Size.
+    public field dwarfSize => Size.
+
+    public field defaultIsStatement => Boolean.
+    public field maxNumberOfOperationsPerInstruction => UInt32.
+    public field minimumInstructionLength => UInt32.
+    public field opcodeBase => UInt32.
+
+    public field directoryDictionary => Dictionary.
+    public field directories => OrderedCollection.
+
+    public field fileDictionary => Dictionary.
+    public field files => OrderedCollection.
+
+    public field minLine => Int32.
+    public field maxLine => Int32.
+    public field lineAdvance => Int32.
+    public field lineBase => Int32.
+    public field lineRange => Int32.
+
+    private field regAddress => UInt32.
+    private field regAddressSection => NativeCodeSection.
+    private field regOpIndex => UInt32.
+    private field regFile => UInt32.
+    private field regLine => UInt32.
+    private field regColumn => UInt32.
+    private field regIsStatement => Boolean.
+    private field regBasicBlock => Boolean.
+    private field regEndSequence => Boolean.
+    private field regPrologueEnd => Boolean.
+    private field regEpilogueBegin => Boolean.
+    private field regISA => UInt32.
+    private field regDiscriminator => Boolean.
+
+    public override method initialize => Void := {
+        super initialize.
+
+        pointerSize := UIntPointer valueSize.
+        version := 5u16.
+
+        defaultIsStatement := true.
+        maxNumberOfOperationsPerInstruction := 1u32.
+        minimumInstructionLength := 1u32.
+        opcodeBase := 13u32.
+
+        directoryDictionary := Dictionary new.
+        directories := OrderedCollection new.
+
+        fileDictionary := Dictionary new.
+        files := OrderedCollection new.
+    }.
+
+    public method addSourceDirectory: (directory: String) ::=> UInt32 := {
+        directory isNil || (directory = "") ifTrue: {return: 0u32}.
+
+        directoryDictionary at: directory ifAbsentPut: {:: UInt32 |
+            directories add: (directory withoutSuffix: "/").
+            directories size asUInt32
+        }
+    }.
+
+    public method addSourceCode: (sourceCode: SourceCode) ::=> UInt32 := {
+        sourceCode ifNil: (return: 0u32).
+
+        fileDictionary at: sourceCode ifAbsentPut: {:: UInt32 |
+            let directoryIndex := self addSourceDirectory: sourceCode directory.
+            files add: (directoryIndex, sourceCode name, sourceCode isInFile ifTrue: "" ifFalse: sourceCode text).
+            files size asUInt32
+        }
+    }.
+
+    public method computeLineRangeForSections: (sections: SequenceableCollection) ::=> Void := {
+        minLine := Int32 maxVal.
+        maxLine := Int32 minVal.
+        let previousLine mutable := 1i32.
+
+        sections do: {:(NativeCodeSection)section :: Void |
+            section isExecutable not || section debugSourcePositions isNil ifTrue: {return: void}.
+
+            section debugSourcePositions values do: {:(SourcePosition)each :: Void |
+                each ifNil: {return: void}.
+                self addSourceCode: each sourceCode.
+
+                let startLine := each startLine asInt32.
+                let lineAdvance := startLine - previousLine.
+                lineAdvance abs < 8i32 ifTrue: {
+                    minLine := minLine min: lineAdvance.
+                    maxLine := maxLine max: lineAdvance.
+                }.
+                previousLine := startLine.
+            }
+        }.
+
+        minLine > maxLine ifTrue: {
+            minLine := maxLine := 1i32
+        }.
+
+        lineBase := (minLine min: 127i32) max: -128i32.
+        lineRange := (maxLine - minLine min: 255i32) max: 1i32.
+    }.
+
+    public method writeSourceLocationForSections: (sections: SequenceableCollection) ::=> Void := {
+        self computeLineRangeForSections: sections.
+
+        let initialLenghtOffset := targetSection size.
+        dwarfSize = 4sz ifTrue: {
+            targetSection uint32: 0u32.
+        } ifFalse: {
+            targetSection
+                uint32: 16rFFFFFFFF u32;
+                uint64: 0u64.
+        }.
+
+        targetSection uint16: version.
+        version >= 5u16 ifTrue: {
+            targetSection
+                uint8: pointerSize asUInt8; ## Address size
+                uint8: 0u8. ## Segment selector.
+        }.
+
+        let programSizeOffset := targetSection size.
+        dwarfSize = 4sz ifTrue: {
+            targetSection uint32: 0u32.
+        } ifFalse: {
+            targetSection uint64: 0u64.
+        }.
+
+        let programHeaderOffset := targetSection size.
+        self generateProgramHeader.
+        let programHeaderSize := targetSection size - programHeaderOffset.
+
+        self generateProgramForSections: sections.
+
+        dwarfSize = 4sz ifTrue: {
+            let lineSectionSize := targetSection size - initialLenghtOffset - 4sz.
+            targetSection
+                uint32At: initialLenghtOffset put: lineSectionSize asUInt32;
+                uint32At: programSizeOffset put: programHeaderSize asUInt32.
+        } ifFalse: {
+            let lineSectionSize := targetSection size - initialLenghtOffset - 12sz.
+            targetSection
+                uint64At: initialLenghtOffset + 4sz put: lineSectionSize asUInt64;
+                uint64At: programSizeOffset put: programHeaderSize asUInt64.
+        }.
+    }.
+
+    public method generateProgramHeader => Void := {
+		targetSection
+			uint8: 1u8 #* minimum_instruction_length *#;
+			uint8: 1u8 #* maximum_operations_per_instruction *#;
+			uint8: (defaultIsStatement ifTrue: 1u8 ifFalse: 0u8);
+			uint8: lineBase asUInt8;
+			uint8: lineRange asUInt8;
+			uint8: opcodeBase asUInt8 #* opcode_base *#;
+			
+			uint8: 0u8; #* DW_LNS_copy *#
+			uint8: 1u8; #* DW_LNS_advance_pc *#
+			uint8: 1u8; #* DW_LNS_advance_line *#
+			uint8: 1u8; #* DW_LNS_set_file *#
+			uint8: 1u8; #* DW_LNS_set_column *#
+			uint8: 0u8; #* DW_LNS_negate_stmt *#
+			uint8: 0u8; #* DW_LNS_set_basic_block *#
+			uint8: 0u8; #* DW_LNS_const_add_pc *#
+			uint8: 1u8; #* DW_LNS_fixed_advance_pc *#
+			uint8: 0u8; #* DW_LNS_set_prologue_end *#
+			uint8: 0u8; #* DW_LNS_set_epilogue_begin *#
+			uint8: 1u8; #* DW_LNS_set_isa *#
+			
+			yourself.
+		
+        version >= 5u16 ifTrue: {
+            ## Directories
+            targetSection
+                uleb128: 1sz;
+                uleb128: Dwarf::DW_LNCT_path asSize; uleb128: Dwarf::DW_FORM_string asSize.
+
+            targetSection uleb128: directories size.
+            directories do: { :(String)eachDirectory :: Void |
+                targetSection cstring: eachDirectory
+            }.
+            
+            ## Files
+            targetSection
+                uleb128: 3sz;
+                uleb128: Dwarf::DW_LNCT_path asSize; uleb128: Dwarf::DW_FORM_string asSize;
+                uleb128: Dwarf::DW_LNCT_directory_index asSize; uleb128: Dwarf::DW_FORM_udata asSize;
+                uleb128: Dwarf::DW_LNCT_source asSize; uleb128: Dwarf::DW_FORM_string asSize.
+
+            targetSection uleb128: files size.
+            files do: { :(Array)file :: Void |
+                let directoryIndex => UInt32 := file first.
+                let name => String := file second.
+                let sourceText => String := file third.
+                targetSection
+                    cstring: file second;
+                    uleb128: file first asSize;
+                    cstring: (sourceText ifNil: "")
+            }.
+        } ifFalse: {
+            ## Directories
+            directories do: { :(String)eachDirectory :: Void |
+                targetSection cstring: eachDirectory
+            }.
+            targetSection uint8: 0u8.
+            
+            ## Files
+            files do: { :(Array)file :: Void |
+                targetSection
+                    cstring: file second;
+                    uleb128: file first asSize;
+                    uleb128: 0sz;
+                    uleb128: 0sz.
+            }.
+            targetSection uint8: 0u8.
+
+        }.
+    }.
+
+    public method generateProgramForSections: (sections: SequenceableCollection) ::=> Void := {
+		regAddress := 0u32.
+		regAddressSection := nil.
+		regOpIndex := 0u32.
+		regFile := 1u32.
+		regLine := 1u32.
+		regColumn := 0u32.
+		regIsStatement := defaultIsStatement.
+		regBasicBlock := false.
+		regEndSequence := false.
+		regPrologueEnd := false.
+		regEpilogueBegin := false.
+		regISA := 0u32.
+		regDiscriminator := false.
+
+        sections do: {:(NativeCodeSection)section :: Void |
+            section isExecutable not || section debugSourcePositions isNil ifTrue: {return: void}.
+
+            section debugSourcePositions values doWithIndex: {:(SourcePosition)sourcePosition :(Size)index :: Void |
+                let pc := section debugSourcePositions keys uint32At: index.
+                self emitSourcePosition: sourcePosition section: section pc: pc.
+            }.
+        }.
+
+        self endSequence.
+    }.
+
+    public method emitSourcePosition: (sourcePosition: SourcePosition) section: (section: NativeCodeSection) pc: (pc: UInt32) ::=> Void := {
+        regAddressSection ~~ section ifTrue: {
+            self setSection: section pc: pc
+        }.
+        sourcePosition ifNil: {
+            return: void
+        }.
+
+        let sourceCode := sourcePosition sourceCode.
+        let startLine := sourcePosition startLine asUInt32.
+        let startColumn := sourcePosition startColumn asUInt32.
+
+        (regColumn = startColumn) && (regLine = startLine) ifTrue: (return: void).
+
+        self
+            setFile: (sourceCode ifNil: 1u32 ifNotNil: (fileDictionary at: sourceCode));
+            setColumn: startColumn.
+
+        let pcAdvance := pc - regAddress.
+        let lineAdvance := startLine asInt32 - regLine asInt32.
+        self advanceLine: lineAdvance pc: pcAdvance andEmitWithOperationIndex: 0u8.
+    }.
+
+    public method setFile: (fileIndex: UInt32) ::=> Void := {
+        regFile = fileIndex ifFalse: {
+            targetSection uint8: Dwarf::DW_LNS_set_file asUInt8; uleb128: fileIndex asUInt64.
+            regFile := fileIndex
+        }
+    }.
+
+    public method setColumn: (column: UInt32) ::=> Void := {
+        regColumn = column ifFalse: {
+            targetSection uint8: Dwarf::DW_LNS_set_column asUInt8; uleb128: column asUInt64.
+            regColumn := column
+        }
+    }.
+
+    public method advanceLine: (lineAdvance: Int32) pc: (pcAdvance: UInt32) andEmitWithOperationIndex: (operationIndex: UInt8) ::=> Void := {
+        let operationAdvance := pcAdvance / minimumInstructionLength.
+
+        let opcode := (lineAdvance - lineBase) + (lineRange * operationAdvance asInt32) + opcodeBase asInt32.
+        (0i32 <= opcode) && (opcode <= 255i32) && (lineAdvance - lineBase < lineRange) && (lineAdvance >= lineBase) ifTrue: {
+            targetSection uint8: opcode asUInt8.
+            regLine := (regLine asInt32 + lineAdvance) asUInt32.
+            regAddress := regAddress + pcAdvance.
+        } ifFalse: {
+            self
+                advanceLine: lineAdvance;
+                advancePC: pcAdvance;
+                copyRow
+        }.
+    }.
+
+    public method advanceLine: (advance: Int32) ::=> Void := {
+        targetSection uint8: Dwarf::DW_LNS_advance_line asUInt8; sleb128: advance asInt64.
+        regLine := (regLine asInt32 + advance) asUInt32.
+    }.
+
+    public method advancePC: (advance: UInt32) ::=> Void := {
+        targetSection uint8: Dwarf::DW_LNS_advance_pc asUInt8; uleb128: advance asUInt64.
+        regAddress := regAddress + advance
+    }.
+
+    public method copyRow => Void := {
+        targetSection uint8: Dwarf::DW_LNS_copy asUInt8.
+        regDiscriminator := false.
+        regBasicBlock := false.
+        regPrologueEnd := false.
+        regEpilogueBegin := false.
+    }.
+
+    public method setSection: (section: NativeCodeSection) pc: (pc: UInt32) ::=> Void := {
+        targetSection uint8: 0u8; uleb128: (1sz + pointerSize) asUInt64; uint8: Dwarf::DW_LNE_set_address asUInt8.
+        
+        self relocatableAddress: pc inSection: section
+    }.
+
+    public method relocatableAddress: (address: UInt32) inSection: (section: NativeCodeSection) ::=> Void := {
+        pointerSize = 4sz ifTrue: {
+            targetSection uint32IntoSection: section addend: address.
+        } ifFalse: {
+            targetSection uint64IntoSection: section addend: address asUInt64
+        }.
+
+        regAddressSection := section.
+        regAddress := address.
+    }.
+
+    public method endSequence => Void := {
+        targetSection uint8: 0u8; uleb128: 1u64; uint8: Dwarf::DW_LNE_end_sequence asUInt8
+    }.
 }.

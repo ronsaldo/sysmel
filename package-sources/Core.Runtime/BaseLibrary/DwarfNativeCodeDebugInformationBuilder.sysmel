@@ -4,6 +4,8 @@ public class DwarfNativeCodeDebugInformationBuilder superclass: Object; definiti
     public field pointerSize => Size.
     public field dwarfRegisterMap => DwarfRegisterMap.
     public field builder => NativeCodeBuilder.
+    public field debugLineSection => NativeCodeSection.
+    public field debugLineSectionOffset => Size.
 
     __Meta__ definition: {
         public method buildForJitNativeCode: (jitNativeCode: NativeCode) ::=> NativeCode
@@ -45,5 +47,15 @@ public class DwarfNativeCodeDebugInformationBuilder superclass: Object; definiti
             return: void
         }.
 
+        let debugLineSectionBuilder := builder debugLineSection.
+        debugLineSection := debugLineSectionBuilder section.
+        debugLineSectionOffset := debugLineSectionBuilder size.
+        
+        DwarfLineInformationBuilder new
+            targetSection: debugLineSectionBuilder;
+            version: version asUInt16;
+            dwarfSize: 4sz;
+            pointerSize: pointerSize;
+            writeSourceLocationForSections: nativeCode sections
     }.
 }.

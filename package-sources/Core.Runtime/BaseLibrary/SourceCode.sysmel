@@ -6,6 +6,18 @@ SourceCode definition: {
                 directory: directory;
                 name: name;
                 language: language;
+                isInFile: true;
+                textSize: text size;
+                yourself.
+
+        public method text: (text: String) name: (name: String) language: (language: StringSymbol) ::=> self
+            := self new
+                text: text;
+                directory: "";
+                name: name;
+                language: language;
+                isInFile: false;
+                textSize: text size;
                 yourself.
 
         public method text: (text: String) filename: (filename: String) language: (language: StringSymbol) ::=> self
@@ -41,7 +53,7 @@ SourceCode definition: {
 
     public method findLineIndexForSourceIndex: (sourceCodeIndex: UInt32) ::=> UInt32 := {
         self ensureLineStartIndexTableIsBuilt.
-        sourceCodeIndex asSize > text size ifTrue: {return: 0u32}.
+        sourceCodeIndex asSize > textSize ifTrue: {return: 0u32}.
 
         let left mutable := 0u32.
         let right mutable := lineStartIndexTable size asUInt32.
@@ -66,7 +78,7 @@ SourceCode definition: {
 
     public method columnNumberAtIndex: (index: UInt32) ::=> UInt32 := {
         self ensureLineStartIndexTableIsBuilt.
-        index asSize > text size ifTrue: {return: 0u32}.
+        index asSize > textSize ifTrue: {return: 0u32}.
 
         let lineIndex := self findLineIndexForSourceIndex: index.
         let lineSourceIndex => UInt32 := lineStartIndexTable at: lineIndex asSize.

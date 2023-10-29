@@ -1416,7 +1416,9 @@ FunctionDefinition definition: {
         type ifNotNil: {return: void}.
 
         sourceAnalyzedDefinition ifNil: {
-            sourceAnalyzedDefinition := FunctionSourceAnalyzedDefinition new.
+            sourceAnalyzedDefinition := FunctionSourceAnalyzedDefinition new
+                sourcePosition: sourceDefinition sourcePosition;
+                yourself
         }.
 
         sourceAnalyzedDefinition environment: (FunctionAnalysisEnvironment parent: sourceDefinition environment).
@@ -1474,6 +1476,7 @@ FunctionDefinition definition: {
         let validSourceAnalyzedDefinition := self ensureSourceAnalyzedDefinition.
 
         FunctionBytecodeCompiler::Current ifNotNil: {
+            ##printLine("Compile sourceAnalyzedDefinition for ", self, " at ", validSourceAnalyzedDefinition sourcePosition).
             bytecode := FunctionBytecodeCompiler::Current compileFunctionSourceAnalyzedDefinition: validSourceAnalyzedDefinition.
 
             ## Discard our source analyzed definition after the bytecode is generated.

@@ -14,6 +14,8 @@ typedef struct sysbvm_sourceCode_s
     sysbvm_tuple_t directory;
     sysbvm_tuple_t name;
     sysbvm_tuple_t language;
+    sysbvm_tuple_t isInFile;
+    sysbvm_tuple_t textSize;
     sysbvm_tuple_t lineStartIndexTable;
 } sysbvm_sourceCode_t;
 

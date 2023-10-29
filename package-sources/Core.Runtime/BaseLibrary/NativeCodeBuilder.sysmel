@@ -25,6 +25,36 @@ public final class NativeCodeBuilder superclass: Object; definition: {
                 yourself
         }.
 
+    public method debugInfoSection => NativeCodeSectionBuilder
+        := self getSectionNamed: #".debug_info" orCreateWith: {:: NativeCodeSectionBuilder |
+            NativeCodeSectionBuilder new
+                name: #".debug_info";
+                machoSectionName: #__debug_info;
+                machoSegmentName: #__DWARF;
+                flags: NativeCodeSection::Flags::Debugging;
+                yourself
+        }.
+
+    public method debugLineSection => NativeCodeSectionBuilder
+        := self getSectionNamed: #".debug_line" orCreateWith: {:: NativeCodeSectionBuilder |
+            NativeCodeSectionBuilder new
+                name: #".debug_line";
+                machoSectionName: #__debug_line;
+                machoSegmentName: #__DWARF;
+                flags: NativeCodeSection::Flags::Debugging;
+                yourself
+        }.
+
+    public method debugFrameSection => NativeCodeSectionBuilder
+        := self getSectionNamed: #".debug_frame" orCreateWith: {:: NativeCodeSectionBuilder |
+            NativeCodeSectionBuilder new
+                name: #".debug_frame";
+                machoSectionName: #__debug_frame;
+                machoSegmentName: #__DWARF;
+                flags: NativeCodeSection::Flags::Debugging;
+                yourself
+        }.
+
     public method finish => NativeCode := {
         let symbolTable := symbolTableBuilder finish.
         NativeCode new

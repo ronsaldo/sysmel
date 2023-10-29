@@ -103,7 +103,7 @@ public final struct NativeCodeLoader definition: {
 
     public method installSectionFirstPass: (eachSection: NativeCodeSection) ::=> Void := {
         ## Write the section data onto memory.
-        eachSection isLoaded ifFalse: {
+        eachSection isLoaded || eachSection isDebugging ifFalse: {
             return: void
         }.
 
@@ -245,6 +245,10 @@ public final struct NativeCodeLoader definition: {
     }.
 
     public method installSectionRelocations: (eachSection: NativeCodeSection) ::=> Void := {
+        eachSection isLoaded || eachSection isDebugging ifFalse: {
+            return: void
+        }.
+
         eachSection relocations ifNil: {return: void}.
 
         eachSection relocations decodedRelocationsDo: {:(UInt8)type :(UInt32)symbolIndex :(UInt32)offset :(Int64)addend :: Void |
@@ -254,6 +258,14 @@ public final struct NativeCodeLoader definition: {
             let relocationVirtualAddress := eachSection virtualAddress + offset asSize.
             let relocationTargetAddress := eachSection writeableVirtualAddress + offset asSize.
             switch: type withCases: #{
+                NativeCodeRelocation::Type::Absolute32 : {
+                    let value := symbol virtualAddress asIntPointer + addend asIntPointer.
+                    (relocationTargetAddress reinterpretCastTo: Int32 pointer) store: value asInt32
+                }.
+                NativeCodeRelocation::Type::Absolute64 : {
+                    let value := symbol virtualAddress asIntPointer + addend asIntPointer.
+                    (relocationTargetAddress reinterpretCastTo: Int64 pointer) store: value asInt64
+                }.
                 NativeCodeRelocation::Type::Relative32 : {
                     let value := symbol virtualAddress asIntPointer + addend asIntPointer - relocationVirtualAddress asIntPointer.
                     ##printLine(relocationVirtualAddress, "-", symbol virtualAddress, " Relative32 ", symbol, " ", value).
