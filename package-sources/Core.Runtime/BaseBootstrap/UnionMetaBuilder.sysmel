@@ -1,0 +1,44 @@
+public class UnionMetaBuilder superclass: TypeMetaBuilder; definition: {
+    public method validSupertypeExpression => ASTNode
+        := supertypeExpression ifNil: `'AnyUnion.
+
+    public override method finishExpansionWithEnvironment: (environment: Environment) ::=> ASTNode := {
+        let flagsExpression := ASTLiteralNode new
+            sourcePosition: sourcePosition;
+            value: self typeFlags;
+            yourself.
+
+        let makeUnionExpression := ``(
+            (`,(self validSupertypeExpression) subunionWithTypeSlots: `,(self validMetaSlotsExpression))
+                addFlags: `,flagsExpression;
+                enqueuePendingAnalysisInEnvironment: `,(ASTLiteralNode new
+                    sourcePosition: self sourcePosition;
+                    value: environment;
+                    yourself);
+                yourself
+        ).
+
+        let unionValueExpression := name
+            ifNil: makeUnionExpression
+            ifNotNil: (if: self isPublic
+                then: ``(public: `,name with: (`,makeUnionExpression name: `,name; yourself))
+                else: ``(let: `,name with: `,makeUnionExpression) 
+            ).
+
+        definitionExpression
+            ifNil: unionValueExpression
+            ifNotNil: ``(`,unionValueExpression definition: `,definitionExpression)
+    }.
+}.
+
+public global union := MetaBuilderFactory for: UnionMetaBuilder.
+
+FlagMetaBuilder extend: {
+    public method union => ASTNode := {
+        <metaBuilder>
+        self delegateToMetaBuilder: (UnionMetaBuilder new
+            typeFlags: self typeFlags;
+            isPublic: self isPublic;
+            yourself)
+    }
+}.

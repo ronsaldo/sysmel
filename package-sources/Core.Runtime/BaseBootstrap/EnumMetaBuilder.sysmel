@@ -1,0 +1,54 @@
+## Enum MetaBuilder.
+public class EnumMetaBuilder superclass: TypeMetaBuilder; definition: {
+    public field valueTypeExpression => ASTNode.
+
+    public method validValueTypeExpression => ASTNode
+        := valueTypeExpression ifNil: `'AnyValue.
+
+    public method valueType: (newValueTypeExpression: ASTNode) ::=> ASTNode := {
+        <metaBuilder>
+        valueTypeExpression := newValueTypeExpression.
+        self continueExpansion
+    }.
+
+    public override method finishExpansionWithEnvironment: (environment: Environment) ::=> ASTNode := {
+        let flagsExpression := ASTLiteralNode new
+            sourcePosition: self sourcePosition;
+            value: self typeFlags;
+            yourself.
+
+        let makeEnumExpression := ``(
+            (EnumType makeWithValueType: `,(self validValueTypeExpression) typeSlots: `,(self validMetaSlotsExpression))
+                addFlags: `,flagsExpression;
+                enqueuePendingAnalysisInEnvironment: `,(ASTLiteralNode new
+                    sourcePosition: self sourcePosition;
+                    value: environment;
+                    yourself);
+                yourself
+        ).
+
+        let enumValueExpression := name
+            ifNil: makeEnumExpression
+            ifNotNil: (if: self isPublic
+                then: ``(public: `,name with: (`,makeEnumExpression name: `,name; yourself))
+                else: ``(let: `,name with: `,makeEnumExpression) 
+            ).
+
+        let definitionExpression := self definitionExpression.
+        definitionExpression
+            ifNil: enumValueExpression
+            ifNotNil: ``(`,enumValueExpression definition: `,definitionExpression)
+    }.
+}.
+
+public global enum := MetaBuilderFactory for: EnumMetaBuilder.
+
+FlagMetaBuilder extend: {
+    public method enum => ASTNode := {
+        <metaBuilder>
+        self delegateToMetaBuilder: (EnumMetaBuilder new
+            typeFlags: self typeFlags;
+            isPublic: self isPublic;
+            yourself)
+    }
+}.

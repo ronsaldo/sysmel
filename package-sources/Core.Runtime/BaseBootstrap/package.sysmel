@@ -31,12 +31,16 @@ loadSourceNamed: "ProgramEntity.sysmel".
 loadSourceNamed: "SequenceTuple.sysmel".
 loadSourceNamed: "FixedArray.sysmel".
 loadSourceNamed: "Enum.sysmel".
+loadSourceNamed: "EnumMetaBuilder.sysmel".
 loadSourceNamed: "Struct.sysmel".
 loadSourceNamed: "StructMetaBuilder.sysmel".
+loadSourceNamed: "Union.sysmel".
+loadSourceNamed: "UnionMetaBuilder.sysmel".
 loadSourceNamed: "GCStackFrameDescription.sysmel".
 loadSourceNamed: "Exception.sysmel".
 loadSourceNamed: "Namespace.sysmel".
 loadSourceNamed: "PointerLikeType.sysmel".
+loadSourceNamed: "PrimitiveVectorType.sysmel".
 loadSourceNamed: "FunctionType.sysmel".
 loadSourceNamed: "SimpleFunctionType.sysmel".
 loadSourceNamed: "PlatformDescription.sysmel".

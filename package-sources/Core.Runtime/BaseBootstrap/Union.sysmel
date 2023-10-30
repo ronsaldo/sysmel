@@ -1,0 +1,80 @@
+public global TypeFlags::UnionDefaultFlags := TypeFlags::Value.
+
+public class UnionType superclass: ValueType; definition: {
+    public field isPacked => Boolean.
+
+    public method subunionWithTypeSlots: (typeSlots: Array) packed: (isPacked: Boolean) ::=> UnionType := {
+        let: #metatype with: UnionMetatype basicNew.
+        let: #metatypeSuper with: self __type__.
+        metatype
+            flags: TypeFlags::MetatypeRequiredFlags;
+            supertype: metatypeSuper;
+            slots: typeSlots;
+            totalSlotCount: metatypeSuper validTotalSlotCount + typeSlots size;
+            registerSlotsInDictionary;
+            generatePublicAccessors;
+            createBasicInitializeMethod.
+        
+        let: #union with: metatype basicNew.
+        union
+            flags: TypeFlags::UnionDefaultFlags;
+            supertype: self;
+            isPacked: isPacked;
+            slots: ();
+            totalSlotCount: nil;
+            registerInSupertype.
+        metatype thisType: union.
+        union
+    }.
+
+    public override method defaultValue => self
+        := self basicNew.
+
+    public override method literalConstantRequiresShallowCopy => Boolean
+        := true.
+
+    protected field canEncodeValueInBytes.
+    protected field canDecodeValueFromBytes.
+
+    public override method computeLayout => Void := {
+        instanceSize := 0sz.
+        instanceAlignment := 1sz.
+
+        supertype ifNotNil: {
+            instanceSize := supertype validInstanceSize.
+            instanceAlignment := supertype validInstanceAlignment.
+        }.
+
+        self validSlots do: {:(TypeSlot)eachSlot :: Void |
+            let slotSize := eachSlot size.
+            let slotAlignment := eachSlot alignment.
+            eachSlot offset: 0sz.
+
+            instanceSize := instanceSize max: slotSize.
+            instanceAlignment := instanceAlignment max: slotAlignment.
+        }.
+
+        instanceSize := instanceSize alignedTo: instanceAlignment
+    }.
+}.
+
+public class UnionMetatype superclass: ValueMetatype; definition: {
+    __Meta__ definition:{
+        public override method getOrCreateDependentApplicationValueForNode: (astNode: ASTNode)
+            := UnionType
+    }.
+}.
+
+let AnyUnionType := UnionMetatype basicNew
+    flags: TypeFlags::MetatypeRequiredFlags;
+    supertype: UnionType;
+    totalSlotCount: UnionType validTotalSlotCount;
+    yourself.
+public global AnyUnion := AnyUnionType basicNew
+    name: #AnyUnion;
+    flags: TypeFlags::UnionDefaultFlags;
+    supertype: AnyValue;
+    slots: ();
+    totalSlotCount: 0sz;
+    registerInSupertype;
+    yourself.
