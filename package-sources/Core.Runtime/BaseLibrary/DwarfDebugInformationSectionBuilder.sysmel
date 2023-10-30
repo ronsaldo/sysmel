@@ -17,7 +17,9 @@ public class DwarfDebugInformationSectionBuilder superclass: Object; definition:
     }.
 
     public method beginDebugInfo => Void := {
+        abbrevBaseOffset := abbrevSection size.
         initialLengthOffset := infoSection size.
+
         dwarfSize = 4sz ifTrue: {
             infoSection uint32: 0u32
         } ifFalse: {
@@ -26,18 +28,23 @@ public class DwarfDebugInformationSectionBuilder superclass: Object; definition:
                 uint64: 0u64.
         }.
 
+
         infoSection uint16: version.
         version >= 5u16 ifTrue: {
             infoSection uint8: Dwarf::DW_UT_compile asUInt8.
-        }.
-
-        infoSection uint8: pointerSize asUInt8.
-
-        abbrevBaseOffset := abbrevSection size.
-        dwarfSize = 4sz ifTrue: {
-            infoSection section: abbrevSection section relativeInt32: abbrevBaseOffset asInt32
+            infoSection uint8: pointerSize asUInt8.
+            dwarfSize = 4sz ifTrue: {
+                infoSection section: abbrevSection section relativeInt32: abbrevBaseOffset asInt32
+            } ifFalse: {
+                infoSection section: abbrevSection section relativeInt64: abbrevBaseOffset asInt64
+            }.
         } ifFalse: {
-            infoSection section: abbrevSection section relativeInt64: abbrevBaseOffset asInt64
+            dwarfSize = 4sz ifTrue: {
+                infoSection section: abbrevSection section relativeInt32: abbrevBaseOffset asInt32
+            } ifFalse: {
+                infoSection section: abbrevSection section relativeInt64: abbrevBaseOffset asInt64
+            }.
+            infoSection uint8: pointerSize asUInt8.
         }.
     }.
 

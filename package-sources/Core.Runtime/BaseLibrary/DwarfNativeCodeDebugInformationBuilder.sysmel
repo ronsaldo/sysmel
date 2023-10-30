@@ -16,7 +16,7 @@ public class DwarfNativeCodeDebugInformationBuilder superclass: Object; definiti
 
     public method buildForJitNativeCode: (jitNativeCode: NativeCode) ::=> NativeCode := {
         isForJIT := true.
-        version := 5u8.
+        version := 4u8.
         pointerSize := UIntPointer valueSize.
         builder := NativeCodeBuilder new.
         dwarfRegisterMap := DwarfRegisterMap forCurrentPlatform.
