@@ -1,0 +1,14 @@
+MacroMetaBuilder publicSubclass: #NamedMetaBuilder slots: (
+    TypeSlot publicNamed: #name type: ASTNode ,
+    TypeSlot publicNamed: #nameIsNotExpectedAnymore type: Boolean ,
+).
+
+NamedMetaBuilder
+    withSelector: #expandMessageSendNode: addMethod: {:self :(ASTMessageSendNode)messageSendNode :: ASTNode |
+        if: (self name == nil) && messageSendNode arguments isEmpty && self nameIsNotExpectedAnymore not then: {
+            self name: messageSendNode selector.
+            self continueExpansion
+        } else: {
+            self expandMessageSendNodeWithMetaBuilderMethod: messageSendNode
+        }.
+    } makeOverride.

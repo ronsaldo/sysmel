@@ -1,0 +1,9 @@
+Class
+    withSelector: #publicSubclass:classSlots:slots: addMacroMethod: {:macroContext :(ASTNode)self :(ASTNode)name :(ASTNode)classSlots :(ASTNode)instanceSlots :: ASTNode |
+        ``(public: `,name with: (`,self subclass: `,name classSlots: `,classSlots slots: `,instanceSlots))
+    } makeMacro;
+    withSelector: #publicSubclass:slots: addMacroMethod: {:macroContext :(ASTNode)self :(ASTNode)name :(ASTNode)instanceSlots :: ASTNode |
+        ``(public: `,name with: (`,self subclass: `,name slots: `,instanceSlots))
+    } makeMacro.
+
+Object publicSubclass: #MetaBuilder slots: ().

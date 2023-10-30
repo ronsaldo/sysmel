@@ -1,0 +1,21 @@
+NamedMetaBuilder publicSubclass: #VariableMetaBuilder slots: (
+    TypeSlot publicNamed: #typeExpression type: ASTNode ,
+    TypeSlot publicNamed: #initialValue type: ASTNode ,
+).
+
+VariableMetaBuilder
+    withSelector: #type: addMethod: {:self :(ASTNode)typeExpression :: ASTNode |
+        <metaBuilder>
+        self typeExpression: typeExpression.
+        self continueExpansion
+    };
+    withSelector: #=> addMethod: {:self :(ASTNode)typeExpression :: ASTNode |
+        <metaBuilder>
+        self typeExpression: typeExpression.
+        self continueExpansion
+    };
+    withSelector: #":=" addMethod: {:self :(ASTNode)initialValue :: ASTNode |
+        <metaBuilder>
+        self initialValue: initialValue.
+        self finishExpansion
+    }.

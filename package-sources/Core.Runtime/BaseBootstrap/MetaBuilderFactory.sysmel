@@ -1,0 +1,43 @@
+MetaBuilder publicSubclass: #MetaBuilderFactory slots: (
+    TypeSlot publicNamed: #metaBuilderClass type: Class,
+).
+
+MetaBuilderFactory
+    withSelector: #for: addClassMethod: {:self :metaBuilderClass :: self |
+        self new
+            metaBuilderClass: metaBuilderClass;
+            yourself
+    };
+    withSelector: #analyzeAndEvaluateMessageSendNode:withEnvironment: addMethod: {:self :(ASTMessageSendNode)messageSendNode :(Environment)environment |
+        let: #metaBuilderInstance with: self metaBuilderClass new.
+        let: #metaBuilderInstanceNode with: (ASTLiteralNode new
+            sourcePosition: messageSendNode receiver sourcePosition;
+            value: metaBuilderInstance;
+            yourself).
+        let: #messageWithMetaBuilderInstance with: (messageSendNode copy
+            receiver: metaBuilderInstanceNode;
+            yourself).
+        metaBuilderInstance analyzeAndEvaluateMessageSendNode: messageWithMetaBuilderInstance withEnvironment: environment
+    } makeOverride;
+    withSelector: #analyzeMessageSendNode:withEnvironment: addMethod: {:self :(ASTMessageSendNode)messageSendNode :(Environment)environment |
+        let: #metaBuilderInstance with: self metaBuilderClass new.
+        let: #metaBuilderInstanceNode with: (ASTLiteralNode new
+            sourcePosition: messageSendNode receiver sourcePosition;
+            value: metaBuilderInstance;
+            yourself).
+        let: #messageWithMetaBuilderInstance with: (messageSendNode copy
+            receiver: metaBuilderInstanceNode;
+            yourself).
+        metaBuilderInstance analyzeMessageSendNode: messageWithMetaBuilderInstance withEnvironment: environment
+    } makeOverride;
+    withSelector: #analyzeUnexpandedApplicationNode:withEnvironment: addMethod: {:self :(ASTUnexpandedApplicationNode)unexpandedApplicationNode :(Environment)environment |
+        let: #metaBuilderInstance with: self metaBuilderClass new.
+        let: #metaBuilderInstanceNode with: (ASTLiteralNode new
+            sourcePosition: unexpandedApplicationNode functionOrMacroExpression sourcePosition;
+            value: metaBuilderInstance;
+            yourself).
+        let: #unexpandedApplicationNodeWithInstance with: (unexpandedApplicationNode copy
+            functionOrMacroExpression: metaBuilderInstanceNode;
+            yourself).
+        metaBuilderInstance analyzeUnexpandedApplicationNode: unexpandedApplicationNodeWithInstance withEnvironment: environment
+    } makeOverride.

@@ -1,0 +1,38 @@
+NamedMetaBuilder publicSubclass: #TypeMetaBuilder slots: (
+    TypeSlot publicNamed: #isPublic type: Boolean ,
+    TypeSlot publicNamed: #typeFlags type: Bitflags ,
+    TypeSlot publicNamed: #metaSlotsExpression type: ASTNode ,
+    TypeSlot publicNamed: #supertypeExpression type: ASTNode ,
+    TypeSlot publicNamed: #definitionExpression type: ASTNode ,
+).
+
+TypeMetaBuilder
+    withSelector: #initialize addMethod: {:self :: Void |
+        (tuple: self withLookupStartingFrom: TypeMetaBuilder supertype) initialize.
+        self isPublic: false.
+        self typeFlags: TypeFlags::None
+    } makeOverride;
+    withSelector: #metaSlots: addMethod: {:self :(ASTNode)metaSlotsExpression :: ASTNode |
+        <metaBuilder>
+        self metaSlotsExpression: metaSlotsExpression.
+        self continueExpansion
+    };
+    withSelector: #supertype: addMethod: {:self :(ASTNode)supertypeExpression :: ASTNode |
+        <metaBuilder>
+        self supertypeExpression: supertypeExpression.
+        self continueExpansion
+    };
+    withSelector: #definition: addMethod: {:self :(ASTNode)definitionExpression :: ASTNode |
+        <metaBuilder>
+        self definitionExpression: definitionExpression.
+        self finishExpansion
+    };
+    withSelector: #":=" addMethod: {:self :(ASTNode)definitionExpression :: ASTNode |
+        <metaBuilder>
+        self definitionExpression: definitionExpression.
+        self finishExpansion
+    };
+    
+    withSelector: #validMetaSlotsExpression addMethod: {:self :: ASTNode |
+        self metaSlotsExpression ifNil: `'()
+    }.

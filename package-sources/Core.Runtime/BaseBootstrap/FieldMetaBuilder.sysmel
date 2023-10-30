@@ -1,0 +1,46 @@
+VariableMetaBuilder publicSubclass: #FieldMetaBuilder slots: (
+    TypeSlot publicNamed: #fieldFlags type: Bitflags ,
+    TypeSlot publicNamed: #bitsExpression type: ASTNode
+).
+
+FieldMetaBuilder
+    withSelector: #initialize addMethod: {:self :: Void |
+        (tuple: self withLookupStartingFrom: FieldMetaBuilder supertype) initialize.
+        self fieldFlags: TypeSlotFlags::None
+    } makeOverride;
+    withSelector: #addFieldFlags: addMethod: {:self :(Bitflags)flags :: Void |
+        self fieldFlags: self fieldFlags | flags
+    };
+    withSelector: #bits: addMethod: {:self :(ASTNode)bitsExpression :: Void |
+        <metaBuilder>
+        self bitsExpression: bitsExpression.
+        self continueExpansion
+    };
+    withSelector: #finishExpansionWithEnvironment: addMethod: {:self :(Environment)environment :: ASTNode |
+        let: #typeExpression with: self typeExpression.
+        let: #flagsExpression with: (ASTLiteralNode new
+            sourcePosition: self sourcePosition;
+            value: self fieldFlags;
+            yourself).
+        let: #initialValue with: self initialValue.
+        let: #initialValueBlock with: (initialValue ifNotNil: (``{:(SelfType)self :: `,typeExpression | `,initialValue })).
+
+        initialValueBlock
+            ifNil: (
+                typeExpression
+                    ifNil: ``(__OwnerProgramEntity__ addTypeSlot: (TypeSlot named: `,(self name) flags: `,flagsExpression))
+                    ifNotNil: ``(__OwnerProgramEntity__ addTypeSlot: (TypeSlot named: `,(self name) type: `,typeExpression flags: `,flagsExpression))
+            ) ifNotNil: (
+                typeExpression
+                    ifNil: ``(__OwnerProgramEntity__ addTypeSlot: (TypeSlot named: `,(self name) flags: `,flagsExpression) initialValueBlock: `,initialValueBlock)
+                    ifNotNil: ``(__OwnerProgramEntity__ addTypeSlot: (TypeSlot named: `,(self name) type: `,typeExpression flags: `,flagsExpression) initialValueBlock: `,initialValueBlock)
+            )
+    } makeOverride.
+
+FlagMetaBuilder
+    withSelector: #field addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self delegateToMetaBuilder: (FieldMetaBuilder new
+            addFieldFlags: self fieldFlags;
+            yourself)
+    }.

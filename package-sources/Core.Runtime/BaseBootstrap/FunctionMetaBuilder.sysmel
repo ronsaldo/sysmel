@@ -1,0 +1,109 @@
+NamedMetaBuilder publicSubclass: #FunctionMetaBuilder slots: (
+    TypeSlot publicNamed: #functionFlags type: Bitflags ,
+    TypeSlot publicNamed: #callingConvention type: Symbol ,
+    TypeSlot publicNamed: #isEager type: Boolean ,
+    TypeSlot publicNamed: #isMacro type: Boolean ,
+    TypeSlot publicNamed: #isPublic type: Boolean ,
+    TypeSlot publicNamed: #resultType type: ASTNode ,
+    TypeSlot publicNamed: #body type: ASTNode ,
+    TypeSlot publicNamed: #arguments type: Array
+).
+
+public: #noFFIAvailableError with: {:: Unwinds | error("FFI is not available for external call. ")}.
+
+FunctionMetaBuilder
+    withSelector: #expandUnexpandedApplicationNode: addMethod: {:self :(ASTUnexpandedApplicationNode)unexpandedApplicationNode :: ASTNode |
+        if: self arguments == nil then: {
+            self nameIsNotExpectedAnymore: true.
+            self arguments: (unexpandedApplicationNode arguments collect: {:each | each parseAsArgumentNode}).
+            self continueExpansion
+        } else: {
+            self finishExpansion
+        }.
+    } makeOverride;
+    withSelector: #addFunctionFlags: addMethod: {:self :(Bitflags)flags :: Void |
+        self functionFlags: self functionFlags | flags
+    };
+    withSelector: #isExternC addMethod: {:self :: Boolean |
+        (self functionFlags & FunctionFlags::ExternC) ~= 0bflgs
+    };
+    withSelector: #":=" addMethod: {:self :(ASTNode)bodyNode :: ASTNode |
+        <metaBuilder>
+        self body: bodyNode.
+        self finishExpansion
+    };
+    withSelector: #=> addMethod: {:self :(ASTNode)resultType :: ASTNode |
+        <metaBuilder>
+        self resultType: resultType.
+        self continueExpansion
+    };
+    withSelector: #finishMacroFunction addMethod: {:self :: ASTNode |
+        let: #macroContextArgument with: (ASTArgumentNode new
+            sourcePosition: self sourcePosition;
+            isForAll: false;
+            name: `'#__macroContext__;
+            type: `'MacroContext;
+            yourself).
+        let: #arguments with: (Array with: macroContextArgument) -- self arguments.
+        ASTLambdaNode new
+            sourcePosition: self sourcePosition;
+            flags: self functionFlags;
+            name: self name;
+            arguments: arguments;
+            body: self body;
+            resultType: self resultType;
+            makeEagerIf: self isEager;
+            yourself
+    };
+    withSelector: #expansionBody addMethod: {:self  :: ASTNode |
+        let: #body with: self body.
+        if: body ~~ nil then: {
+            body
+        } else: {
+            if: self isExternC
+                then: `'(noFFIAvailableError())
+                else: nil
+        }
+    };
+    withSelector: #finishFunctionExpansion addMethod: {:self :: ASTNode |
+        ASTLambdaNode new
+            sourcePosition: self sourcePosition;
+            flags: self functionFlags;
+            callingConventionName: self callingConvention;
+            name: self name;
+            arguments: self arguments;
+            body: self expansionBody;
+            resultType: self resultType;
+            makeEagerIf: self isEager;
+            yourself
+    } makeVirtual;
+    withSelector: #finishExpansionWithEnvironment: addMethod: {:self :(Environment)environment :: ASTNode |
+        let: #name with: self name.
+        let: #functionNode with: (if: self isMacro
+            then: self finishMacroFunction
+            else: self finishFunctionExpansion).
+        let: #exportNode with: (if: self isPublic
+            then: ``(public: `,(self name) with: `,functionNode)
+            else: functionNode).
+
+        if: (name ~~ nil) && self isExternC then: {
+            if: self body == nil
+                then: ``(`,exportNode importWithSymbol: `,name; yourself)
+                else: ``(`,exportNode exportWithSymbol: `,name; yourself)
+        } else: {
+            exportNode
+        }
+    } makeOverride.
+
+public: #function with: (MetaBuilderFactory for: FunctionMetaBuilder).
+
+FlagMetaBuilder
+    withSelector: #function addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self delegateToMetaBuilder: (FunctionMetaBuilder new
+            addFunctionFlags: self methodFlags;
+            callingConvention: self callingConvention;
+            isPublic: self isPublic;
+            isEager: self isEager;
+            yourself)
+    }.

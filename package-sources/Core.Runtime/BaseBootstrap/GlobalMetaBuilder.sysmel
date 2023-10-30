@@ -1,0 +1,39 @@
+LetMetaBuilder publicSubclass: #GlobalMetaBuilder slots: (
+    TypeSlot publicNamed: #isPublic type: Boolean ,
+    TypeSlot publicNamed: #isExternal type: Boolean ,
+    TypeSlot publicNamed: #isThreadLocal type: Boolean ,
+).
+
+GlobalMetaBuilder
+    withSelector: #finishExpansionWithEnvironment: addMethod: {:self :(Environment)environment :: ASTNode |
+        let: #name with: self name.
+        let: #variableDefinitionNode with: (ASTVariableDefinitionNode new
+            sourcePosition: self sourcePosition;
+            nameExpression: self name;
+            typeExpression: self typeExpression;
+            valueExpression: self initialValue;
+            isMutable: self isMutable;
+            isPublic: self isPublic;
+            isExternal: self isExternal;
+            isThreadLocal: self isThreadLocal;
+            yourself).
+
+        variableDefinitionNode
+    } makeOverride.
+
+FlagMetaBuilder
+    withSelector: #threadLocal addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self delegateToMetaBuilder: (GlobalMetaBuilder new
+            isPublic: self isPublic;
+            isExternal: self isExternal;
+            isThreadLocal: true;
+            yourself)
+    };
+    withSelector: #global addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self delegateToMetaBuilder: (GlobalMetaBuilder new
+            isPublic: self isPublic;
+            isExternal: self isExternal;
+            yourself)
+    }.

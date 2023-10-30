@@ -1,0 +1,31 @@
+ProgramEntity definition: {
+    public virtual method getOrCreateNamespaceNamed: (name: Symbol) ::=> Namespace
+        := self error: "Cannot create children namespaces in program entity " -- self printString.
+}.
+
+Namespace definition: {
+    public override method getOrCreateNamespaceNamed: (name: Symbol) ::=> Namespace := {
+        self error: "TODO: getOrCreateNamespaceNamed: " -- name printString
+    }.
+}.
+
+public class NamespaceMetaBuilder superclass: MacroMetaBuilder; definition: {
+    public field nameComponents => OrderedCollection.
+
+    public override method initialize => Void := {
+        super initialize.
+        nameComponents := OrderedCollection new.
+    }.
+
+    public override method finishExpansionWithEnvironment: (environment: Environment) ::=> Environment := {
+        error("TODO: NamespaceMetaBuilder finishExpansionWithEnvironment:")
+    }.
+}.
+
+#*
+public global namespace := MetaBuilderFactory for: NamespaceMetaBuilder.
+
+namespace TestNamespace definition: {
+
+}.
+*#

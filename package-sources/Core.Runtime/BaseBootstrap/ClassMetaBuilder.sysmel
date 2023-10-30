@@ -1,0 +1,50 @@
+TypeMetaBuilder publicSubclass: #ClassMetaBuilder slots: (
+).
+
+ClassMetaBuilder
+    withSelector: #classSlots: addMethod: {:self :(ASTNode)classSlotsExpression :: ASTNode |
+        <metaBuilder>
+        self metaSlotsExpression: classSlotsExpression.
+        self continueExpansion
+    };
+    withSelector: #superclass: addMethod: {:self :(ASTNode)superclassExpression :: ASTNode |
+        <metaBuilder>
+        self supertypeExpression: superclassExpression.
+        self continueExpansion
+    };
+    withSelector: #validSuperclassExpression addMethod: {:self :: ASTNode |
+        self supertypeExpression ifNil: `'Object
+    };
+    withSelector: #finishExpansionWithEnvironment: addMethod: {:self :(Environment)environment :: ASTNode |
+        let: #flagsExpression with: (ASTLiteralNode new
+            sourcePosition: self sourcePosition;
+            value: self typeFlags;
+            yourself).
+
+        let: #makeClassExpression with: ``(
+            (`,(self validSuperclassExpression) subclassWithClassSlots: `,(self validMetaSlotsExpression))
+                addFlags: `,flagsExpression;
+                enqueuePendingAnalysisInEnvironment: `,(ASTLiteralNode new
+                    sourcePosition: self sourcePosition;
+                    value: environment;
+                    yourself);
+                yourself
+        ).
+
+        let: #name with: self name.
+
+        let: #classValueExpression with: (name
+            ifNil: makeClassExpression
+            ifNotNil: (if: self isPublic
+                then: ``(public: `,name with: (`,makeClassExpression name: `,name; yourself))
+                else: ``(let: `,name with: `,makeClassExpression) 
+            )
+        ).
+
+        let: #definitionExpression with: self definitionExpression.
+        definitionExpression
+        ifNil: classValueExpression
+        ifNotNil: ``(`,classValueExpression definition: `,definitionExpression)
+    } makeOverride.
+
+public: #class with: (MetaBuilderFactory for: ClassMetaBuilder).

@@ -1,0 +1,51 @@
+ASTNode
+    withSelector: #parseAsArgumentNode addMethod: {:self :: ASTArgumentNode |
+        self error: self sourcePosition asString -- ": " -- self asString -- " is not a valid argument expression."
+    } makeVirtual.
+
+ASTArgumentNode
+    withSelector: #parseAsArgumentNode addMethod: {:self :: ASTArgumentNode | self } makeOverride.
+
+ASTIdentifierReferenceNode
+    withSelector: #parseKeywordAsLiteralWithoutColon addMethod: {:self :: ASTLiteralNode |
+        ASTLiteralNode new
+            sourcePosition: self sourcePosition;
+            value: (self value asString withoutSuffix: ":") asSymbol;
+            yourself
+    };
+    withSelector: #parseAsArgumentNode addMethod: {:self :: ASTArgumentNode |
+        ASTArgumentNode new
+            sourcePosition: self sourcePosition;
+            isForAll: false;
+            name: (ASTLiteralNode new
+                sourcePosition: self sourcePosition;
+                value: self value;
+                yourself);
+            yourself
+    } makeOverride.
+
+ASTUnexpandedSExpressionNode
+    withSelector: #parseAsArgumentNode addMethod: {:self :: ASTArgumentNode |
+        if: self elements size ~= 2sz then: self asString -- " is not a valid argument expression.".
+        let: #name with: self elements first parseKeywordAsLiteralWithoutColon.
+        let: #type with: self elements second.
+        ASTArgumentNode new
+            sourcePosition: self sourcePosition;
+            isForAll: false;
+            name: name;
+            type: type;
+            yourself
+    } makeOverride.
+
+ASTUnexpandedApplicationNode
+    withSelector: #parseAsArgumentNode addMethod: {:self :: ASTArgumentNode |
+        if: self arguments size ~= 1sz then: self asString -- " is not a valid argument expression.".
+        let: #name with: self functionOrMacroExpression parseKeywordAsLiteralWithoutColon.
+        let: #type with: self arguments first.
+        ASTArgumentNode new
+            sourcePosition: self sourcePosition;
+            isForAll: false;
+            name: name;
+            type: type;
+            yourself
+    } makeOverride.

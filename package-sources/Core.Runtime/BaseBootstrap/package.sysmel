@@ -3,9 +3,30 @@ loadSourceNamed: "AST.sysmel".
 __DefaultAnalysisQueueValueBox__ value waitPendingAnalysis.
 
 loadSourceNamed: "GlobalMacros.sysmel".
+loadSourceNamed: "ExtensionMacros.sysmel".
 loadSourceNamed: "RuntimeMacros.sysmel".
-loadSourceNamed: "MetaBuilders.sysmel".
+
+loadSourceNamed: "ArgumentNodeParsing.sysmel".
+
+loadSourceNamed: "ClassBuildingMethods.sysmel".
+loadSourceNamed: "MetaBuilder.sysmel".
+loadSourceNamed: "MetaBuilderFactory.sysmel".
+loadSourceNamed: "MacroMetaBuilder.sysmel".
+loadSourceNamed: "FlagMetaBuilder.sysmel".
+loadSourceNamed: "NamedMetaBuilder.sysmel".
+loadSourceNamed: "FunctionMetaBuilder.sysmel".
+loadSourceNamed: "TemplateMetaBuilder.sysmel".
+loadSourceNamed: "MethodMetaBuilder.sysmel".
+
+loadSourceNamed: "TypeMetaBuilder.sysmel".
+loadSourceNamed: "ClassMetaBuilder.sysmel".
+loadSourceNamed: "VariableMetaBuilder.sysmel".
+loadSourceNamed: "LetMetaBuilder.sysmel".
+loadSourceNamed: "GlobalMetaBuilder.sysmel".
+loadSourceNamed: "FieldMetaBuilder.sysmel".
+loadSourceNamed: "MacroMethodMetaBuilder.sysmel".
 loadSourceNamed: "PackageMacro.sysmel".
+
 loadSourceNamed: "ProgramEntity.sysmel".
 loadSourceNamed: "SequenceTuple.sysmel".
 loadSourceNamed: "FixedArray.sysmel".

@@ -1,0 +1,29 @@
+
+{
+    let: #typeExtendMacro with: {:macroContext :self :extensionBlock :: ASTNode |
+            ``{
+                let: #SelfType with: `,self.
+                let: #ReceiverType with: SelfType asReceiverType.
+                let: #SuperType with: SelfType supertype.
+                let: #__Meta__ with: SelfType __type__.
+                let: #__OwnerProgramEntity__ with: SelfType.
+                macroLet: #super with: (tuple: self withLookupStartingFrom: SuperType).
+                `,extensionBlock
+            }
+        } makeMacro.
+    Type
+        withSelector: #extend: addMacroMethod: typeExtendMacro;
+        withSelector: #definition: addMacroMethod: typeExtendMacro.
+}.
+
+{
+    let: #namespaceExtendMacro with: {:macroContext :self :extensionBlock :: ASTNode |
+            ``{
+                let: #__OwnerProgramEntity__ with: `,self.
+                `,extensionBlock
+            }
+        } makeMacro.
+    Namespace
+        withSelector: #extend: addMacroMethod: namespaceExtendMacro;
+        withSelector: #definition: addMacroMethod: namespaceExtendMacro.
+}.

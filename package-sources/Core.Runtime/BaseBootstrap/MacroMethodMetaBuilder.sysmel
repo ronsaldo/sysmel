@@ -1,0 +1,46 @@
+
+MacroMetaBuilder publicSubclass: #MacroMethodMetaBuilder slots: (
+    TypeSlot publicNamed: #methodFlags type: Bitflags ,
+    TypeSlot publicNamed: #isFallbackMethod type: Boolean ,
+    TypeSlot publicNamed: #isPublic type: Boolean ,
+).
+
+MacroMethodMetaBuilder
+    withSelector: #initialize addMethod: {:self :: Void |
+        (tuple: self withLookupStartingFrom: MacroMethodMetaBuilder supertype) initialize.
+        self methodFlags: FunctionFlags::Macro.
+        self isFallbackMethod: false.
+    } makeOverride;
+    withSelector: #addMethodFlags: addMethod: {:self :(Bitflags)flags :: Void |
+        self methodFlags: self methodFlags | flags
+    };
+    withSelector: #fallback addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self isFallbackMethod: true.
+        self continueExpansion
+    };
+    withSelector: #method addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self delegateToMetaBuilder: (MethodMetaBuilder new
+            methodFlags: self methodFlags;
+            isMacro: true;
+            isFallbackMethod: self isFallbackMethod;
+            yourself)
+    };
+    withSelector: #function addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self delegateToMetaBuilder: (FunctionMetaBuilder new
+            functionFlags: self functionFlags;
+            isMacro: true;
+            isPublic: self isPublic;
+            yourself)
+    }.
+
+FlagMetaBuilder
+    withSelector: #macro addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self delegateToMetaBuilder: (MacroMethodMetaBuilder new
+            addMethodFlags: self methodFlags;
+            isPublic: self isPublic;
+            yourself)
+    }

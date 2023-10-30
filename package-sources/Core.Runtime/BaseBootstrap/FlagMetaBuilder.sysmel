@@ -1,0 +1,176 @@
+MacroMetaBuilder publicSubclass: #FlagMetaBuilder slots: (
+    TypeSlot publicNamed: #methodFlags type: Bitflags ,
+    TypeSlot publicNamed: #callingConvention type: Symbol ,
+    TypeSlot publicNamed: #typeFlags type: Bitflags ,
+    TypeSlot publicNamed: #fieldFlags type: Bitflags ,
+    TypeSlot publicNamed: #isPublic type: Boolean ,
+    TypeSlot publicNamed: #isExternal type: Boolean ,
+    TypeSlot publicNamed: #isThreadLocal type: Boolean ,
+    TypeSlot publicNamed: #isEager type: Boolean ,
+).
+
+FlagMetaBuilder
+    withSelector: #initialize addMethod: {:self :: Void |
+        (tuple: self withLookupStartingFrom: FlagMetaBuilder supertype) initialize.
+        self methodFlags: FunctionFlags::None.
+        self typeFlags: TypeFlags::None.
+        self fieldFlags: TypeSlotFlags::None.
+        self isPublic: false.
+    } makeOverride;
+    withSelector: #expandMessageSendNode: addMethod: {:self :(ASTMessageSendNode)messageSendNode :: ASTNode |
+        let: #selector with: messageSendNode selector.
+        if: (selector isLiteralNode && (selector downCastTo: ASTLiteralNode) value) == #class then: {
+            self delegateToMetaBuilder: (ClassMetaBuilder new
+                isPublic: self isPublic;
+                typeFlags: self typeFlags;
+                yourself)
+        } else: {
+            self expandMessageSendNodeWithMetaBuilderMethod: messageSendNode
+        }.
+    } makeOverride;
+    withSelector: #addFieldFlags: addMethod: {:self :(Bitflags)flags :: Void |
+        self fieldFlags: self fieldFlags | flags
+    };
+    withSelector: #addMethodFlags: addMethod: {:self :(Bitflags)flags :: Void |
+        self methodFlags: self methodFlags | flags
+    };
+    withSelector: #addTypeFlags: addMethod: {:self :(Bitflags)flags :: Void |
+        self typeFlags: self typeFlags | flags
+    };
+    withSelector: #pure addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addMethodFlags: FunctionFlags::Pure.
+        self continueExpansion
+    };
+    withSelector: #final addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addTypeFlags: TypeFlags::Final.
+        self addMethodFlags: FunctionFlags::Final.
+        self continueExpansion
+    };
+    withSelector: #virtual addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addMethodFlags: FunctionFlags::Virtual.
+        self continueExpansion
+    };
+    withSelector: #abstract addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addTypeFlags: TypeFlags::Abstract.
+        self addMethodFlags: FunctionFlags::Abstract.
+        self continueExpansion
+    };
+    withSelector: #override addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addMethodFlags: FunctionFlags::Override.
+        self continueExpansion
+    };
+    withSelector: #static addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addMethodFlags: FunctionFlags::Static.
+        self continueExpansion
+    };
+    withSelector: #readonly addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addFieldFlags: TypeSlotFlags::ReadOnly.
+        self continueExpansion
+    };
+    withSelector: #externC addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addMethodFlags: FunctionFlags::ExternC.
+        self continueExpansion
+    };
+    withSelector: #dllImport addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addMethodFlags: FunctionFlags::DLLImport.
+        self continueExpansion
+    };
+    withSelector: #dllExport addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addMethodFlags: FunctionFlags::DLLExport.
+        self continueExpansion
+    };
+    withSelector: #cdecl addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self callingConvention: #cdecl.
+        self continueExpansion
+    };
+    withSelector: #stdcall addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self callingConvention: #stdcall.
+        self continueExpansion
+    };
+    withSelector: #apicall addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self callingConvention: #apicall.
+        self continueExpansion
+    };
+    withSelector: #thiscall addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self callingConvention: #thiscall.
+        self continueExpansion
+    };
+    withSelector: #coldcc addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self callingConvention: #coldcc.
+        self continueExpansion
+    };
+    withSelector: #hotcc addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self callingConvention: #hotcc.
+        self continueExpansion
+    };
+    withSelector: #inline addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addMethodFlags: FunctionFlags::Inline.
+        self continueExpansion
+    };
+    withSelector: #alwaysInline addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addMethodFlags: FunctionFlags::AlwaysInline.
+        self continueExpansion
+    };
+    withSelector: #neverInline addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addMethodFlags: FunctionFlags::NeverInline.
+        self continueExpansion
+    };
+    withSelector: #withoutSourceDebugging addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addMethodFlags: FunctionFlags::WithoutSourceDebugging.
+        self continueExpansion
+    };
+    withSelector: #nogc addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self addMethodFlags: FunctionFlags::NoGC.
+        self continueExpansion
+    };
+    withSelector: #eager addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self isEager: true.
+        self continueExpansion
+    };
+    withSelector: #external addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self isExternal: true.
+        self continueExpansion
+    }.
+
+FlagMetaBuilder publicSubclass: #PublicMetaBuilder slots: (
+).
+
+PublicMetaBuilder
+    withSelector: #initialize addMethod: {:self :: Void |
+        (tuple: self withLookupStartingFrom: PublicMetaBuilder supertype) initialize.
+        self fieldFlags: TypeSlotFlags::Public.
+        self isPublic: true.
+    } makeOverride.
+
+FlagMetaBuilder publicSubclass: #ProtectedMetaBuilder slots: (
+).
+
+FlagMetaBuilder publicSubclass: #PrivateMetaBuilder slots: (
+).
+
+public: #public with: (MetaBuilderFactory for: PublicMetaBuilder).
+public: #protected with: (MetaBuilderFactory for: ProtectedMetaBuilder).
+public: #private with: (MetaBuilderFactory for: PrivateMetaBuilder).

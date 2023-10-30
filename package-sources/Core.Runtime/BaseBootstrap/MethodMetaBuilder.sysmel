@@ -1,0 +1,118 @@
+MacroMetaBuilder publicSubclass: #MethodMetaBuilder slots: (
+    TypeSlot publicNamed: #methodFlags type: Bitflags ,
+    TypeSlot publicNamed: #callingConvention type: Symbol ,
+    TypeSlot publicNamed: #isMacro type: Boolean ,
+    TypeSlot publicNamed: #isFallbackMethod type: Boolean ,
+    TypeSlot publicNamed: #isEager type: Boolean ,
+    TypeSlot publicNamed: #selector type: ASTNode ,
+    TypeSlot publicNamed: #resultType type: ASTNode ,
+    TypeSlot publicNamed: #body type: ASTNode ,
+    TypeSlot publicNamed: #arguments type: Array
+).
+
+MethodMetaBuilder
+    withSelector: #initialize addMethod: {:self :: Void |
+        (tuple: self withLookupStartingFrom: MethodMetaBuilder supertype) initialize.
+        self methodFlags: FunctionFlags::None.
+        self isMacro: false.
+        self isFallbackMethod: false.
+    } makeOverride;
+    withSelector: #expandMessageSendNode: addMethod: {:self :(ASTMessageSendNode)messageSendNode :: ASTNode |
+        if: self selector == nil then: {
+            self selector: messageSendNode selector.
+            self arguments: (messageSendNode arguments collect: {:each | each parseAsArgumentNode}).
+            self continueExpansion
+        } else: {
+            self expandMessageSendNodeWithMetaBuilderMethod: messageSendNode
+        }.
+    } makeOverride;
+    withSelector: #addMethodFlags: addMethod: {:self :(Bitflags)flags :: Void |
+        self methodFlags: self methodFlags | flags
+    };
+    withSelector: #":=" addMethod: {:self :(ASTNode)bodyNode :: ASTNode |
+        <metaBuilder>
+        self body: bodyNode.
+        self finishExpansion
+    };
+    withSelector: #=> addMethod: {:self :(ASTNode)resultType :: ASTNode |
+        <metaBuilder>
+        self resultType: resultType.
+        self continueExpansion
+    };
+    withSelector: #bodyWithInjectedCode addMethod: {:self :: ASTNode |
+        let: #selfIdentifier with: (ASTIdentifierReferenceNode new
+            sourcePosition: self sourcePosition;
+            value: #self;
+            yourself).
+        let: #useSelf with: (ASTUseNamedSlotsOfNode new
+            sourcePosition: self sourcePosition;
+            tupleExpression: selfIdentifier;
+            yourself).
+        let: #sequence with: (ASTSequenceNode new
+            sourcePosition: self sourcePosition;
+            expressions: (Array with: useSelf with: self body);
+            yourself)
+    };
+    withSelector: #finishMacroMethodExpansion addMethod: {:self :: ASTNode |
+        let: #macroContextArgument with: (ASTArgumentNode new
+            sourcePosition: self sourcePosition;
+            isForAll: false;
+            name: `'#__macroContext__;
+            type: `'MacroContext;
+            yourself).
+        let: #selfArgument with: (ASTArgumentNode new
+            sourcePosition: self sourcePosition;
+            isForAll: false;
+            name: `'#self;
+            type: `'ASTNode;
+            yourself).
+        let: #arguments with: (Array with: macroContextArgument with: selfArgument) -- self arguments.
+        let: #methodNode with: (ASTLambdaNode new
+            sourcePosition: self sourcePosition;
+            flags: self methodFlags;
+            arguments: arguments;
+            body: self bodyWithInjectedCode;
+            resultType: self resultType;
+            yourself
+        ).
+        
+        if: self isFallbackMethod
+        then: ``(__OwnerProgramEntity__ withSelector: `,(self selector) addFallbackMethod: `,methodNode)
+        else: ``(__OwnerProgramEntity__ withSelector: `,(self selector) addMacroMethod: `,methodNode)
+    };
+    withSelector: #finishMethodExpansion addMethod: {:self :: ASTNode |
+        let: #selfArgument with: (ASTArgumentNode new
+            sourcePosition: self sourcePosition;
+            isForAll: false;
+            name: `'#self;
+            type: `'ReceiverType;
+            yourself).
+        let: #arguments with: (Array with: selfArgument) -- self arguments.
+        let: #methodNode with: (ASTLambdaNode new
+            sourcePosition: self sourcePosition;
+            flags: self methodFlags;
+            callingConventionName: self callingConvention;
+            arguments: arguments;
+            body: self bodyWithInjectedCode;
+            resultType: self resultType;
+            makeEagerIf: self isEager;
+            yourself
+        ).
+        
+        ``(__OwnerProgramEntity__ withSelector: `,(self selector) addMethod: `,methodNode)
+    };
+    withSelector: #finishExpansionWithEnvironment: addMethod: {:self :(Environment)environment :: ASTNode |
+        if: self isMacro
+        then: self finishMacroMethodExpansion
+        else: self finishMethodExpansion
+    } makeOverride.
+
+FlagMetaBuilder
+    withSelector: #method addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self delegateToMetaBuilder: (MethodMetaBuilder new
+            addMethodFlags: self methodFlags;
+            callingConvention: self callingConvention;
+            isEager: self isEager;
+            yourself)
+    }.

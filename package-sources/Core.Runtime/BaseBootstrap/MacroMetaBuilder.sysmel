@@ -1,0 +1,81 @@
+MetaBuilder publicSubclass: #MacroMetaBuilder slots: (
+    TypeSlot publicNamed: #environment type: Environment ,
+    TypeSlot publicNamed: #sourcePosition type: SourcePosition ,
+    TypeSlot publicNamed: #continueExpansion type: ASTNode
+).
+
+MacroMetaBuilder
+    withSelector: #analyzeAndEvaluateMessageSendNode:withEnvironment: addMethod: {:self :(ASTMessageSendNode)messageSendNode :(Environment)environment |
+        (self expandMessageSendNode: messageSendNode withEnvironment: environment) analyzeAndEvaluateWithEnvironment: environment
+    } makeOverride;
+    withSelector: #analyzeMessageSendNode:withEnvironment: addMethod: {:self :(ASTMessageSendNode)messageSendNode :(Environment)environment |
+        (self expandMessageSendNode: messageSendNode withEnvironment: environment) analyzeWithEnvironment: environment
+    } makeOverride;
+    withSelector: #analyzeAndEvaluateUnexpandedApplicationNode:withEnvironment: addMethod: {:self :(ASTUnexpandedApplicationNode)unexpandedApplicationNode :(Environment)environment |
+        (self expandUnexpandedApplicationNode: unexpandedApplicationNode withEnvironment: environment) analyzeAndEvaluateWithEnvironment: environment
+    } makeOverride;
+    withSelector: #analyzeUnexpandedApplicationNode:withEnvironment: addMethod: {:self :(ASTUnexpandedApplicationNode)unexpandedApplicationNode :(Environment)environment |
+        (self expandUnexpandedApplicationNode: unexpandedApplicationNode withEnvironment: environment) analyzeWithEnvironment: environment
+    } makeOverride;
+    withSelector: #expandMessageSendNode:withEnvironment: addMethod: {:self :(ASTMessageSendNode)messageSendNode :(Environment)environment :: ASTNode |
+        self
+            environment: environment;
+            sourcePosition: messageSendNode sourcePosition;
+            continueExpansion: messageSendNode receiver;
+            expandMessageSendNode: messageSendNode
+    };
+    withSelector: #expandUnexpandedApplicationNode:withEnvironment: addMethod: {:self :(ASTUnexpandedApplicationNode)unexpandedApplicationNode :(Environment)environment :: ASTNode |
+        self
+            environment: environment;
+            sourcePosition: unexpandedApplicationNode sourcePosition;
+            continueExpansion: unexpandedApplicationNode functionOrMacroExpression;
+            expandUnexpandedApplicationNode: unexpandedApplicationNode
+    };
+    withSelector: #analyzeAndEvaluateConcreteMetaValueWithEnvironment: addMethod: {:self :(Environment)environment |
+        (self
+            environment: environment;
+            finishExpansion) analyzeAndEvaluateWithEnvironment: environment
+    } makeOverride;
+    withSelector: #analyzeConcreteMetaValue:withEnvironment: addMethod: {:self :(ASTLiteralNode)metaBuilderLiteralNode :(Environment)environment |
+        self
+            environment: environment;
+            sourcePosition: metaBuilderLiteralNode sourcePosition;
+            finishExpansion
+    } makeOverride;
+    withSelector: #expandMessageSendNode: addMethod: {:self :(ASTMessageSendNode)messageSendNode :: ASTNode |
+        self expandMessageSendNodeWithMetaBuilderMethod: messageSendNode
+    } makeVirtual;
+    withSelector: #expandUnexpandedApplicationNode: addMethod: {:self :(ASTUnexpandedApplicationNode)unexpandedApplicationNode :: ASTNode |
+        self finishExpansion
+    } makeVirtual;
+    withSelector: #expandMessageSendNodeWithMetaBuilderMethod: addMethod: {:self :(ASTMessageSendNode)messageSendNode :: ASTNode |
+        let: #metaBuilderMethod with: (
+            if: messageSendNode selector isLiteralNode
+                then: (self class lookupSelector: (messageSendNode selector downCastTo: ASTLiteralNode) value)
+                else: (nil)
+        ).
+
+        if: metaBuilderMethod isNotNil && (metaBuilderMethod hasPragmaNamed: #metaBuilder)
+            then: (metaBuilderMethod applyWithArguments:(Array with: self) -- messageSendNode arguments)
+            else: self finishExpansion
+    };
+    withSelector: #finishExpansionWithMessageSendNode:environment: addMethod: {:self :(ASTMessageSendNode)messageSendNode :(Environment)environment :: ASTNode |
+        messageSendNode copy
+            receiver: (self finishExpansionWithEnvironment: environment);
+            yourself
+    };
+    withSelector: #finishExpansionWithMessageSendNode: addMethod: {:self :(ASTMessageSendNode)messageSendNode :: ASTNode |
+        self finishExpansionWithMessageSendNode: messageSendNode environment: self environment
+    };
+    withSelector: #finishExpansionWithEnvironment: addMethod: {:self :(Environment)environment :: ASTNode |
+        self subclassResponsibility
+    } makeAbstract;
+    withSelector: #finishExpansion addMethod: {:self :: ASTNode |
+        self finishExpansionWithEnvironment: self environment
+    };
+    withSelector: #delegateToMetaBuilder: addMethod: {:self :metaBuilder :: ASTNode |
+        ASTLiteralNode new
+            sourcePosition: self sourcePosition;
+            value: metaBuilder;
+            yourself
+    }.

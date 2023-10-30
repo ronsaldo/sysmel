@@ -1,0 +1,93 @@
+ProgramEntity
+    withSelector: #enqueuePendingAnalysisInEnvironment: addMethod: {:(ProgramEntity)self :(Environment)environment :: Void |
+        environment enqueuePendingAnalysis: self
+    }.
+
+Type
+    withSelector: #analyzeAndEvaluateConcreteMetaValue:withEnvironment: addMethod: {:self :(Untyped)metaBuilderInstance :(Environment)environment :: Untyped |
+        metaBuilderInstance
+    } makeVirtual;
+    withSelector: #analyzeConcreteMetaValue:withEnvironment: addMethod: {:self :(ASTLiteralNode)metaValueLiteralNode :(Environment)environment |
+        metaValueLiteralNode
+    } makeVirtual.
+
+MetaBuilder
+    withSelector: #analyzeAndEvaluateMessageSendNode:forReceiver:withEnvironment: addClassMethod: {:self :(ASTMessageSendNode)messageSendNode :(Untyped)receiver :(Environment)environment |
+        let: #selfReceiver with: (ASTLiteralNode new
+            sourcePosition: messageSendNode receiver sourcePosition;
+            value: receiver;
+            yourself). 
+        let: #messageWithSelfReceiver with: (messageSendNode copy
+            receiver: selfReceiver;
+            yourself).
+
+        receiver analyzeAndEvaluateMessageSendNode: messageWithSelfReceiver withEnvironment: environment
+    } makeVirtual;
+    withSelector: #analyzeMessageSendNode:withEnvironment: addClassMethod: {:self :(ASTMessageSendNode)messageSendNode :(Environment)environment |
+        self assert: messageSendNode receiver isLiteralNode.
+        (messageSendNode receiver downCastTo: ASTLiteralNode) value analyzeMessageSendNode: messageSendNode withEnvironment: environment
+    };
+    withSelector: #analyzeAndEvaluateUnexpandedApplicationNode:of:withEnvironment: addClassMethod: {:self :(ASTUnexpandedApplicationNode)unexpandedApplicationNode :(Untyped)functional :(Environment)environment |
+        let: #selfReceiver with: (ASTLiteralNode new
+            sourcePosition: unexpandedApplicationNode functionOrMacroExpression sourcePosition;
+            value: functional;
+            yourself). 
+        let: #unexpandedApplicationWithSelfReceiver with: (unexpandedApplicationNode copy
+            functionOrMacroExpression: selfReceiver;
+            yourself).
+
+        functional analyzeAndEvaluateUnexpandedApplicationNode: unexpandedApplicationWithSelfReceiver withEnvironment: environment
+    } makeVirtual;
+    withSelector: #analyzeUnexpandedApplicationNode:withEnvironment: addClassMethod: {:self :(ASTUnexpandedApplicationNode)unexpandedApplicationNode :(Environment)environment |
+        self assert: unexpandedApplicationNode functionOrMacroExpression isLiteralNode.
+        (unexpandedApplicationNode functionOrMacroExpression downCastTo: ASTLiteralNode) value analyzeUnexpandedApplicationNode: unexpandedApplicationNode withEnvironment: environment
+    } makeVirtual;
+    withSelector: #analyzeAndEvaluateMessageChainNode:forReceiver:withEnvironment: addClassMethod: {:self :messageChainNode :(Untyped)receiver :(Environment)environment :: Untyped |
+        let: #selfReceiver with: (ASTLiteralNode new
+            sourcePosition: messageChainNode receiver sourcePosition;
+            value: receiver;
+            yourself). 
+        
+        let: #result type: Untyped mutableWith: receiver.
+
+        messageChainNode messages do: {:messageChainMessageNode :: Void |
+            result := receiver analyzeAndEvaluateMessageSendNode: (messageChainMessageNode asMessageSendNodeWithReceiver: selfReceiver) withEnvironment: environment
+        }.
+
+        result __refLoad__
+    } makeVirtual;
+    withSelector: #analyzeMessageChainNode:withEnvironment: addClassMethod: {:self :messageChainNode :(Environment)environment |
+        let: #selfReceiver with: messageChainNode receiver.
+        let: #receiver with: selfReceiver value.
+        let: #result type: ASTNode mutableWith: selfReceiver.
+
+        messageChainNode messages do: {:messageChainMessageNode :: Void |
+            result := receiver analyzeMessageSendNode: (messageChainMessageNode asMessageSendNodeWithReceiver: selfReceiver) withEnvironment: environment
+        }.
+
+        result
+    } makeVirtual;
+    withSelector: #analyzeAndEvaluateConcreteMetaValue:withEnvironment: addClassMethod: {:self :metaBuilderInstance :(Environment)environment |
+        metaBuilderInstance analyzeAndEvaluateConcreteMetaValueWithEnvironment: environment
+    } makeOverride;
+    withSelector: #analyzeConcreteMetaValue:withEnvironment: addClassMethod: {:self :(ASTLiteralNode)metaBuilderLiteralNode :(Environment)environment |
+        metaBuilderLiteralNode value analyzeConcreteMetaValue: metaBuilderLiteralNode withEnvironment: environment
+    } makeOverride;
+    withSelector: #analyzeAndEvaluateMessageSendNode:withEnvironment: addMethod: {:self :(ASTMessageSendNode)messageSendNode :(Environment)environment |
+        self subclassResponsibility
+    } makeAbstract;
+    withSelector: #analyzeMessageSendNode:withEnvironment: addMethod: {:self :(ASTMessageSendNode)messageSendNode :(Environment)environment |
+        self subclassResponsibility
+    } makeAbstract;
+    withSelector: #analyzeAndEvaluateUnexpandedApplicationNode:withEnvironment: addMethod: {:self :(ASTUnexpandedApplicationNode)node :(Environment)environment |
+        self subclassResponsibility
+    } makeAbstract;
+    withSelector: #analyzeUnexpandedApplicationNode:withEnvironment: addMethod: {:self :(ASTMessageSendNode)messageSendNode :(Environment)environment |
+        self subclassResponsibility
+    } makeAbstract;
+    withSelector: #analyzeAndEvaluateConcreteMetaValueWithEnvironment: addMethod: {:self :(Environment)environment |
+        self
+    } makeVirtual;
+    withSelector: #analyzeConcreteMetaValue:withEnvironment: addMethod: {:self :(ASTLiteralNode)metaBuilderLiteralNode :(Environment)environment |
+        metaBuilderLiteralNode
+    } makeVirtual.

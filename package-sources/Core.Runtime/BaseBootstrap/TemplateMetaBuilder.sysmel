@@ -1,0 +1,36 @@
+FunctionMetaBuilder publicSubclass: #TemplateMetaBuilder slots: (
+).
+
+TemplateMetaBuilder
+    withSelector: #initialize addMethod: {:self :: Void |
+        (tuple: self withLookupStartingFrom: TemplateMetaBuilder supertype) initialize.
+        self functionFlags: FunctionFlags::Memoized | FunctionFlags::Template.
+    } makeOverride;
+    withSelector: #finishFunctionExpansion addMethod: {:self :: ASTNode |
+        let: #templateResultArgument with: (ASTArgumentNode new
+            sourcePosition: self sourcePosition;
+            isForAll: false;
+            name: `'#__templateResult__;
+            type: `'WeakValueAssociation;
+            yourself).
+
+        ASTLambdaNode new
+            sourcePosition: self sourcePosition;
+            flags: self functionFlags;
+            name: self name;
+            arguments: (Array with: templateResultArgument) -- self arguments;
+            body: self expansionBody;
+            resultType: self resultType;
+            makeEagerIf: self isEager;
+            yourself
+    } makeOverride.
+
+FlagMetaBuilder
+    withSelector: #template addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self delegateToMetaBuilder: (TemplateMetaBuilder new
+            addFunctionFlags: self methodFlags;
+            isPublic: self isPublic;
+            isEager: self isEager;
+            yourself)
+    }.

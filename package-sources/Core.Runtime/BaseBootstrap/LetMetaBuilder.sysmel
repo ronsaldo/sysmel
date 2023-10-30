@@ -1,0 +1,25 @@
+VariableMetaBuilder publicSubclass: #LetMetaBuilder slots: (
+    TypeSlot publicNamed: #isMutable type: Boolean ,
+).
+
+LetMetaBuilder
+    withSelector: #initialize addMethod: {:self :: Void |
+        (tuple: self withLookupStartingFrom: TypeMetaBuilder supertype) initialize.
+        self isMutable: false
+    } makeOverride;
+    withSelector: #mutable addMethod: {:self :: ASTNode |
+        <metaBuilder>
+        self isMutable: true.
+        self continueExpansion
+    };
+    withSelector: #finishExpansionWithEnvironment: addMethod: {:self :(Environment)environment :: ASTNode |
+        ASTVariableDefinitionNode new
+            sourcePosition: self sourcePosition;
+            nameExpression: self name;
+            typeExpression: self typeExpression;
+            valueExpression: self initialValue;
+            isMutable: self isMutable;
+            yourself
+    } makeOverride.
+
+public: #let with: (MetaBuilderFactory for: LetMetaBuilder).
