@@ -291,6 +291,16 @@ public final struct NativeCodeLoader definition: {
                     ##self assert: value asInt32 asIntPointer = value.
                     (relocationTargetAddress reinterpretCastTo: Int32 pointer) store: value asInt32
                 }.
+                NativeCodeRelocation::Type::SectionRelative32 : {
+                    let value := symbol virtualAddress asIntPointer + addend asIntPointer.
+                    let sectionAddress := symbol section ifNotNil: symbol section virtualAddress asIntPointer ifNil: 0iptr.
+                    (relocationTargetAddress reinterpretCastTo: Int32 pointer) store: (value - sectionAddress) asInt32
+                }.
+                NativeCodeRelocation::Type::SectionRelative64 : {
+                    let value := symbol virtualAddress asIntPointer + addend asIntPointer.
+                    let sectionAddress := symbol section ifNotNil: symbol section virtualAddress asIntPointer ifNil: 0iptr.
+                    (relocationTargetAddress reinterpretCastTo: Int64 pointer) store: (value - sectionAddress) asInt64
+                }.
                 _: {
                     error("Unsupported jit relocation of type " -- (NativeCodeRelocation::Type::NameTable at: type) asString).
                 }

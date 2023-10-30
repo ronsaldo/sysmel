@@ -41,6 +41,7 @@ public global NativeCodeLoaderElf::Last mutable => NativeCodeLoaderSymbolFile :=
 public class NativeCodeLoaderElf64Builder superclass: Object; definition: {
     public field header => Elf64::Header.
     public field sectionHeaders => Elf64::SectionHeader[NativeCodeLoaderElfSectionCapacity].
+    public field sectionRelocatedContents => Elf64::Addr[NativeCodeLoaderElfSectionCapacity].
     public field sectionsContents => Array.
 
     public field stringTableBuilder => StringStream.
@@ -152,12 +153,15 @@ public class NativeCodeLoaderElf64Builder superclass: Object; definition: {
         sectionsContents at: sectionIndex put: nativeCodeSection data.
 
         let sectionHeader := sectionHeaders[sectionIndex] address.
+        let relocatedAddress := nativeCodeSection virtualAddress asUInt64.
+        sectionRelocatedContents[sectionIndex] := relocatedAddress.
+
         sectionHeader _
             name: (self addString: nativeCodeSection name asString);
             type: Elf::SectionHeaderType::Progbits;
             flags: sectionFlags asUInt64;
             size: nativeCodeSection size asUInt64;
-            addr: nativeCodeSection virtualAddress asUInt64;
+            addr: (nativeCodeSection isDebugging ifTrue: 0u64 ifFalse: relocatedAddress);
             addrAlign: nativeCodeSection alignment asUInt64.
     }.
 
@@ -324,14 +328,20 @@ public class NativeCodeLoaderElf64Builder superclass: Object; definition: {
             let i mutable := 0sz.
             while: (i < sectionCount) do: {
                 let sectionHeader := sectionHeaders[i] address.
+                let relocatedContentAddress := sectionRelocatedContents[i].
+                
                 sectionHeader _ size > 0u64 ifTrue: {
                     sectionHeader _ addr ~= 0u64 ifTrue: {
                         memcpy(destinationPointer + sectionHeader _ offset asIntPointer reinterpretCastTo: Void pointer, sectionHeader _ addr asUIntPointer reinterpretCastTo: Void pointer, sectionHeader _ size).
                     } ifFalse: {
-                        let content => ByteArray := sectionsContents at: i.
-                        content ifNotNil: {
-                            memcpy(destinationPointer + sectionHeader _ offset asIntPointer reinterpretCastTo: Void pointer, content __rawContentsPointer__, content __byteSize__).
-                        }.
+                        relocatedContentAddress ~= 0u64 ifTrue: {
+                            memcpy(destinationPointer + sectionHeader _ offset asIntPointer reinterpretCastTo: Void pointer, relocatedContentAddress asUIntPointer reinterpretCastTo: Void pointer, sectionHeader _ size).
+                        } ifFalse: {
+                            let content => ByteArray := sectionsContents at: i.
+                            content ifNotNil: {
+                                memcpy(destinationPointer + sectionHeader _ offset asIntPointer reinterpretCastTo: Void pointer, content __rawContentsPointer__, content __byteSize__).
+                            }.
+                        }
                     }
                 }
             } continueWith: (i := i + 1sz).

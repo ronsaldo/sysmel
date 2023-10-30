@@ -67,9 +67,20 @@ public class DwarfLineInformationBuilder superclass: Object; definition: {
 
         fileDictionary at: sourceCode ifAbsentPut: {:: UInt32 |
             let directoryIndex := self addSourceDirectory: sourceCode directory.
-            files add: (directoryIndex, sourceCode name, sourceCode isInFile ifTrue: "" ifFalse: sourceCode text).
+            files add: (directoryIndex, sourceCode name, sourceCode isInFile ifTrue: nil ifFalse: sourceCode text).
             files size asUInt32
         }
+    }.
+
+    public method getSourceCodeIndex: (sourceCode: SourceCode) ::=> UInt32
+        := fileDictionary at: sourceCode.
+
+    public method addSourceCodesForProgramEntities: (programEntities: SequenceableCollection) ::=> Void := {
+        programEntities do: {:(NativeCodeProgramEntity)each :: Void |
+            each debugSourcePosition ifNotNil: {
+                self addSourceCode: each debugSourcePosition sourceCode
+            }
+        }.
     }.
 
     public method computeLineRangeForSections: (sections: SequenceableCollection) ::=> Void := {
@@ -102,7 +113,8 @@ public class DwarfLineInformationBuilder superclass: Object; definition: {
         lineRange := (maxLine - minLine min: 255i32) max: 1i32.
     }.
 
-    public method writeSourceLocationForSections: (sections: SequenceableCollection) ::=> Void := {
+    public method writeSourceLocationForSections: (sections: SequenceableCollection) programEntities: (programEntities: SequenceableCollection)::=> Void := {
+        self addSourceCodesForProgramEntities: programEntities.
         self computeLineRangeForSections: sections.
 
         let initialLenghtOffset := targetSection size.
@@ -177,28 +189,49 @@ public class DwarfLineInformationBuilder superclass: Object; definition: {
                 uleb128: 1sz;
                 uleb128: Dwarf::DW_LNCT_path asSize; uleb128: Dwarf::DW_FORM_string asSize.
 
-            targetSection uleb128: directories size.
+            targetSection uleb128: directories size + 1sz.
+            targetSection cstring: "". ## Empty working directory.
             directories do: { :(String)eachDirectory :: Void |
                 targetSection cstring: eachDirectory
             }.
             
             ## Files
-            targetSection
-                uleb128: 3sz;
-                uleb128: Dwarf::DW_LNCT_path asSize; uleb128: Dwarf::DW_FORM_string asSize;
-                uleb128: Dwarf::DW_LNCT_directory_index asSize; uleb128: Dwarf::DW_FORM_udata asSize;
-                uleb128: Dwarf::DW_LNCT_source asSize; uleb128: Dwarf::DW_FORM_string asSize.
-
-            targetSection uleb128: files size.
-            files do: { :(Array)file :: Void |
-                let directoryIndex => UInt32 := file first.
-                let name => String := file second.
-                let sourceText => String := file third.
+            let hasInlineText := files anySatisfy: {:(Array)each :: Boolean | each third isNotNil }.
+            hasInlineText ifTrue: {
                 targetSection
-                    cstring: file second;
-                    uleb128: file first asSize;
-                    cstring: (sourceText ifNil: "")
+                    uleb128: 3sz;
+                    uleb128: Dwarf::DW_LNCT_path asSize; uleb128: Dwarf::DW_FORM_string asSize;
+                    uleb128: Dwarf::DW_LNCT_directory_index asSize; uleb128: Dwarf::DW_FORM_udata asSize;
+                    uleb128: Dwarf::DW_LNCT_source asSize; uleb128: Dwarf::DW_FORM_string asSize.
+
+                targetSection uleb128: files size + 1sz.
+                targetSection cstring: ""; uleb128: 0sz; cstring: "". ## Empty compilation unit file.
+                files do: { :(Array)file :: Void |
+                    let directoryIndex => UInt32 := file first.
+                    let name => String := file second.
+                    let sourceText => String := file third.
+                    targetSection
+                        cstring: file second;
+                        uleb128: file first asSize;
+                        cstring: (sourceText ifNil: "")
+                }.
+            } ifFalse: {
+                targetSection
+                    uleb128: 2sz;
+                    uleb128: Dwarf::DW_LNCT_path asSize; uleb128: Dwarf::DW_FORM_string asSize;
+                    uleb128: Dwarf::DW_LNCT_directory_index asSize; uleb128: Dwarf::DW_FORM_udata asSize.
+
+                targetSection uleb128: files size + 1sz.
+                targetSection cstring: ""; uleb128: 0sz. ## Empty compilation unit file.
+                files do: { :(Array)file :: Void |
+                    let directoryIndex => UInt32 := file first.
+                    let name => String := file second.
+                    targetSection
+                        cstring: file second;
+                        uleb128: file first asSize
+                }.
             }.
+
         } ifFalse: {
             ## Directories
             directories do: { :(String)eachDirectory :: Void |

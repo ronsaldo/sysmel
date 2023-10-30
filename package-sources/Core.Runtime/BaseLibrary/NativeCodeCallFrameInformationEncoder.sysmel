@@ -62,8 +62,9 @@ public final class NativeCodeCallFrameInformationEncoder superclass: Object; def
         self assert: address <= newAddress.
         let advance := newAddress - address.
         advance ~= 0u32 ifTrue: {
-            self operation: NativeCodeCallFrameInformation::Opcode::AdvancePC operand: advance asInt32
-        }
+            self operation: NativeCodeCallFrameInformation::Opcode::AdvancePC operand: advance asInt32.
+            address := newAddress
+        }.
     }.
 
     public method endPrologue => Void

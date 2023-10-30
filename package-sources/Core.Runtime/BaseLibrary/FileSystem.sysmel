@@ -3,7 +3,6 @@ FileSystem::workingDirectory adoptDefinitionOf: {:: String |
 }.
 
 (FileSystem::workingDirectory:) adoptDefinitionOf: {:(String)newWorkingDirectory :: Void |
-    "."
 }.
 
 String definition: {
@@ -13,7 +12,9 @@ String definition: {
     }.
 
     public pure final eager method FileSystem::absolute => String
-        := self FileSystem::isAbsolute ifTrue: self ifFalse: (FileSystem::workingDirectory() FileSystem::joinPath: self).
+        := self FileSystem::isAbsolute
+            ifTrue: self
+            ifFalse: (FileSystem::workingDirectory() FileSystem::joinPath: self).
 
     public pure final eager method FileSystem::joinPath: (nextPath: String) ::=> String := {
         self isEmpty || nextPath FileSystem::isAbsolute ifTrue: {

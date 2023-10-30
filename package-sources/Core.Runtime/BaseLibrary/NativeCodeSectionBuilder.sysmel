@@ -96,4 +96,15 @@ public final class NativeCodeSectionBuilder superclass: Object; definition: {
         relocations type: NativeCodeRelocation::Type::Absolute64 symbolIndex: (symbolTableBuilder getOrCreateSymbolForSection: targetSection) offset: byteStream size asUInt32 addend64: addend asInt64.
         self uint64: 0u64
     }.
+
+    public method section: (targetSection: NativeCodeSection) relativeInt32: (addend: Int32) ::=> Void := {
+        relocations type: NativeCodeRelocation::Type::SectionRelative32 symbolIndex: (symbolTableBuilder getOrCreateSymbolForSection: targetSection) offset: byteStream size asUInt32 addend32: addend.
+        self int32: 0i32
+    }.
+
+    public method section: (targetSection: NativeCodeSection) relativeInt64: (addend: Int64) ::=> Void := {
+        relocations type: NativeCodeRelocation::Type::SectionRelative64 symbolIndex: (symbolTableBuilder getOrCreateSymbolForSection: targetSection) offset: byteStream size asUInt32 addend64: addend.
+        self int64: 0i64
+    }.
+
 }.

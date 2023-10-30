@@ -17,6 +17,18 @@ NativeCode definition: {
         nil
     }.
 
+    public method findSectionNamedOrNil: (name: Symbol) ::=> NativeCodeSection := {
+        let i mutable := 0sz.
+        while: i < sections size do: {
+            let section => NativeCodeSection := sections at: i.
+            section name = name ifTrue: {
+                return: section
+            }
+        } continueWith: (i := i + 1sz).
+
+        nil
+    }.
+ 
     public override method fullPrintOn: (stream: Stream) ::=> Void := {
         stream string: "Sections:"; nl.
         sections do: {:(NativeCodeSection)eachSection :: Void |

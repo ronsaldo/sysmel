@@ -695,6 +695,7 @@ FunctionBytecodeAssembler definition: {
 
         ## Store the debug information tables.
         result
+            sourcePosition: sourcePosition;
             debugSourcePositions: debugSourcePositions finish;
             debugSourceEnvironments: debugSourceEnvironments finish.
 
