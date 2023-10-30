@@ -32,6 +32,7 @@ loadSourceNamed: "SequenceTuple.sysmel".
 loadSourceNamed: "FixedArray.sysmel".
 loadSourceNamed: "Enum.sysmel".
 loadSourceNamed: "Struct.sysmel".
+loadSourceNamed: "StructMetaBuilder.sysmel".
 loadSourceNamed: "GCStackFrameDescription.sysmel".
 loadSourceNamed: "Exception.sysmel".
 loadSourceNamed: "Namespace.sysmel".

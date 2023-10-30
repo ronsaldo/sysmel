@@ -1,0 +1,57 @@
+public class StructMetaBuilder superclass: TypeMetaBuilder; definition: {
+    public field isPacked => Boolean.
+    
+    public method validSupertypeExpression => ASTNode
+        := supertypeExpression ifNil: `'AnyStruct.
+
+    public method packed => ASTNode := {
+        <metaBuilder>
+        isPacked := true.
+        self continueExpansion
+    }.
+
+    public override method finishExpansionWithEnvironment: (environment: Environment) ::=> ASTNode := {
+        let flagsExpression := ASTLiteralNode new
+            sourcePosition: sourcePosition;
+            value: self typeFlags;
+            yourself.
+
+        let packedExpression := ASTLiteralNode new
+            sourcePosition: self sourcePosition;
+            value: self isPacked;
+            yourself.
+
+        let makeStructExpression := ``(
+            (`,(self validSupertypeExpression) substructureWithTypeSlots: `,(self validMetaSlotsExpression) packed: `,packedExpression)
+                addFlags: `,flagsExpression;
+                enqueuePendingAnalysisInEnvironment: `,(ASTLiteralNode new
+                    sourcePosition: self sourcePosition;
+                    value: environment;
+                    yourself);
+                yourself
+        ).
+
+        let structValueExpression := name
+            ifNil: makeStructExpression
+            ifNotNil: (if: self isPublic
+                then: ``(public: `,name with: (`,makeStructExpression name: `,name; yourself))
+                else: ``(let: `,name with: `,makeStructExpression) 
+            ).
+
+        definitionExpression
+            ifNil: structValueExpression
+            ifNotNil: ``(`,structValueExpression definition: `,definitionExpression)
+    }.
+}.
+
+public global struct := MetaBuilderFactory for: StructMetaBuilder.
+
+FlagMetaBuilder extend: {
+    public method struct => ASTNode := {
+        <metaBuilder>
+        self delegateToMetaBuilder: (StructMetaBuilder new
+            typeFlags: self typeFlags;
+            isPublic: self isPublic;
+            yourself)
+    }
+}.

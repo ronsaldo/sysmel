@@ -505,7 +505,8 @@ ASTSequenceNode
     withSelector: #isSequenceNode addMethod: {:(ASTSequenceNode)self :: Boolean | true } makeOverride;
 
     withSelector: #hasPragmaNamed: addMethod: {:(ASTSequenceNode)self :selector :: Boolean |
-        self pragmas anySatisfy: {:(ASTNode)pragma :: Boolean | pragma hasPragmaNamed: selector}
+        (self pragmas anySatisfy: {:(ASTNode)pragma :: Boolean | pragma hasPragmaNamed: selector}) || 
+        (self expressions anySatisfy: {:(ASTNode)expression :: Boolean | expression hasPragmaNamed: selector})
     } makeOverride;
     withSelector: #childrenDo: addMethod: {:(ASTSequenceNode)self :aBlock :: Void |
         self pragmas do: aBlock.

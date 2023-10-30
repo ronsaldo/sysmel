@@ -11,14 +11,52 @@ Namespace definition: {
 
 public class NamespaceMetaBuilder superclass: MacroMetaBuilder; definition: {
     public field nameComponents => OrderedCollection.
+    public field definitionExpression => ASTNode.
 
     public override method initialize => Void := {
         super initialize.
         nameComponents := OrderedCollection new.
     }.
 
-    public override method finishExpansionWithEnvironment: (environment: Environment) ::=> Environment := {
-        error("TODO: NamespaceMetaBuilder finishExpansionWithEnvironment:")
+    public override method expandMessageSendNode: (messageSendNode: ASTMessageSendNode) ::=> ASTNode := {
+        messageSendNode arguments isEmpty && messageSendNode selector isLiteralNode ifTrue: {
+            nameComponents add: messageSendNode selector.
+            self continueExpansion
+        } ifFalse: {
+            self expandMessageSendNodeWithMetaBuilderMethod: messageSendNode
+        }
+    }.
+
+    public override method finishExpansionWithEnvironment: (environment: Environment) ::=> ASTNode := {
+        let namespaceObjectNode mutable => ASTNode := nil.
+
+        nameComponents isEmpty ifTrue: {
+            namespaceObjectNode := ASTErrorNode new
+                sourcePosition: sourcePosition;
+                errorMessage: "A namespace name is required.";
+                yourself
+        } ifFalse: {
+            namespaceObjectNode := ASTIdentifierReferenceNode new
+                sourcePosition: sourcePosition;
+                value: #__OwnerProgramEntity__;
+                yourself.
+
+            let getOrCreateNamespaceNamedSelector := ASTLiteralNode new
+                sourcePosition: sourcePosition;
+                value: #getOrCreateNamespaceNamed:;
+                yourself.
+
+            nameComponents do: {:(ASTNode)eachNameComponent :: Void |
+                namespaceObjectNode := ASTMessageSendNode new
+                    sourcePosition: sourcePosition;
+                    receiver: namespaceObjectNode;
+                    selector: getOrCreateNamespaceNamedSelector;
+                    arguments: (Array with: eachNameComponent);
+                    yourself.
+            }.
+        }.
+
+        namespaceObjectNode
     }.
 }.
 
