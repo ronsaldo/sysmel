@@ -74,3 +74,5 @@ loadSourceNamed: "System.sysmel".
 loadSourceNamed: "Time.sysmel".
 loadSourceNamed: "Type.sysmel".
 loadSourceNamed: "WordArray.sysmel".
+
+loadSourceNamed: "PrimitiveVectorType.sysmel".

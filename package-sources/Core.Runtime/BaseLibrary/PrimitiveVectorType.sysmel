@@ -1,0 +1,124 @@
+public global TypeFlags::PrimitiveVectorDefaultFlags := TypeFlags::Value | TypeFlags::Bytes.
+
+PrimitiveValueType extend: {
+    public virtual method getVectorizableScalarOperationSelectors => Array
+        := #().
+}.
+
+PrimitiveInteger __type__ extend: {
+    public override method getVectorizableScalarOperationSelectors => Array
+        := #(+ - * /).
+}.
+
+PrimitiveFloat __type__ extend: {
+    public override method getVectorizableScalarOperationSelectors => Array
+        := #(+ - * / sqrt negated abs min: max:).
+}.
+
+public class PrimitiveVectorType superclass: ValueType; definition: {
+    private field elementType => PrimitiveValueType.
+    private field elements => Size.
+
+    public inline method elementType => PrimitiveValueType := elementType.
+    public inline method elements => Size := elements.
+
+    public method initializeWithElementType: (initialElementType: PrimitiveValueType) elements: (initialElements: Size) ::=> Void := {
+        elementType := initialElementType.
+        elements := initialElements.
+        self assert: elementType name isNotNil.
+        self name: (elementType name asString -- "x" -- elements asString) asSymbol.
+
+        flags := TypeFlags::PrimitiveVectorDefaultFlags.
+        totalSlotCount := 0sz.
+        supertype := AnyPrimitiveVector.
+        instanceAlignment := elementType valueAlignment * self alignmentMultiplicationFactor.
+        instanceSize := elementType valueSize * elements.
+        gcLayout := supertype ensureLayoutIsComputed; gcLayout.
+        self addVectorizableScalarOperations.
+    }.
+
+    public method alignmentMultiplicationFactor => Size
+        := elements asLargerPowerOfTwo.
+
+    public override method defaultValue => self
+        := self basicNew.
+
+    public method addVectorizableScalarOperations => Void := {
+        elementType getVectorizableScalarOperationSelectors do: {:(StringSymbol)selector :: Void |
+            let baseMethod := elementType lookupSelector: selector.
+            baseMethod ifNil: {
+                return: void
+            }.
+            let vectorPrimitiveName := (self name asString -- "::" -- selector asString) asSymbol.
+            let SelfTypeLiteral := self asMacroLiteral.
+
+            let methodFunctionNode := ``{:(`,SelfTypeLiteral)self :(`,SelfTypeLiteral)other :: `,SelfTypeLiteral |
+                <primitive: `,(vectorPrimitiveName asMacroLiteral)>
+                <targetDefinedPrimitive>
+                primitiveFailedError()
+            }.
+            
+            let vectorPrimitiveMethod := methodFunctionNode analyzeAndEvaluateWithEnvironment: Environment defaultForEvaluation.
+            self withSelector: selector addMethod: vectorPrimitiveMethod
+        }.
+    }.
+}.
+
+public class PrimitiveVectorMetatype superclass: ValueMetatype; definition: {
+    __Meta__ definition:{
+        public override method getOrCreateDependentApplicationValueForNode: (astNode: ASTNode)
+            := PrimitiveVectorType
+    }.
+}.
+
+let AnyPrimitiveVectorType := PrimitiveVectorMetatype basicNew
+    flags: TypeFlags::MetatypeRequiredFlags;
+    supertype: ValueType;
+    totalSlotCount: PrimitiveVectorType validTotalSlotCount;
+    yourself.
+public global AnyPrimitiveVector := AnyPrimitiveVectorType basicNew
+    name: #AnyPrimitiveVector;
+    flags: TypeFlags::PrimitiveVectorDefaultFlags;
+    supertype: AnyValue;
+    slots: ();
+    totalSlotCount: 0sz;
+    registerInSupertype;
+    yourself.
+
+public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType, elements: Size) => PrimitiveVectorType := {
+    let result := PrimitiveVectorType basicNew.
+    __templateResult__ value: result.
+    result
+        initializeWithElementType: elementType elements: elements;
+        yourself
+}.
+
+public global Booleanx2 := PrimitiveVectorTypeTemplate(Boolean, 2sz).
+public global Booleanx3 := PrimitiveVectorTypeTemplate(Boolean, 3sz).
+public global Booleanx4 := PrimitiveVectorTypeTemplate(Boolean, 4sz).
+public global Booleanx8 := PrimitiveVectorTypeTemplate(Boolean, 8sz).
+public global Booleanx16 := PrimitiveVectorTypeTemplate(Boolean, 16sz).
+
+public global Int8x4  := PrimitiveVectorTypeTemplate(Int8, 2sz).
+public global Int8x8  := PrimitiveVectorTypeTemplate(Int8, 8sz).
+public global Int8x16 := PrimitiveVectorTypeTemplate(Int8, 16sz).
+
+public global Int32x2 := PrimitiveVectorTypeTemplate(Int32, 2sz).
+public global Int32x3 := PrimitiveVectorTypeTemplate(Int32, 3sz).
+public global Int32x4 := PrimitiveVectorTypeTemplate(Int32, 4sz).
+
+public global UInt8x4  := PrimitiveVectorTypeTemplate(Int8, 4sz).
+public global UInt8x8  := PrimitiveVectorTypeTemplate(Int8, 8sz).
+public global UInt8x16 := PrimitiveVectorTypeTemplate(Int8, 16sz).
+
+public global UInt32x2 := PrimitiveVectorTypeTemplate(UInt32, 2sz).
+public global UInt32x3 := PrimitiveVectorTypeTemplate(UInt32, 3sz).
+public global UInt32x4 := PrimitiveVectorTypeTemplate(UInt32, 4sz).
+
+public global Float32x2 := PrimitiveVectorTypeTemplate(Float32, 2sz).
+public global Float32x3 := PrimitiveVectorTypeTemplate(Float32, 3sz).
+public global Float32x4 := PrimitiveVectorTypeTemplate(Float32, 4sz).
+
+public global Float64x2 := PrimitiveVectorTypeTemplate(Float64, 2sz).
+public global Float64x3 := PrimitiveVectorTypeTemplate(Float64, 3sz).
+public global Float64x4 := PrimitiveVectorTypeTemplate(Float64, 4sz).

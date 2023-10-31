@@ -40,7 +40,6 @@ loadSourceNamed: "GCStackFrameDescription.sysmel".
 loadSourceNamed: "Exception.sysmel".
 loadSourceNamed: "Namespace.sysmel".
 loadSourceNamed: "PointerLikeType.sysmel".
-loadSourceNamed: "PrimitiveVectorType.sysmel".
 loadSourceNamed: "FunctionType.sysmel".
 loadSourceNamed: "SimpleFunctionType.sysmel".
 loadSourceNamed: "PlatformDescription.sysmel".

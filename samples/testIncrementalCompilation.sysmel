@@ -102,6 +102,7 @@ printLine(linkedCode fullPrintString).
 }.
 *#
 
+#*
 {
 public global TestGlobal mutable := 5i32.
 public global TestGlobal2 mutable := 5i64.
@@ -138,6 +139,45 @@ let nativeLinkedObjectCode := AsmProgramEntity new
 nativeLinkedObjectCode writeObjectToFileNamed: "test.o".
 
 }.
+*#
 
 #*
 *#
+
+
+{
+public global TestGlobal mutable := 5i32.
+public global TestGlobal2 mutable := 5i64.
+
+public function add(a: Int32, b: Int32) => Int32
+    := a + b + TestGlobal.
+
+public externC function main(argc: Int32, argv: Char8 const pointer) ::=> Int32
+    := add(argc, 3i32) * TestGlobal + TestGlobal2 asInt32.
+
+let hirModule := HIRModuleCompilationContext forDefaultTarget
+    exclusiveCompilationMode: true;
+    compileFunctionsWithDefinitions: (add, main);
+    finish.
+
+hirModule performStandardOptimizations.
+##printLine(hirModule fullPrintString).
+
+##let nativeCodes := hirModule asNativeCodesFor: AsmCompilationTarget x86_64 setForLinux asMirCompilationTarget keepingIRTextForDebugging: true.
+##printLine(nativeCodes fullPrintString).
+
+let asmCompilationTarget := AsmCompilationTarget x86_64 setForLinux.
+let nativeCode := hirModule asNativeCodeFor: asmCompilationTarget asMirCompilationTarget keepingIRTextForDebugging: true.
+printLine(nativeCode fullPrintString).
+
+let nativeObjectCode := nativeCode asAsmObjectCodeWithTarget: asmCompilationTarget.
+let nativeLinkedObjectCode := AsmProgramEntity new
+    compilationTarget: asmCompilationTarget;
+    ##buildTargetUnwindingInfoForObjectCode: nativeObjectCode;
+    buildDebugInfoForObjectCode: nativeObjectCode;
+    assembleAppendingNewSectionsToObjectObject: nativeObjectCode.
+
+##printLine(nativeObjectCode fullPrintString).
+nativeLinkedObjectCode writeObjectToFileNamed: "test.o".
+
+}.
