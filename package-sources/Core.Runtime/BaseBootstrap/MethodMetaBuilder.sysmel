@@ -85,7 +85,7 @@ MethodMetaBuilder
             sourcePosition: self sourcePosition;
             isForAll: false;
             name: `'#self;
-            type: `'ReceiverType;
+            type: (`'ReceiverType copy sourcePosition: self sourcePosition; yourself);
             yourself).
         let: #arguments with: (Array with: selfArgument) -- self arguments.
         let: #methodNode with: (ASTLambdaNode new

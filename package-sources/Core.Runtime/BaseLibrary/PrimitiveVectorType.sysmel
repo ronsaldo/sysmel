@@ -12,7 +12,7 @@ PrimitiveInteger __type__ extend: {
 
 PrimitiveFloat __type__ extend: {
     public override method getVectorizableScalarOperationSelectors => Array
-        := #(+ - * / sqrt negated abs min: max:).
+        := #(+ - * / sqrt negated min: max:).
 }.
 
 public class PrimitiveVectorType superclass: ValueType; definition: {
@@ -40,6 +40,9 @@ public class PrimitiveVectorType superclass: ValueType; definition: {
     public method alignmentMultiplicationFactor => Size
         := elements asLargerPowerOfTwo.
 
+    public method alignedBitWidth => Size
+        := elementType instanceSize * self alignmentMultiplicationFactor * 8sz max: 32sz.
+
     public override method defaultValue => self
         := self basicNew.
 
@@ -62,6 +65,11 @@ public class PrimitiveVectorType superclass: ValueType; definition: {
             self withSelector: selector addMethod: vectorPrimitiveMethod
         }.
     }.
+
+    public override pure method asReceiverType => Type := self.
+    public override pure method asResultType => Type := self.
+    public override method decayReferenceLikeForReceiverType: (reference: ReferenceLikeType) ::=> Type := self.
+    public override method isPrimitiveVectorType => Boolean := true.
 }.
 
 public class PrimitiveVectorMetatype superclass: ValueMetatype; definition: {
@@ -93,13 +101,14 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
         yourself
 }.
 
+#*
 public global Booleanx2 := PrimitiveVectorTypeTemplate(Boolean, 2sz).
 public global Booleanx3 := PrimitiveVectorTypeTemplate(Boolean, 3sz).
 public global Booleanx4 := PrimitiveVectorTypeTemplate(Boolean, 4sz).
 public global Booleanx8 := PrimitiveVectorTypeTemplate(Boolean, 8sz).
 public global Booleanx16 := PrimitiveVectorTypeTemplate(Boolean, 16sz).
 
-public global Int8x4  := PrimitiveVectorTypeTemplate(Int8, 2sz).
+public global Int8x4  := PrimitiveVectorTypeTemplate(Int8, 4sz).
 public global Int8x8  := PrimitiveVectorTypeTemplate(Int8, 8sz).
 public global Int8x16 := PrimitiveVectorTypeTemplate(Int8, 16sz).
 
@@ -114,11 +123,14 @@ public global UInt8x16 := PrimitiveVectorTypeTemplate(Int8, 16sz).
 public global UInt32x2 := PrimitiveVectorTypeTemplate(UInt32, 2sz).
 public global UInt32x3 := PrimitiveVectorTypeTemplate(UInt32, 3sz).
 public global UInt32x4 := PrimitiveVectorTypeTemplate(UInt32, 4sz).
+*#
 
 public global Float32x2 := PrimitiveVectorTypeTemplate(Float32, 2sz).
 public global Float32x3 := PrimitiveVectorTypeTemplate(Float32, 3sz).
 public global Float32x4 := PrimitiveVectorTypeTemplate(Float32, 4sz).
 
+#*
 public global Float64x2 := PrimitiveVectorTypeTemplate(Float64, 2sz).
 public global Float64x3 := PrimitiveVectorTypeTemplate(Float64, 3sz).
 public global Float64x4 := PrimitiveVectorTypeTemplate(Float64, 4sz).
+*#

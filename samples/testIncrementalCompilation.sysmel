@@ -146,21 +146,15 @@ nativeLinkedObjectCode writeObjectToFileNamed: "test.o".
 
 
 {
-public global TestGlobal mutable := 5i32.
-public global TestGlobal2 mutable := 5i64.
-
-public function add(a: Int32, b: Int32) => Int32
-    := a + b + TestGlobal.
-
-public externC function main(argc: Int32, argv: Char8 const pointer) ::=> Int32
-    := add(argc, 3i32) * TestGlobal + TestGlobal2 asInt32.
+public function addVector(a: Float32x4, b: Float32x4) => Float32x4
+    := a + b.
 
 let hirModule := HIRModuleCompilationContext forDefaultTarget
     exclusiveCompilationMode: true;
-    compileFunctionsWithDefinitions: (add, main);
+    compileFunctionsWithDefinitions: (addVector,);
     finish.
 
-hirModule performStandardOptimizations.
+##hirModule performStandardOptimizations.
 ##printLine(hirModule fullPrintString).
 
 ##let nativeCodes := hirModule asNativeCodesFor: AsmCompilationTarget x86_64 setForLinux asMirCompilationTarget keepingIRTextForDebugging: true.
@@ -168,7 +162,9 @@ hirModule performStandardOptimizations.
 
 let asmCompilationTarget := AsmCompilationTarget x86_64 setForLinux.
 let nativeCode := hirModule asNativeCodeFor: asmCompilationTarget asMirCompilationTarget keepingIRTextForDebugging: true.
-printLine(nativeCode fullPrintString).
+printLine(nativeCode hirTextIR).
+printLine(nativeCode mirTextIR).
+printLine(nativeCode asmTextIR).
 
 let nativeObjectCode := nativeCode asAsmObjectCodeWithTarget: asmCompilationTarget.
 let nativeLinkedObjectCode := AsmProgramEntity new

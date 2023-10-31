@@ -596,6 +596,21 @@ MIRCallingConvention extend: {
     public abstract method registerConstraintsOfCallStruct: (instruction: MIRInstruction) with: (registerAllocator: MIRRegisterAllocator) ::=> Void
         := self subclassResponsibility.
 
+    public abstract method registerConstraintsOfCallVector32: (instruction: MIRInstruction) with: (registerAllocator: MIRRegisterAllocator) ::=> Void
+        := self subclassResponsibility.
+
+    public abstract method registerConstraintsOfCallVector64: (instruction: MIRInstruction) with: (registerAllocator: MIRRegisterAllocator) ::=> Void
+        := self subclassResponsibility.
+
+    public abstract method registerConstraintsOfCallVector128: (instruction: MIRInstruction) with: (registerAllocator: MIRRegisterAllocator) ::=> Void
+        := self subclassResponsibility.
+
+    public abstract method registerConstraintsOfCallVector256: (instruction: MIRInstruction) with: (registerAllocator: MIRRegisterAllocator) ::=> Void
+        := self subclassResponsibility.
+
+    public abstract method registerConstraintsOfCallVector512: (instruction: MIRInstruction) with: (registerAllocator: MIRRegisterAllocator) ::=> Void
+        := self subclassResponsibility.
+
     public abstract method registerConstraintsOfCallVoid: (instruction: MIRInstruction) with: (registerAllocator: MIRRegisterAllocator) ::=> Void
         := self subclassResponsibility.
 }.

@@ -258,6 +258,16 @@ PrimitiveFloat class extend: {
         := MIRPhysicalFloatRegister.
 }.
 
+PrimitiveVectorType extend: {
+    public override method valueMirPhysicalLocationClass => MIRPhysicalLocation class
+        := MIRPhysicalVectorRegister.
+}.
+
+EnumType extend: {
+    public override method valueMirPhysicalLocationClass => MIRPhysicalLocation class
+        := valueType valueMirPhysicalLocationClass.
+}.
+
 Int8 class extend: {
     public override method valueIsSignedExtended => Boolean := true.
 }.
@@ -308,6 +318,9 @@ MIRValue definition: {
 
     public virtual method alignment => UInt64
         := self subclassResponsibility.
+
+    public method alignedSize => UInt64
+        := self size alignedTo: self alignment.
 
     public virtual method isSignedExtended => Boolean := false.
     public virtual method isFloatingPoint => Boolean := false.
@@ -1463,15 +1476,15 @@ MIRInstruction definition: {
 public global MIR::Operation::Branch := MIROperation terminatorNamed: #branch.
 public global MIR::Operation::ConditionalBranch := MIROperation terminatorNamed: #condBranch.
 
-public global MIR::Operation::SwitchInt8 := MIROperation switchNamed: #switchInt8.
-public global MIR::Operation::SwitchInt16 := MIROperation switchNamed: #switchInt16.
-public global MIR::Operation::SwitchInt32 := MIROperation switchNamed: #switchInt32.
-public global MIR::Operation::SwitchInt64 := MIROperation switchNamed: #switchInt64.
-public global MIR::Operation::SwitchUInt8 := MIROperation switchNamed: #switchUInt8.
-public global MIR::Operation::SwitchUInt16 := MIROperation switchNamed: #switchUInt16.
-public global MIR::Operation::SwitchUInt32 := MIROperation switchNamed: #switchUInt32.
-public global MIR::Operation::SwitchUInt64 := MIROperation switchNamed: #switchUInt64.
-public global MIR::Operation::SwitchPointer := MIROperation switchNamed: #switchPointer.
+public global MIR::Operation::SwitchInt8      := MIROperation switchNamed: #switchInt8.
+public global MIR::Operation::SwitchInt16     := MIROperation switchNamed: #switchInt16.
+public global MIR::Operation::SwitchInt32     := MIROperation switchNamed: #switchInt32.
+public global MIR::Operation::SwitchInt64     := MIROperation switchNamed: #switchInt64.
+public global MIR::Operation::SwitchUInt8     := MIROperation switchNamed: #switchUInt8.
+public global MIR::Operation::SwitchUInt16    := MIROperation switchNamed: #switchUInt16.
+public global MIR::Operation::SwitchUInt32    := MIROperation switchNamed: #switchUInt32.
+public global MIR::Operation::SwitchUInt64    := MIROperation switchNamed: #switchUInt64.
+public global MIR::Operation::SwitchPointer   := MIROperation switchNamed: #switchPointer.
 
 public global MIR::Operation::MoveInt8       := MIROperation moveNamed: #moveInt8.
 public global MIR::Operation::MoveInt16      := MIROperation moveNamed: #moveInt16.
@@ -1482,6 +1495,11 @@ public global MIR::Operation::MoveFatPointer := MIROperation moveNamed: #moveFat
 public global MIR::Operation::MoveFloat32    := MIROperation moveNamed: #moveFloat32.
 public global MIR::Operation::MoveFloat64    := MIROperation moveNamed: #moveFloat64.
 public global MIR::Operation::MoveStruct     := MIROperation moveNamed: #moveStruct.
+public global MIR::Operation::MoveVector32   := MIROperation moveNamed: #moveVector32.
+public global MIR::Operation::MoveVector64   := MIROperation moveNamed: #moveVector64.
+public global MIR::Operation::MoveVector128  := MIROperation moveNamed: #moveVector128.
+public global MIR::Operation::MoveVector256  := MIROperation moveNamed: #moveVector256.
+public global MIR::Operation::MoveVector512  := MIROperation moveNamed: #moveVector512.
 
 public global MIR::Operation::PhiInt8       := MIROperation phiNamed: #phiInt8 moveOperation: MIR::Operation::MoveInt8.
 public global MIR::Operation::PhiInt16      := MIROperation phiNamed: #phiInt16 moveOperation: MIR::Operation::MoveInt16.
@@ -1492,6 +1510,11 @@ public global MIR::Operation::PhiFatPointer := MIROperation phiNamed: #phiFatPoi
 public global MIR::Operation::PhiFloat32    := MIROperation phiNamed: #phiFloat32 moveOperation: MIR::Operation::MoveFloat32.
 public global MIR::Operation::PhiFloat64    := MIROperation phiNamed: #phiFloat64 moveOperation: MIR::Operation::MoveFloat64.
 public global MIR::Operation::PhiStruct     := MIROperation phiNamed: #phiStruct moveOperation: MIR::Operation::MoveStruct.
+public global MIR::Operation::PhiVector32   := MIROperation phiNamed: #phiVector32 moveOperation: MIR::Operation::MoveVector32.
+public global MIR::Operation::PhiVector64   := MIROperation phiNamed: #phiVector64 moveOperation: MIR::Operation::MoveVector64.
+public global MIR::Operation::PhiVector128  := MIROperation phiNamed: #phiVector128 moveOperation: MIR::Operation::MoveVector128.
+public global MIR::Operation::PhiVector256  := MIROperation phiNamed: #phiVector256 moveOperation: MIR::Operation::MoveVector256.
+public global MIR::Operation::PhiVector512  := MIROperation phiNamed: #phiVector512 moveOperation: MIR::Operation::MoveVector512.
 
 public global MIR::Operation::LoadInt8       := MIROperation loadNamed: #loadInt8.
 public global MIR::Operation::LoadInt16      := MIROperation loadNamed: #loadInt16.
@@ -1506,6 +1529,11 @@ public global MIR::Operation::LoadFatPointer := MIROperation loadNamed: #loadFat
 public global MIR::Operation::LoadFloat32    := MIROperation loadNamed: #loadFloat32.
 public global MIR::Operation::LoadFloat64    := MIROperation loadNamed: #loadFloat64.
 public global MIR::Operation::LoadStruct     := MIROperation loadNamed: #loadStruct.
+public global MIR::Operation::LoadVector32   := MIROperation loadNamed: #loadVector32.
+public global MIR::Operation::LoadVector64   := MIROperation loadNamed: #loadVector64.
+public global MIR::Operation::LoadVector128  := MIROperation loadNamed: #loadVector128.
+public global MIR::Operation::LoadVector256  := MIROperation loadNamed: #loadVector256.
+public global MIR::Operation::LoadVector512  := MIROperation loadNamed: #loadVector512.
 
 public global MIR::Operation::StoreInt8       := MIROperation storeNamed: #storeInt8.
 public global MIR::Operation::StoreInt16      := MIROperation storeNamed: #storeInt16.
@@ -1516,6 +1544,11 @@ public global MIR::Operation::StoreFatPointer := MIROperation storeNamed: #store
 public global MIR::Operation::StoreFloat32    := MIROperation storeNamed: #storeFloat32.
 public global MIR::Operation::StoreFloat64    := MIROperation storeNamed: #storeFloat64.
 public global MIR::Operation::StoreStruct     := MIROperation storeNamed: #storeStruct.
+public global MIR::Operation::StoreVector32   := MIROperation storeNamed: #storeVector32.
+public global MIR::Operation::StoreVector64   := MIROperation storeNamed: #storeVector64.
+public global MIR::Operation::StoreVector128  := MIROperation storeNamed: #storeVector128.
+public global MIR::Operation::StoreVector256  := MIROperation storeNamed: #storeVector256.
+public global MIR::Operation::StoreVector512  := MIROperation storeNamed: #storeVector512.
 
 public global MIR::Operation::GenerationalWriteBarrier := MIROperation named: #generationalWriteBarrier.
 
@@ -1531,6 +1564,11 @@ public global MIR::Operation::CallFatPointer := MIROperation callNamed: #callFat
 public global MIR::Operation::CallFloat32    := MIROperation callNamed: #callFloat32.
 public global MIR::Operation::CallFloat64    := MIROperation callNamed: #callFloat64.
 public global MIR::Operation::CallStruct     := MIROperation callNamed: #callStruct.
+public global MIR::Operation::CallVector32   := MIROperation callNamed: #callVector32.
+public global MIR::Operation::CallVector64   := MIROperation callNamed: #callVector64.
+public global MIR::Operation::CallVector128  := MIROperation callNamed: #callVector128.
+public global MIR::Operation::CallVector256  := MIROperation callNamed: #callVector256.
+public global MIR::Operation::CallVector512  := MIROperation callNamed: #callVector512.
 public global MIR::Operation::CallVoid       := MIROperation callNamed: #callVoid.
 
 public global MIR::Operation::ReturnInt8       := MIROperation terminatorNamed: #returnInt8.
@@ -1542,6 +1580,11 @@ public global MIR::Operation::ReturnFatPointer := MIROperation terminatorNamed: 
 public global MIR::Operation::ReturnFloat32    := MIROperation terminatorNamed: #returnFloat32.
 public global MIR::Operation::ReturnFloat64    := MIROperation terminatorNamed: #returnFloat64.
 public global MIR::Operation::ReturnStruct     := MIROperation terminatorNamed: #returnStruct.
+public global MIR::Operation::ReturnVector32   := MIROperation terminatorNamed: #returnVector32.
+public global MIR::Operation::ReturnVector64   := MIROperation terminatorNamed: #returnVector64.
+public global MIR::Operation::ReturnVector128  := MIROperation terminatorNamed: #returnVector128.
+public global MIR::Operation::ReturnVector256  := MIROperation terminatorNamed: #returnVector256.
+public global MIR::Operation::ReturnVector512  := MIROperation terminatorNamed: #returnVector512.
 public global MIR::Operation::ReturnVoid       := MIROperation terminatorNamed: #returnVoid.
 
 public global MIR::Operation::ExceptionSetjmp := MIROperation terminatorNamed: #exceptionSetjmp.
@@ -2357,6 +2400,36 @@ public final class MIRBlockBuilder superclass: Object; definition: {
     public method callStruct: (function: MIRValue) arguments: (arguments: Array) type: (type: Type) ::=> MIRInstruction
         := self callStruct: function convention: self compilationTarget defaultCallingConvention arguments: arguments type: type.
 
+    public method callVector32: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) arguments: (arguments: Array) type: (type: Type) ::=> MIRInstruction
+        := self call: function operation: MIR::Operation::CallVector32 convention: callingConvention arguments: arguments type: type.
+
+    public method callVector32: (function: MIRValue) arguments: (arguments: Array) type: (type: Type) ::=> MIRInstruction
+        := self callVector32: function convention: self compilationTarget defaultCallingConvention arguments: arguments type: type.
+
+    public method callVector64: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) arguments: (arguments: Array) type: (type: Type) ::=> MIRInstruction
+        := self call: function operation: MIR::Operation::CallVector64 convention: callingConvention arguments: arguments type: type.
+
+    public method callVector64: (function: MIRValue) arguments: (arguments: Array) type: (type: Type) ::=> MIRInstruction
+        := self callVector64: function convention: self compilationTarget defaultCallingConvention arguments: arguments type: type.
+
+    public method callVector128: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) arguments: (arguments: Array) type: (type: Type) ::=> MIRInstruction
+        := self call: function operation: MIR::Operation::CallVector128 convention: callingConvention arguments: arguments type: type.
+
+    public method callVector128: (function: MIRValue) arguments: (arguments: Array) type: (type: Type) ::=> MIRInstruction
+        := self callVector128: function convention: self compilationTarget defaultCallingConvention arguments: arguments type: type.
+
+    public method callVector256: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) arguments: (arguments: Array) type: (type: Type) ::=> MIRInstruction
+        := self call: function operation: MIR::Operation::CallVector256 convention: callingConvention arguments: arguments type: type.
+
+    public method callVector256: (function: MIRValue) arguments: (arguments: Array) type: (type: Type) ::=> MIRInstruction
+        := self callVector256: function convention: self compilationTarget defaultCallingConvention arguments: arguments type: type.
+
+    public method callVector512: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) arguments: (arguments: Array) type: (type: Type) ::=> MIRInstruction
+        := self call: function operation: MIR::Operation::CallVector512 convention: callingConvention arguments: arguments type: type.
+
+    public method callVector512: (function: MIRValue) arguments: (arguments: Array) type: (type: Type) ::=> MIRInstruction
+        := self callVector512: function convention: self compilationTarget defaultCallingConvention arguments: arguments type: type.
+
     public method callVoid: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) arguments: (arguments: Array) ::=> MIRInstruction
         := self call: function operation: MIR::Operation::CallVoid convention: callingConvention arguments: arguments type: Void.
 
@@ -2411,6 +2484,21 @@ public final class MIRBlockBuilder superclass: Object; definition: {
     public method moveFloat64: (source: MIRValue) ::=> MIRInstruction
         := self operation: MIR::Operation::MoveFloat64 with: source type: Float32.
 
+    public method moveVector32: (source: MIRValue) type: (vectorType: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::MoveVector32 with: source type: vectorType.
+
+    public method moveVector64: (source: MIRValue) type: (vectorType: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::MoveVector64 with: source type: vectorType.
+
+    public method moveVector128: (source: MIRValue) type: (vectorType: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::MoveVector128 with: source type: vectorType.
+
+    public method moveVector256: (source: MIRValue) type: (vectorType: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::MoveVector256 with: source type: vectorType.
+
+    public method moveVector512: (source: MIRValue) type: (vectorType: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::MoveVector512 with: source type: vectorType.
+
     public method phiInt8 ::=> MIRInstruction
         := self operation: MIR::Operation::PhiInt8 type: Int8.
 
@@ -2449,7 +2537,22 @@ public final class MIRBlockBuilder superclass: Object; definition: {
 
     public method phiFloat64 ::=> MIRInstruction
         := self operation: MIR::Operation::PhiFloat64 type: Float32.
-        
+
+    public method phiVector32: (type: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::PhiVector32 type: type.
+
+    public method phiVector64: (type: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::PhiVector64 type: type.
+
+    public method phiVector128: (type: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::PhiVector128 type: type.
+
+    public method phiVector256: (type: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::PhiVector256 type: type.
+
+    public method phiVector512: (type: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::PhiVector512 type: type.
+
     public method constantOffsetImmediateFor: (constantOffset: Int64) ::=> MIRValue
         := self has64BitsPointers && (constantOffset asInt32 asInt64 ~= constantOffset)
             ifTrue: (self int64: constantOffset)
@@ -2513,6 +2616,21 @@ public final class MIRBlockBuilder superclass: Object; definition: {
     public method loadStruct: (pointer: MIRValue) constantOffset: (constantOffset: Int64) type: (type: Type) ::=> MIRInstruction
         := self operation: MIR::Operation::LoadStruct with: pointer with: (self constantOffsetImmediateFor: constantOffset) type: type.
 
+    public method loadVector32: (pointer: MIRValue) constantOffset: (constantOffset: Int64) type: (type: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::LoadVector32 with: pointer with: (self constantOffsetImmediateFor: constantOffset) type: type.
+
+    public method loadVector64: (pointer: MIRValue) constantOffset: (constantOffset: Int64) type: (type: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::LoadVector64 with: pointer with: (self constantOffsetImmediateFor: constantOffset) type: type.
+
+    public method loadVector128: (pointer: MIRValue) constantOffset: (constantOffset: Int64) type: (type: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::LoadVector128 with: pointer with: (self constantOffsetImmediateFor: constantOffset) type: type.
+
+    public method loadVector256: (pointer: MIRValue) constantOffset: (constantOffset: Int64) type: (type: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::LoadVector256 with: pointer with: (self constantOffsetImmediateFor: constantOffset) type: type.
+
+    public method loadVector512: (pointer: MIRValue) constantOffset: (constantOffset: Int64) type: (type: PrimitiveVectorType) ::=> MIRInstruction
+        := self operation: MIR::Operation::LoadVector512 with: pointer with: (self constantOffsetImmediateFor: constantOffset) type: type.
+
     public method pointerConstantWith: (value: UInt64) ::=> MIRValue
         := self has64BitsPointers
             ifTrue: (self uint64: value)
@@ -2544,6 +2662,21 @@ public final class MIRBlockBuilder superclass: Object; definition: {
 
     public method storeStruct: (value: MIRValue) into: (pointer: MIRValue) constantOffset: (constantOffset: Int64) ::=> MIRInstruction
         := self operation: MIR::Operation::StoreStruct with: value with: pointer with: (self constantOffsetImmediateFor: constantOffset).
+
+    public method storeVector32: (value: MIRValue) into: (pointer: MIRValue) constantOffset: (constantOffset: Int64) ::=> MIRInstruction
+        := self operation: MIR::Operation::StoreVector32 with: value with: pointer with: (self constantOffsetImmediateFor: constantOffset).
+
+    public method storeVector64: (value: MIRValue) into: (pointer: MIRValue) constantOffset: (constantOffset: Int64) ::=> MIRInstruction
+        := self operation: MIR::Operation::StoreVector64 with: value with: pointer with: (self constantOffsetImmediateFor: constantOffset).
+
+    public method storeVector128: (value: MIRValue) into: (pointer: MIRValue) constantOffset: (constantOffset: Int64) ::=> MIRInstruction
+        := self operation: MIR::Operation::StoreVector128 with: value with: pointer with: (self constantOffsetImmediateFor: constantOffset).
+
+    public method storeVector256: (value: MIRValue) into: (pointer: MIRValue) constantOffset: (constantOffset: Int64) ::=> MIRInstruction
+        := self operation: MIR::Operation::StoreVector256 with: value with: pointer with: (self constantOffsetImmediateFor: constantOffset).
+
+    public method storeVector512: (value: MIRValue) into: (pointer: MIRValue) constantOffset: (constantOffset: Int64) ::=> MIRInstruction
+        := self operation: MIR::Operation::StoreVector512 with: value with: pointer with: (self constantOffsetImmediateFor: constantOffset).
 
     public method generationalWriteBarrier: (pointer: MIRValue) constantOffset: (constantOffset: Int64) value: (storedValue: MIRValue) rememberFunction: (rememberFunction: MIRValue) ::=> MIRInstruction
         := self operation: MIR::Operation::GenerationalWriteBarrier with: pointer with: (self constantOffsetImmediateFor: constantOffset) with: storedValue with: rememberFunction.
@@ -2636,6 +2769,21 @@ public final class MIRBlockBuilder superclass: Object; definition: {
     public method returnStruct: (value: MIRValue) ::=> MIRInstruction
         := self operation: MIR::Operation::ReturnStruct with: value.
 
+    public method returnVector32: (value: MIRValue) ::=> MIRInstruction
+        := self operation: MIR::Operation::ReturnVector32 with: value.
+
+    public method returnVector64: (value: MIRValue) ::=> MIRInstruction
+        := self operation: MIR::Operation::ReturnVector64 with: value.
+
+    public method returnVector128: (value: MIRValue) ::=> MIRInstruction
+        := self operation: MIR::Operation::ReturnVector128 with: value.
+
+    public method returnVector256: (value: MIRValue) ::=> MIRInstruction
+        := self operation: MIR::Operation::ReturnVector256 with: value.
+
+    public method returnVector512: (value: MIRValue) ::=> MIRInstruction
+        := self operation: MIR::Operation::ReturnVector512 with: value.
+
     public method trap ::=> MIRInstruction
         := self operation: MIR::Operation::Trap.
 
@@ -2717,7 +2865,13 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int8PopCount Int16PopCount Int32PopCount Int64PopCount
 
     Float32Negate Float64Negate
-    Float32Sqrt Float64Sqrt
+    Float32Sqrt   Float64Sqrt
+
+    Float32x2Negate Float64x2Negate
+    Float32x2Sqrt   Float64x2Sqrt
+
+    Float32x4Negate Float64x4Negate
+    Float32x4Sqrt   Float64x4Sqrt
 
     TruncateInt64ToInt32 TruncateInt64ToInt16 TruncateInt64ToInt8
     TruncateInt32ToInt16 TruncateInt32ToInt8
@@ -2776,6 +2930,22 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Float32Sub Float64Sub
     Float32Mul Float64Mul
     Float32Div Float64Div
+    Float32Min Float64Min
+    Float32Max Float64Max
+
+    Float32x2Add Float64x2Add
+    Float32x2Sub Float64x2Sub
+    Float32x2Mul Float64x2Mul
+    Float32x2Div Float64x2Div
+    Float32x2Min Float64x2Min
+    Float32x2Max Float64x2Max
+
+    Float32x4Add Float64x4Add
+    Float32x4Sub Float64x4Sub
+    Float32x4Mul Float64x4Mul
+    Float32x4Div Float64x4Div
+    Float32x4Min Float64x4Min
+    Float32x4Max Float64x4Max
 
     Float32UnorderedCompare Float64UnorderedCompare
 

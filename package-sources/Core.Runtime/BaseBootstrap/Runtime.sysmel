@@ -2890,7 +2890,7 @@ SourcePosition
         let: #sourceCode with: self sourceCode.
 
         stream
-            nextPutAll: (if: sourceCode == nil then: "unknown" else: (sourceCode directory FileSystem::joinPath: sourceCode name));
+            nextPutAll: (if: sourceCode == nil then: "unknown" else: ((if: sourceCode directory == nil then: "" else: sourceCode directory) FileSystem::joinPath: sourceCode name));
             nextPut: ':'c8;
             print: self startLine;
             nextPut: '.'c8;

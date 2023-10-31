@@ -1308,6 +1308,139 @@ FixedArrayType definition: {
     }.
 }.
 
+EnumType extend: {
+    public override method emitMirUncheckedUnbox: (boxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
+        := self shouldBeImplemented.
+
+    public override method emitMirCheckAndUnbox: (boxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
+        := self shouldBeImplemented.
+
+    public override method emitMirBox: (unboxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
+        := self shouldBeImplemented.
+
+    public override method emitMirCall: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) withArguments: (arguments: Array) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := valueType emitMirCall: function convention: callingConvention withArguments: arguments withBlockBuilder: builder.
+
+    public override method emitMirMove: (value: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := valueType emitMirMove: value withBlockBuilder: builder.
+
+    public override method emitMirPhiWithBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := valueType emitMirPhiWithBlockBuilder: builder.
+
+    public override method emitMirReturn: (value: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := valueType emitMirReturn: value withBlockBuilder: builder.
+
+    public override method emitMirLoadFromPointer: (pointer: MIRValue) constantOffset: (constantOffset: Int64) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := valueType emitMirLoadFromPointer: pointer constantOffset: constantOffset withBlockBuilder: builder.
+
+    public override method emitMirStore: (value: MIRValue) intoPointer: (pointer: MIRValue) constantOffset: (constantOffset: Int64) in: (object: MIRValue) with: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
+        := valueType emitMirStore: value intoPointer: pointer constantOffset: constantOffset in: object with: codegen.
+
+    public override method emitMirEquals: (left: MIRValue) with: (right: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := valueType emitMirEquals: left with: right withBlockBuilder: builder.
+
+    public override method emitMirNotEquals: (left: MIRValue) with: (right: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := valueType emitMirNotEquals: left with: right withBlockBuilder: builder.
+
+    public override method translateUndefinedConstant: (constant: HIRUndefinedConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
+        := valueType translateUndefinedConstant: constant intoMirWith: codegen.
+
+    public override method translateHIRLiteralConstant: (constant: HIRLiteralConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
+        := valueType translateHIRLiteralConstant: constant intoMirWith: codegen.
+
+    public override method emitMirSwitch: (value: MIRValue) keys: (keys: Array) destinations: (destinations: Array) defaultDestination: (defaultDestination: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := valueType emitMirSwitch: value keys: keys destinations: destinations defaultDestination: defaultDestination withBlockBuilder: builder.
+}.
+
+PrimitiveVectorType extend: {
+    public override method emitMirUncheckedUnbox: (boxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
+        := codegen blockBuilder trap.
+
+    public override method emitMirCheckAndUnbox: (boxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
+        := codegen blockBuilder trap.
+
+    public override method emitMirBox: (unboxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
+        := codegen blockBuilder trap.
+
+    public override method emitMirCall: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) withArguments: (arguments: Array) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue := {
+        switch: self alignedBitWidth asUInt32 withCases: #{
+             32u32 : (builder callVector32:  function convention: callingConvention arguments: arguments type: self).
+             64u32 : (builder callVector64:  function convention: callingConvention arguments: arguments type: self).
+            128u32 : (builder callVector128: function convention: callingConvention arguments: arguments type: self).
+            256u32 : (builder callVector256: function convention: callingConvention arguments: arguments type: self).
+            512u32 : (builder callVector512: function convention: callingConvention arguments: arguments type: self).
+            _: (self error: "Unsupported vector bit width " -- self alignedBitWidth printString)
+        }
+    }.
+
+    public override method emitMirMove: (value: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue := {
+        switch: self alignedBitWidth asUInt32 withCases: #{
+             32u32 : (builder moveVector32:  value type: self).
+             64u32 : (builder moveVector64:  value type: self).
+            128u32 : (builder moveVector128: value type: self).
+            256u32 : (builder moveVector256: value type: self).
+            512u32 : (builder moveVector512: value type: self).
+            _: (self error: "Unsupported vector bit width " -- self alignedBitWidth printString)
+        }
+    }.
+
+    public override method emitMirPhiWithBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue := {
+        switch: self alignedBitWidth asUInt32 withCases: #{
+             32u32 : (builder phiVector32:  self).
+             64u32 : (builder phiVector64:  self).
+            128u32 : (builder phiVector128: self).
+            256u32 : (builder phiVector256: self).
+            512u32 : (builder phiVector512: self).
+            _: (self error: "Unsupported vector bit width " -- self alignedBitWidth printString)
+        }
+    }.
+
+    public override method emitMirReturn: (value: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue := {
+        switch: self alignedBitWidth asUInt32 withCases: #{
+             32u32 : (builder returnVector32:  value).
+             64u32 : (builder returnVector64:  value).
+            128u32 : (builder returnVector128: value).
+            256u32 : (builder returnVector256: value).
+            512u32 : (builder returnVector512: value).
+            _: (self error: "Unsupported vector bit width " -- self alignedBitWidth printString)
+        }
+    }.
+
+    public override method emitMirLoadFromPointer: (pointer: MIRValue) constantOffset: (constantOffset: Int64) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue := {
+        switch: self alignedBitWidth asUInt32 withCases: #{
+             32u32 : (builder loadVector32:  pointer constantOffset: constantOffset type: self).
+             64u32 : (builder loadVector64:  pointer constantOffset: constantOffset type: self).
+            128u32 : (builder loadVector128: pointer constantOffset: constantOffset type: self).
+            256u32 : (builder loadVector256: pointer constantOffset: constantOffset type: self).
+            512u32 : (builder loadVector512: pointer constantOffset: constantOffset type: self).
+            _: (self error: "Unsupported vector bit width " -- self alignedBitWidth printString)
+        }
+    }.
+
+    public override method emitMirStore: (value: MIRValue) intoPointer: (pointer: MIRValue) constantOffset: (constantOffset: Int64) in: (object: MIRValue) with: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
+        switch: self alignedBitWidth asUInt32 withCases: #{
+             32u32 : (codegen blockBuilder storeVector32:  value into: pointer constantOffset: constantOffset).
+             64u32 : (codegen blockBuilder storeVector64:  value into: pointer constantOffset: constantOffset).
+            128u32 : (codegen blockBuilder storeVector128: value into: pointer constantOffset: constantOffset).
+            256u32 : (codegen blockBuilder storeVector256: value into: pointer constantOffset: constantOffset).
+            512u32 : (codegen blockBuilder storeVector512: value into: pointer constantOffset: constantOffset).
+            _: (self error: "Unsupported vector bit width " -- self alignedBitWidth printString)
+        }
+    }.
+
+    public override method emitMirEquals: (left: MIRValue) with: (right: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := self shouldBeImplemented.
+
+    public override method emitMirNotEquals: (left: MIRValue) with: (right: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := self shouldBeImplemented.
+
+    public override method translateUndefinedConstant: (constant: HIRUndefinedConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
+        := self shouldBeImplemented.
+
+    public override method translateHIRLiteralConstant: (constant: HIRLiteralConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
+        := self shouldBeImplemented.
+}.
+
 Char8 __type__ extend: {
     public override method emitMirUncheckedUnbox: (boxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
         := codegen blockBuilder callInt8: (codegen translateRuntimeFunction: ObjectModel::unboxChar8) with: boxedValue type: self.
@@ -2578,6 +2711,9 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float32::* : translateBinaryPrimitiveInto(MIR::Operation::Float32Mul).
     #Float32::/ : translateBinaryPrimitiveInto(MIR::Operation::Float32Div).
 
+    #Float32::min: : translateBinaryPrimitiveInto(MIR::Operation::Float32Min).
+    #Float32::max: : translateBinaryPrimitiveInto(MIR::Operation::Float32Max).
+
     #Float32::= : translateBinaryPrimitiveInto(MIR::Operation::Float32UnorderedEquals).
     #Float32::~= : translateBinaryPrimitiveInto(MIR::Operation::Float32UnorderedNotEquals).
     #Float32::<=> : translateBinaryPrimitiveInto(MIR::Operation::Float32UnorderedCompare).
@@ -2601,6 +2737,15 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float32::asFloat64 : translateUnaryPrimitiveInto(MIR::Operation::Float32ToFloat64).
     #Float32::asIEEEFloat32Encoding : translateUnaryPrimitiveInto(MIR::Operation::Float32ToIEEEUInt32). 
 
+    ## Float32x4 primitives
+    #Float32x4::negated : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Negate).
+    #Float32x4::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Sqrt).
+
+    #Float32x4::+ : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Add).
+    #Float32x4::- : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Sub).
+    #Float32x4::* : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Mul).
+    #Float32x4::/ : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Div).
+
     ## Float64 primitives
     #Float64::negated : translateUnaryPrimitiveInto(MIR::Operation::Float64Negate).
     #Float64::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float64Sqrt).
@@ -2609,6 +2754,9 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float64::- : translateBinaryPrimitiveInto(MIR::Operation::Float64Sub).
     #Float64::* : translateBinaryPrimitiveInto(MIR::Operation::Float64Mul).
     #Float64::/ : translateBinaryPrimitiveInto(MIR::Operation::Float64Div).
+
+    #Float64::min: : translateBinaryPrimitiveInto(MIR::Operation::Float64Min).
+    #Float64::max: : translateBinaryPrimitiveInto(MIR::Operation::Float64Max).
 
     #Float64::= : translateBinaryPrimitiveInto(MIR::Operation::Float64UnorderedEquals).
     #Float64::~= : translateBinaryPrimitiveInto(MIR::Operation::Float64UnorderedNotEquals).
@@ -2632,6 +2780,16 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float64::asFloat32 : translateUnaryPrimitiveInto(MIR::Operation::Float64ToFloat32).
     #Float64::asFloat64 : translateYourselfPrimitive.
     #Float64::asIEEEFloat64Encoding : translateUnaryPrimitiveInto(MIR::Operation::Float64ToIEEEUInt64). 
+
+    ## Float64x4 primitives
+    #Float64x4::negated : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Negate).
+    #Float64x4::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Sqrt).
+
+    #Float64x4::+ : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Add).
+    #Float64x4::- : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Sub).
+    #Float64x4::* : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Mul).
+    #Float64x4::/ : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Div).
+
 }.
 
 HIRFunctionDefinitionMIRCodeGenerator extend: {

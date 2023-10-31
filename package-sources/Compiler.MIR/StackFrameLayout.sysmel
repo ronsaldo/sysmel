@@ -83,7 +83,7 @@ public final class MIRStackFrameSegment superclass: Object; definition: {
             stackSegment: segmentIndex;
             stackSegmentOffset: offset;
             hasValidStackSegmentOffset: true.
-        size := offset + value size.
+        size := offset + value alignedSize.
         alignment := alignment max: value alignment.
         hasGCRoots := hasGCRoots || value isGCRoot.
 
