@@ -143,6 +143,15 @@ public final class MIRPhysicalLocationRegisterPair superclass: MIRPhysicalLocati
             := self new firstComponent: first; secondComponent: second; yourself.
     }.
 
+    public override method hash => Size
+        := (self class identityHash hashConcatenate: firstComponent hash) hashConcatenate: secondComponent hash.
+
+    public override method = other ::=> Boolean := {
+        self class == other class ifFalse: {return: false}.
+        let otherPair := other downCastTo: MIRPhysicalLocationRegisterPair.
+        (firstComponent = otherPair firstComponent) && (secondComponent = otherPair secondComponent)
+    }.
+
     public override method isRegisterSequence => Boolean := true.
 
     public override method canBeUsedForByte => Boolean
@@ -650,7 +659,7 @@ MIRLocalValue definition: {
 
     public override method isLocalValue => Boolean := true.
 
-    public override method isFloatingPoint => Boolean := type asDecayedType isPrimitiveFloatType.
+    public override method isFloatingPoint => Boolean := type asDecayedType isPrimitiveFloatOrFloatVectorType.
     public override method isVector => Boolean := type asDecayedType isPrimitiveVectorType.
 
     public method hasValidType => Boolean := type isVoidType not.
@@ -2870,6 +2879,9 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Float32x2Negate Float64x2Negate
     Float32x2Sqrt   Float64x2Sqrt
 
+    Float32x3Negate Float64x3Negate
+    Float32x3Sqrt   Float64x3Sqrt
+
     Float32x4Negate Float64x4Negate
     Float32x4Sqrt   Float64x4Sqrt
 
@@ -2939,6 +2951,13 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Float32x2Div Float64x2Div
     Float32x2Min Float64x2Min
     Float32x2Max Float64x2Max
+
+    Float32x3Add Float64x3Add
+    Float32x3Sub Float64x3Sub
+    Float32x3Mul Float64x3Mul
+    Float32x3Div Float64x3Div
+    Float32x3Min Float64x3Min
+    Float32x3Max Float64x3Max
 
     Float32x4Add Float64x4Add
     Float32x4Sub Float64x4Sub

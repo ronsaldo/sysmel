@@ -2217,6 +2217,14 @@ let instructionDefinitionTable := #(
         (OpRxRmw #[16r66] #[16r0f 16r6E])
         (OpRmwRx #[16r66] #[16r0f 16r7E])
     )
+    (movdqa (dst src) "Move double-word quad aligned"
+        (OpRxRmx #[16r66] #[16r0f 16r6F])
+        (OpRmxRx #[16r66] #[16r0f 16r7F])
+    )
+    (movdqu (dst src) "Move double-word quad unaligned"
+        (OpRxRmx #[16rF3] #[16r0f 16r6F])
+        (OpRmxRx #[16rF3] #[16r0f 16r7F])
+    )
 
     (maxpd (dst with) "Maximum packed double"
         (OpRxRmx #[16r66] #[16r0f 16r5F])

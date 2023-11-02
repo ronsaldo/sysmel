@@ -391,6 +391,12 @@ MIRRegisterAllocator definition: {
     public abstract method spillIfNeededAndAllocateFloatRegister: (register: MIRPhysicalFloatRegister) withResultValue: (value: MIRValue) ::=> Void
         := self subclassResponsibility.
 
+    public abstract method spillIfNeededAndAllocateFloatRegisterSequence: (sequence: MIRPhysicalLocationRegisterSequence) withValue: (value: MIRValue) ::=> Void
+        := self subclassResponsibility.
+
+    public abstract method spillIfNeededAndAllocateFloatRegisterSequence: (sequence: MIRPhysicalLocationRegisterSequence) withResultValue: (value: MIRValue) ::=> Void
+        := self subclassResponsibility.
+
     public abstract method spillIfNeededAndAllocateVectorRegister: (register: MIRPhysicalVectorRegister) withValue: (value: MIRValue) ::=> Void
         := self subclassResponsibility.
 
@@ -398,6 +404,12 @@ MIRRegisterAllocator definition: {
         := self subclassResponsibility.
 
     public abstract method spillIfNeededAndAllocateVectorRegister: (register: MIRPhysicalVectorRegister) withResultValue: (value: MIRValue) ::=> Void
+        := self subclassResponsibility.
+
+    public abstract method spillIfNeededAndAllocateVectorRegisterSequence: (sequence: MIRPhysicalLocationRegisterSequence) withValue: (value: MIRValue) ::=> Void
+        := self subclassResponsibility.
+
+    public abstract method spillIfNeededAndAllocateVectorRegisterSequence: (sequence: MIRPhysicalLocationRegisterSequence) withResultValue: (value: MIRValue) ::=> Void
         := self subclassResponsibility.
 
     public virtual method allocateRegisterOrMemoryForInstruction: (instruction: MIRInstruction) operandAt: (operandIndex: Size) ::=> Void := {
@@ -516,6 +528,14 @@ MIRPhysicalFloatRegister extend: {
     public override method makeActiveWithResultValue: (value: MIRValue) inRegisterAllocator: (registerAllocator: MIRRegisterAllocator) ::=> Void := {
         registerAllocator spillIfNeededAndAllocateFloatRegister: self withResultValue: value
     }.
+
+    public override method makeActiveSequence: (sequence: MIRPhysicalLocationRegisterSequence) withValue: (value: MIRValue) inRegisterAllocator: (registerAllocator: MIRRegisterAllocator) ::=> Void := {
+        registerAllocator spillIfNeededAndAllocateFloatRegisterSequence: sequence withValue: value
+    }.
+
+    public override method makeActiveSequence: (sequence: MIRPhysicalLocationRegisterSequence) withResultValue: (value: MIRValue) inRegisterAllocator: (registerAllocator: MIRRegisterAllocator) ::=> Void := {
+        registerAllocator spillIfNeededAndAllocateFloatRegisterSequence: sequence withResultValue: value
+    }.
 }.
 
 MIRPhysicalVectorRegister extend: {
@@ -543,6 +563,14 @@ MIRPhysicalVectorRegister extend: {
 
     public override method makeActiveWithResultValue: (value: MIRValue) inRegisterAllocator: (registerAllocator: MIRRegisterAllocator) ::=> Void := {
         registerAllocator spillIfNeededAndAllocateVectorRegister: self withResultValue: value
+    }.
+
+    public override method makeActiveSequence: (sequence: MIRPhysicalLocationRegisterSequence) withValue: (value: MIRValue) inRegisterAllocator: (registerAllocator: MIRRegisterAllocator) ::=> Void := {
+        registerAllocator spillIfNeededAndAllocateVectorRegisterSequence: sequence withValue: value
+    }.
+
+    public override method makeActiveSequence: (sequence: MIRPhysicalLocationRegisterSequence) withResultValue: (value: MIRValue) inRegisterAllocator: (registerAllocator: MIRRegisterAllocator) ::=> Void := {
+        registerAllocator spillIfNeededAndAllocateVectorRegisterSequence: sequence withResultValue: value
     }.
 }.
 

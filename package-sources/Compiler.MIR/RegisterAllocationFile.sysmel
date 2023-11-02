@@ -156,7 +156,7 @@ public final class MIRRegisterAllocationFile superclass: Object; definition: {
     }.
 
     public method spillIfNeededAndAllocateRegisterSequence: (usedRegisterSequence: MIRPhysicalLocationRegisterSequence) withValue: (value: MIRValue) ::=> Void := {
-        value isNotNil && (value coalescedAssignedRegister == usedRegisterSequence) ifTrue: {
+        value isNotNil && (value coalescedAssignedRegister = usedRegisterSequence) ifTrue: {
             return: void
         }.
 
@@ -179,7 +179,7 @@ public final class MIRRegisterAllocationFile superclass: Object; definition: {
     }.
 
     public method spillIfNeededAndAllocateRegisterSequence: (usedRegisterSequence: MIRPhysicalLocationRegisterSequence) withResultValue: (value: MIRValue) ::=> Void := {
-        value isNotNil && (value coalescedAssignedRegister == usedRegisterSequence) ifTrue: {
+        value isNotNil && (value coalescedAssignedRegister = usedRegisterSequence) ifTrue: {
             return: void
         }.
 

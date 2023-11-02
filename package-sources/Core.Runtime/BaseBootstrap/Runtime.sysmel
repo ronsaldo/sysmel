@@ -3186,6 +3186,7 @@ Type
     withSelector: #isPrimitiveIntegerType addMethod: {:(Type)self :: Boolean | false } makeVirtual;
     withSelector: #isPrimitiveUnsignedIntegerType addMethod: {:(Type)self :: Boolean | false } makeVirtual;
     withSelector: #isPrimitiveSignedIntegerType addMethod: {:(Type)self :: Boolean | false } makeVirtual;
+    withSelector: #isPrimitiveFloatOrFloatVectorType addMethod: {:(Type)self :: Boolean | false } makeVirtual;
     withSelector: #isPrimitiveVectorType addMethod: {:(Type)self :: Boolean | false } makeVirtual.
 
 ValueType
@@ -3210,6 +3211,7 @@ PointerLikeType
 PrimitiveNumber __type__ withSelector: #isPrimitiveNumberType addMethod: {:(Type)self :: Boolean | true } makeOverride.
 PrimitiveCharacter __type__ withSelector: #isPrimitiveCharacterType addMethod: {:(Type)self :: Boolean | true } makeOverride.
 PrimitiveFloat __type__ withSelector: #isPrimitiveFloatType addMethod: {:(Type)self :: Boolean | true } makeOverride.
+PrimitiveFloat __type__ withSelector: #isPrimitiveFloatOrFloatVectorType addMethod: {:(Type)self :: Boolean | true } makeOverride.
 PrimitiveInteger __type__ withSelector: #isPrimitiveIntegerType addMethod: {:(Type)self :: Boolean | true } makeOverride.
 PrimitiveSignedInteger __type__ withSelector: #isPrimitiveSignedIntegerType addMethod: {:(Type)self :: Boolean | true } makeOverride.
 PrimitiveUnsignedInteger __type__ withSelector: #isPrimitiveUnsignedIntegerType addMethod: {:(Type)self :: Boolean | true } makeOverride.

@@ -397,6 +397,14 @@ public final class MIRLinearScanRegisterAllocator superclass: MIRRegisterAllocat
         floatRegisterFile spillIfNeededAndAllocateRegister: register withResultValue: value
     }.
 
+    public override method spillIfNeededAndAllocateFloatRegisterSequence: (sequence: MIRPhysicalLocationRegisterSequence) withValue: (value: MIRValue) ::=> Void := {
+        floatRegisterFile spillIfNeededAndAllocateRegisterSequence: sequence withValue: value
+    }.
+
+    public override method spillIfNeededAndAllocateFloatRegisterSequence: (sequence: MIRPhysicalLocationRegisterSequence) withResultValue: (value: MIRValue) ::=> Void := {
+        floatRegisterFile spillIfNeededAndAllocateRegisterSequence: sequence withResultValue: value
+    }.
+
     public override method allocateVectorRegisterForValue: (value: MIRValue) ::=> MIRPhysicalLocation
         := vectorRegisterFile allocateForValue: value.
 
@@ -415,5 +423,13 @@ public final class MIRLinearScanRegisterAllocator superclass: MIRRegisterAllocat
 
     public override method spillIfNeededAndAllocateVectorRegister: (register: MIRPhysicalVectorRegister) withResultValue: (value: MIRValue) ::=> Void := {
         vectorRegisterFile spillIfNeededAndAllocateRegister: register withResultValue: value
+    }.
+
+    public override method spillIfNeededAndAllocateVectorRegisterSequence: (sequence: MIRPhysicalLocationRegisterSequence) withValue: (value: MIRValue) ::=> Void := {
+        vectorRegisterFile spillIfNeededAndAllocateRegisterSequence: sequence withValue: value
+    }.
+
+    public override method spillIfNeededAndAllocateVectorRegisterSequence: (sequence: MIRPhysicalLocationRegisterSequence) withResultValue: (value: MIRValue) ::=> Void := {
+        vectorRegisterFile spillIfNeededAndAllocateRegisterSequence: sequence withResultValue: value
     }.
 }.

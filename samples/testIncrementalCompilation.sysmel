@@ -146,12 +146,27 @@ nativeLinkedObjectCode writeObjectToFileNamed: "test.o".
 
 
 {
-public function addVector(a: Float32x4, b: Float32x4) => Float32x4
+public function addVector32x2(a: Float32x2, b: Float32x2) => Float32x2
+    := a + b.
+
+public function addVector32x3(a: Float32x3, b: Float32x3) => Float32x3
+    := a + b.
+
+public function addVector32x4(a: Float32x4, b: Float32x4) => Float32x4
+    := a + b.
+
+public function addVector64x2(a: Float64x2, b: Float64x2) => Float64x2
+    := a + b.
+
+public function addVector64x3(a: Float64x3, b: Float64x3) => Float64x3
+    := a + b.
+
+public function addVector64x4(a: Float64x4, b: Float64x4) => Float64x4
     := a + b.
 
 let hirModule := HIRModuleCompilationContext forDefaultTarget
     exclusiveCompilationMode: true;
-    compileFunctionsWithDefinitions: (addVector,);
+    compileFunctionsWithDefinitions: (addVector32x2, addVector32x3, addVector32x4, addVector64x2, addVector64x3, addVector64x4);
     finish.
 
 ##hirModule performStandardOptimizations.

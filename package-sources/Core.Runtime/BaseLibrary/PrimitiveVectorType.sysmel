@@ -69,7 +69,9 @@ public class PrimitiveVectorType superclass: ValueType; definition: {
     public override pure method asReceiverType => Type := self.
     public override pure method asResultType => Type := self.
     public override method decayReferenceLikeForReceiverType: (reference: ReferenceLikeType) ::=> Type := self.
+
     public override method isPrimitiveVectorType => Boolean := true.
+    public override method isPrimitiveFloatOrFloatVectorType => Boolean := elementType isPrimitiveFloatType.
 }.
 
 public class PrimitiveVectorMetatype superclass: ValueMetatype; definition: {
@@ -129,8 +131,6 @@ public global Float32x2 := PrimitiveVectorTypeTemplate(Float32, 2sz).
 public global Float32x3 := PrimitiveVectorTypeTemplate(Float32, 3sz).
 public global Float32x4 := PrimitiveVectorTypeTemplate(Float32, 4sz).
 
-#*
 public global Float64x2 := PrimitiveVectorTypeTemplate(Float64, 2sz).
 public global Float64x3 := PrimitiveVectorTypeTemplate(Float64, 3sz).
 public global Float64x4 := PrimitiveVectorTypeTemplate(Float64, 4sz).
-*#

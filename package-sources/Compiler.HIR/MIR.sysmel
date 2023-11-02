@@ -2737,6 +2737,28 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float32::asFloat64 : translateUnaryPrimitiveInto(MIR::Operation::Float32ToFloat64).
     #Float32::asIEEEFloat32Encoding : translateUnaryPrimitiveInto(MIR::Operation::Float32ToIEEEUInt32). 
 
+    ## Float32x2 primitives
+    #Float32x2::negated : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Negate).
+    #Float32x2::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Sqrt).
+
+    #Float32x2::+ : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Add).
+    #Float32x2::- : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Sub).
+    #Float32x2::* : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Mul).
+    #Float32x2::/ : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Div).
+    #Float32x2::min: : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Min).
+    #Float32x2::max: : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Max).
+
+    ## Float32x3 primitives
+    #Float32x3::negated : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Negate).
+    #Float32x3::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Sqrt).
+
+    #Float32x3::+ : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Add).
+    #Float32x3::- : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Sub).
+    #Float32x3::* : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Mul).
+    #Float32x3::/ : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Div).
+    #Float32x3::min: : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Min).
+    #Float32x3::max: : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Max).
+
     ## Float32x4 primitives
     #Float32x4::negated : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Negate).
     #Float32x4::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Sqrt).
@@ -2745,6 +2767,8 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float32x4::- : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Sub).
     #Float32x4::* : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Mul).
     #Float32x4::/ : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Div).
+    #Float32x4::min: : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Min).
+    #Float32x4::max: : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Max).
 
     ## Float64 primitives
     #Float64::negated : translateUnaryPrimitiveInto(MIR::Operation::Float64Negate).
@@ -2781,6 +2805,28 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float64::asFloat64 : translateYourselfPrimitive.
     #Float64::asIEEEFloat64Encoding : translateUnaryPrimitiveInto(MIR::Operation::Float64ToIEEEUInt64). 
 
+    ## Float64x3 primitives
+    #Float64x2::negated : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Negate).
+    #Float64x2::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Sqrt).
+
+    #Float64x2::+ : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Add).
+    #Float64x2::- : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Sub).
+    #Float64x2::* : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Mul).
+    #Float64x2::/ : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Div).
+    #Float64x2::min: : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Min).
+    #Float64x2::max: : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Max).
+
+    ## Float64x3 primitives
+    #Float64x3::negated : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Negate).
+    #Float64x3::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Sqrt).
+
+    #Float64x3::+ : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Add).
+    #Float64x3::- : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Sub).
+    #Float64x3::* : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Mul).
+    #Float64x3::/ : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Div).
+    #Float64x3::min: : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Min).
+    #Float64x3::max: : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Max).
+
     ## Float64x4 primitives
     #Float64x4::negated : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Negate).
     #Float64x4::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Sqrt).
@@ -2789,6 +2835,8 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float64x4::- : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Sub).
     #Float64x4::* : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Mul).
     #Float64x4::/ : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Div).
+    #Float64x4::min: : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Min).
+    #Float64x4::max: : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Max).
 
 }.
 
