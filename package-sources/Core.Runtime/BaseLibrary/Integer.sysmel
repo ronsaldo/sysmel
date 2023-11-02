@@ -1,5 +1,5 @@
 if: ObjectModel::PointerSize = 4sz then: {
-    UInt32 definition: {
+    UInt32 eagerDefinition: {
         public pure final eager method asInteger ::=> Integer := {
             <primitive: #UInt32::asInteger>
             self <= ObjectModel::Immediate::Int::Max asUInt32 ifTrue: {
@@ -12,7 +12,7 @@ if: ObjectModel::PointerSize = 4sz then: {
         }.
     }.
 
-    Int32 definition: {
+    Int32 eagerDefinition: {
         public pure final eager method asInteger ::=> Integer := {
             <primitive: #UInt32::asInteger>
             (ObjectModel::Immediate::Int::Min asInt32 <= self) && (self <= ObjectModel::Immediate::Int::Max asInt32) ifTrue: {
@@ -25,14 +25,14 @@ if: ObjectModel::PointerSize = 4sz then: {
         }.
     }.
 } else: {
-    UInt32 definition: {
+    UInt32 eagerDefinition: {
         public pure final eager method asInteger ::=> Integer := {
             <primitive: #UInt32::asInteger>
             (self asUIntPointer << ObjectModel::Tag::Bits asUIntPointer) | ObjectModel::Tag::Integer asUIntPointer reinterpretCastTo: Integer.
         }.
     }.
 
-    Int32 definition: {
+    Int32 eagerDefinition: {
         public pure final eager method asInteger ::=> Integer := {
             <primitive: #UInt32::asInteger>
             (self asIntPointer << ObjectModel::Tag::Bits asIntPointer) | ObjectModel::Tag::Integer asIntPointer reinterpretCastTo: Integer.
@@ -40,7 +40,7 @@ if: ObjectModel::PointerSize = 4sz then: {
     }.
 }.
 
-UInt64 definition: {
+UInt64 eagerDefinition: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #UInt64::asInteger>
         self <= ObjectModel::Immediate::Int::Max asUInt64 ifTrue: {
@@ -53,7 +53,7 @@ UInt64 definition: {
     }.
 }.
 
-Int64 definition: {
+Int64 eagerDefinition: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Int64::asInteger>
         (ObjectModel::Immediate::Int::Min asInt64 <= self) && (self <= ObjectModel::Immediate::Int::Max asInt64) ifTrue: {
@@ -66,70 +66,70 @@ Int64 definition: {
     }.
 }.
 
-Char8 definition: {
+Char8 eagerDefinition: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Char8::asInteger>
         self asUInt32 asInteger
     }.
 }.
 
-UInt8 definition: {
+UInt8 eagerDefinition: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #UInt8::asInteger>
         self asUInt32 asInteger
     }.
 }.
 
-Int8 definition: {
+Int8 eagerDefinition: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Int8::asInteger>
         self asInt32 asInteger
     }.
 }.
 
-Char16 definition: {
+Char16 eagerDefinition: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Char16::asInteger>
         self asUInt32 asInteger
     }.
 }.
 
-UInt16 definition: {
+UInt16 eagerDefinition: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #UInt16::asInteger>
         self asUInt32 asInteger
     }.
 }.
 
-Int16 definition: {
+Int16 eagerDefinition: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Int16::asInteger>
         self asInt32 asInteger
     }.
 }.
 
-Char32 definition: {
+Char32 eagerDefinition: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Char32::asInteger>
         self asUInt32 asInteger
     }.
 }.
 
-Float32 definition: {
+Float32 eagerDefinition: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Float32::asInteger>
         self asIntPointer asInteger
     }.
 }.
 
-Float64 definition: {
+Float64 eagerDefinition: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Float64::asInteger>
         self asIntPointer asInteger
     }.
 }.
 
-Integer definition: {
+Integer eagerDefinition: {
     public pure final eager method isSmallInteger => Boolean
         := (ObjectModel::getTuplePointerUIntValue(self) & ObjectModel::Tag::Mask asUIntPointer) = ObjectModel::Tag::Integer asUIntPointer.
 

@@ -1,4 +1,4 @@
-SymbolBinding definition: {
+SymbolBinding eagerDefinition: {
     public abstract method analyzeAndEvaluateWithEnvironment: (environment: Environment) at: (sourcePosition: SourcePosition) ::=> Untyped
         := self subclassResponsibility.
 
@@ -11,7 +11,7 @@ SymbolBinding definition: {
     public virtual method isSymbolValueBinding => Boolean := false.
 }.
 
-SymbolValueBinding definition: {
+SymbolValueBinding eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) at: (sourcePosition: SourcePosition) ::=> Untyped
         := self __slotNamedAt__: #value.
 
@@ -33,12 +33,12 @@ SymbolValueBinding definition: {
     public override method isSymbolValueBinding => Boolean := true.
 }.
 
-SymbolMacroValueBinding definition: {
+SymbolMacroValueBinding eagerDefinition: {
     public override eager method analyzeIdentifierReference: (node: ASTIdentifierReferenceNode) withEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode
         := self expansion analyzeWithEnvironment: environment.
 }.
 
-SymbolAnalysisBinding definition: {
+SymbolAnalysisBinding eagerDefinition: {
     public override eager method analyzeIdentifierReference: (node: ASTIdentifierReferenceNode) withEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode
         := node copy
             analyzerToken: environment validAnalyzerToken;
@@ -47,12 +47,12 @@ SymbolAnalysisBinding definition: {
             yourself.
 }.
 
-SymbolArgumentBinding definition: {
+SymbolArgumentBinding eagerDefinition: {
     public override method evaluateWithActivationEnvironment: (environment: FunctionActivationEnvironment) ::=> Untyped
         := environment valueVector at: vectorIndex.
 }.
 
-SymbolCaptureBinding definition: {
+SymbolCaptureBinding eagerDefinition: {
     public override method evaluateWithActivationEnvironment: (environment: FunctionActivationEnvironment) ::=> Untyped
         := environment captureVector at: vectorIndex.
 }.
@@ -69,7 +69,7 @@ function concretizeMetaValueWithEnvironment(value: Untyped, environment: Environ
         ifNotNil: (type analyzeAndEvaluateConcreteMetaValue: value withEnvironment: environment)
 }.
 
-Type definition: {
+Type eagerDefinition: {
     public virtual eager method getOrCreateDependentApplicationValueForNode: (node: ASTNode) ::=> Untyped := {
         let result := RawTuple::new(0sz).
         (RawTuple::type:)(result, self).
@@ -78,7 +78,7 @@ Type definition: {
     }.
 }.
 
-ASTNode definition: {
+ASTNode eagerDefinition: {
     public virtual eager method analyzeConcreteMetaValueWithEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode
         := self.
 
@@ -119,12 +119,12 @@ ASTNode definition: {
         := analyzedType getOrCreateDependentApplicationValueForNode: self.
 }.
 
-ASTLiteralNode definition: {
+ASTLiteralNode eagerDefinition: {
     public override eager method getOrCreateDependentApplicationValue => Untyped
         := self __slotNamedAt__: #value.
 }.
 
-ASTArgumentNode definition: {
+ASTArgumentNode eagerDefinition: {
     public eager override method analyzeWithEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode := {
         let result := self copy
             analyzerToken: environment validAnalyzerToken;
@@ -153,7 +153,7 @@ ASTArgumentNode definition: {
         := self type ifNil: (Untyped) ifNotNil: (self type evaluateWithEnvironment: environment).
 }.
 
-ASTCoerceValueNode definition: {
+ASTCoerceValueNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let type => Type := self typeExpression analyzeAndEvaluateWithEnvironment: environment.
         let value := self valueExpression analyzeAndEvaluateWithEnvironment: environment.
@@ -172,7 +172,7 @@ ASTCoerceValueNode definition: {
     }.
 }.
 
-ASTDownCastNode definition: {
+ASTDownCastNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let type => Type := self typeExpression analyzeAndEvaluateWithEnvironment: environment.
         let value := self valueExpression analyzeAndEvaluateWithEnvironment: environment.
@@ -210,7 +210,7 @@ ASTDownCastNode definition: {
     }.
 }.
 
-ASTErrorNode definition: {
+ASTErrorNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped
         := self parseError: self errorMessage.
 
@@ -221,7 +221,7 @@ ASTErrorNode definition: {
         := self parseError: self errorMessage.
 }.
 
-ASTIdentifierReferenceNode definition: {
+ASTIdentifierReferenceNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let binding := environment lookSymbolRecursively: self value.
         binding ifNil: {
@@ -244,7 +244,7 @@ ASTIdentifierReferenceNode definition: {
         := binding evaluateWithActivationEnvironment: environment.
 }.
 
-ASTLiteralNode definition: {
+ASTLiteralNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped
         := self __slotNamedAt__: #value.
 
@@ -264,7 +264,7 @@ ASTLiteralNode definition: {
     }.
 }.
 
-ASTLambdaNode definition: {
+ASTLambdaNode eagerDefinition: {
     public eager method argumentCount => Size := {
         let result mutable := 0sz.
         self arguments do: {:(ASTArgumentNode)eachArgument :: Void |
@@ -383,7 +383,7 @@ ASTLambdaNode definition: {
     }.
 }.
 
-ASTLexicalBlockNode definition: {
+ASTLexicalBlockNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let childEnvironment := AnalysisAndEvaluationEnvironment parent: environment.
         body analyzeAndEvaluateWithEnvironment: childEnvironment
@@ -399,7 +399,7 @@ ASTLexicalBlockNode definition: {
     }.
 }.
 
-ASTVariableDefinitionNode definition: {
+ASTVariableDefinitionNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let name := self nameExpression ifNotNil: (self nameExpression analyzeAndEvaluateWithEnvironment: environment).
         self isMacroSymbol ifTrue: {
@@ -487,7 +487,7 @@ ASTVariableDefinitionNode definition: {
     }.
 }.
 
-ASTMakeAssociationNode definition: {
+ASTMakeAssociationNode eagerDefinition: {
     public override eager method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped
         := Association
             key: (self key analyzeAndEvaluateWithEnvironment: environment)
@@ -507,7 +507,7 @@ ASTMakeAssociationNode definition: {
             value: (self value ifNotNil: (self value evaluateWithEnvironment: environment)).
 }.
 
-ASTMakeArrayNode definition: {
+ASTMakeArrayNode eagerDefinition: {
     public override eager method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped
         := self elements collect: {:(ASTNode)each | each analyzeAndEvaluateWithEnvironment: environment }.
 
@@ -522,7 +522,7 @@ ASTMakeArrayNode definition: {
         := self elements collect: {:(ASTNode)each | each evaluateWithEnvironment: environment }.
 }.
 
-ASTMakeByteArrayNode definition: {
+ASTMakeByteArrayNode eagerDefinition: {
     public override eager method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let result := ByteArray new: elements size.
         self elements doWithIndex: {:(ASTNode)each :(Size)index :: Void |
@@ -547,7 +547,7 @@ ASTMakeByteArrayNode definition: {
     }.
 }.
 
-ASTMakeDictionaryNode definition: {
+ASTMakeDictionaryNode eagerDefinition: {
     public override eager method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let result := Dictionary new: elements size.
         self elements doWithIndex: {:(ASTNode)each :(Size)index :: Void |
@@ -572,7 +572,7 @@ ASTMakeDictionaryNode definition: {
     }.
 }.
 
-ASTPragmaNode definition: {
+ASTPragmaNode eagerDefinition: {
     public eager override method analyzeWithEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode := {
         let result := self copy
             analyzerToken: environment validAnalyzerToken;
@@ -594,7 +594,7 @@ ASTPragmaNode definition: {
     }.
 }.
 
-ASTSequenceNode definition: {
+ASTSequenceNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let resultBox := ValueBox with: void.
         self expressions do: {:(ASTNode)eachExpression :: Void |
@@ -633,7 +633,7 @@ ASTSequenceNode definition: {
     }.
 }.
 
-ASTUnexpandedSExpressionNode definition: {
+ASTUnexpandedSExpressionNode eagerDefinition: {
     public method asUnexpandedApplicationNode => ASTUnexpandedApplicationNode
         := ASTUnexpandedApplicationNode new
             sourcePosition: self sourcePosition;
@@ -658,7 +658,7 @@ ASTUnexpandedSExpressionNode definition: {
     }.
 }.
 
-ASTUnexpandedApplicationNode definition: {
+ASTUnexpandedApplicationNode eagerDefinition: {
     public eager method asFunctionApplicationNode => ASTFunctionApplicationNode
         := ASTFunctionApplicationNode new
             sourcePosition: self sourcePosition;
@@ -677,7 +677,7 @@ ASTUnexpandedApplicationNode definition: {
 }.
 
 ## Temporal definition to avoid cyclic issues.
-Function class definition: {
+Function class eagerDefinition: {
     public virtual eager method analyzeAndEvaluateUnexpandedApplicationNode: (node: ASTUnexpandedApplicationNode) of: (functional: Untyped) withEnvironment: (environment: Environment) ::=> Untyped := {
         functional isMacro ifTrue: {
             (node expandWithMacro: functional environment: environment) analyzeAndEvaluateWithEnvironment: environment
@@ -700,7 +700,7 @@ Function class definition: {
     }.
 }.
 
-FunctionType definition: {
+FunctionType eagerDefinition: {
     public virtual eager method analyzeAndEvaluateUnexpandedApplicationNode: (node: ASTUnexpandedApplicationNode) of: (functional: Untyped) withEnvironment: (environment: Environment) ::=> Untyped := {
         functional isMacro ifTrue: {
             (node expandWithMacro: functional environment: environment) analyzeAndEvaluateWithEnvironment: environment
@@ -723,7 +723,7 @@ FunctionType definition: {
     }.
 }.
 
-Type definition: {
+Type eagerDefinition: {
     public virtual eager method analyzeAndEvaluateUnexpandedApplicationNode: (node: ASTUnexpandedApplicationNode) of: (functional: Untyped) withEnvironment: (environment: Environment) ::=> Untyped := {
         node asFunctionApplicationNode
             functionExpression: (ASTLiteralNode new
@@ -738,7 +738,7 @@ Type definition: {
     }.
 }.
 
-Function class definition: {
+Function class eagerDefinition: {
     public virtual eager method analyzeAndEvaluateUnexpandedApplicationNode: (node: ASTUnexpandedApplicationNode) of: (functional: Untyped) withEnvironment: (environment: Environment) ::=> Untyped := {
         functional isMacro ifTrue: {
             (node expandWithMacro: functional environment: environment) analyzeAndEvaluateWithEnvironment: environment
@@ -756,7 +756,7 @@ Function class definition: {
     }.
 }.
 
-FunctionType definition: {
+FunctionType eagerDefinition: {
     public virtual eager method analyzeAndEvaluateUnexpandedApplicationNode: (node: ASTUnexpandedApplicationNode) of: (functional: Untyped) withEnvironment: (environment: Environment) ::=> Untyped := {
         functional isMacro ifTrue: {
             (node expandWithMacro: functional environment: environment) analyzeAndEvaluateWithEnvironment: environment
@@ -774,7 +774,7 @@ FunctionType definition: {
     }.
 }.
 
-MetaBuilder class definition: {
+MetaBuilder class eagerDefinition: {
     public virtual eager method analyzeUnexpandedApplicationNode: (node: ASTUnexpandedApplicationNode) withEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> Untyped := {
         node functionOrMacroExpression isLiteralNode ifTrue: {
             (node functionOrMacroExpression downCastTo: ASTLiteralNode) value analyzeUnexpandedApplicationNode: node withEnvironment: environment
@@ -784,7 +784,7 @@ MetaBuilder class definition: {
     }.
 }.
 
-ASTUnexpandedApplicationNode definition: {
+ASTUnexpandedApplicationNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let functionOrMacro := self functionOrMacroExpression analyzeAndEvaluateWithEnvironment: environment.
         RawTuple::type(functionOrMacro) analyzeAndEvaluateUnexpandedApplicationNode: self of: functionOrMacro withEnvironment: environment
@@ -799,7 +799,7 @@ ASTUnexpandedApplicationNode definition: {
     }.
 }.
 
-ASTFunctionApplicationNode definition: {
+ASTFunctionApplicationNode eagerDefinition: {
     public eager method optimizePureApplicationWithEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode := {
         let canOptimize := self functionExpression isLiteralPureFunctionNode
             && (self arguments allSatisfy: {:(ASTNode)each :: Boolean | each isLiteralNode }).
@@ -809,7 +809,7 @@ ASTFunctionApplicationNode definition: {
     }.
 }.
 
-public final class MessageSendStaticLookupResult superclass: Object; definition: {
+public final class MessageSendStaticLookupResult superclass: Object; eagerDefinition: {
     public field foundMethod => AnyValue.
     public field owner => Type.
     public field selector => Symbol.
@@ -826,7 +826,7 @@ public final class MessageSendStaticLookupResult superclass: Object; definition:
         := isDoesNotUnderstand not && (owner isFinal || self isMacro || self isFinal || self hasVirtualDispatch not).
 }.
 
-ASTMessageSendNode definition: {
+ASTMessageSendNode eagerDefinition: {
     public eager method expandWithDoesNotUnderstandMacro: macroFunction environment: (environment: Environment) ::=> ASTNode := {
         let macroContext := MacroContext new
             sourceNode: self;
@@ -846,7 +846,7 @@ ASTMessageSendNode definition: {
     }.
 }.
 
-ASTMessageChainMessageNode definition: {
+ASTMessageChainMessageNode eagerDefinition: {
     public eager method analyzeAndEvaluateWithReceiver: (receiver: Untyped) environment: (environment: Environment) ::=> Untyped
         := (self asMessageSendNodeWithReceiver: (ASTLiteralNode new
             sourcePosition: self sourcePosition;
@@ -854,7 +854,7 @@ ASTMessageChainMessageNode definition: {
             yourself)) analyzeAndEvaluateWithEnvironment: environment.
 }.
 
-ASTMessageChainNode definition: {
+ASTMessageChainNode eagerDefinition: {
     public eager method expandAsSequence => ASTNode := {
         let messageCount := self messages size.
         messageCount = 0sz ifTrue: {
@@ -910,7 +910,7 @@ ASTMessageChainNode definition: {
     }
 }.
 
-Type definition: {
+Type eagerDefinition: {
     public virtual eager method analyzeAndTypeCheckFunctionApplicationNode: (node: ASTFunctionApplicationNode) withEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode := {
         node
             analyzedType: AnyValue;
@@ -1104,12 +1104,12 @@ Type definition: {
         := self analyzeOrdinaryMessageChainNode: node withEnvironment: environment.
 }.
 
-PointerType definition: {
+PointerType eagerDefinition: {
     public override eager method analyzeAndTypeCheckFunctionApplicationNode: (node: ASTFunctionApplicationNode) withEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode
         := baseType analyzeAndTypeCheckFunctionApplicationNode: node withEnvironment: environment.
 }.
 
-ReferenceLikeType definition: {
+ReferenceLikeType eagerDefinition: {
     public override eager method messageSendStaticLookupDirectSelector: (selector: Symbol) ::=> MessageSendStaticLookupResult
         := (super messageSendStaticLookupDirectSelector: selector) ifNil: (baseType messageSendStaticLookupDirectSelector: selector).
 
@@ -1117,7 +1117,7 @@ ReferenceLikeType definition: {
         := super messageSendStaticLookupDoesNotUnderstandSelector ifNil: (baseType messageSendStaticLookupDoesNotUnderstandSelector).
 }.
 
-SimpleFunctionType definition: {
+SimpleFunctionType eagerDefinition: {
     public virtual eager method analyzeAndTypeCheckFunctionApplicationNode: (node: ASTFunctionApplicationNode) withEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode := {
         let isVariadic := self isVariadic.
         let isMemoizedTemplate := self isMemoizedTemplate.
@@ -1193,7 +1193,7 @@ SimpleFunctionType definition: {
     }.
 }.
 
-DependentFunctionType definition: {
+DependentFunctionType eagerDefinition: {
     public method initializeWithFunctionAnalysisEnvironment: (functionAnalysisEnvironment: FunctionAnalysisEnvironment)
         argumentNodes: (theArgumentNode: Array) resultTypeNode: (theResultTypeNode: ASTNode) functionFlags: (theFunctionFlags: Bitflags) ::=> Void := {
 
@@ -1386,7 +1386,7 @@ DependentFunctionType definition: {
     }.
 }.
 
-FunctionBytecodeCompiler definition: {
+FunctionBytecodeCompiler eagerDefinition: {
     __Meta__ definition: {
         public abstract eager method compileFunctionSourceAnalyzedDefinition: (sourceAnalyzedDefinition: FunctionSourceAnalyzedDefinition) ::=> FunctionBytecode
             := self subclassResponsibility
@@ -1410,7 +1410,7 @@ FunctionNativeCodeDefinition definition: {
     }.
 }.
 
-FunctionDefinition definition: {
+FunctionDefinition eagerDefinition: {
     public eager method ensureTypeAnalysis => Void := {
         sourceDefinition argumentNodes ifNil: {return: void}.
         type ifNotNil: {return: void}.
@@ -1620,7 +1620,7 @@ ASTMessageSendNode definition: {
     }.
 }.
 
-ASTMessageChainNode definition: {
+ASTMessageChainNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         self receiver ifNotNil: {
             let receiver := self receiver analyzeAndEvaluateWithEnvironment: environment.
@@ -1671,7 +1671,7 @@ ASTMessageChainNode definition: {
         := self error: "Message chain node should be expanded."
 }.
 
-ASTTupleWithLookupStartingFromNode definition: {
+ASTTupleWithLookupStartingFromNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped
         := self tupleExpression analyzeAndEvaluateWithEnvironment: environment.
 
@@ -1690,7 +1690,7 @@ ASTTupleWithLookupStartingFromNode definition: {
         := self tupleExpression evaluateWithEnvironment: environment.
 }.
 
-ASTTupleSlotNamedAtNode definition: {
+ASTTupleSlotNamedAtNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let tuple := self tupleExpression analyzeAndEvaluateWithEnvironment: environment.
         let slot => TypeSlot := self boundSlot ifNotNil: {
@@ -1742,7 +1742,7 @@ ASTTupleSlotNamedAtNode definition: {
     }.
 }.
 
-ASTTupleSlotNamedReferenceAtNode definition: {
+ASTTupleSlotNamedReferenceAtNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let tuple := self tupleExpression analyzeAndEvaluateWithEnvironment: environment.
         let slot => TypeSlot := self boundSlot ifNotNil: {
@@ -1794,7 +1794,7 @@ ASTTupleSlotNamedReferenceAtNode definition: {
     }.
 }.
 
-ASTTupleSlotNamedAtPutNode definition: {
+ASTTupleSlotNamedAtPutNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let tuple := self tupleExpression analyzeAndEvaluateWithEnvironment: environment.
         let value := self valueExpression analyzeAndEvaluateWithEnvironment: environment.
@@ -1851,7 +1851,7 @@ ASTTupleSlotNamedAtPutNode definition: {
     }.
 }.
 
-ASTUseNamedSlotsOfNode definition: {
+ASTUseNamedSlotsOfNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let usedTuple := self tupleExpression analyzeAndEvaluateWithEnvironment: environment.
         let localBinding := environment setNewSymbol: nil valueBinding: usedTuple at: self sourcePosition.
@@ -1887,7 +1887,7 @@ ASTUseNamedSlotsOfNode definition: {
     }.
 }.
 
-ASTBreakNode definition: {
+ASTBreakNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         self semanticError: "TODO: ASTBreakNode analyzeAndEvaluateWithEnvironment"
     }.
@@ -1929,7 +1929,7 @@ ASTContinueNode definition: {
     }.
 }.
 
-Type definition: {
+Type eagerDefinition: {
     public method computeTypeHierarchyDepth => Int32
         := supertype ifNil: 0i32 ifNotNil: supertype computeTypeHierarchyDepth + 1i32.
     Type ensureAnalysisOfMethodWithSelector: #computeTypeHierarchyDepth.
@@ -1975,7 +1975,7 @@ Type definition: {
         := otherType computeConditionCoercionTypeWithOrdinaryType: self.
 }.
 
-UndefinedObject __type__ definition: {
+UndefinedObject __type__ eagerDefinition: {
     public override eager method computeConditionCoercionTypeWithOrdinaryType: (otherType: Type) ::=> Type
         := otherType.
 
@@ -1983,7 +1983,7 @@ UndefinedObject __type__ definition: {
         := otherType computeConditionCoercionTypeWithUndefinedType: self.
 }.
 
-ControlFlowEscapeType __type__ definition: {
+ControlFlowEscapeType __type__ eagerDefinition: {
     public override eager method computeConditionCoercionTypeWithOrdinaryType: (otherType: Type) ::=> Type
         := otherType.
 
@@ -1991,7 +1991,7 @@ ControlFlowEscapeType __type__ definition: {
         := otherType computeConditionCoercionTypeWithControlFlowEscapeType: self.
 }.
 
-ASTIfNode definition: {
+ASTIfNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let condition => Boolean := self conditionExpression analyzeAndEvaluateWithEnvironment: environment.
         condition ifTrue: {
@@ -2050,7 +2050,7 @@ ASTIfNode definition: {
     }.
 }.
 
-ASTSwitchNode definition: {
+ASTSwitchNode eagerDefinition: {
     public override eager method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         let value := expression analyzeAndEvaluateWithEnvironment: environment.
         let result mutable => Untyped := nil.
@@ -2147,7 +2147,7 @@ ASTSwitchNode definition: {
     }.
 }.
 
-ASTReturnNode definition: {
+ASTReturnNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         self semanticError: "TODO: ASTReturnNode analyzeAndEvaluateWithEnvironment"
     }.
@@ -2165,7 +2165,7 @@ ASTReturnNode definition: {
     }.
 }.
 
-ASTDoWhileContinueWithNode definition: {
+ASTDoWhileContinueWithNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         do: {
             self bodyExpression ifNotNil: {
@@ -2222,7 +2222,7 @@ ASTDoWhileContinueWithNode definition: {
     }.
 }.
 
-ASTWhileContinueWithNode definition: {
+ASTWhileContinueWithNode eagerDefinition: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         while: (self conditionExpression ifNil: true ifNotNil: (self conditionExpression analyzeAndEvaluateWithEnvironment: environment)) do: {
             self bodyExpression ifNotNil: {
@@ -2275,7 +2275,7 @@ ASTWhileContinueWithNode definition: {
     }.
 }.
 
-Function definition: {
+Function eagerDefinition: {
     public eager method recompileAndOptimize => Function := {
         self ensureAnalysis.
         definition ifNil: (return: self).

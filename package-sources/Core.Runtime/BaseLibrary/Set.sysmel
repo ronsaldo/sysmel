@@ -1,4 +1,4 @@
-Set definition: {
+Set eagerDefinition: {
     public eager method scanFor: key hashFunction: hashFunction equalsFunction: equalsFunction ::=> IntPointer := {
         storage ifNil: { return: -1iptr }.
 

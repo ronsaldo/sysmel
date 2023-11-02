@@ -41,12 +41,12 @@ public struct ExceptionOnDoStackRecord supertype: ExceptionStackRecord; definiti
     public field setjmpBuffer => ExceptionSetjmpBuffer.
 }.
 
-AnyValue definition: {
+AnyValue eagerDefinition: {
     public virtual method handlesException: (exception: Exception) ::=> Boolean
         := false.
 }.
 
-Exception definition: {
+Exception eagerDefinition: {
     __Meta__ definition: {
         public override method handlesException: (exception: Exception) ::=> Boolean
             := exception isKindOf: self.

@@ -86,8 +86,8 @@ SourceCode definition: {
     }.
 }.
 
-SourcePosition definition: {
-    __Meta__ definition: {
+SourcePosition eagerDefinition: {
+    __Meta__ eagerDefinition: {
         public method for: (sourceCode: SourceCode) startIndex: (startIndex: UInt32) endIndex: (endIndex: UInt32) ::=> self
             := self new
                 sourceCode: sourceCode;

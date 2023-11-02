@@ -1,6 +1,6 @@
 OrderedCollection::new adoptDefinitionOf: {:: OrderedCollection | OrderedCollection new}.
 
-OrderedCollection definition: {
+OrderedCollection eagerDefinition: {
     public eager method capacity => Size
         := storage ifNil: 0sz ifNotNil: storage size.
 

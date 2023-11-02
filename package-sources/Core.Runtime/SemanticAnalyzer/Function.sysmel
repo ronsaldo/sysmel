@@ -1,4 +1,4 @@
-FunctionDefinition definition: {
+FunctionDefinition eagerDefinition: {
     public eager method captures => Array := {
         bytecode ifNotNil: {
             return: bytecode captures
@@ -18,7 +18,7 @@ FunctionDefinition definition: {
     }.
 }.
 
-Function definition: {
+Function eagerDefinition: {
     public eager method setupWithFunctionDefinition: (newDefinition: FunctionDefinition) captureEnvironment: (newCaptureEnvironment: Environment) ::=> Void := {
         flags := newDefinition flags.
         argumentCount := newDefinition argumentCount.
@@ -177,7 +177,7 @@ Function definition: {
     }.
 }.
 
-FunctionDefinition definition: {
+FunctionDefinition eagerDefinition: {
     public method isTargetDefinedPrimitive => Boolean
         := (self hasAnyFlag: FunctionFlags::TargetDefinedPrimitive) || (self hasPragmaNamed: #targetDefinedPrimitive).
 

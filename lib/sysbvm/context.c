@@ -471,6 +471,9 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
     context->roots.weakArrayType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.arrayType);
     context->roots.weakOrderedCollectionType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.orderedCollectionType);
 
+    context->roots.pendingDefinitionFragmentsType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.objectType);
+    context->roots.pendingDefinitionFragmentType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.objectType);
+
     context->roots.gcLayoutBuilderType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.objectType);
     context->roots.gcLayoutType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.arrayedCollectionType);
     context->roots.nativeCodeCallFrameInformation = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.byteArrayType);
@@ -680,6 +683,16 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
     sysbvm_context_setIntrinsicTypeMetadata(context, context->roots.packageType, "Package", SYSBVM_NULL_TUPLE,
         "children", SYSBVM_TYPE_SLOT_FLAG_PROTECTED, context->roots.orderedCollectionType,
         NULL);
+    sysbvm_context_setIntrinsicTypeMetadata(context, context->roots.typeType, "PendingDefinitionFragment", SYSBVM_NULL_TUPLE,
+        "node", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.astNodeType,
+        "environment", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.environmentType,
+        NULL);
+    sysbvm_context_setIntrinsicTypeMetadata(context, context->roots.typeType, "PendingDefinitionFragments", SYSBVM_NULL_TUPLE,
+        "supertype", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.orderedCollectionType,
+        "valueType", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.orderedCollectionType,
+        "values", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.orderedCollectionType,
+        "definitionsAndExtensions", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.orderedCollectionType,
+        NULL);
     sysbvm_context_setIntrinsicTypeMetadata(context, context->roots.typeType, "Type", SYSBVM_NULL_TUPLE,
         "supertype", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_NO_RTTI_EXCLUDED, context->roots.typeType,
         "slots", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, context->roots.arrayType,
@@ -697,6 +710,10 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
         "macroMethodDictionary", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, context->roots.methodDictionaryType,
         "methodDictionary", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, context->roots.methodDictionaryType,
         "fallbackMethodDictionary", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, context->roots.methodDictionaryType,
+
+        "constructors", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, context->roots.orderedCollectionType,
+        "conversions", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, context->roots.orderedCollectionType,
+
         "virtualMethodSelectorList", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, context->roots.orderedCollectionType,
         "virtualTableLayout", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_TARGET_GENERATED | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, context->roots.virtualTableLayoutType,
         "virtualTable", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_TARGET_GENERATED, context->roots.virtualTableType,
@@ -704,6 +721,7 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
         "variableDataGCLayout", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.gcLayoutType,
 
         "pendingSlots", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, SYSBVM_NULL_TUPLE,
+        "pendingDefinitionFragments", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, context->roots.pendingDefinitionFragmentsType,
         "subtypes", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, SYSBVM_NULL_TUPLE,
         "children", SYSBVM_TYPE_SLOT_FLAG_PROTECTED, context->roots.orderedCollectionType,
         NULL);

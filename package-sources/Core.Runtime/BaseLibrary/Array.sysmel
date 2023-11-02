@@ -1,4 +1,4 @@
-Array definition: {
+Array eagerDefinition: {
     public override final eager method hash ::=> Size := {
         let result mutable := self class identityHash.
         self do: {:each :: Void |

@@ -1,4 +1,4 @@
-Dictionary definition: {
+Dictionary eagerDefinition: {
     public virtual eager method scanFor: key ::=> IntPointer := {
         storage ifNil: { return: -1iptr }.
 

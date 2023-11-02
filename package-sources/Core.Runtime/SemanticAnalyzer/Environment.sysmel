@@ -1,12 +1,12 @@
-Symbol extend: {
+Symbol eagerExtend: {
     public virtual method isGeneratedSymbol => Boolean := false.
 }.
 
-GeneratedSymbol extend: {
+GeneratedSymbol eagerExtend: {
     public override method isGeneratedSymbol => Boolean := true.
 }.
 
-SymbolBinding definition: {
+SymbolBinding eagerDefinition: {
     public eager virtual method isAnalysisBinding => Boolean := false.
 
     public eager abstract method evaluateInEnvironment: (environment: Environment) ::=> Untyped
@@ -19,7 +19,7 @@ SymbolBinding definition: {
         := self name isNotNil && self name isGeneratedSymbol not.
 }.
 
-SymbolValueBinding definition: {
+SymbolValueBinding eagerDefinition: {
     public eager abstract method evaluateInEnvironment: (environment: Environment) ::=> Untyped
         := self __slotNamedAt__: #value.
 
@@ -29,33 +29,33 @@ SymbolValueBinding definition: {
             ifFalse: type.
 }.
 
-SymbolAnalysisBinding definition: {
+SymbolAnalysisBinding eagerDefinition: {
     public eager override method isAnalysisBinding => Boolean := true.
 
     public virtual method getOrCreateCaptureInFunctionAnalysisEnvironment: (environment: FunctionAnalysisEnvironment) ::=> SymbolAnalysisBinding
         := environment getOrCreateCaptureForParentBinding: self.
 }.
 
-SymbolTupleSlotBinding definition: {
+SymbolTupleSlotBinding eagerDefinition: {
     public override method getOrCreateCaptureInFunctionAnalysisEnvironment: (environment: FunctionAnalysisEnvironment) ::=> SymbolAnalysisBinding
         := self copy
             tupleBinding: (environment getOrCreateCaptureForParentBinding: self tupleBinding);
             yourself.
 }.
 
-SymbolArgumentBinding definition: {
+SymbolArgumentBinding eagerDefinition: {
     public override method setValue: (value: Untyped) inFunctionActivationEnvironment: (environment: FunctionActivationEnvironment) ::=> Void := {
         environment valueVector untypedAt: vectorIndex put: value
     }
 }.
 
-SymbolLocalBinding definition: {
+SymbolLocalBinding eagerDefinition: {
     public override method setValue: (value: Untyped) inFunctionActivationEnvironment: (environment: FunctionActivationEnvironment) ::=> Void := {
         environment valueVector untypedAt: environment argumentVectorSize + vectorIndex put: value
     }
 }.
 
-Environment definition: {
+Environment eagerDefinition: {
     public eager virtual method initializeWithParent: (theParent: Environment) ::=> Void := {
         parent := theParent.
     }.
@@ -63,7 +63,7 @@ Environment definition: {
     public eager virtual method analyzerTokenOrNil => Object := nil.
     public eager virtual method expectedTypeOrNil => Type := nil.
 
-    __Meta__ definition: {
+    __Meta__ eagerDefinition: {
         public method empty => self
             := self new.
 
@@ -152,12 +152,12 @@ Environment
     ensureAnalysisOfMethodWithSelector: #hasValidContinueTarget.
     
 
-Type extend: {
+Type eagerExtend: {
     public eager virtual method asCanonicalTypeForNode: (node: ASTNode) ::=> Type
         := self.
 }.
 
-TypeInferenceType __type__ extend: {
+TypeInferenceType __type__ eagerExtend: {
     public eager override method asCanonicalTypeForNode: (node: ASTNode) ::=> Type
         := node analyzedType.
 
@@ -165,17 +165,17 @@ TypeInferenceType __type__ extend: {
         := self subclassResponsibility.
 }.
 
-DirectTypeInferenceType __type__ extend: {
+DirectTypeInferenceType __type__ eagerExtend: {
     public override eager method coerceASTNode: (node: ASTNode) withEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode
         := node.
 }.
 
-DecayedTypeInferenceType __type__ extend: {
+DecayedTypeInferenceType __type__ eagerExtend: {
     public override eager method coerceASTNode: (node: ASTNode) withEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode
         := (node analyzedType ifNil: Untyped) asDecayedType coerceASTNode: node withEnvironment: environment.
 }.
 
-ReceiverTypeInferenceType __type__ extend: {
+ReceiverTypeInferenceType __type__ eagerExtend: {
     public override eager method coerceASTNode: (node: ASTNode) withEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode
         := (node analyzedType ifNil: Untyped) asDecayedReceiverType coerceASTNode: node withEnvironment: environment.
 }.
@@ -185,7 +185,7 @@ public final class ASTNodeWithCanonicalType superclass: Object; definition: {
     public field canonicalType => Type.
 }.
 
-Environment definition: {
+Environment eagerDefinition: {
     public eager virtual method lookFunctionAnalysisEnvironmentRecursively => FunctionAnalysisEnvironment
         := self error: "Cannot have a function analysis environment in this context.".
 
@@ -222,7 +222,7 @@ Environment definition: {
     }.
 }.
 
-AnalysisEnvironment definition: {
+AnalysisEnvironment eagerDefinition: {
     public eager override method hasValidBreakTarget => Boolean
         := hasBreakTarget.
 
@@ -230,7 +230,7 @@ AnalysisEnvironment definition: {
         := hasContinueTarget.
 }.
 
-AnalysisAndEvaluationEnvironment definition: {
+AnalysisAndEvaluationEnvironment eagerDefinition: {
     public eager override method initializeWithParent: (theParent: Environment) ::=> Void := {
         super initializeWithParent: theParent.
         theParent ifNotNil: {
@@ -240,7 +240,7 @@ AnalysisAndEvaluationEnvironment definition: {
     }.
 }.
 
-LocalAnalysisEnvironment definition: {
+LocalAnalysisEnvironment eagerDefinition: {
     public eager override method initializeWithParent: (theParent: Environment) ::=> Void := {
         super initializeWithParent: theParent.
         theParent ifNotNil: {
@@ -250,7 +250,7 @@ LocalAnalysisEnvironment definition: {
     }.
 }.
 
-FunctionAnalysisEnvironment definition: {
+FunctionAnalysisEnvironment eagerDefinition: {
     public eager override method initialize => Void := {
         super initialize.
         captureBindingTable := IdentityDictionary new.
@@ -327,7 +327,7 @@ FunctionAnalysisEnvironment definition: {
 SymbolAnalysisBinding ensureAnalysisOfMethodWithSelector: #getOrCreateCaptureInFunctionAnalysisEnvironment:.
 SymbolTupleSlotBinding ensureAnalysisOfMethodWithSelector: #getOrCreateCaptureInFunctionAnalysisEnvironment:.
 
-AnalysisAndEvaluationEnvironment definition: {
+AnalysisAndEvaluationEnvironment eagerDefinition: {
     public eager override method lookFunctionAnalysisEnvironmentRecursively => FunctionAnalysisEnvironment
         := parent ifNotNil: parent lookFunctionAnalysisEnvironmentRecursively.
 
@@ -510,7 +510,7 @@ AnalysisAndEvaluationEnvironment definition: {
     }.
 }.
 
-FunctionActivationEnvironment definition: {
+FunctionActivationEnvironment eagerDefinition: {
     public method bindArgumentNodeAt: (argumentIndex: Size) value: (value: Untyped) ::=> Void := {
         valueVector at: argumentIndex put: value
     }.

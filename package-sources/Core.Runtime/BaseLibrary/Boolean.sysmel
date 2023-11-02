@@ -1,4 +1,4 @@
-Boolean definition: {
+Boolean eagerDefinition: {
     public final pure eager method not => Boolean := {
         <primitive: #Boolean::not>
         <targetDefinedPrimitive>

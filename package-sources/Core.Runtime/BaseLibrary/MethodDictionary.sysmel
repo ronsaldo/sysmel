@@ -1,6 +1,6 @@
 MethodDictionary::new adoptDefinitionOf: {:: MethodDictionary | MethodDictionary new}.
 
-MethodDictionary definition: {
+MethodDictionary eagerDefinition: {
     public final eager method capacity => Size
         := self storage size / 2sz.
 

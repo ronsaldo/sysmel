@@ -1,5 +1,6 @@
 NamedMetaBuilder publicSubclass: #TypeMetaBuilder slots: (
     TypeSlot publicNamed: #isPublic type: Boolean ,
+    TypeSlot publicNamed: #isEager type: Boolean ,
     TypeSlot publicNamed: #typeFlags type: Bitflags ,
     TypeSlot publicNamed: #metaSlotsExpression type: ASTNode ,
     TypeSlot publicNamed: #supertypeExpression type: ASTNode ,
@@ -22,9 +23,20 @@ TypeMetaBuilder
         self supertypeExpression: supertypeExpression.
         self continueExpansion
     };
+    withSelector: #eager addMethod: {:self :(ASTNode)definitionExpression :: ASTNode |
+        <metaBuilder>
+        self isEager: true.
+        self continueExpansion
+    };
     withSelector: #definition: addMethod: {:self :(ASTNode)definitionExpression :: ASTNode |
         <metaBuilder>
         self definitionExpression: definitionExpression.
+        self finishExpansion
+    };
+    withSelector: #eagerDefinition: addMethod: {:self :(ASTNode)definitionExpression :: ASTNode |
+        <metaBuilder>
+        self definitionExpression: definitionExpression.
+        self isEager: true.
         self finishExpansion
     };
     withSelector: #":=" addMethod: {:self :(ASTNode)definitionExpression :: ASTNode |

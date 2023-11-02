@@ -1,4 +1,4 @@
-ProgramEntity definition: {
+ProgramEntity eagerDefinition: {
     public override eager method recordBindingWithOwner: (newOwner: ProgramEntity) andName: (newName: Symbol) ::=> Void := {
         self owner isNil && self name isNil ifTrue: {
             self owner: newOwner.

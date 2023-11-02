@@ -19,6 +19,22 @@ typedef struct sysbvm_variableValueBox_s
     sysbvm_tuple_t binding;
 } sysbvm_variableValueBox_t;
 
+typedef struct sysbvm_type_pendingDefinitionFragment_s
+{
+    sysbvm_tuple_header_t super;
+    sysbvm_tuple_t node;
+    sysbvm_tuple_t environment;
+} sysbvm_type_pendingDefinitionFragment_t;
+
+typedef struct sysbvm_type_pendingDefinitionFragments_s
+{
+    sysbvm_tuple_header_t super;
+    sysbvm_tuple_t supertype;
+    sysbvm_tuple_t valueType;
+    sysbvm_tuple_t values;
+    sysbvm_tuple_t definitionsAndExtensions;
+} sysbvm_type_pendingDefinitionFragments_t;
+
 typedef struct sysbvm_type_tuple_s
 {
     sysbvm_programEntity_t super;
@@ -39,6 +55,9 @@ typedef struct sysbvm_type_tuple_s
     sysbvm_tuple_t methodDictionary;
     sysbvm_tuple_t fallbackMethodDictionary;
 
+    sysbvm_tuple_t constructors;
+    sysbvm_tuple_t conversions;
+
     sysbvm_tuple_t virtualMethodSelectorList;
     sysbvm_tuple_t virtualTableSelectorDictionary;
     sysbvm_tuple_t virtualTable;
@@ -46,6 +65,7 @@ typedef struct sysbvm_type_tuple_s
     sysbvm_tuple_t variableDataGCLayout;
 
     sysbvm_tuple_t pendingSlots;
+    sysbvm_tuple_t pendingDefinitionFragments;
     sysbvm_tuple_t subtypes;
     sysbvm_tuple_t children;
 } sysbvm_type_tuple_t;
