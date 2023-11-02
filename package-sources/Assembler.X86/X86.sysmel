@@ -847,6 +847,9 @@ AsmX86Instruction definition: {
     public abstract method secondOperand => AsmInstructionOperand
         := self error: "Operand not present.".
 
+    public abstract method thirdOperand => AsmInstructionOperand
+        := self error: "Operand not present.".
+
     public override method selectEncodingAlternatives => Void := {
         definition alternatives do: {:(AsmX86InstructionTemplate)eachAlternative :: Void |
             shortAlternative isNil && (eachAlternative canWriteInstructionIfShort: self) ifTrue: {
@@ -912,6 +915,19 @@ public final class AsmX86InstructionWithTwoOperands superclass: AsmX86Instructio
     }.
 }.
 
+public final class AsmX86InstructionWithThreeOperands superclass: AsmX86Instruction; definition: {
+    public field firstOperand => AsmInstructionOperand.
+    public field secondOperand => AsmInstructionOperand.
+    public field thirdOperand => AsmInstructionOperand.
+
+    public override method operandCount => Size := 3sz.
+
+    public override method fullPrintOn: (stream: Stream) ::=> Void := {
+        stream string: definition mnemonic; space; print: firstOperand; nextPutAll: ", "; print: secondOperand; nextPutAll: ", "; print: thirdOperand.
+        self printDebugInfoOn: stream.
+    }.
+}.
+
 AsmX86InstructionDefinition definition: {
     public method generateStreamBuilderMethod => Void := {
         let selectorBuilder := StringStream new.
@@ -969,6 +985,23 @@ AsmX86InstructionDefinition definition: {
                     definition: self;
                     firstOperand: firstOperand;
                     secondOperand: secondOperand;
+                    yourself)
+            } recompileAndOptimize.
+
+            AsmStreamBuilder
+                withSelector: directSelector addMethod: method;
+                withSelector: selector addMethod: method.
+        }.
+
+        ## Three operand case.
+        if: operandCount = 3sz then: {
+            let method := {:(AsmStreamBuilder)builder :(AsmInstructionOperand)firstOperand :(AsmInstructionOperand)secondOperand :(AsmInstructionOperand)thirdOperand :: AsmX86InstructionWithThreeOperands |
+                <keepSourceDefinition>
+                builder addElement: (AsmX86InstructionWithThreeOperands new
+                    definition: self;
+                    firstOperand: firstOperand;
+                    secondOperand: secondOperand;
+                    thirdOperand: thirdOperand;
                     yourself)
             } recompileAndOptimize.
 
@@ -1468,7 +1501,26 @@ let instructionTemplateTable := #{
                 nextPutX86ModRM: registerAddress reg: register
         };
         yourself).
-
+    OpRxRmxI8: (AsmX86InstructionTemplate new
+        when: {:(AsmX86InstructionTemplate)templ :(AsmX86Instruction)instruction :: Boolean | 
+            (instruction operandCount = 3sz) &&
+                instruction firstOperand isVectorRegister && 
+                instruction secondOperand isVectorRegisterOrRegisterAddress && 
+                instruction thirdOperand isImmediate8
+        };
+        writeWith: {:(AsmX86InstructionTemplate)templ :(AsmX86Instruction)instruction :(AsmObjectCodeStream)stream :: Void |
+            let register := instruction firstOperand.
+            let registerAddress := instruction secondOperand.
+            let immediate := instruction thirdOperand.
+            stream 
+                nextPutAll: templ mandatoryPrefix;
+                nextPutX86SegmentOverride: registerAddress;
+                nextPutX86RexRM: registerAddress reg: register;
+                nextPutAll: templ opcode;
+                nextPutX86ModRM: registerAddress reg: register;
+                nextPutImmediate: immediate withSize: 1sz
+        };
+        yourself).
     OpRxRmw: (AsmX86InstructionTemplate new
         when: {:(AsmX86InstructionTemplate)templ :(AsmX86Instruction)instruction :: Boolean | 
             (instruction operandCount = 2sz) &&
@@ -2283,6 +2335,13 @@ let instructionDefinitionTable := #(
     )
     (sqrtss (dst with) "Sqrt scalar single"
         (OpRxRmx #[16rf3] #[16r0f 16r51])
+    )
+
+    (shufps (dst with mask) "Suffle packed single"
+        (OpRxRmxI8 #[] #[16r0f 16rC6])
+    )
+    (shufpd (dst with mask) "Suffle packed double"
+        (OpRxRmxI8 #[16r66] #[16r0f 16rC6])
     )
 
     (subpd (dst with) "Subtract packed double"

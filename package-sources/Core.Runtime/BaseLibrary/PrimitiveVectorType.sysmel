@@ -34,7 +34,9 @@ public class PrimitiveVectorType superclass: ValueType; definition: {
         instanceAlignment := elementType valueAlignment * self alignmentMultiplicationFactor.
         instanceSize := elementType valueSize * elements.
         gcLayout := supertype ensureLayoutIsComputed; gcLayout.
-        self addVectorizableScalarOperations.
+        self
+            addConstructionMethods;
+            addVectorizableScalarOperations.
     }.
 
     public method alignmentMultiplicationFactor => Size
@@ -45,6 +47,21 @@ public class PrimitiveVectorType superclass: ValueType; definition: {
 
     public override method defaultValue => self
         := self basicNew.
+
+    public method addConstructionMethods => Void := {
+        let SelfMetaTypeLiteral := self class asMacroLiteral.
+        let SelfTypeLiteral := self asMacroLiteral.
+        let ElementTypeLiteral := self elementType asMacroLiteral.
+
+        let withAllMethod := ``{:(`,SelfMetaTypeLiteral)self :(`,ElementTypeLiteral)element :: `,SelfTypeLiteral |
+            <primitive: `,((self name asString -- "::withAll:") asSymbol asMacroLiteral)>
+            <targetDefinedPrimitive>
+            primitiveFailedError()
+        }.
+
+        self class
+            withSelector: #withAll: addMethod: (withAllMethod analyzeAndEvaluateWithEnvironment: Environment defaultForEvaluation).
+    }.
 
     public method addVectorizableScalarOperations => Void := {
         elementType getVectorizableScalarOperationSelectors do: {:(StringSymbol)selector :: Void |
@@ -83,7 +100,7 @@ public class PrimitiveVectorMetatype superclass: ValueMetatype; definition: {
 
 let AnyPrimitiveVectorType := PrimitiveVectorMetatype basicNew
     flags: TypeFlags::MetatypeRequiredFlags;
-    supertype: ValueType;
+    supertype: PrimitiveVectorType;
     totalSlotCount: PrimitiveVectorType validTotalSlotCount;
     yourself.
 public global AnyPrimitiveVector := AnyPrimitiveVectorType basicNew
@@ -96,7 +113,12 @@ public global AnyPrimitiveVector := AnyPrimitiveVectorType basicNew
     yourself.
 
 public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType, elements: Size) => PrimitiveVectorType := {
-    let result := PrimitiveVectorType basicNew.
+    let mataType := PrimitiveVectorMetatype basicNew
+        flags: TypeFlags::MetatypeRequiredFlags;
+        supertype: PrimitiveVectorType;
+        totalSlotCount: PrimitiveVectorType validTotalSlotCount;
+        yourself.
+    let result := mataType basicNew.
     __templateResult__ value: result.
     result
         initializeWithElementType: elementType elements: elements;
