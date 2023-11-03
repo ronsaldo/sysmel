@@ -1047,6 +1047,15 @@ public final class MIRFunctionAsmCodeGenerator superclass: MIRAsmCodeGenerator; 
             symbol
         }.
 
+    public method symbolForVectorConstant: (vector: AnyValue) ::=> AsmSymbol
+        := constantSymbolDictionary at: (#vector, vector) ifAbsentPut: {:: AsmSymbol |
+            let symbol := AsmSymbol new
+                name: #vectorConstant;
+                yourself.
+            self rodataSection align: vector __type__ instanceAlignment; label: symbol; vector: vector.
+            symbol
+        }.
+
     public method symbolForGCStackFrameDescriptorFor: (stackFrameLayout: MIRStackFrameLayout) ::=> AsmSymbol := {
         let symbol := AsmSymbol new
                 name: #gcStackFrameDescriptor;

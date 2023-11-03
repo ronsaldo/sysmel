@@ -2590,6 +2590,48 @@ MIRConstantFloat64 extend: {
     }.
 }.
 
+MIRVectorConstant extend: {
+    public override method x86_64::moveIntoRegister: (register: MIRPhysicalLocation) with: (codegen: MIRFunctionAsmCodeGenerator) ::=> Void := {
+        let constantSymbol := codegen symbolForVectorConstant: value.
+
+        type isPrimitiveFloatOrFloatVectorType ifTrue: {
+            switch: self size asUInt32 withCases: #{
+                4u32 : (codegen textSection x86::movss: (register x86::vector128For: codegen) src: constantSymbol x86::dwordPtr).
+                8u32 : (codegen textSection x86::movsd: (register x86::vector128For: codegen) src: constantSymbol x86::qwordPtr).
+                12u32 : (codegen textSection x86::movaps: (register x86::vector128For: codegen) src: constantSymbol x86::owordPtr).
+                16u32 : (codegen textSection x86::movaps: (register x86::vector128For: codegen) src: constantSymbol x86::owordPtr).
+                24u32 : (codegen textSection
+                    x86::movaps: (register firstComponent x86::vector128For: codegen) src: constantSymbol x86::owordPtr;
+                    x86::movsd: (register secondComponent x86::vector128For: codegen) src: constantSymbol x86::owordPtr + 16i32 asAsmImmediate
+                ).
+                32u32 : (codegen textSection
+                    x86::movaps: (register firstComponent x86::vector128For: codegen) src: constantSymbol x86::owordPtr;
+                    x86::movaps: (register secondComponent x86::vector128For: codegen) src: constantSymbol x86::owordPtr + 16i32 asAsmImmediate
+                ).
+                _: {self error: "Unsupported register size"}
+            }
+        } ifFalse: {
+            switch: self size asUInt32 withCases: #{
+                4u32 : (codegen textSection x86::movd: (register x86::vector128For: codegen) src: constantSymbol x86::dwordPtr).
+                8u32 : (codegen textSection x86::movq: (register x86::vector128For: codegen) src: constantSymbol x86::qwordPtr).
+                12u32 : (codegen textSection x86::movdqa: (register x86::vector128For: codegen) src: constantSymbol x86::owordPtr).
+                16u32 : (codegen textSection x86::movdqa: (register x86::vector128For: codegen) src: constantSymbol x86::owordPtr).
+                _: {self error: "Unsupported register size"}
+            }
+        }.
+    }.
+
+#*
+    public override method x86_64::moveIntoSpecificMemoryLocation: (memoryLocation: MIRSpecificPhysicalMemoryLocation) with: (codegen: MIRFunctionAsmCodeGenerator) ::=> Void := {
+        codegen textSection x86::mov: (memoryLocation x86::pointerWithCodegen: codegen) qword src: value asIEEEFloat64Encoding asAsmImmediate
+    }.
+
+    public override method x86_64::pushWith: (codegen: MIRFunctionAsmCodeGenerator) ::=> Void := {
+        codegen textSection x86::push: (codegen symbolForFloat64Constant: value) x86::qwordPtr
+    }.
+*#
+}.
+
 MIRGenericObjectPointerConstant extend: {
     public override method x86_64::moveIntoRegister: (register: MIRPhysicalLocation) with: (codegen: MIRFunctionAsmCodeGenerator) ::=> Void := {
         codegen textSection x86::mov: (register x86::int64For: codegen) src: (codegen x86_64::pointerForGCRootObjectTableEntryFor: self object).

@@ -36,6 +36,31 @@ public class PrimitiveVectorType superclass: ValueType; definition: {
 
     public override method isPrimitiveVectorType => Boolean := true.
     public override method isPrimitiveFloatOrFloatVectorType => Boolean := elementType isPrimitiveFloatType.
+
+    public override method canEncodeValueInBytes => Boolean := true.
+
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void := {
+        ObjectModel::isLogical() ifTrue: {
+            let i mutable := 0sz.
+            while: i < instanceSize do: {
+                bytes __uint8At__: offset + i put: (value __uint8At__: i).
+            } continueWith: (i := i + 1sz).
+        } ifFalse: {
+            super encodeValue: value inBytes: bytes atOffset: offset
+        }
+    }.
+
+    public override method canDecodeValueFromBytes => Boolean := true.
+
+    public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> self := {
+        let result := self basicAllocate.
+        let i mutable := 0sz.
+        while: i < instanceSize do: {
+            result __uint8At__: i put: (bytes __uint8At__: offset + i).
+        } continueWith: (i := i + 1sz).
+
+        result
+    }.
 }.
 
 public class PrimitiveVectorMetatype superclass: ValueMetatype; definition: {

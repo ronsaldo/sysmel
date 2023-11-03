@@ -893,6 +893,20 @@ public final class MIRStructureConstant superclass: MIRConstant; definition: {
     }.
 }.
 
+public final class MIRVectorConstant superclass: MIRConstant; definition: {
+    public field value => AnyValue.
+    public field size => Size.
+    public field alignment => Size.
+    public field type => PrimitiveVectorType.
+
+    public override method physicalLocationClass => MIRPhysicalLocation class
+        := MIRPhysicalVectorRegister.
+
+    public override method printOn: (stream: Stream) ::=> Void := {
+        stream nextPutAll: "vectorConstant("; print: value; nextPut: ')'c8
+    }.
+}.
+
 public final class MIRConstantInt8 superclass: MIRConstantInteger; definition: {
     public field value => Int8.
 

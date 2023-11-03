@@ -50,6 +50,7 @@ public final class HIRModuleMIRCodeGenerator superclass: HIRMIRCodeGenerator; de
 
     private field genericObjectPointerConstants => ObjectPointerDictionary.
     private field structureConstants => ObjectPointerDictionary.
+    private field primitiveVectorConstants => Dictionary.
     private field cstringConstants => Dictionary.
 
     public method initializeWithTarget: (theCompilationTarget: MIRCompilationTarget) ::=> Void := {
@@ -67,6 +68,7 @@ public final class HIRModuleMIRCodeGenerator superclass: HIRMIRCodeGenerator; de
         boxingApplicationTrampolinesDictionary := Dictionary new.
         genericObjectPointerConstants := ObjectPointerDictionary new.
         structureConstants := ObjectPointerDictionary new.
+        primitiveVectorConstants := Dictionary new.
         cstringConstants := Dictionary new.
     }.
 
@@ -452,6 +454,17 @@ public final class HIRModuleMIRCodeGenerator superclass: HIRMIRCodeGenerator; de
                 size: structureType validInstanceSize;
                 alignment: structureType validInstanceAlignment;
                 type: structureType;
+                yourself.
+        }.
+
+    public method translatePrimitiveVectorConstant: (vector: AnyValue) ::=> MIRValue
+        := primitiveVectorConstants at: vector ifAbsentPut: {:: MIRVectorConstant |
+            let vectorType := vector __type__ downCastTo: PrimitiveVectorType.
+            (MIRVectorConstant forContext: mirContext)
+                value: vector;
+                size: vectorType validInstanceSize;
+                alignment: vectorType validInstanceAlignment;
+                type: vectorType;
                 yourself.
         }.
 
@@ -1434,11 +1447,11 @@ PrimitiveVectorType extend: {
     public override method emitMirNotEquals: (left: MIRValue) with: (right: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
         := self shouldBeImplemented.
 
-    public override method translateUndefinedConstant: (constant: HIRUndefinedConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
-        := self shouldBeImplemented.
-
     public override method translateHIRLiteralConstant: (constant: HIRLiteralConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
-        := self shouldBeImplemented.
+        := codegen translatePrimitiveVectorConstant: constant value.
+
+    public override method translateUndefinedConstant: (constant: HIRUndefinedConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
+        := codegen translatePrimitiveVectorConstant: constant type defaultValue.
 }.
 
 Char8 __type__ extend: {

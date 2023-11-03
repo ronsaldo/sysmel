@@ -221,6 +221,11 @@ AsmObjectCodeSection definition: {
         writeOffset := writeOffset + structureSize
     }.
 
+    public method nextPutVector: (vector: AnyValue) withSize: (vectorSize: Size) ::=> Void := {
+        vector __type__ encodeValue: vector inBytes: data atOffset: writeOffset.
+        writeOffset := writeOffset + vectorSize
+    }.
+
     public method nextReserveBytes: (size: Size) ::=> Void := {
         writeOffset := writeOffset + size
     }.
@@ -1058,6 +1063,9 @@ AsmObjectCodeStream definition: {
     public abstract method nextPutStructure: (structure: AnyValue) withSize: (structureSize: Size) ::=> Void
         := self subclassResponsibility.
 
+    public abstract method nextPutVector: (structure: AnyValue) withSize: (structureSize: Size) ::=> Void
+        := self subclassResponsibility.
+
     public abstract method nextReserveBytes: (size: Size) ::=> Void
         := self subclassResponsibility.
 
@@ -1150,6 +1158,10 @@ AsmObjectCodeSizeStream definition: {
     }.
     
     public override method nextPutStructure: (structure: AnyValue) withSize: (structureSize: Size) ::=> Void := {
+        activeSection increaseSizeBy: structureSize
+    }.
+
+    public override method nextPutVector: (structure: AnyValue) withSize: (structureSize: Size) ::=> Void := {
         activeSection increaseSizeBy: structureSize
     }.
 
@@ -1253,6 +1265,10 @@ AsmObjectCodeWriteStream definition: {
 
     public override method nextPutStructure: (structure: AnyValue) withSize: (structureSize: Size) ::=> Void := {
         activeSection nextPutStructure: structure withSize: structureSize
+    }.
+
+    public override method nextPutVector: (structure: AnyValue) withSize: (structureSize: Size) ::=> Void := {
+        activeSection nextPutVector: structure withSize: structureSize
     }.
 
     public override method nextReserveBytes: (size: Size) ::=> Void := {

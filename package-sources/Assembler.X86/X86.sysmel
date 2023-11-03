@@ -482,17 +482,20 @@ AsmX86RegisterAddress definition: {
 }.
 
 AsmSymbol extend: {
-    public method x86::bytePtr => AsmRegisterAddress
+    public method x86::bytePtr => AsmX86RegisterAddress
         := AsmX86RegisterAddress size: 1u8 displacement: self dword.
 
-    public method x86::wordPtr => AsmRegisterAddress
+    public method x86::wordPtr => AsmX86RegisterAddress
         := AsmX86RegisterAddress size: 2u8 displacement: self dword.
 
-    public method x86::dwordPtr => AsmRegisterAddress
+    public method x86::dwordPtr => AsmX86RegisterAddress
         := AsmX86RegisterAddress size: 4u8 displacement: self dword.
 
-    public method x86::qwordPtr => AsmRegisterAddress
+    public method x86::qwordPtr => AsmX86RegisterAddress
         := AsmX86RegisterAddress size: 8u8 displacement: self dword.
+
+    public method x86::owordPtr => AsmX86RegisterAddress
+        := AsmX86RegisterAddress size: 16u8 displacement: self dword.
 }.
 
 public class AsmX86IntRegister superclass: AsmX86Register; definition: {

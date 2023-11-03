@@ -1317,6 +1317,19 @@ public final class AsmStructureDirective superclass: AsmStreamElement; definitio
     }.
 }.
 
+public final class AsmVectorDirective superclass: AsmStreamElement; definition: {
+    public field value => AnyValue.
+
+    public override method fullPrintOn: (stream: Stream) ::=> Void := {
+        stream nextPutAll: ".vector "; print: value.
+        self printDebugInfoOn: stream.
+    }.
+
+    public override method writeOnObjectCodeStream: (stream: AsmObjectCodeStream) ::=> Void := {
+        stream nextPutVector: value withSize: value __type__ alignedInstanceSize
+    }.
+}.
+
 public final class AsmReserveBytesDirective superclass: AsmStreamElement; definition: {
     public field size => Size.
 
@@ -1788,6 +1801,11 @@ public final class AsmStreamBuilder superclass: Object; definition: {
         := self addElement: (AsmStructureDirective new
             value: value;
             size: size;
+            yourself).
+
+    public method vector: (value: AnyValue) ::=> AsmVectorDirective
+        := self addElement: (AsmVectorDirective new
+            value: value;
             yourself).
 
     public method reserveBytes: (size: Size) ::=> AsmReserveBytesDirective

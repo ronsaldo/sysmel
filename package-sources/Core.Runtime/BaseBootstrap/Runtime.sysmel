@@ -139,40 +139,40 @@ AnyValue
             message: message;
             receiver: self;
             signal
-    } withEagerAnalysis.
-
-Object
+    } makeVirtual withEagerAnalysis;
     withSelector: #error: addMethod: {:(Object)self :(String)errorMessage :: Unwinds |
         Error signal: errorMessage
-    } withEagerAnalysis;
+    } makeFinal withEagerAnalysis;
     withSelector: #primitiveFailed addMethod: {:(Object)self :: Unwinds |
         error("Primitive failed")
-    } withEagerAnalysis;
+    } makeFinal withEagerAnalysis;
     withSelector: #errorSubscriptBounds: addMethod: {:(Object)self :(Size)index :: Unwinds |
         error("Index is out of bounds")
-    } withEagerAnalysis;
+    } makeFinal withEagerAnalysis;
     withSelector: #assert: addMethod: {:(Object)self :(Boolean)condition :: Void |
         if: condition then: void else: {
             AssertionFailure signal
         }
-    } withEagerAnalysis;
+    } makeFinal withEagerAnalysis;
     withSelector: #assertion:failedAt: addMethod: {:(Object)self :(String)assertionString :(SourcePosition)assertionLocation :: Unwinds |
         AssertionFailure new
             sourcePosition: assertionLocation;
             signal: assertionString
-    } withEagerAnalysis;
+    } makeFinal withEagerAnalysis;
     withSelector: #subclassResponsibility addMethod: {:(Object)self :: Unwinds |
         self error: self __type__ printString -- " Subclass responsibility."
-    } withEagerAnalysis;
+    } makeFinal withEagerAnalysis;
     withSelector: #shouldBeImplemented addMethod: {:(Object)self :: Unwinds |
         self error: self __type__ printString -- " should be implemented."
-    } withEagerAnalysis;
+    } makeFinal withEagerAnalysis.
+
+Object
     withSelector: #doesNotUnderstand: addMethod: {:(AnyValue)self :(Message)message |
         MessageNotUnderstood new
             message: message;
             receiver: self;
             signal
-    } makeVirtual withEagerAnalysis.
+    } makeOverride withEagerAnalysis.
 
 ASTDownCastNode __type__
     withSelector: #makeForASTNode:targetType: addMethod: {:(ASTDownCastNode __type__)self :(ASTNode)astNode :(Type)targetType :: self |
@@ -3177,6 +3177,9 @@ Type
     withSelector: #valueSize addMethod: {:(Type)self :: Size |
         UIntPointer instanceSize
     } makeVirtual;
+    withSelector: #alignedInstanceSize addMethod: {:(Type)self :: Size |
+        self validInstanceSize alignedTo: self validInstanceAlignment
+    } makeFinal;
     withSelector: #alignedValueSize addMethod: {:(Type)self :: Size |
         self valueSize alignedTo: self valueAlignment
     } makeFinal;
