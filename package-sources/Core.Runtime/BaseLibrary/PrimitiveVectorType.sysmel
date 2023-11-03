@@ -110,23 +110,35 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
         public method at: (index: Size) ::=> ElementType := {
             <primitive: (VectorTypeName -- "::at:") asSymbol>
             <targetDefinedPrimitive>
-            index >= Elements ifTrue: (error("Index is out of bounds.")).
-            ElementGetterFunction(self, index * ElementByteSize)
+            ObjectModel::isLogical() ifTrue: {
+                index >= Elements ifTrue: (error("Index is out of bounds.")).
+                ElementGetterFunction(self, index * ElementByteSize)
+            } ifFalse: {
+                primitiveFailedError()
+            }
         }.
 
-        public inline method x => ElementType
-            := self at: 0sz.
+        public inline method x => ElementType := {
+            <primitive: (VectorTypeName -- "::x") asSymbol>
+            self at: 0sz
+        }.
 
-        public inline method y => ElementType
-            := self at: 1sz.
+        public inline method y => ElementType := {
+            <primitive: (VectorTypeName -- "::y") asSymbol>
+            self at: 1sz
+        }.
 
         Elements >= 3sz ifTrue: {
-            public inline method z => ElementType
-                := self at: 2sz.
+            public inline method z => ElementType := {
+                <primitive: (VectorTypeName -- "::z") asSymbol>
+                self at: 2sz
+            }.
 
             Elements >= 4sz ifTrue: {
-                public inline method w => ElementType
-                    := self at: 3sz.
+                public inline method w => ElementType := {
+                    <primitive: (VectorTypeName -- "::z") asSymbol>
+                    self at: 3sz
+                }.
             }.
         }.
 
@@ -134,65 +146,93 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
             public method x: (x: ElementType) ::=> VectorType := {
                 <primitive: (VectorTypeName -- "::makeWithX:") asSymbol>
                 <targetDefinedPrimitive>
-                let result := VectorType basicAllocate.
-                ElementSetterFunction(result, 0sz, x).
-                result
+                ObjectModel::isLogical() ifTrue: {
+                    let result := VectorType basicAllocate.
+                    ElementSetterFunction(result, 0sz, x).
+                    result
+                } ifFalse: {
+                    primitiveFailedError()
+                }
             }.
 
             public method y: (y: ElementType) ::=> VectorType := {
                 <primitive: (VectorTypeName -- "::makeWithY:") asSymbol>
                 <targetDefinedPrimitive>
-                let result := VectorType basicAllocate.
-                ElementSetterFunction(result, ElementByteSize, y).
-                result
+                ObjectModel::isLogical() ifTrue: {
+                    let result := VectorType basicAllocate.
+                    ElementSetterFunction(result, ElementByteSize, y).
+                    result
+                } ifFalse: {
+                    primitiveFailedError()
+                }
             }.
 
             public method x: (x: ElementType) y: (y: ElementType) ::=> VectorType := {
                 <primitive: (VectorTypeName -- "::makeWithX:y:") asSymbol>
                 <targetDefinedPrimitive>
-                let result := VectorType basicAllocate.
-                ElementSetterFunction(result, 0sz, x).
-                ElementSetterFunction(result, ElementByteSize, y).
-                result
+                ObjectModel::isLogical() ifTrue: {
+                    let result := VectorType basicAllocate.
+                    ElementSetterFunction(result, 0sz, x).
+                    ElementSetterFunction(result, ElementByteSize, y).
+                    result
+                } ifFalse: {
+                    primitiveFailedError()
+                }
             }.
 
             Elements >= 3sz ifTrue: {
                 public method z: (z: ElementType) ::=> VectorType := {
                     <primitive: (VectorTypeName -- "::makeWithZ:") asSymbol>
                     <targetDefinedPrimitive>
-                    let result := VectorType basicAllocate.
-                    ElementSetterFunction(result, ElementByteSize*2sz, z).
-                    result
+                    ObjectModel::isLogical() ifTrue: {
+                        let result := VectorType basicAllocate.
+                        ElementSetterFunction(result, ElementByteSize*2sz, z).
+                        result
+                    } ifFalse: {
+                        primitiveFailedError()
+                    }
                 }.
 
                 public method x: (x: ElementType) y: (y: ElementType) z: (z: ElementType) ::=> VectorType := {
                     <primitive: (VectorTypeName -- "::makeWithX:y:z:") asSymbol>
                     <targetDefinedPrimitive>
-                    let result := VectorType basicAllocate.
-                    ElementSetterFunction(result, 0sz, x).
-                    ElementSetterFunction(result, ElementByteSize, y).
-                    ElementSetterFunction(result, ElementByteSize*2sz, z).
-                    result
+                    ObjectModel::isLogical() ifTrue: {
+                        let result := VectorType basicAllocate.
+                        ElementSetterFunction(result, 0sz, x).
+                        ElementSetterFunction(result, ElementByteSize, y).
+                        ElementSetterFunction(result, ElementByteSize*2sz, z).
+                        result
+                    } ifFalse: {
+                        primitiveFailedError()
+                    }
                 }.
 
                 Elements >= 4sz ifTrue: {
                     public method w: (w: ElementType) ::=> VectorType := {
                         <primitive: (VectorTypeName -- "::makeWithW:") asSymbol>
                         <targetDefinedPrimitive>
-                        let result := VectorType basicAllocate.
-                        ElementSetterFunction(result, ElementByteSize*3sz, w).
-                        result
+                        ObjectModel::isLogical() ifTrue: {
+                            let result := VectorType basicAllocate.
+                            ElementSetterFunction(result, ElementByteSize*3sz, w).
+                            result
+                        } ifFalse: {
+                            primitiveFailedError()
+                        }
                     }.
 
                     public method x: (x: ElementType) y: (y: ElementType) z: (z: ElementType) w: (w: ElementType) ::=> VectorType := {
                         <primitive: (VectorTypeName -- "::makeWithX:y:z:w:") asSymbol>
                         <targetDefinedPrimitive>
-                        let result := VectorType basicAllocate.
-                        ElementSetterFunction(result, 0sz, x).
-                        ElementSetterFunction(result, ElementByteSize, y).
-                        ElementSetterFunction(result, ElementByteSize*2sz, z).
-                        ElementSetterFunction(result, ElementByteSize*3sz, w).
-                        result
+                        ObjectModel::isLogical() ifTrue: {
+                            let result := VectorType basicAllocate.
+                            ElementSetterFunction(result, 0sz, x).
+                            ElementSetterFunction(result, ElementByteSize, y).
+                            ElementSetterFunction(result, ElementByteSize*2sz, z).
+                            ElementSetterFunction(result, ElementByteSize*3sz, w).
+                            result
+                        } ifFalse: {
+                            primitiveFailedError()
+                        }
                     }.
                 }.
             }.
