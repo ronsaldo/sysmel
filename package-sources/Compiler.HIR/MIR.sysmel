@@ -1366,14 +1366,20 @@ EnumType extend: {
 }.
 
 PrimitiveVectorType extend: {
-    public override method emitMirUncheckedUnbox: (boxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
-        := codegen blockBuilder trap.
+    public override method emitMirCheckAndUnbox: (value: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
+        ## TODO: Implement this via some kind of memcpy for the generic case.
+        codegen notYetImplementedError: "Primitive vector type unbox"
+    }.
 
-    public override method emitMirCheckAndUnbox: (boxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
-        := codegen blockBuilder trap.
+    public override method emitMirUncheckedUnbox: (value: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
+        ## TODO: Implement this via some kind of memcpy for the generic case.
+        codegen notYetImplementedError: "Primitive vector type unbox"
+    }.
 
-    public override method emitMirBox: (unboxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
-        := codegen blockBuilder trap.
+    public override method emitMirBox: (value: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
+        ## TODO: Implement this via some kind of memcpy.
+        codegen notYetImplementedError: "Primitive vector type box"
+    }.
 
     public override method emitMirCall: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) withArguments: (arguments: Array) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue := {
         switch: self alignedBitWidth asUInt32 withCases: #{

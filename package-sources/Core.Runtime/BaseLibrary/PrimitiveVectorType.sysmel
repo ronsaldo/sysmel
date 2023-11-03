@@ -61,6 +61,16 @@ public class PrimitiveVectorType superclass: ValueType; definition: {
 
         result
     }.
+
+    public override method defaultValue => self := self basicAllocate.
+
+    public override method createBasicInitializeMethod => Void := {
+        let ReceiverType := self asReceiverType.
+        basicInitializeMethod := {:(ReceiverType)self :: Void |
+            <keepSourceDefinition>
+            <primitive: #zeroInitialization>
+        } makeOverride makeFinal recompileAndOptimize
+    }.
 }.
 
 public class PrimitiveVectorMetatype superclass: ValueMetatype; definition: {
@@ -450,7 +460,6 @@ public global UInt32x3 := PrimitiveVectorTypeTemplate(UInt32, 3sz).
 public global UInt32x4 := PrimitiveVectorTypeTemplate(UInt32, 4sz).
 *#
 
-#*
 public global Float32x2 := PrimitiveVectorTypeTemplate(Float32, 2sz).
 public global Float32x3 := PrimitiveVectorTypeTemplate(Float32, 3sz).
 public global Float32x4 := PrimitiveVectorTypeTemplate(Float32, 4sz).
@@ -458,4 +467,3 @@ public global Float32x4 := PrimitiveVectorTypeTemplate(Float32, 4sz).
 public global Float64x2 := PrimitiveVectorTypeTemplate(Float64, 2sz).
 public global Float64x3 := PrimitiveVectorTypeTemplate(Float64, 3sz).
 public global Float64x4 := PrimitiveVectorTypeTemplate(Float64, 4sz).
-*#
