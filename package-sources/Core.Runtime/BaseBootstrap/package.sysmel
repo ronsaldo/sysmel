@@ -3,8 +3,8 @@ loadSourceNamed: "AST.sysmel".
 __DefaultAnalysisQueueValueBox__ value waitPendingAnalysis.
 
 loadSourceNamed: "GlobalMacros.sysmel".
-loadSourceNamed: "ExtensionMacros.sysmel".
 loadSourceNamed: "RuntimeMacros.sysmel".
+loadSourceNamed: "ExtensionMacros.sysmel".
 
 loadSourceNamed: "ArgumentNodeParsing.sysmel".
 

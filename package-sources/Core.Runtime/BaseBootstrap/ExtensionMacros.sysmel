@@ -1,45 +1,110 @@
-{
-    let: #typeExtendMacro with: {:macroContext :self :extensionBlock :: ASTNode |
-            ``{
-                let: #SelfType with: `,self.
-                let: #ReceiverType with: SelfType asReceiverType.
-                let: #SuperType with: SelfType supertype.
-                let: #__Meta__ with: SelfType __type__.
-                let: #__OwnerProgramEntity__ with: SelfType.
-                macroLet: #super with: (tuple: self withLookupStartingFrom: SuperType).
-                `,extensionBlock
-            }
-        } makeMacro.
-    Type
-        withSelector: #extend: addMacroMethod: typeExtendMacro;
-        withSelector: #definition: addMacroMethod: typeExtendMacro.
-}.
+ProgramEntity
+    withSelector: #addPendingDefinitionBody:withEnvironment: addMethod: {:(ProgramEntity)self :(ASTNode)body :(Environment)definitionEnvironment :: Void |
+        self evaluateDefinition: body withEnvironment: definitionEnvironment
+    } makeVirtual;
+    withSelector: #addEagerDefinitionBody:withEnvironment: addMethod: {:(ProgramEntity)self :(ASTNode)body :(Environment)definitionEnvironment :: Void |
+        self evaluateDefinition: body withEnvironment: definitionEnvironment
+    } makeVirtual;
+    withSelector: #addPendingExtension:withEnvironment: addMethod: {:(ProgramEntity)self :(ASTNode)body :(Environment)definitionEnvironment :: Void |
+        self evaluateExtension: body withEnvironment: definitionEnvironment
+    } makeVirtual;
+    withSelector: #addEagerExtension:withEnvironment: addMethod: {:(ProgramEntity)self :(ASTNode)body :(Environment)definitionEnvironment :: Void |
+        self evaluateExtension: body withEnvironment: definitionEnvironment
+    } makeVirtual;
+    withSelector: #evaluateDefinition:withEnvironment: addMethod: {:(ProgramEntity)self :(ASTNode)body :(Environment)definitionEnvironment :: Void |
+        body analyzeAndEvaluateWithEnvironment: definitionEnvironment
+    } makeVirtual;
+    withSelector: #evaluateExtension:withEnvironment: addMethod: {:(ProgramEntity)self :(ASTNode)body :(Environment)definitionEnvironment :: Void |
+        body analyzeAndEvaluateWithEnvironment: definitionEnvironment
+    } makeVirtual;
 
-{
-    let: #typeExtendMacro with: {:macroContext :self :extensionBlock :: ASTNode |
-            ``{
-                let: #SelfType with: `,self.
-                let: #ReceiverType with: SelfType asReceiverType.
-                let: #SuperType with: SelfType supertype.
-                let: #__Meta__ with: SelfType __type__.
-                let: #__OwnerProgramEntity__ with: SelfType.
-                macroLet: #super with: (tuple: self withLookupStartingFrom: SuperType).
-                `,extensionBlock
-            }
-        } makeMacro.
-    Type
-        withSelector: #eagerExtend: addMacroMethod: typeExtendMacro;
-        withSelector: #eagerDefinition: addMacroMethod: typeExtendMacro.
-}.
+    withSelector: #pendingDefinitionBody: addMacroMethod: {:(MacroContext)macroContext :(ASTNode)self :(ASTNode)bodyBlock :: ASTNode |
+        macroContext send: (macroContext literal: #addPendingDefinitionBody:withEnvironment:)
+            to: self
+            with: (ASTLiteralNode new
+                sourcePosition: bodyBlock sourcePosition;
+                value: bodyBlock;
+                yourself)
+            with: (macroContext literal: macroContext environment)
+    } makeMacro;
+    withSelector: #pendingExtensionBody: addMacroMethod: {:(MacroContext)macroContext :(ASTNode)self :(ASTNode)bodyBlock :: ASTNode |
+        macroContext send: (macroContext literal: #addPendingExtension:withEnvironment:)
+            to: self
+            with: (ASTLiteralNode new
+                sourcePosition: bodyBlock sourcePosition;
+                value: bodyBlock;
+                yourself)
+            with: (macroContext literal: macroContext environment)
+    } makeMacro;
+    withSelector: #eagerDefinitionBody: addMacroMethod: {:(MacroContext)macroContext :(ASTNode)self :(ASTNode)bodyBlock :: ASTNode |
+        macroContext send: (macroContext literal: #addEagerDefinitionBody:withEnvironment:)
+            to: self
+            with: (ASTLiteralNode new
+                sourcePosition: bodyBlock sourcePosition;
+                value: bodyBlock;
+                yourself)
+            with: (macroContext literal: macroContext environment)
+    } makeMacro;
+    withSelector: #eagerExtensionBody: addMacroMethod: {:(MacroContext)macroContext :(ASTNode)self :(ASTNode)bodyBlock :: ASTNode |
+        macroContext send: (macroContext literal: #addEagerExtension:withEnvironment:)
+            to: self
+            with: (ASTLiteralNode new
+                sourcePosition: bodyBlock sourcePosition;
+                value: bodyBlock;
+                yourself)
+            with: (macroContext literal: macroContext environment)
+    } makeMacro.
 
-{
-    let: #namespaceExtendMacro with: {:macroContext :self :extensionBlock :: ASTNode |
-            ``{
-                let: #__OwnerProgramEntity__ with: `,self.
-                `,extensionBlock
-            }
-        } makeMacro.
-    Namespace
-        withSelector: #extend: addMacroMethod: namespaceExtendMacro;
-        withSelector: #definition: addMacroMethod: namespaceExtendMacro.
-}.
+Type
+    withSelector: #definition: addMacroMethod: {:(MacroContext)macroContext :(ASTNode)self :(ASTNode)bodyBlock :: ASTNode |
+        macroContext send: (macroContext literal: #addPendingDefinitionBody:withEnvironment:)
+            to: self
+            with: (ASTLiteralNode new
+                sourcePosition: bodyBlock sourcePosition;
+                value: bodyBlock;
+                yourself)
+            with: (macroContext literal: macroContext environment)
+    } makeMacro;
+    withSelector: #extend: addMacroMethod: {:(MacroContext)macroContext :(ASTNode)self :(ASTNode)bodyBlock :: ASTNode |
+        macroContext send: (macroContext literal: #addPendingExtension:withEnvironment:)
+            to: self
+            with: (ASTLiteralNode new
+                sourcePosition: bodyBlock sourcePosition;
+                value: bodyBlock;
+                yourself)
+            with: (macroContext literal: macroContext environment)
+    } makeMacro;
+    withSelector: #evaluateDefinition:withEnvironment: addMethod: {:(Type)self :(ASTNode)body :(Environment)environment :: Void |
+        ``{
+            let: #SelfType with: `,(self asMacroLiteral).
+            let: #ReceiverType with: SelfType asReceiverType.
+            let: #SuperType with: SelfType supertype.
+            let: #__Meta__ with: SelfType __type__.
+            let: #__OwnerProgramEntity__ with: SelfType.
+            macroLet: #super with: (tuple: self withLookupStartingFrom: SuperType).
+            `,body
+        } analyzeAndEvaluateWithEnvironment: environment
+    } makeVirtual;
+    withSelector: #evaluateExtension:withEnvironment: addMethod: {:(ProgramEntity)self :(ASTNode)body :(Environment)environment :: Void |
+        self evaluateDefinition: body withEnvironment: environment
+    } makeVirtual.
+
+Namespace
+    withSelector: #definition: addMacroMethod: {:(MacroContext)macroContext :(ASTNode)self :(ASTNode)bodyBlock :: ASTNode |
+        macroContext send: (macroContext literal: #addEagerDefinitionBody:withEnvironment:)
+            to: self
+            with: (ASTLiteralNode new
+                sourcePosition: bodyBlock sourcePosition;
+                value: bodyBlock;
+                yourself)
+            with: (macroContext literal: macroContext environment)
+    } makeMacro;
+    withSelector: #evaluateDefinition:withEnvironment: addMethod: {:(Type)self :(ASTNode)body :(Environment)environment :: Void |
+        ``{
+            let: #__OwnerProgramEntity__ with: `,(self asMacroLiteral).
+            `,body
+        } analyzeAndEvaluateWithEnvironment: environment
+    } makeVirtual;
+    withSelector: #evaluateExtension:withEnvironment: addMethod: {:(ProgramEntity)self :(ASTNode)body :(Environment)environment :: Void |
+        self evaluateDefinition: body withEnvironment: environment
+    } makeVirtual.

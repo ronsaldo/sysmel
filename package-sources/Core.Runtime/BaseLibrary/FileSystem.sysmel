@@ -5,7 +5,7 @@ FileSystem::workingDirectory adoptDefinitionOf: {:: String |
 (FileSystem::workingDirectory:) adoptDefinitionOf: {:(String)newWorkingDirectory :: Void |
 }.
 
-String eagerDefinition: {
+String eagerDefinitionBody: {
     public pure final eager method FileSystem::isAbsolute => Boolean := {
         ## FIXME: Add proper support for windows
         self isNotEmpty && (self first = '/'c8 || ((self size >= 2sz) && (self second = ':'c8)))

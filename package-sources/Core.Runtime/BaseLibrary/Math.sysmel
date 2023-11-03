@@ -9,7 +9,7 @@
     let primitivePrefix := NumberType name asString -- "::".
     let isUnsigned := NumberType one negated > NumberType zero.
 
-    NumberType eagerDefinition: {
+    NumberType eagerDefinitionBody: {
         public pure final eager method negated ::=> SelfType := {
             <primitive: (primitivePrefix -- "negated") asSymbol>
             <targetDefinedPrimitive>

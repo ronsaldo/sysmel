@@ -1,4 +1,4 @@
-IdentitySet eagerDefinition: {
+IdentitySet eagerDefinitionBody: {
     public eager method untypedScanFor: (key: Untyped) ::=> IntPointer := {
         storage ifNil: { return: -1iptr }.
 

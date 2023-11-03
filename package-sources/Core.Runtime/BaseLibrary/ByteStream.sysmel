@@ -1,4 +1,4 @@
-ByteStream eagerDefinition: {
+ByteStream eagerDefinitionBody: {
     public eager method capacity => Size
         := storage ifNil: 0sz ifNotNil: storage size.
 

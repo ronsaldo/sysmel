@@ -1,4 +1,4 @@
-public class HIR_MIRFunctionNativeCodeCompiler superclass: FunctionNativeCodeCompiler; eagerDefinition: {
+public class HIR_MIRFunctionNativeCodeCompiler superclass: FunctionNativeCodeCompiler; eagerDefinitionBody: {
     __Meta__ definition: {
         public override eager method compileFunctionDefinition: (definition: FunctionDefinition) ::=> FunctionNativeCodeDefinition
             := self new compileFunctionDefinition: definition

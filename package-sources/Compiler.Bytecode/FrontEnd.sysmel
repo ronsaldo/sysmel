@@ -4,7 +4,7 @@ FunctionBytecodeDirectCompiler definition: {
         := self assembler withASTNode: node do: {| node doCompileIntoBytecodeWith: self }.
 }.
 
-ASTNode eagerDefinition: {
+ASTNode eagerDefinitionBody: {
     public final eager method compileBytecodesDirectlyWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand
         := compiler compileASTNode: self.
 
@@ -12,14 +12,14 @@ ASTNode eagerDefinition: {
         := self subclassResponsibility
 }.
 
-ASTBreakNode eagerExtend: {
+ASTBreakNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand
         := compiler assembler
             jumpTo: compiler breakLabel;
             literal: nil
 }.
 
-ASTCoerceValueNode eagerExtend: {
+ASTCoerceValueNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let type := self typeExpression compileBytecodesDirectlyWith: compiler.
         let value := self valueExpression compileBytecodesDirectlyWith: compiler.
@@ -29,14 +29,14 @@ ASTCoerceValueNode eagerExtend: {
     }.      
 }.
 
-ASTContinueNode eagerExtend: {
+ASTContinueNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand
         := compiler assembler
             jumpTo: compiler continueLabel;
             literal: nil
 }.
 
-ASTDoWhileContinueWithNode eagerExtend: {
+ASTDoWhileContinueWithNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let assembler := compiler assembler.
 
@@ -76,7 +76,7 @@ ASTDoWhileContinueWithNode eagerExtend: {
     }
 }.
 
-ASTDownCastNode eagerExtend: {
+ASTDownCastNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let type := self typeExpression compileBytecodesDirectlyWith: compiler.
         let value := self valueExpression compileBytecodesDirectlyWith: compiler.
@@ -86,7 +86,7 @@ ASTDownCastNode eagerExtend: {
     }.
 }.
 
-ASTLambdaNode eagerExtend: {
+ASTLambdaNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let functionDefinition := self functionDefinition.
         functionDefinition ensureSourceAnalyzedDefinition.
@@ -106,17 +106,17 @@ ASTLambdaNode eagerExtend: {
     }.
 }.
 
-ASTLexicalBlockNode eagerExtend: {
+ASTLexicalBlockNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand
         := compiler assembler withSourceEnvironment: self bodyEnvironment do: {:: FunctionBytecodeAssemblerVectorOperand | self body compileBytecodesDirectlyWith: compiler }.
 }.
 
-ASTLiteralNode eagerExtend: {
+ASTLiteralNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand
         := compiler assembler literal: self value.
 }.
 
-ASTVariableDefinitionNode eagerExtend: {
+ASTVariableDefinitionNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let value := self valueExpression compileBytecodesDirectlyWith: compiler.
 
@@ -134,17 +134,17 @@ ASTVariableDefinitionNode eagerExtend: {
     }.
 }.
 
-SymbolBinding eagerExtend: {
+SymbolBinding eagerExtensionBody: {
     public abstract method compileBytecodesDirectlyWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand
         := self subclassResponsibility.
 }.
 
-SymbolAnalysisBinding eagerExtend: {
+SymbolAnalysisBinding eagerExtensionBody: {
     public override method compileBytecodesDirectlyWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand
         := compiler getValueForLocalBinding: self.
 }.
 
-SymbolTupleSlotBinding eagerExtend: {
+SymbolTupleSlotBinding eagerExtensionBody: {
     public override method compileBytecodesDirectlyWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let assembler := compiler assembler.
         let tupleValue := compiler getValueForLocalBinding: tupleBinding.
@@ -160,7 +160,7 @@ SymbolTupleSlotBinding eagerExtend: {
     }.
 }.
 
-SymbolValueBinding eagerExtend: {
+SymbolValueBinding eagerExtensionBody: {
     public override method compileBytecodesDirectlyWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let assembler := compiler assembler.
         let result := assembler temporary: self name type: self type.
@@ -169,12 +169,12 @@ SymbolValueBinding eagerExtend: {
     }.
 }.
 
-ASTIdentifierReferenceNode eagerExtend: {
+ASTIdentifierReferenceNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand
         := self binding compileBytecodesDirectlyWith: compiler.
 }.
 
-ASTIfNode eagerExtend: {
+ASTIfNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let assembler := compiler assembler.
 
@@ -212,7 +212,7 @@ ASTIfNode eagerExtend: {
     }.
 }.
 
-ASTSwitchNode eagerExtend: {
+ASTSwitchNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let assembler := compiler assembler.
 
@@ -253,7 +253,7 @@ ASTSwitchNode eagerExtend: {
     }.
 }.
 
-ASTWhileContinueWithNode eagerExtend: {
+ASTWhileContinueWithNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let assembler := compiler assembler.
 
@@ -339,7 +339,7 @@ ASTFunctionApplicationNode extend: {
     }.
 }.
 
-ASTMakeAssociationNode eagerExtend: {
+ASTMakeAssociationNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let key := self key compileBytecodesDirectlyWith: compiler.
         let value := self value
@@ -352,7 +352,7 @@ ASTMakeAssociationNode eagerExtend: {
     }.
 }.
 
-ASTMakeByteArrayNode eagerExtend: {
+ASTMakeByteArrayNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let elements := self elements collect: {:(ASTNode)each :: FunctionBytecodeAssemblerVectorOperand | each compileBytecodesDirectlyWith: compiler }.
         let result := compiler assembler temporary: #makeByteArray type: self analyzedType.
@@ -361,7 +361,7 @@ ASTMakeByteArrayNode eagerExtend: {
     }.
 }.
 
-ASTMakeArrayNode eagerExtend: {
+ASTMakeArrayNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let elements := self elements collect: {:(ASTNode)each :: FunctionBytecodeAssemblerVectorOperand | each compileBytecodesDirectlyWith: compiler }.
         let result := compiler assembler temporary: #makeArray type: self analyzedType.
@@ -370,7 +370,7 @@ ASTMakeArrayNode eagerExtend: {
     }.
 }.
 
-ASTMakeDictionaryNode eagerExtend: {
+ASTMakeDictionaryNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let elements := self elements collect: {:(ASTNode)each :: FunctionBytecodeAssemblerVectorOperand | each compileBytecodesDirectlyWith: compiler }.
         let result := compiler assembler temporary: #makeDictionary type: self analyzedType.
@@ -379,7 +379,7 @@ ASTMakeDictionaryNode eagerExtend: {
     }.
 }.
 
-ASTMessageSendNode eagerExtend: {
+ASTMessageSendNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         self receiverLookupType ifNotNil: {:(ASTNode)receiverLookupTypeNode |
             let receiver := self receiver compileBytecodesDirectlyWith: compiler.
@@ -406,14 +406,14 @@ ASTMessageSendNode eagerExtend: {
     }.
 }.
 
-ASTReturnNode eagerExtend: {
+ASTReturnNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand
         := compiler assembler
             return: (self expression compileBytecodesDirectlyWith: compiler);
             literal: nil
 }.
 
-ASTSequenceNode eagerExtend: {
+ASTSequenceNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let result mutable => FunctionBytecodeAssemblerVectorOperand := compiler assembler literal: void.
         self expressions do: {:(ASTNode)expression :: Void |
@@ -424,7 +424,7 @@ ASTSequenceNode eagerExtend: {
     }
 }.
 
-ASTTupleSlotNamedAtNode eagerExtend: {
+ASTTupleSlotNamedAtNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let tuple := self tupleExpression compileBytecodesDirectlyWith: compiler.
         let slot := compiler assembler literal: self boundSlot.
@@ -439,7 +439,7 @@ ASTTupleSlotNamedAtNode eagerExtend: {
     }.
 }.
 
-ASTTupleSlotNamedAtPutNode eagerExtend: {
+ASTTupleSlotNamedAtPutNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let tuple := self tupleExpression compileBytecodesDirectlyWith: compiler.
         let slot := compiler assembler literal: self boundSlot.
@@ -455,7 +455,7 @@ ASTTupleSlotNamedAtPutNode eagerExtend: {
     }.
 }.
 
-ASTTupleSlotNamedReferenceAtNode eagerExtend: {
+ASTTupleSlotNamedReferenceAtNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let tuple := self tupleExpression compileBytecodesDirectlyWith: compiler.
         let slot := compiler assembler literal: self boundSlot.
@@ -470,7 +470,7 @@ ASTTupleSlotNamedReferenceAtNode eagerExtend: {
     }.
 }.
 
-ASTUseNamedSlotsOfNode eagerExtend: {
+ASTUseNamedSlotsOfNode eagerExtensionBody: {
     public override eager method doCompileIntoBytecodeWith: (compiler: FunctionBytecodeDirectCompiler) ::=> FunctionBytecodeAssemblerVectorOperand := {
         let tuple := self tupleExpression compileBytecodesDirectlyWith: compiler.
         compiler setValue: tuple forBinding: self binding.

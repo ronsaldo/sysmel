@@ -1,20 +1,5 @@
 public global TypeFlags::PrimitiveVectorDefaultFlags := TypeFlags::Value | TypeFlags::Bytes.
 
-PrimitiveValueType extend: {
-    public virtual method getVectorizableScalarOperationSelectors => Array
-        := #().
-}.
-
-PrimitiveInteger __type__ extend: {
-    public override method getVectorizableScalarOperationSelectors => Array
-        := #(+ - * /).
-}.
-
-PrimitiveFloat __type__ extend: {
-    public override method getVectorizableScalarOperationSelectors => Array
-        := #(+ - * / sqrt negated min: max:).
-}.
-
 public class PrimitiveVectorType superclass: ValueType; definition: {
     private field elementType => PrimitiveValueType.
     private field elements => Size.
@@ -34,9 +19,6 @@ public class PrimitiveVectorType superclass: ValueType; definition: {
         instanceAlignment := elementType valueAlignment * self alignmentMultiplicationFactor.
         instanceSize := elementType valueSize * elements.
         gcLayout := supertype ensureLayoutIsComputed; gcLayout.
-        self
-            addConstructionMethods;
-            addVectorizableScalarOperations.
     }.
 
     public method alignmentMultiplicationFactor => Size
@@ -47,41 +29,6 @@ public class PrimitiveVectorType superclass: ValueType; definition: {
 
     public override method defaultValue => self
         := self basicNew.
-
-    public method addConstructionMethods => Void := {
-        let SelfMetaTypeLiteral := self class asMacroLiteral.
-        let SelfTypeLiteral := self asMacroLiteral.
-        let ElementTypeLiteral := self elementType asMacroLiteral.
-
-        let withAllMethod := ``{:(`,SelfMetaTypeLiteral)self :(`,ElementTypeLiteral)element :: `,SelfTypeLiteral |
-            <primitive: `,((self name asString -- "::withAll:") asSymbol asMacroLiteral)>
-            <targetDefinedPrimitive>
-            primitiveFailedError()
-        }.
-
-        self class
-            withSelector: #withAll: addMethod: (withAllMethod analyzeAndEvaluateWithEnvironment: Environment defaultForEvaluation).
-    }.
-
-    public method addVectorizableScalarOperations => Void := {
-        elementType getVectorizableScalarOperationSelectors do: {:(StringSymbol)selector :: Void |
-            let baseMethod := elementType lookupSelector: selector.
-            baseMethod ifNil: {
-                return: void
-            }.
-            let vectorPrimitiveName := (self name asString -- "::" -- selector asString) asSymbol.
-            let SelfTypeLiteral := self asMacroLiteral.
-
-            let methodFunctionNode := ``{:(`,SelfTypeLiteral)self :(`,SelfTypeLiteral)other :: `,SelfTypeLiteral |
-                <primitive: `,(vectorPrimitiveName asMacroLiteral)>
-                <targetDefinedPrimitive>
-                primitiveFailedError()
-            }.
-            
-            let vectorPrimitiveMethod := methodFunctionNode analyzeAndEvaluateWithEnvironment: Environment defaultForEvaluation.
-            self withSelector: selector addMethod: vectorPrimitiveMethod
-        }.
-    }.
 
     public override pure method asReceiverType => Type := self.
     public override pure method asResultType => Type := self.
@@ -111,18 +58,307 @@ public global AnyPrimitiveVector := AnyPrimitiveVectorType basicNew
     totalSlotCount: 0sz;
     registerInSupertype;
     yourself.
+AnyPrimitiveVectorType thisType: AnyPrimitiveVector.
 
 public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType, elements: Size) => PrimitiveVectorType := {
-    let mataType := PrimitiveVectorMetatype basicNew
+    let metaType := PrimitiveVectorMetatype basicNew.
+    metaType
         flags: TypeFlags::MetatypeRequiredFlags;
-        supertype: PrimitiveVectorType;
+        supertype: AnyPrimitiveVectorType;
         totalSlotCount: PrimitiveVectorType validTotalSlotCount;
         yourself.
-    let result := mataType basicNew.
+    let result => PrimitiveVectorType := metaType basicNew.
+    metaType thisType: result.
+
     __templateResult__ value: result.
-    result
-        initializeWithElementType: elementType elements: elements;
-        yourself
+
+    result initializeWithElementType: elementType elements: elements; definition: {
+        let VectorType := SelfType.
+        let ElementType := SelfType elementType.
+        let Elements := SelfType elements.
+        let VectorTypeName := VectorType name asString.
+
+        let ElementByteSize := ElementType instanceSize.
+        let ElementGetterFunction => ((AnyValue, Size) => ElementType) := ElementType bytesElementGetter.
+        let ElementSetterFunction => ((AnyValue, Size, ElementType) => Void) := ElementType bytesElementSetter.
+
+        public method at: (index: Size) ::=> ElementType := {
+            <primitive: (VectorTypeName -- "::at:") asSymbol>
+            <targetDefinedPrimitive>
+            index >= Elements ifTrue: (error("Index is out of bounds.")).
+            ElementGetterFunction(self, index * ElementByteSize)
+        }.
+
+        public inline method x => ElementType
+            := self at: 0sz.
+
+        public inline method y => ElementType
+            := self at: 1sz.
+
+        Elements >= 3sz ifTrue: {
+            public inline method z => ElementType
+                := self at: 2sz.
+
+            Elements >= 4sz ifTrue: {
+                public inline method w => ElementType
+                    := self at: 3sz.
+            }.
+        }.
+
+        __Meta__ definition: {
+            public method x: (x: ElementType) ::=> VectorType := {
+                <primitive: (VectorTypeName -- "::makeWithX:") asSymbol>
+                <targetDefinedPrimitive>
+                let result := VectorType basicAllocate.
+                ElementSetterFunction(result, 0sz, x).
+                result
+            }.
+
+            public method y: (y: ElementType) ::=> VectorType := {
+                <primitive: (VectorTypeName -- "::makeWithY:") asSymbol>
+                <targetDefinedPrimitive>
+                let result := VectorType basicAllocate.
+                ElementSetterFunction(result, ElementByteSize, y).
+                result
+            }.
+
+            public method x: (x: ElementType) y: (y: ElementType) ::=> VectorType := {
+                <primitive: (VectorTypeName -- "::makeWithX:y:") asSymbol>
+                <targetDefinedPrimitive>
+                let result := VectorType basicAllocate.
+                ElementSetterFunction(result, 0sz, x).
+                ElementSetterFunction(result, ElementByteSize, y).
+                result
+            }.
+
+            Elements >= 3sz ifTrue: {
+                public method z: (z: ElementType) ::=> VectorType := {
+                    <primitive: (VectorTypeName -- "::makeWithZ:") asSymbol>
+                    <targetDefinedPrimitive>
+                    let result := VectorType basicAllocate.
+                    ElementSetterFunction(result, ElementByteSize*2sz, z).
+                    result
+                }.
+
+                public method x: (x: ElementType) y: (y: ElementType) z: (z: ElementType) ::=> VectorType := {
+                    <primitive: (VectorTypeName -- "::makeWithX:y:z:") asSymbol>
+                    <targetDefinedPrimitive>
+                    let result := VectorType basicAllocate.
+                    ElementSetterFunction(result, 0sz, x).
+                    ElementSetterFunction(result, ElementByteSize, y).
+                    ElementSetterFunction(result, ElementByteSize*2sz, z).
+                    result
+                }.
+
+                Elements >= 4sz ifTrue: {
+                    public method w: (w: ElementType) ::=> VectorType := {
+                        <primitive: (VectorTypeName -- "::makeWithW:") asSymbol>
+                        <targetDefinedPrimitive>
+                        let result := VectorType basicAllocate.
+                        ElementSetterFunction(result, ElementByteSize*3sz, w).
+                        result
+                    }.
+
+                    public method x: (x: ElementType) y: (y: ElementType) z: (z: ElementType) w: (w: ElementType) ::=> VectorType := {
+                        <primitive: (VectorTypeName -- "::makeWithX:y:z:w:") asSymbol>
+                        <targetDefinedPrimitive>
+                        let result := VectorType basicAllocate.
+                        ElementSetterFunction(result, 0sz, x).
+                        ElementSetterFunction(result, ElementByteSize, y).
+                        ElementSetterFunction(result, ElementByteSize*2sz, z).
+                        ElementSetterFunction(result, ElementByteSize*3sz, w).
+                        result
+                    }.
+                }.
+            }.
+        }.
+
+        switch: Elements withCases: #{
+            2sz : {
+                __Meta__ definition: {
+                    public pure method withAll: (element: ElementType) ::=> VectorType := {
+                        <primitive: (VectorTypeName -- "::withAll:") asSymbol>
+                        <targetDefinedPrimitive>
+                        VectorType x: element y: element
+                    }.
+                }.
+
+                public inline method collect: (aBlock: (ElementType) => ElementType) ::=> SelfType := {
+                    SelfType x: aBlock(self x) y: aBlock(self y)
+                }.
+
+                public inline method collectWithIndex: (aBlock: (ElementType, Size) => ElementType) ::=> SelfType := {
+                    SelfType x: aBlock(self x, 0sz) y: aBlock(self y, 1sz)
+                }.
+
+                public inline method do: (aBlock: (ElementType) => Void) ::=> Void := {
+                    aBlock(self x).
+                    aBlock(self y).
+                }.
+
+                public inline method doWithIndex: (aBlock: (ElementType, Size) => Void) ::=> Void := {
+                    aBlock(self x, 0sz).
+                    aBlock(self y, 1sz).
+                }.
+
+                public inline method with: (other: SelfType) collect: (aBlock: (ElementType, ElementType) => ElementType) ::=> SelfType := {
+                    SelfType x: aBlock(self x, other x) y: aBlock(self y, other y)
+                }.
+            }.
+            3sz : {
+                __Meta__ definition: {
+                    public pure method withAll: (element: ElementType) ::=> VectorType := {
+                        <primitive: (VectorTypeName -- "::withAll:") asSymbol>
+                        <targetDefinedPrimitive>
+                        VectorType x: element y: element z: element
+                    }.
+                }.
+
+                public inline method collect: (aBlock: (ElementType) => ElementType) ::=> SelfType := {
+                    SelfType x: aBlock(self x) y: aBlock(self y) z: aBlock(self z)
+                }.
+
+                public inline method collectWithIndex: (aBlock: (ElementType, Size) => ElementType) ::=> SelfType := {
+                    SelfType x: aBlock(self x, 0sz) y: aBlock(self y, 1sz) z: aBlock(self z, 2sz)
+                }.
+
+                public inline method do: (aBlock: (ElementType) => Void) ::=> Void := {
+                    aBlock(self x).
+                    aBlock(self y).
+                    aBlock(self z).
+                }.
+
+                public inline method doWithIndex: (aBlock: (ElementType, Size) => Void) ::=> Void := {
+                    aBlock(self x, 0sz).
+                    aBlock(self y, 1sz).
+                    aBlock(self z, 2sz).
+                }.
+
+                public inline method with: (other: SelfType) collect: (aBlock: (ElementType, ElementType) => ElementType) ::=> SelfType := {
+                    SelfType x: aBlock(self x, other x) y: aBlock(self y, other y) z: aBlock(self z, other z)
+                }.
+            }.
+            4sz : {
+                __Meta__ definition: {
+                    public pure method withAll: (element: ElementType) ::=> VectorType := {
+                        <primitive: (VectorTypeName -- "::withAll:") asSymbol>
+                        <targetDefinedPrimitive>
+                        VectorType x: element y: element z: element w: element
+                    }.
+                }.
+
+                public inline method collect: (aBlock: (ElementType) => ElementType) ::=> SelfType := {
+                    SelfType x: aBlock(self x) y: aBlock(self y) z: aBlock(self z) w: aBlock(self w)
+                }.
+
+                public inline method collectWithIndex: (aBlock: (ElementType, Size) => ElementType) ::=> SelfType := {
+                    SelfType x: aBlock(self x, 0sz) y: aBlock(self y, 1sz) z: aBlock(self z, 2sz) w: aBlock(self w, 3sz)
+                }.
+
+                public inline method do: (aBlock: (ElementType) => Void) ::=> Void := {
+                    aBlock(self x).
+                    aBlock(self y).
+                    aBlock(self z).
+                    aBlock(self w).
+                }.
+
+                public inline method doWithIndex: (aBlock: (ElementType, Size) => Void) ::=> Void := {
+                    aBlock(self x, 0sz).
+                    aBlock(self y, 1sz).
+                    aBlock(self z, 2sz).
+                    aBlock(self w, 3sz).
+                }.
+
+                public inline method with: (other: SelfType) collect: (aBlock: (ElementType, ElementType) => ElementType) ::=> SelfType := {
+                    SelfType x: aBlock(self x, other x) y: aBlock(self y, other y) z: aBlock(self z, other z) w: aBlock(self w, other w)
+                }.
+            }.
+            _: error("Unsupported primitive vector with " -- Elements asString -- " elements.")
+        }.
+
+        ElementType isPrimitiveNumberType ifTrue: {
+            let Zeros := SelfType withAll: ElementType zero.
+            let Ones := SelfType withAll: ElementType one.
+
+            __Meta__ definition: {
+                public pure method zeros => VectorType := Zeros.
+                public pure method ones => VectorType := Ones.
+            }.
+
+            public pure method negated => SelfType := {
+                <primitive: (VectorTypeName -- "::negated") asSymbol>
+                <targetDefinedPrimitive>
+                self collect: {:(ElementType)element :: ElementType | element negated}
+            }.
+
+            ElementType isPrimitiveFloatType ifTrue: {
+                public pure method sqrt => SelfType := {
+                    <primitive: (VectorTypeName -- "::sqrt") asSymbol>
+                    <targetDefinedPrimitive>
+                    self collect: {:(ElementType)element :: ElementType | element sqrt}
+                }.
+            }.
+
+            public pure method + (other: SelfType) => SelfType := {
+                <primitive: (VectorTypeName -- "::+") asSymbol>
+                <targetDefinedPrimitive>
+                self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a + b}
+            }.
+
+            public pure method - (other: SelfType) => SelfType := {
+                <primitive: (VectorTypeName -- "::-") asSymbol>
+                <targetDefinedPrimitive>
+                self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a - b}
+            }.
+
+            public pure method * (other: SelfType) => SelfType := {
+                <primitive: (VectorTypeName -- "::*") asSymbol>
+                <targetDefinedPrimitive>
+                self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a * b}
+            }.
+
+            public pure method / (other: SelfType) => SelfType := {
+                <primitive: (VectorTypeName -- "::/") asSymbol>
+                <targetDefinedPrimitive>
+                self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a / b}
+            }.
+
+            ElementType isPrimitiveIntegerType ifTrue: {
+                public pure method % => SelfType := {
+                    <primitive: (VectorTypeName -- "::%") asSymbol>
+                    <targetDefinedPrimitive>
+                    self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a % b}
+                }.
+
+                public pure method \\ => SelfType := {
+                    <primitive: (VectorTypeName -- "::\\\\") asSymbol>
+                    <targetDefinedPrimitive>
+                    self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a \\ b}
+                }.
+            }.
+
+            public pure method min: (other: SelfType) ::=> SelfType := {
+                <primitive: (VectorTypeName -- "::min:") asSymbol>
+                <targetDefinedPrimitive>
+                self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a min: b}
+            }.
+
+            public pure method max: (other: SelfType) ::=> SelfType := {
+                <primitive: (VectorTypeName -- "::max:") asSymbol>
+                <targetDefinedPrimitive>
+                self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a max: b}
+            }.
+        }.
+
+        public override method printOn: (stream: Stream) ::=> Void := {
+            stream print: SelfType; nextPut: '('c8.
+            self doWithIndex: {:(ElementType)element :(Size)index :: Void |
+                index > 0sz ifTrue: (stream string: ", ").
+                element printOn: stream
+            }.
+            stream nextPut: ')'c8.
+        }.
+    }; yourself
 }.
 
 #*
@@ -149,6 +385,7 @@ public global UInt32x3 := PrimitiveVectorTypeTemplate(UInt32, 3sz).
 public global UInt32x4 := PrimitiveVectorTypeTemplate(UInt32, 4sz).
 *#
 
+#*
 public global Float32x2 := PrimitiveVectorTypeTemplate(Float32, 2sz).
 public global Float32x3 := PrimitiveVectorTypeTemplate(Float32, 3sz).
 public global Float32x4 := PrimitiveVectorTypeTemplate(Float32, 4sz).
@@ -156,3 +393,4 @@ public global Float32x4 := PrimitiveVectorTypeTemplate(Float32, 4sz).
 public global Float64x2 := PrimitiveVectorTypeTemplate(Float64, 2sz).
 public global Float64x3 := PrimitiveVectorTypeTemplate(Float64, 3sz).
 public global Float64x4 := PrimitiveVectorTypeTemplate(Float64, 4sz).
+*#

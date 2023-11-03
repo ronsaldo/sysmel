@@ -1,6 +1,6 @@
 public class ByteSerializableObject superclass: Object; definition: {
     __Meta__ extend: {
-        public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void := {
+        public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void := {
             self ensureLayoutIsComputed.
             ObjectModel::isLogical() ifTrue: {
                 self allSlotsDo: {:(TypeSlot)eachSlot :: Void |
@@ -35,7 +35,7 @@ public class ByteSerializableObject superclass: Object; definition: {
 
 public class ByteSerializablePackedObject superclass: Object; definition: {
     __Meta__ extend: {
-        public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void := {
+        public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void := {
             let destOffset mutable := offset.
 
             self allSlotsDo: {:(TypeSlot)eachSlot :: Void |

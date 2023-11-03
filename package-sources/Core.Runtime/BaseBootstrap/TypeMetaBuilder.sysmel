@@ -33,7 +33,7 @@ TypeMetaBuilder
         self definitionExpression: definitionExpression.
         self finishExpansion
     };
-    withSelector: #eagerDefinition: addMethod: {:self :(ASTNode)definitionExpression :: ASTNode |
+    withSelector: #eagerDefinitionBody: addMethod: {:self :(ASTNode)definitionExpression :: ASTNode |
         <metaBuilder>
         self definitionExpression: definitionExpression.
         self isEager: true.

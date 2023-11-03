@@ -1,4 +1,4 @@
-Function eagerDefinition: {
+Function eagerDefinitionBody: {
     public eager method applyWithExpandedArguments: (arguments: Array) ::=> Untyped := {
         arguments size = argumentCount ifFalse: {
             error("Mismatching argument count.")

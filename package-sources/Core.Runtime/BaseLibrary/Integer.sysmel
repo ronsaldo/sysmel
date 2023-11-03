@@ -1,5 +1,5 @@
 if: ObjectModel::PointerSize = 4sz then: {
-    UInt32 eagerDefinition: {
+    UInt32 eagerDefinitionBody: {
         public pure final eager method asInteger ::=> Integer := {
             <primitive: #UInt32::asInteger>
             self <= ObjectModel::Immediate::Int::Max asUInt32 ifTrue: {
@@ -12,7 +12,7 @@ if: ObjectModel::PointerSize = 4sz then: {
         }.
     }.
 
-    Int32 eagerDefinition: {
+    Int32 eagerDefinitionBody: {
         public pure final eager method asInteger ::=> Integer := {
             <primitive: #UInt32::asInteger>
             (ObjectModel::Immediate::Int::Min asInt32 <= self) && (self <= ObjectModel::Immediate::Int::Max asInt32) ifTrue: {
@@ -25,14 +25,14 @@ if: ObjectModel::PointerSize = 4sz then: {
         }.
     }.
 } else: {
-    UInt32 eagerDefinition: {
+    UInt32 eagerDefinitionBody: {
         public pure final eager method asInteger ::=> Integer := {
             <primitive: #UInt32::asInteger>
             (self asUIntPointer << ObjectModel::Tag::Bits asUIntPointer) | ObjectModel::Tag::Integer asUIntPointer reinterpretCastTo: Integer.
         }.
     }.
 
-    Int32 eagerDefinition: {
+    Int32 eagerDefinitionBody: {
         public pure final eager method asInteger ::=> Integer := {
             <primitive: #UInt32::asInteger>
             (self asIntPointer << ObjectModel::Tag::Bits asIntPointer) | ObjectModel::Tag::Integer asIntPointer reinterpretCastTo: Integer.
@@ -40,7 +40,7 @@ if: ObjectModel::PointerSize = 4sz then: {
     }.
 }.
 
-UInt64 eagerDefinition: {
+UInt64 eagerDefinitionBody: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #UInt64::asInteger>
         self <= ObjectModel::Immediate::Int::Max asUInt64 ifTrue: {
@@ -53,7 +53,7 @@ UInt64 eagerDefinition: {
     }.
 }.
 
-Int64 eagerDefinition: {
+Int64 eagerDefinitionBody: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Int64::asInteger>
         (ObjectModel::Immediate::Int::Min asInt64 <= self) && (self <= ObjectModel::Immediate::Int::Max asInt64) ifTrue: {
@@ -66,70 +66,70 @@ Int64 eagerDefinition: {
     }.
 }.
 
-Char8 eagerDefinition: {
+Char8 eagerDefinitionBody: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Char8::asInteger>
         self asUInt32 asInteger
     }.
 }.
 
-UInt8 eagerDefinition: {
+UInt8 eagerDefinitionBody: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #UInt8::asInteger>
         self asUInt32 asInteger
     }.
 }.
 
-Int8 eagerDefinition: {
+Int8 eagerDefinitionBody: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Int8::asInteger>
         self asInt32 asInteger
     }.
 }.
 
-Char16 eagerDefinition: {
+Char16 eagerDefinitionBody: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Char16::asInteger>
         self asUInt32 asInteger
     }.
 }.
 
-UInt16 eagerDefinition: {
+UInt16 eagerDefinitionBody: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #UInt16::asInteger>
         self asUInt32 asInteger
     }.
 }.
 
-Int16 eagerDefinition: {
+Int16 eagerDefinitionBody: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Int16::asInteger>
         self asInt32 asInteger
     }.
 }.
 
-Char32 eagerDefinition: {
+Char32 eagerDefinitionBody: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Char32::asInteger>
         self asUInt32 asInteger
     }.
 }.
 
-Float32 eagerDefinition: {
+Float32 eagerDefinitionBody: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Float32::asInteger>
         self asIntPointer asInteger
     }.
 }.
 
-Float64 eagerDefinition: {
+Float64 eagerDefinitionBody: {
     public pure final eager method asInteger ::=> Integer := {
         <primitive: #Float64::asInteger>
         self asIntPointer asInteger
     }.
 }.
 
-Integer eagerDefinition: {
+Integer eagerDefinitionBody: {
     public pure final eager method isSmallInteger => Boolean
         := (ObjectModel::getTuplePointerUIntValue(self) & ObjectModel::Tag::Mask asUIntPointer) = ObjectModel::Tag::Integer asUIntPointer.
 

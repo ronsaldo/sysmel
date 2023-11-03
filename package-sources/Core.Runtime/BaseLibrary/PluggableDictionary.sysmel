@@ -1,4 +1,4 @@
-public class PluggableDictionary superclass: Dictionary; eagerDefinition: {
+public class PluggableDictionary superclass: Dictionary; eagerDefinitionBody: {
     public field hashFunction => ((AnyValue) => Size).
     public field equalsFunction => ((AnyValue, AnyValue) => Boolean).
 

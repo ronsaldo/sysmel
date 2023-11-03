@@ -25,108 +25,76 @@ ByteArray definition: {
 
     public method replaceBytesFrom: (startIndex: Size) count: (replacementSize: Size) with: replacement ::=> Void
         := self replaceBytesFrom: startIndex count: replacementSize with: replacement startingAt: 0sz.
+
+    public alwaysInline method char8At: (index: Size) ::=> Char8
+        := self __char8At__: index.
+
+    public alwaysInline method char8At: (index: Size) put: (value: Char8) ::=> Void
+        := self __char8At__: index put: value.
+
+    public alwaysInline method int8At: (index: Size) ::=> Int8
+        := self __int8At__: index.
+
+    public alwaysInline method int8At: (index: Size) put: (value: Int8) ::=> Void
+        := self __int8At__: index put: value.
+
+    public alwaysInline method uint16At: (index: Size) ::=> UInt16
+        := self __uint16At__: index.
+
+    public alwaysInline method uint16At: (index: Size) put: (value: UInt16) ::=> Void
+        := self __uint16At__: index put: value.
+
+    public alwaysInline method char16At: (index: Size) ::=> Char16
+        := self __char16At__: index.
+
+    public alwaysInline method char16At: (index: Size) put: (value: Char16) ::=> Void
+        := self __char16At__: index put: value.
+
+    public alwaysInline method int16At: (index: Size) ::=> Int16
+        := self __int16At__: index.
+
+    public alwaysInline method int16At: (index: Size) put: (value: Int16) ::=> Void
+        := self __int16At__: index put: value.
+
+    public alwaysInline method uint32At: (index: Size) ::=> UInt32
+        := self __uint32At__: index.
+
+    public alwaysInline method uint32At: (index: Size) put: (value: UInt32) ::=> Void
+        := self __uint32At__: index put: value.
+
+    public alwaysInline method char32At: (index: Size) ::=> Char32
+        := self __char32At__: index.
+
+    public alwaysInline method char32At: (index: Size) put: (value: Char32) ::=> Void
+        := self __char32At__: index put: value.
+
+    public alwaysInline method int32At: (index: Size) ::=> Int32
+        := self __int32At__: index.
+
+    public alwaysInline method int32At: (index: Size) put: (value: Int32) ::=> Void
+        := self __int32At__: index put: value.
+
+    public alwaysInline method uint64At: (index: Size) ::=> UInt64
+        := self __uint64At__: index.
+
+    public alwaysInline method uint64At: (index: Size) put: (value: UInt64) ::=> Void
+        := self __uint64At__: index put: value.
+
+    public alwaysInline method int64At: (index: Size) ::=> Int64
+        := self __int64At__: index.
+
+    public alwaysInline method int64At: (index: Size) put: (value: Int64) ::=> Void
+        := self __int64At__: index put: value.
+
+    public alwaysInline method float32At: (index: Size) ::=> Float32
+        := self __float32At__: index.
+
+    public alwaysInline method float32At: (index: Size) put: (value: Float32) ::=> Void
+        := self __float32At__: index put: value.
+
+    public alwaysInline method float64At: (index: Size) ::=> Float64
+        := self __float64At__: index.
+
+    public alwaysInline method float64At: (index: Size) put: (value: Float64) ::=> Void
+        := self __float64At__: index put: value.
 }.
-
-ByteArray
-    withSelector: #char8At: addMethod: {:(ByteArray)self :(Size)index :: Char8 |
-        (self uint8At: index) asChar8
-    };
-    withSelector: #char8At:put: addMethod: {:(ByteArray)self :(Size)index :(Char8)value :: Void |
-        self uint8At: index put: value asUInt8
-    };
-    withSelector: #int8At: addMethod: {:(ByteArray)self :(Size)index :: Int8 |
-        (self uint8At: index) asInt8
-    };
-    withSelector: #int8At:put: addMethod: {:(ByteArray)self :(Size)index :(Int8)value :: Void |
-        self uint8At: index put: value asUInt8
-    };
-
-    withSelector: #uint16At: addMethod: {:(ByteArray)self :(Size)index :: UInt16 |
-        (self uint8At: index) asUInt16
-        | ((self uint8At: index + 1sz) asUInt16 << 8u16)
-    };
-    withSelector: #uint16At:put: addMethod: {:(ByteArray)self :(Size)index :(UInt16)value :: Void |
-        self
-            uint8At: index put: value asUInt8;
-            uint8At: index + 1sz put: (value >> 8u16) asUInt8
-    };
-    withSelector: #char16At: addMethod: {:(ByteArray)self :(Size)index :: Char16 |
-        (self uint16At: index) asChar16
-    };
-    withSelector: #char16At:put: addMethod: {:(ByteArray)self :(Size)index :(Char16)value :: Void |
-        self uint16At: index put: value asUInt16
-    };
-    withSelector: #int16At: addMethod: {:(ByteArray)self :(Size)index :: Int16 |
-        (self uint16At: index) asInt16
-    };
-    withSelector: #int16At:put: addMethod: {:(ByteArray)self :(Size)index :(Int16)value :: Void |
-        self uint16At: index put: value asUInt16
-    };
-
-    withSelector: #uint32At: addMethod: {:(ByteArray)self :(Size)index :: UInt32 |
-        (((self uint8At: index) asUInt32
-        | ((self uint8At: index + 1sz) asUInt32 << 8u32))
-        | ((self uint8At: index + 2sz) asUInt32 << 16u32))
-        | ((self uint8At: index + 3sz) asUInt32 << 24u32)
-    };
-    withSelector: #uint32At:put: addMethod: {:(ByteArray)self :(Size)index :(UInt32)value :: Void |
-        self
-            uint8At: index put: value asUInt8;
-            uint8At: index + 1sz put: (value >> 8u32) asUInt8;
-            uint8At: index + 2sz put: (value >> 16u32) asUInt8;
-            uint8At: index + 3sz put: (value >> 24u32) asUInt8
-    };
-    withSelector: #char32At: addMethod: {:(ByteArray)self :(Size)index :: Char32 |
-        (self uint32At: index) asChar32
-    };
-    withSelector: #char32At:put: addMethod: {:(ByteArray)self :(Size)index :(Char32)value :: Void |
-        self uint32At: index put: value asUInt32
-    };
-    withSelector: #int32At: addMethod: {:(ByteArray)self :(Size)index :: Int32 |
-        (self uint32At: index) asInt32
-    };
-    withSelector: #int32At:put: addMethod: {:(ByteArray)self :(Size)index :(Int32)value :: Void |
-        self uint32At: index put: value asUInt32
-    };
-
-    withSelector: #uint64At: addMethod: {:(ByteArray)self :(Size)index :: UInt64 |
-        (((((((self uint8At: index) asUInt64
-        | ((self uint8At: index + 1sz) asUInt64 << 8u64))
-        | ((self uint8At: index + 2sz) asUInt64 << 16u64))
-        | ((self uint8At: index + 3sz) asUInt64 << 24u64))
-        | ((self uint8At: index + 4sz) asUInt64 << 32u64))
-        | ((self uint8At: index + 5sz) asUInt64 << 40u64))
-        | ((self uint8At: index + 6sz) asUInt64 << 48u64))
-        | ((self uint8At: index + 7sz) asUInt64 << 56u64)
-    };
-    withSelector: #uint64At:put: addMethod: {:(ByteArray)self :(Size)index :(UInt64) value :: Void |
-        self
-            uint8At: index put: value asUInt8;
-            uint8At: index + 1sz put: (value >> 8u64) asUInt8;
-            uint8At: index + 2sz put: (value >> 16u64) asUInt8;
-            uint8At: index + 3sz put: (value >> 24u64) asUInt8;
-            uint8At: index + 4sz put: (value >> 32u64) asUInt8;
-            uint8At: index + 5sz put: (value >> 40u64) asUInt8;
-            uint8At: index + 6sz put: (value >> 48u64) asUInt8;
-            uint8At: index + 7sz put: (value >> 56u64) asUInt8
-    };
-    withSelector: #int64At: addMethod: {:(ByteArray)self :(Size)index :: Int64 |
-        (self uint64At: index) asInt64
-    };
-    withSelector: #int64At:put: addMethod: {:(ByteArray)self :(Size)index :(Int64) value :: Void |
-        self uint64At: index put: value asUInt64
-    };
-
-    withSelector: #float32At: addMethod: {:(ByteArray)self :(Size)index :: Float32 |
-        (self uint32At: index) asIEEEFloat32Decoded
-    };
-    withSelector: #float32At:put: addMethod: {:(ByteArray)self :(Size)index :(Float32)value :: Void |
-        self uint32At: index put: value asIEEEFloat32Encoding
-    };
-
-    withSelector: #float64At: addMethod: {:(ByteArray)self :(Size)index :: Float64 |
-        (self uint64At: index) asIEEEFloat64Decoded
-    };
-    withSelector: #float64At:put: addMethod: {:(ByteArray)self :(Size)index :(Float64)value :: Void |
-        self uint64At: index put: value asIEEEFloat64Encoding
-    }.

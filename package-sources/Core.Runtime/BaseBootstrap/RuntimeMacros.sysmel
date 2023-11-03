@@ -49,6 +49,30 @@ MacroContext
             sourcePosition: self sourcePosition;
             expressions: expressions;
             yourself
+    };
+    withSelector: #send:to:withArguments: addMethod: {:(MacroContext)self :(ASTNode)selector :(ASTNode)receiver :(Array)arguments :: ASTMessageSendNode |
+        ASTMessageSendNode new
+            sourcePosition: self sourcePosition;
+            receiver: receiver;
+            selector: selector;
+            arguments: arguments;
+            yourself
+    };
+    withSelector: #send:to:with: addMethod: {:(MacroContext)self :(ASTNode)selector :(ASTNode)receiver :(ASTNode)firstArgument :: ASTMessageSendNode |
+        ASTMessageSendNode new
+            sourcePosition: self sourcePosition;
+            receiver: receiver;
+            selector: selector;
+            arguments: (Array with: firstArgument);
+            yourself
+    };
+    withSelector: #send:to:with:with: addMethod: {:(MacroContext)self :(ASTNode)selector :(ASTNode)receiver :(ASTNode)firstArgument :(ASTNode)secondArgument :: ASTMessageSendNode |
+        ASTMessageSendNode new
+            sourcePosition: self sourcePosition;
+            receiver: receiver;
+            selector: selector;
+            arguments: (Array with: firstArgument with: secondArgument);
+            yourself
     }.
 
 (begin) adoptDefinitionOf: {:(MacroContext)macroContext :(Array)expressions... :: ASTSequenceNode |

@@ -20,11 +20,11 @@ AnyValue definition: {
 Type definition: {
     public virtual method canEncodeValueInBytes => Boolean := false.
 
-    public virtual method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void := {
+    public virtual method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void := {
         ## By default do nothing.
     }.
 
-    public virtual method encodeValueIn: (valueOwner: Untyped) atTypeSlot: (typeSlot: TypeSlot) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void := {
+    public virtual method encodeValueIn: (valueOwner: Untyped) atTypeSlot: (typeSlot: TypeSlot) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void := {
         self encodeValue: (RawTuple::typeSlotAt:)(valueOwner, typeSlot) inBytes: bytes atOffset: offset
     }.
 
@@ -44,7 +44,7 @@ Type definition: {
 }.
 
 ValueType definition: {
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void := {
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void := {
         ObjectModel::isLogical() ifTrue: {
             self subclassResponsibility
         } ifFalse: {
@@ -56,7 +56,7 @@ ValueType definition: {
         }.
     }.
 
-    public override method encodeValueIn: (owner: Untyped) atTypeSlot: (typeSlot: TypeSlot) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void := {
+    public override method encodeValueIn: (owner: Untyped) atTypeSlot: (typeSlot: TypeSlot) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void := {
         ObjectModel::isLogical() ifTrue: {
             self encodeValue: (RawTuple::typeSlotAt:)(owner, typeSlot) inBytes: bytes atOffset: offset
         } ifFalse: {
@@ -73,7 +73,7 @@ FixedArrayType definition: {
     public override method canEncodeValueInBytes => Boolean
         := elementType canEncodeValueInBytes.
 
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void := {
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void := {
         ObjectModel::isLogical() ifTrue: {
             let i mutable := 0sz.
             let elementOffset mutable := offset.
@@ -109,13 +109,13 @@ FixedArrayType definition: {
 }.
 
 PointerLikeType definition: {
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void := {
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void := {
         RawTuple::isBytes(value) ifTrue: {
             ObjectModel::isLogical() ifTrue: {
                 let pointerSize := self validInstanceSize.
                 let i mutable := 0sz.
                 while: (i < pointerSize) do: {
-                    bytes uint8At: offset + i put: (RawTuple::byteSlotAt:)(value, i)
+                    bytes __uint8At__: offset + i put: (RawTuple::byteSlotAt:)(value, i)
                 } continueWith: (i := i + 1sz)
             } ifFalse: {
                 memcpy(
@@ -146,7 +146,7 @@ StructType definition: {
         canEncodeValueInBytes
     }.
 
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void := {
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void := {
         ObjectModel::isLogical() ifTrue: {
             self ensureLayoutIsComputed.
 
@@ -189,142 +189,142 @@ StructType definition: {
 
 Char8 class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes char8At: offset put: (tuple: value uncheckedDownCastTo: Char8).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __char8At__: offset put: (tuple: value uncheckedDownCastTo: Char8).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := bytes char8At: offset.
+        := bytes __char8At__: offset.
 }.
 
 UInt8 class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes uint8At: offset put: (tuple: value uncheckedDownCastTo: UInt8).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __uint8At__: offset put: (tuple: value uncheckedDownCastTo: UInt8).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := bytes uint8At: offset.
+        := bytes __uint8At__: offset.
 }.
 
 Int8 class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes int8At: offset put: (tuple: value uncheckedDownCastTo: Int8).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __int8At__: offset put: (tuple: value uncheckedDownCastTo: Int8).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := bytes int8At: offset.
+        := bytes __int8At__: offset.
 }.
 
 Char16 class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes char16At: offset put: (tuple: value uncheckedDownCastTo: Char16).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __char16At__: offset put: (tuple: value uncheckedDownCastTo: Char16).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := bytes char16At: offset.
+        := bytes __char16At__: offset.
 }.
 
 UInt16 class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes uint16At: offset put: (tuple: value uncheckedDownCastTo: UInt16).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __uint16At__: offset put: (tuple: value uncheckedDownCastTo: UInt16).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := bytes uint16At: offset.
+        := bytes __uint16At__: offset.
 }.
 
 Int16 class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes int16At: offset put: (tuple: value uncheckedDownCastTo: Int16).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __int16At__: offset put: (tuple: value uncheckedDownCastTo: Int16).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := bytes int16At: offset.
+        := bytes __int16At__: offset.
 }.
 
 Char32 class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes char32At: offset put: (tuple: value uncheckedDownCastTo: Char32).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __char32At__: offset put: (tuple: value uncheckedDownCastTo: Char32).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := bytes char32At: offset.
+        := bytes __char32At__: offset.
 }.
 
 UInt32 class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes uint32At: offset put: (tuple: value uncheckedDownCastTo: UInt32).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __uint32At__: offset put: (tuple: value uncheckedDownCastTo: UInt32).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := bytes uint32At: offset.
+        := bytes __uint32At__: offset.
 }.
 
 Int32 class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes int32At: offset put: (tuple: value uncheckedDownCastTo: Int32).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __int32At__: offset put: (tuple: value uncheckedDownCastTo: Int32).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := bytes int32At: offset.
+        := bytes __int32At__: offset.
 }.
 
 UInt64 class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes uint64At: offset put: (tuple: value uncheckedDownCastTo: UInt64).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __uint64At__: offset put: (tuple: value uncheckedDownCastTo: UInt64).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := bytes uint64At: offset.
+        := bytes __uint64At__: offset.
 }.
 
 Int64 class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes int64At: offset put: (tuple: value uncheckedDownCastTo: Int64).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __int64At__: offset put: (tuple: value uncheckedDownCastTo: Int64).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := bytes int64At: offset.
+        := bytes __int64At__: offset.
 }.
 
 Float32 class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes float32At: offset put: (tuple: value uncheckedDownCastTo: Float32).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __float32At__: offset put: (tuple: value uncheckedDownCastTo: Float32).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := bytes float32At: offset.
+        := bytes __float32At__: offset.
 }.
 
 Float64 class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes float64At: offset put: (tuple: value uncheckedDownCastTo: Float64).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __float64At__: offset put: (tuple: value uncheckedDownCastTo: Float64).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := bytes float64At: offset.
+        := bytes __float64At__: offset.
 }.
 
 Boolean class definition: {
     public override method canEncodeValueInBytes => Boolean := true.
-    public override method encodeValue: (value: Untyped) inBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Void
-        := bytes uint8At: offset put: (if: (tuple: value uncheckedDownCastTo: Boolean) then: 1u8 else: 0u8).
+    public override method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void
+        := bytes __uint8At__: offset put: (if: (tuple: value uncheckedDownCastTo: Boolean) then: 1u8 else: 0u8).
 
     public override method canEncodeValueInBytes => Boolean := true.
     public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> Untyped
-        := (bytes uint8At: offset) ~= 0u8.
+        := (bytes __uint8At__: offset) ~= 0u8.
 }.
 
 SequenceableCollection definition: {

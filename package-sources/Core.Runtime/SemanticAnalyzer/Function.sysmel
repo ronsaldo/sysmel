@@ -1,4 +1,4 @@
-FunctionDefinition eagerDefinition: {
+FunctionDefinition eagerDefinitionBody: {
     public eager method captures => Array := {
         bytecode ifNotNil: {
             return: bytecode captures
@@ -18,7 +18,7 @@ FunctionDefinition eagerDefinition: {
     }.
 }.
 
-Function eagerDefinition: {
+Function eagerDefinitionBody: {
     public eager method setupWithFunctionDefinition: (newDefinition: FunctionDefinition) captureEnvironment: (newCaptureEnvironment: Environment) ::=> Void := {
         flags := newDefinition flags.
         argumentCount := newDefinition argumentCount.
@@ -93,8 +93,9 @@ Function eagerDefinition: {
         (RawTuple::type:)(self, definition type).
     }.
 
-    public override eager method ensureAnalysis => Void := {
-        self doEnsureAnalysis
+    public override eager method ensureAnalysis => Function := {
+        self doEnsureAnalysis.
+        self
     }.
 
     public eager method applyWithExpandedArguments: (arguments: Array) ::=> Untyped := {
@@ -177,7 +178,7 @@ Function eagerDefinition: {
     }.
 }.
 
-FunctionDefinition eagerDefinition: {
+FunctionDefinition eagerDefinitionBody: {
     public method isTargetDefinedPrimitive => Boolean
         := (self hasAnyFlag: FunctionFlags::TargetDefinedPrimitive) || (self hasPragmaNamed: #targetDefinedPrimitive).
 

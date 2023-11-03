@@ -1,5 +1,6 @@
 loadSourceNamed: "StringMemoryFunctions.sysmel".
 loadSourceNamed: "ObjectMemoryAccess.sysmel".
+loadSourceNamed: "PrimitiveDataAccessors.sysmel".
 
 loadSourceNamed: "Collection.sysmel".
 loadSourceNamed: "Array.sysmel".

@@ -1,0 +1,153 @@
+AnyValue definition: {
+    public final alwaysInline method __uint8At__: (index: Size) ::=> UInt8 := {
+        index >= self __byteSize__ ifTrue: (self errorSubscriptBounds: index).
+        self __uncheckedByteSlotAt__: index
+    }.
+
+    public final alwaysInline method __uint8At__: (index: Size) put: (value: UInt8) ::=> Void := {
+        index >= self __byteSize__ ifTrue: (self errorSubscriptBounds: index).
+        self __uncheckedByteSlotAt__: index put: value
+    }.
+}.
+
+AnyValue
+    withSelector: #__char8At__: addMethod: {:(AnyValue)self :(Size)index :: Char8 |
+        (self __uint8At__: index) asChar8
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__char8At__:put: addMethod: {:(AnyValue)self :(Size)index :(Char8)value :: Void |
+        self __uint8At__: index put: value asUInt8
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__int8At__: addMethod: {:(AnyValue)self :(Size)index :: Int8 |
+        (self __uint8At__: index) asInt8
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__int8At__:put: addMethod: {:(AnyValue)self :(Size)index :(Int8)value :: Void |
+        self __uint8At__: index put: value asUInt8
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+
+    withSelector: #__uint16At__: addMethod: {:(AnyValue)self :(Size)index :: UInt16 |
+        (self __uint8At__: index) asUInt16
+        | ((self __uint8At__: index + 1sz) asUInt16 << 8u16)
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__uint16At__:put: addMethod: {:(AnyValue)self :(Size)index :(UInt16)value :: Void |
+        self
+            __uint8At__: index put: value asUInt8;
+            __uint8At__: index + 1sz put: (value >> 8u16) asUInt8
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__char16At__: addMethod: {:(AnyValue)self :(Size)index :: Char16 |
+        (self __uint16At__: index) asChar16
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__char16At__:put: addMethod: {:(AnyValue)self :(Size)index :(Char16)value :: Void |
+        self __uint16At__: index put: value asUInt16
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__int16At__: addMethod: {:(AnyValue)self :(Size)index :: Int16 |
+        (self __uint16At__: index) asInt16
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__int16At__:put: addMethod: {:(AnyValue)self :(Size)index :(Int16)value :: Void |
+        self __uint16At__: index put: value asUInt16
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+
+    withSelector: #__uint32At__: addMethod: {:(AnyValue)self :(Size)index :: UInt32 |
+        (((self __uint8At__: index) asUInt32
+        | ((self __uint8At__: index + 1sz) asUInt32 << 8u32))
+        | ((self __uint8At__: index + 2sz) asUInt32 << 16u32))
+        | ((self __uint8At__: index + 3sz) asUInt32 << 24u32)
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__uint32At__:put: addMethod: {:(AnyValue)self :(Size)index :(UInt32)value :: Void |
+        self
+            __uint8At__: index put: value asUInt8;
+            __uint8At__: index + 1sz put: (value >> 8u32) asUInt8;
+            __uint8At__: index + 2sz put: (value >> 16u32) asUInt8;
+            __uint8At__: index + 3sz put: (value >> 24u32) asUInt8
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__char32At__: addMethod: {:(AnyValue)self :(Size)index :: Char32 |
+        (self __uint32At__: index) asChar32
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__char32At__:put: addMethod: {:(AnyValue)self :(Size)index :(Char32)value :: Void |
+        self __uint32At__: index put: value asUInt32
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__int32At__: addMethod: {:(AnyValue)self :(Size)index :: Int32 |
+        (self __uint32At__: index) asInt32
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__int32At__:put: addMethod: {:(AnyValue)self :(Size)index :(Int32)value :: Void |
+        self __uint32At__: index put: value asUInt32
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+
+    withSelector: #__uint64At__: addMethod: {:(AnyValue)self :(Size)index :: UInt64 |
+        (((((((self __uint8At__: index) asUInt64
+        | ((self __uint8At__: index + 1sz) asUInt64 << 8u64))
+        | ((self __uint8At__: index + 2sz) asUInt64 << 16u64))
+        | ((self __uint8At__: index + 3sz) asUInt64 << 24u64))
+        | ((self __uint8At__: index + 4sz) asUInt64 << 32u64))
+        | ((self __uint8At__: index + 5sz) asUInt64 << 40u64))
+        | ((self __uint8At__: index + 6sz) asUInt64 << 48u64))
+        | ((self __uint8At__: index + 7sz) asUInt64 << 56u64)
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__uint64At__:put: addMethod: {:(AnyValue)self :(Size)index :(UInt64) value :: Void |
+        self
+            __uint8At__: index put: value asUInt8;
+            __uint8At__: index + 1sz put: (value >> 8u64) asUInt8;
+            __uint8At__: index + 2sz put: (value >> 16u64) asUInt8;
+            __uint8At__: index + 3sz put: (value >> 24u64) asUInt8;
+            __uint8At__: index + 4sz put: (value >> 32u64) asUInt8;
+            __uint8At__: index + 5sz put: (value >> 40u64) asUInt8;
+            __uint8At__: index + 6sz put: (value >> 48u64) asUInt8;
+            __uint8At__: index + 7sz put: (value >> 56u64) asUInt8
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__int64At__: addMethod: {:(AnyValue)self :(Size)index :: Int64 |
+        (self __uint64At__: index) asInt64
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__int64At__:put: addMethod: {:(AnyValue)self :(Size)index :(Int64) value :: Void |
+        self __uint64At__: index put: value asUInt64
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+
+    withSelector: #__float32At__: addMethod: {:(AnyValue)self :(Size)index :: Float32 |
+        (self __uint32At__: index) asIEEEFloat32Decoded
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__float32At__:put: addMethod: {:(AnyValue)self :(Size)index :(Float32)value :: Void |
+        self __uint32At__: index put: value asIEEEFloat32Encoding
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+
+    withSelector: #__float64At__: addMethod: {:(AnyValue)self :(Size)index :: Float64 |
+        (self __uint64At__: index) asIEEEFloat64Decoded
+    } makeFinal makeAlwaysInline withEagerAnalysis;
+    withSelector: #__float64At__:put: addMethod: {:(AnyValue)self :(Size)index :(Float64)value :: Void |
+        self __uint64At__: index put: value asIEEEFloat64Encoding
+    } makeFinal makeAlwaysInline withEagerAnalysis.
+
+PrimitiveValueType definition: {
+    public abstract method bytesElementGetter
+        := self subclassResponsibility.
+
+    public abstract method bytesElementSetter
+        := self subclassResponsibility.
+}.
+
+UInt32 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__uint32At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__uint32At__:put:.
+}.
+
+Int32 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__int32At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__int32At__:put:.
+}.
+
+UInt64 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__uint64At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__uint64At__:put:.
+}.
+
+Int64 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__int64At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__int64At__:put:.
+}.
+
+Float32 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__float32At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__float32At__:put:.
+}.
+
+Float64 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__float64At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__float64At__:put:.
+}.

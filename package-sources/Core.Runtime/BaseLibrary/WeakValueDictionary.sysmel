@@ -1,4 +1,4 @@
-WeakValueDictionary eagerDefinition: {
+WeakValueDictionary eagerDefinitionBody: {
     public override final eager method at: key
         := super at: key.
 
