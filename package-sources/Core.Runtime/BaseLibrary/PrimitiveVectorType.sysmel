@@ -118,8 +118,7 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
         let ElementSetterFunction => ((AnyValue, Size, ElementType) => Void) := ElementType bytesElementSetter.
 
         public method at: (index: Size) ::=> ElementType := {
-            <primitive: (VectorTypeName -- "::at:") asSymbol>
-            <targetDefinedPrimitive>
+            <primitive: #PrimitiveVector::at:>
             ObjectModel::isLogical() ifTrue: {
                 index >= Elements ifTrue: (error("Index is out of bounds.")).
                 ElementGetterFunction(self, index * ElementByteSize)
@@ -129,24 +128,24 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
         }.
 
         public inline method x => ElementType := {
-            <primitive: (VectorTypeName -- "::x") asSymbol>
+            <primitive: #PrimitiveVector::x>
             self at: 0sz
         }.
 
         public inline method y => ElementType := {
-            <primitive: (VectorTypeName -- "::y") asSymbol>
+            <primitive: #PrimitiveVector::y>
             self at: 1sz
         }.
 
         Elements >= 3sz ifTrue: {
             public inline method z => ElementType := {
-                <primitive: (VectorTypeName -- "::z") asSymbol>
+                <primitive: #PrimitiveVector::z>
                 self at: 2sz
             }.
 
             Elements >= 4sz ifTrue: {
                 public inline method w => ElementType := {
-                    <primitive: (VectorTypeName -- "::z") asSymbol>
+                    <primitive: #PrimitiveVector::w>
                     self at: 3sz
                 }.
             }.
@@ -154,8 +153,7 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
 
         __Meta__ definition: {
             public method x: (x: ElementType) ::=> VectorType := {
-                <primitive: (VectorTypeName -- "::makeWithX:") asSymbol>
-                <targetDefinedPrimitive>
+                <primitive: #PrimitiveVector::makeWithX:>
                 ObjectModel::isLogical() ifTrue: {
                     let result := VectorType basicAllocate.
                     ElementSetterFunction(result, 0sz, x).
@@ -166,8 +164,7 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
             }.
 
             public method y: (y: ElementType) ::=> VectorType := {
-                <primitive: (VectorTypeName -- "::makeWithY:") asSymbol>
-                <targetDefinedPrimitive>
+                <primitive: #PrimitiveVector::makeWithY:>
                 ObjectModel::isLogical() ifTrue: {
                     let result := VectorType basicAllocate.
                     ElementSetterFunction(result, ElementByteSize, y).
@@ -178,8 +175,7 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
             }.
 
             public method x: (x: ElementType) y: (y: ElementType) ::=> VectorType := {
-                <primitive: (VectorTypeName -- "::makeWithX:y:") asSymbol>
-                <targetDefinedPrimitive>
+                <primitive: #PrimitiveVector::makeWithX:y:>
                 ObjectModel::isLogical() ifTrue: {
                     let result := VectorType basicAllocate.
                     ElementSetterFunction(result, 0sz, x).
@@ -192,8 +188,7 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
 
             Elements >= 3sz ifTrue: {
                 public method z: (z: ElementType) ::=> VectorType := {
-                    <primitive: (VectorTypeName -- "::makeWithZ:") asSymbol>
-                    <targetDefinedPrimitive>
+                    <primitive: #PrimitiveVector::makeWithZ:>
                     ObjectModel::isLogical() ifTrue: {
                         let result := VectorType basicAllocate.
                         ElementSetterFunction(result, ElementByteSize*2sz, z).
@@ -204,8 +199,7 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                 }.
 
                 public method x: (x: ElementType) y: (y: ElementType) z: (z: ElementType) ::=> VectorType := {
-                    <primitive: (VectorTypeName -- "::makeWithX:y:z:") asSymbol>
-                    <targetDefinedPrimitive>
+                    <primitive: #PrimitiveVector::makeWithX:y:z:>
                     ObjectModel::isLogical() ifTrue: {
                         let result := VectorType basicAllocate.
                         ElementSetterFunction(result, 0sz, x).
@@ -219,8 +213,7 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
 
                 Elements >= 4sz ifTrue: {
                     public method w: (w: ElementType) ::=> VectorType := {
-                        <primitive: (VectorTypeName -- "::makeWithW:") asSymbol>
-                        <targetDefinedPrimitive>
+                        <primitive: #PrimitiveVector::makeWithW:>
                         ObjectModel::isLogical() ifTrue: {
                             let result := VectorType basicAllocate.
                             ElementSetterFunction(result, ElementByteSize*3sz, w).
@@ -231,8 +224,7 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                     }.
 
                     public method x: (x: ElementType) y: (y: ElementType) z: (z: ElementType) w: (w: ElementType) ::=> VectorType := {
-                        <primitive: (VectorTypeName -- "::makeWithX:y:z:w:") asSymbol>
-                        <targetDefinedPrimitive>
+                        <primitive: #PrimitiveVector::makeWithX:y:z:w:>
                         ObjectModel::isLogical() ifTrue: {
                             let result := VectorType basicAllocate.
                             ElementSetterFunction(result, 0sz, x).
@@ -252,8 +244,7 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
             2sz : {
                 __Meta__ definition: {
                     public pure method withAll: (element: ElementType) ::=> VectorType := {
-                        <primitive: (VectorTypeName -- "::withAll:") asSymbol>
-                        <targetDefinedPrimitive>
+                        <primitive: #PrimitiveVector::withAll:>
                         VectorType x: element y: element
                     }.
                 }.
@@ -283,8 +274,7 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
             3sz : {
                 __Meta__ definition: {
                     public pure method withAll: (element: ElementType) ::=> VectorType := {
-                        <primitive: (VectorTypeName -- "::withAll:") asSymbol>
-                        <targetDefinedPrimitive>
+                        <primitive: #PrimitiveVector::withAll:>
                         VectorType x: element y: element z: element
                     }.
                 }.
@@ -316,8 +306,7 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
             4sz : {
                 __Meta__ definition: {
                     public pure method withAll: (element: ElementType) ::=> VectorType := {
-                        <primitive: (VectorTypeName -- "::withAll:") asSymbol>
-                        <targetDefinedPrimitive>
+                        <primitive: #PrimitiveVector::withAll:>
                         VectorType x: element y: element z: element w: element
                     }.
                 }.

@@ -426,6 +426,62 @@ public final class HIRFunctionBytecodeCompilationContext superclass: Object; def
         #ObjectModel::isNative : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
             self builder literal: self compilationTarget hasNativeObjectModel
         }.
+
+        #PrimitiveVector::at: : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            self builder vector: arguments first extractElementAt: arguments second type: resultType
+        }.
+        #PrimitiveVector::x : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            self builder vector: arguments first extractElementAt: (self builder literal: 0u8) type: resultType
+        }.
+        #PrimitiveVector::y : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            self builder vector: arguments first extractElementAt: (self builder literal: 1u8) type: resultType
+        }.
+        #PrimitiveVector::z : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            self builder vector: arguments first extractElementAt: (self builder literal: 2u8) type: resultType
+        }.
+        #PrimitiveVector::w : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            self builder vector: arguments first extractElementAt: (self builder literal: 3u8) type: resultType
+        }.
+
+        #PrimitiveVector::makeWithX: : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            self builder vector: (self builder undefined: resultType) insertElement: arguments last at: (self builder literal: 0u8)
+        }.
+        #PrimitiveVector::makeWithY: : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            self builder vector: (self builder undefined: resultType) insertElement: arguments last at: (self builder literal: 1u8)
+        }.
+        #PrimitiveVector::makeWithZ: : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            self builder vector: (self builder undefined: resultType) insertElement: arguments last at: (self builder literal: 2u8)
+        }.
+        #PrimitiveVector::makeWithW: : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            self builder vector: (self builder undefined: resultType) insertElement: arguments last at: (self builder literal: 3u8)
+        }.
+
+        #PrimitiveVector::makeWithX:y: : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            let result mutable => HIRValue := self builder undefined: resultType.
+            result := self builder vector: result insertElement: (arguments at: arguments size - 2sz) at: (self builder literal: 0u8).
+            result := self builder vector: result insertElement: (arguments at: arguments size - 1sz) at: (self builder literal: 1u8).
+            result
+        }.
+        #PrimitiveVector::makeWithX:y:z: : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            let result mutable => HIRValue := self builder undefined: resultType.
+            result := self builder vector: result insertElement: (arguments at: arguments size - 3sz) at: (self builder literal: 0u8).
+            result := self builder vector: result insertElement: (arguments at: arguments size - 2sz) at: (self builder literal: 1u8).
+            result := self builder vector: result insertElement: (arguments at: arguments size - 1sz) at: (self builder literal: 2u8).
+            result
+        }.
+
+        #PrimitiveVector::makeWithX:y:z:w: : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            let result mutable => HIRValue := self builder undefined: resultType.
+            result := self builder vector: result insertElement: (arguments at: arguments size - 4sz) at: (self builder literal: 0u8).
+            result := self builder vector: result insertElement: (arguments at: arguments size - 3sz) at: (self builder literal: 1u8).
+            result := self builder vector: result insertElement: (arguments at: arguments size - 2sz) at: (self builder literal: 2u8).
+            result := self builder vector: result insertElement: (arguments at: arguments size - 1sz) at: (self builder literal: 3u8).
+            result
+        }.
+
+        #PrimitiveVector::withAll: : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            self builder vectorBroadcastElement: arguments last type: resultType
+        }.
     }.
 
     public method compileCall: (calledFunction: HIRValue) isUnchecked: (isUnchecked: Boolean) arguments: (arguments: Array) resultType: (resultType: Type) resultTemporary: (resultTemporary: Int16) ::=> Void := {

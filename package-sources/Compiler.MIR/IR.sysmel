@@ -387,6 +387,9 @@ MIRValue definition: {
     public virtual method isTerminator => Boolean := false.
     public virtual method isPure => Boolean := false.
 
+    public virtual method getConstantValueUInt8 => UInt8
+        := self error: "Not an immediate 8 constant".
+
     public virtual method getConstantValue64 => Int64
         := self error: "Not an immediate 64 constant".
 
@@ -923,6 +926,7 @@ public final class MIRConstantInt8 superclass: MIRConstantInteger; definition: {
     public override method size => UInt64 := 1u64.
     public override method alignment => UInt64 := 1u64.
 
+    public override method getConstantValueUInt8 => UInt8 := value asUInt8.
     public override method getConstantValue64 => Int64 := value asInt64.
 
     public override method printOn: (stream: Stream) ::=> Void := {
@@ -945,6 +949,7 @@ public final class MIRConstantUInt8 superclass: MIRConstantInteger; definition: 
     public override method size => UInt64 := 1u64.
     public override method alignment => UInt64 := 1u64.
     
+    public override method getConstantValueUInt8 => UInt8 := value.
     public override method getConstantValue64 => Int64 := value asInt64.
 
     public override method printOn: (stream: Stream) ::=> Void := {
@@ -967,6 +972,7 @@ public final class MIRConstantInt16 superclass: MIRConstantInteger; definition: 
     public override method size => UInt64 := 2u64.
     public override method alignment => UInt64 := 2u64.
 
+    public override method getConstantValueUInt8 => UInt8 := value asUInt8.
     public override method getConstantValue64 => Int64 := value asInt64.
 
     public override method printOn: (stream: Stream) ::=> Void := {
@@ -988,6 +994,7 @@ public final class MIRConstantUInt16 superclass: MIRConstantInteger; definition:
     public override method size => UInt64 := 2u64.
     public override method alignment => UInt64 := 2u64.
 
+    public override method getConstantValueUInt8 => UInt8 := value asUInt8.
     public override method getConstantValue64 => Int64 := value asInt64.
 
     public override method printOn: (stream: Stream) ::=> Void := {
@@ -1010,6 +1017,7 @@ public final class MIRConstantInt32 superclass: MIRConstantInteger; definition: 
     public override method size => UInt64 := 4u64.
     public override method alignment => UInt64 := 4u64.
 
+    public override method getConstantValueUInt8 => UInt8 := value asUInt8.
     public override method getConstantValue64 => Int64 := value asInt64.
 
     public override method printOn: (stream: Stream) ::=> Void := {
@@ -1031,6 +1039,7 @@ public final class MIRConstantUInt32 superclass: MIRConstantInteger; definition:
     public override method size => UInt64 := 4u64.
     public override method alignment => UInt64 := 4u64.
 
+    public override method getConstantValueUInt8 => UInt8 := value asUInt8.
     public override method getConstantValue64 => Int64 := value asInt64.
 
     public override method printOn: (stream: Stream) ::=> Void := {
@@ -1069,6 +1078,7 @@ public final class MIRConstantInt64 superclass: MIRConstantInteger; definition: 
     public override method alignment => UInt64 := 8u64.
     public override method size => UInt64 := 8u64.
     
+    public override method getConstantValueUInt8 => UInt8 := value asUInt8.
     public override method getConstantValue64 => Int64 := value.
 
     public override method printOn: (stream: Stream) ::=> Void := {
@@ -1086,6 +1096,7 @@ public final class MIRConstantUInt64 superclass: MIRConstantInteger; definition:
 
     public override method isConstantZero => Boolean := value = 0u64.
 
+    public override method getConstantValueUInt8 => UInt8 := value asUInt8.
     public override method getConstantValue64 => Int64 := value asInt64.
 
     public override method type => Type := UInt64.
@@ -1609,6 +1620,20 @@ public global MIR::Operation::ReturnVector128  := MIROperation terminatorNamed: 
 public global MIR::Operation::ReturnVector256  := MIROperation terminatorNamed: #returnVector256.
 public global MIR::Operation::ReturnVector512  := MIROperation terminatorNamed: #returnVector512.
 public global MIR::Operation::ReturnVoid       := MIROperation terminatorNamed: #returnVoid.
+
+public global MIR::Operation::Float32x2ExtractElement := MIROperation named: #float32x2ExtractElement.
+public global MIR::Operation::Float32x2InsertElement  := MIROperation named: #float32x2InsertElement.
+public global MIR::Operation::Float32x3ExtractElement := MIROperation named: #float32x3ExtractElement.
+public global MIR::Operation::Float32x3InsertElement  := MIROperation named: #float32x3InsertElement.
+public global MIR::Operation::Float32x4ExtractElement := MIROperation named: #float32x4ExtractElement.
+public global MIR::Operation::Float32x4InsertElement  := MIROperation named: #float32x4InsertElement.
+
+public global MIR::Operation::Float64x2ExtractElement := MIROperation named: #float64x2ExtractElement.
+public global MIR::Operation::Float64x2InsertElement  := MIROperation named: #float64x2InsertElement.
+public global MIR::Operation::Float64x3ExtractElement := MIROperation named: #float64x3ExtractElement.
+public global MIR::Operation::Float64x3InsertElement  := MIROperation named: #float64x3InsertElement.
+public global MIR::Operation::Float64x4ExtractElement := MIROperation named: #float64x4ExtractElement.
+public global MIR::Operation::Float64x4InsertElement  := MIROperation named: #float64x4InsertElement.
 
 public global MIR::Operation::ExceptionSetjmp := MIROperation terminatorNamed: #exceptionSetjmp.
 public global MIR::Operation::ExceptionLongjmp := MIROperation terminatorNamed: #exceptionLongjmp.
@@ -2283,6 +2308,9 @@ public final class MIRBlockBuilder superclass: Object; definition: {
     public method operation: (operation: MIROperation) with: (firstOperand: MIRValue) with: (secondOperand: MIRValue) with: (thirdOperand: MIRValue) ::=> MIRInstruction
         := self operation: operation withOperands: (Array with: firstOperand with: secondOperand with: thirdOperand).
 
+    public method operation: (operation: MIROperation) with: (firstOperand: MIRValue) with: (secondOperand: MIRValue) with: (thirdOperand: MIRValue) type: (type: Type)::=> MIRInstruction
+        := self operation: operation withOperands: (Array with: firstOperand with: secondOperand with: thirdOperand) type: type.
+
     public method operation: (operation: MIROperation) with: (firstOperand: MIRValue) with: (secondOperand: MIRValue) with: (thirdOperand: MIRValue) with: (fourthOperand: MIRValue) ::=> MIRInstruction
         := self operation: operation withOperands: (Array with: firstOperand with: secondOperand with: thirdOperand with: fourthOperand).
 
@@ -2575,7 +2603,7 @@ public final class MIRBlockBuilder superclass: Object; definition: {
 
     public method phiVector512: (type: PrimitiveVectorType) ::=> MIRInstruction
         := self operation: MIR::Operation::PhiVector512 type: type.
-
+        
     public method constantOffsetImmediateFor: (constantOffset: Int64) ::=> MIRValue
         := self has64BitsPointers && (constantOffset asInt32 asInt64 ~= constantOffset)
             ifTrue: (self int64: constantOffset)
@@ -2892,15 +2920,15 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
 
     Float32x2Negate Float64x2Negate
     Float32x2Sqrt   Float64x2Sqrt
-    Float32x2WithAll   Float64x2WithAll
+    Float32x2BroadcastElement   Float64x2BroadcastElement
 
     Float32x3Negate Float64x3Negate
     Float32x3Sqrt   Float64x3Sqrt
-    Float32x3WithAll   Float64x3WithAll
+    Float32x3BroadcastElement   Float64x3BroadcastElement
 
     Float32x4Negate Float64x4Negate
     Float32x4Sqrt   Float64x4Sqrt
-    Float32x4WithAll   Float64x4WithAll
+    Float32x4BroadcastElement   Float64x4BroadcastElement
 
     TruncateInt64ToInt32 TruncateInt64ToInt16 TruncateInt64ToInt8
     TruncateInt32ToInt16 TruncateInt32ToInt8

@@ -214,10 +214,19 @@ MIRRegisterAllocator definition: {
         operand isImmediate32 ifTrue: {
             instruction operandRegisters at: operandIndex put: (MIRPhysicalLocationImmediate for: operand)
         } ifFalse: {
-            self error: "An immediate32 operand is required here."
+            self error: "An immediate32 operand is required here " -- operand fullPrintString
         }
     }.
 
+    public virtual method allocateImmediateU8ForInstruction: (instruction: MIRInstruction) operandAt: (operandIndex: Size) ::=> Void := {
+        let operand := instruction operands at: operandIndex.
+        operand isImmediateU8 ifTrue: {
+            instruction operandRegisters at: operandIndex put: (MIRPhysicalLocationImmediate for: operand)
+        } ifFalse: {
+            self error: "An immediateU8 operand is required here instead of " -- operand fullPrintString
+        }
+    }.
+    
     public virtual method allocateRegisterOrRelativeImmediate32ForInstruction: (instruction: MIRInstruction) operandAt: (operandIndex: Size) ::=> Void := {
         let operand := instruction operands at: operandIndex.
         operand isRelativeImmediate32 ifTrue: {

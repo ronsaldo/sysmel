@@ -167,11 +167,14 @@ public function addVector64x4(a: Float64x4, b: Float64x4) => Float64x4
     := a + b.
 *#
 
-public function makeVectorWithAll(element: Float64) => Float64x4
-    := Float64x4 withAll: element.
+public function makeVectorWithAll(element: Float32) => Float32x4
+    := Float32x4 withAll: element.
 
-public function ones() => Float64x4
-    := Float64x4 ones.
+public function ones() => Float32x4
+    := Float32x4 ones.
+
+public function getVectorX(v: Float32x4) => Float32
+    := v x.
 
 public function makeVectorX(x: Float32) => Float32x4
     := Float32x4 x: x.
@@ -179,9 +182,15 @@ public function makeVectorX(x: Float32) => Float32x4
 public function makeVector(x: Float32, y: Float32, z: Float32, w: Float32) => Float32x4
     := Float32x4 x: x y: y z: z w: w.
 
+public function vectorAt(v: Float32x4, index: Size) => Float32
+    := v at: index.
+
+public function myVectorY(v: Float32x4) => Float32
+    := v at: 1sz.
+
 let hirModule := HIRModuleCompilationContext forDefaultTarget
     exclusiveCompilationMode: true;
-    compileFunctionsWithDefinitions: (makeVectorX, makeVector,);
+    compileFunctionsWithDefinitions: (getVectorX, myVectorY, vectorAt,);
     finish.
 
 ##hirModule performStandardOptimizations.

@@ -67,6 +67,9 @@ HIRValue definition: {
     public virtual method isTypeSlotReferenceAtInstruction => Boolean := false.
     public virtual method isTypeSlotAtPutInstruction => Boolean := false.
     public virtual method isTerminatorInstruction => Boolean := false.
+    public virtual method isVectorBroadcastElementInstruction => Boolean := false.
+    public virtual method isVectorExtractElementInstruction => Boolean := false.
+    public virtual method isVectorInsertElementInstruction => Boolean := false.
     public virtual method isUnreachableInstruction => Boolean := false.
 
     public virtual method hasSideEffects => Boolean := true.
@@ -3032,6 +3035,90 @@ public final class HIRUnreachableInstruction superclass: HIRInstruction; definit
         := stream nextPutAll: "unreachable".
 }.
 
+public final class HIRVectorBroadcastElementInstruction superclass: HIRInstruction; definition: {
+    public field value => HIRValue.
+
+    public override method isVectorBroadcastElementInstruction => Boolean := true.
+
+    public override method fullPrintOn: (stream: Stream) ::=> Void := {
+        stream print: self;
+            nextPutAll: " vectorBroadcastElement "; print: self value
+    }.
+
+    public override method usedValuesDo: aBlock ::=> Void := {
+        aBlock(self value).
+    }.
+
+    public override method replaceUsedValue: replacedValue with: replacement ::=> Void := {
+        if: self value = replacedValue then: (self value: replacement).
+    }.
+
+    public override method replaceUsedValuesWith: (replacementDictionary: Dictionary) ::=> Void := {
+        replacementDictionary at: self value ifPresent: {:(HIRValue)replacement :: Void | self value: replacement}.
+    }.
+}.
+
+public final class HIRVectorExtractElementInstruction superclass: HIRInstruction; definition: {
+    public field vector => HIRValue.
+    public field index => HIRValue.
+
+    public override method isVectorExtractElementInstruction => Boolean := true.
+
+    public override method fullPrintOn: (stream: Stream) ::=> Void := {
+        stream print: self;
+            nextPutAll: " vector "; print: self vector;
+            nextPutAll: " extractElementAt "; print: self index
+    }.
+
+    public override method usedValuesDo: aBlock ::=> Void := {
+        aBlock(self vector).
+        aBlock(self index).
+    }.
+
+    public override method replaceUsedValue: replacedValue with: replacement ::=> Void := {
+        if: self vector = replacedValue then: (self vector: replacement).
+        if: self index = replacedValue then: (self index: replacement).
+    }.
+
+    public override method replaceUsedValuesWith: (replacementDictionary: Dictionary) ::=> Void := {
+        replacementDictionary at: self vector ifPresent: {:(HIRValue)replacement :: Void | self vector: replacement}.
+        replacementDictionary at: self index ifPresent: {:(HIRValue)replacement :: Void | self index: replacement}.
+    }.
+}.
+
+public final class HIRVectorInsertElementInstruction superclass: HIRInstruction; definition: {
+    public field vector => HIRValue.
+    public field value => HIRValue.
+    public field index => HIRValue.
+
+    public override method isVectorInsertElementInstruction => Boolean := true.
+
+    public override method fullPrintOn: (stream: Stream) ::=> Void := {
+        stream print: self;
+            nextPutAll: " vector "; print: self vector;
+            nextPutAll: " insertValue "; print: self value;
+            nextPutAll: " at "; print: self index
+    }.
+
+    public override method usedValuesDo: aBlock ::=> Void := {
+        aBlock(self vector).
+        aBlock(self value).
+        aBlock(self index).
+    }.
+
+    public override method replaceUsedValue: replacedValue with: replacement ::=> Void := {
+        if: self vector = replacedValue then: (self vector: replacement).
+        if: self value = replacedValue then: (self value: replacement).
+        if: self index = replacedValue then: (self index: replacement).
+    }.
+
+    public override method replaceUsedValuesWith: (replacementDictionary: Dictionary) ::=> Void := {
+        replacementDictionary at: self vector ifPresent: {:(HIRValue)replacement :: Void | self vector: replacement}.
+        replacementDictionary at: self value ifPresent: {:(HIRValue)replacement :: Void | self value: replacement}.
+        replacementDictionary at: self index ifPresent: {:(HIRValue)replacement :: Void | self index: replacement}.
+    }.
+}.
+
 public final class HIRModule superclass: Object; definition: {
     public field context => HIRContext.
     public field globalValues => OrderedCollection.
@@ -3473,6 +3560,30 @@ HIRInstructionBuilder definition: {
             tuple: tuple;
             typeSlot: typeSlot;
             value: value;
+            registerInUsedValues;
+            yourself).
+
+    public method vectorBroadcastElement: (value: HIRValue) type: (type: Type) ::=> HIRVectorBroadcastElementInstruction
+        := self addInstruction: ((HIRVectorBroadcastElementInstruction forContext: context)
+            value: value;
+            type: type;
+            registerInUsedValues;
+            yourself).
+
+    public method vector: (vector: HIRValue) extractElementAt: (index: HIRValue) type: (type: Type) ::=> HIRVectorExtractElementInstruction
+        := self addInstruction: ((HIRVectorExtractElementInstruction forContext: context)
+            vector: vector;
+            index: index;
+            type: type;
+            registerInUsedValues;
+            yourself).
+
+    public method vector: (vector: HIRValue) insertElement: (value: HIRValue) at: (index: HIRValue) ::=> HIRVectorInsertElementInstruction
+        := self addInstruction: ((HIRVectorInsertElementInstruction forContext: context)
+            vector: vector;
+            value: value;
+            index: index;
+            type: vector type;
             registerInUsedValues;
             yourself).
 

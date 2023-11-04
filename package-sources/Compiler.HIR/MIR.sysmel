@@ -1458,6 +1458,15 @@ PrimitiveVectorType extend: {
 
     public override method translateUndefinedConstant: (constant: HIRUndefinedConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
         := codegen translatePrimitiveVectorConstant: constant type defaultValue.
+
+    public abstract method emitMirVectorBroadcastElement: (element: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := self subclassResponsibility.
+
+    public abstract method emitMirVector: (vector: MIRValue) extractElementAt: (index: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := self subclassResponsibility.
+
+    public abstract method emitMirVector: (vector: MIRValue) insertElement: (element: MIRValue) at: (index: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := self subclassResponsibility.
 }.
 
 Char8 __type__ extend: {
@@ -2201,6 +2210,117 @@ HIRSwitchInstruction extend: {
     }.
 }.
 
+Float32x2 __type__ definition: {
+    public override method emitMirVectorBroadcastElement: (element: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float32x2BroadcastElement with: element type: self.
+
+    public override method emitMirVector: (vector: MIRValue) extractElementAt: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float32x2ExtractElement with: vector with: index type: elementType.
+
+    public override method emitMirVector: (vector: MIRValue) insertElement: (value: MIRValue) at: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float32x2InsertElement with: vector with: value with: index type: self.
+}.
+
+Float32x3 __type__ definition: {
+    public override method emitMirVectorBroadcastElement: (element: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float32x3BroadcastElement with: element type: self.
+
+    public override method emitMirVector: (vector: MIRValue) extractElementAt: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float32x3ExtractElement with: vector with: index type: elementType.
+
+    public override method emitMirVector: (vector: MIRValue) insertElement: (value: MIRValue) at: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float32x3InsertElement with: vector with: value with: index type: self.
+}.
+
+Float32x4 __type__ definition: {
+    public override method emitMirVectorBroadcastElement: (element: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float32x4BroadcastElement with: element type: self.
+
+    public override method emitMirVector: (vector: MIRValue) extractElementAt: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float32x4ExtractElement with: vector with: index type: elementType.
+
+    public override method emitMirVector: (vector: MIRValue) insertElement: (value: MIRValue) at: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float32x4InsertElement with: vector with: value with: index type: self.
+}.
+
+Float64x2 __type__ definition: {
+    public override method emitMirVectorBroadcastElement: (element: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float64x2BroadcastElement with: element type: self.
+
+    public override method emitMirVector: (vector: MIRValue) extractElementAt: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float64x2ExtractElement with: vector with: index type: elementType.
+
+    public override method emitMirVector: (vector: MIRValue) insertElement: (value: MIRValue) at: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float64x2InsertElement with: vector with: value with: index type: self.
+}.
+
+Float64x3 __type__ definition: {
+    public override method emitMirVectorBroadcastElement: (element: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float64x3BroadcastElement with: element type: self.
+
+    public override method emitMirVector: (vector: MIRValue) extractElementAt: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float64x3ExtractElement with: vector with: index type: elementType.
+
+    public override method emitMirVector: (vector: MIRValue) insertElement: (value: MIRValue) at: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float64x3InsertElement with: vector with: value with: index type: self.
+}.
+
+Float64x4 __type__ definition: {
+    public override method emitMirVectorBroadcastElement: (element: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float64x4BroadcastElement with: element type: self.
+
+    public override method emitMirVector: (vector: MIRValue) extractElementAt: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float64x4ExtractElement with: vector with: index type: elementType.
+
+    public override method emitMirVector: (vector: MIRValue) insertElement: (value: MIRValue) at: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Float64x4InsertElement with: vector with: value with: index type: self.
+}.
+
+HIRVectorBroadcastElementInstruction extend: {
+    public override method compileIntoMIRWith: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
+        let element := codegen translateValue: self value.
+        let vectorType := type downCastTo: PrimitiveVectorType.
+        vectorType emitMirVectorBroadcastElement: element withBlockBuilder: codegen blockBuilder
+    }.
+}.
+
+HIRVectorExtractElementInstruction extend: {
+    public override method compileIntoMIRWith: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
+        let vector := codegen translateValue: self vector.
+        let index := codegen translateValue: self index.
+        let vectorType := vector type downCastTo: PrimitiveVectorType.
+        index isConstant ifTrue: {
+            vectorType emitMirVector: vector extractElementAt: index withBlockBuilder: codegen blockBuilder
+        } ifFalse: {
+            let vectorLocalValue => MIRLocalValue := vector isLocalValue ifTrue: {
+                vector downCastTo: MIRLocalValue
+            } ifFalse: {
+                codegen functionBuilder newTemporary: #vectorTemporary withType: vector type.
+            }.
+
+            let vectorPointer := vectorLocalValue asValuePointerWithType: vector type pointer compilationTarget: codegen compilationTarget.
+            vector isLocalValue ifFalse: {
+                vector type emitMirStore: vector intoPointer: vectorPointer constantOffset: 0i64 in: nil with: codegen.
+            }.
+
+            let vectorElementPointer := codegen blockBuilder loadEffectiveAddress: vectorPointer index: index constantScale: vectorType elementType valueSize asInt64 type: vectorType elementType pointer.
+            vectorType elementType emitMirLoadFromPointer: vectorElementPointer constantOffset: 0i64 withBlockBuilder: codegen blockBuilder
+        }.
+    }.
+}.
+
+HIRVectorInsertElementInstruction extend: {
+    public override method compileIntoMIRWith: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
+        let vector := codegen translateValue: self vector.
+        let value := codegen translateValue: self value.
+        let index := codegen translateValue: self index.
+        self assert: index isConstant.
+        let vectorType := vector type downCastTo: PrimitiveVectorType.
+
+        vectorType emitMirVector: vector insertElement: value at: index withBlockBuilder: codegen blockBuilder
+    }.
+}.
+
 let translateUnaryPrimitiveInto := {:(MIROperation)operation :: ((Array, Type, HIRFunctionDefinitionMIRCodeGenerator) => MIRValue) |
     {:(Array)arguments :(Type)type :(HIRFunctionDefinitionMIRCodeGenerator)codegen :: MIRValue |
         let operand := codegen translateValue: arguments first.
@@ -2764,8 +2884,6 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float32::asIEEEFloat32Encoding : translateUnaryPrimitiveInto(MIR::Operation::Float32ToIEEEUInt32). 
 
     ## Float32x2 primitives
-    #Float32x2::withAll: : translateVectorWithAll(MIR::Operation::Float32x2WithAll).
-
     #Float32x2::negated : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Negate).
     #Float32x2::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Sqrt).
 
@@ -2777,8 +2895,6 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float32x2::max: : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Max).
 
     ## Float32x3 primitives
-    #Float32x3::withAll: : translateVectorWithAll(MIR::Operation::Float32x3WithAll).
-
     #Float32x3::negated : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Negate).
     #Float32x3::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Sqrt).
 
@@ -2790,8 +2906,6 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float32x3::max: : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Max).
 
     ## Float32x4 primitives
-    #Float32x4::withAll: : translateVectorWithAll(MIR::Operation::Float32x4WithAll).
-
     #Float32x4::negated : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Negate).
     #Float32x4::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Sqrt).
 
@@ -2838,8 +2952,6 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float64::asIEEEFloat64Encoding : translateUnaryPrimitiveInto(MIR::Operation::Float64ToIEEEUInt64). 
 
     ## Float64x3 primitives
-    #Float64x2::withAll: : translateVectorWithAll(MIR::Operation::Float64x2WithAll).
-
     #Float64x2::negated : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Negate).
     #Float64x2::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Sqrt).
 
@@ -2851,8 +2963,6 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float64x2::max: : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Max).
 
     ## Float64x3 primitives
-    #Float64x3::withAll: : translateVectorWithAll(MIR::Operation::Float64x3WithAll).
-
     #Float64x3::negated : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Negate).
     #Float64x3::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Sqrt).
 
@@ -2864,8 +2974,6 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float64x3::max: : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Max).
 
     ## Float64x4 primitives
-    #Float64x4::withAll: : translateVectorWithAll(MIR::Operation::Float64x4WithAll).
-
     #Float64x4::negated : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Negate).
     #Float64x4::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Sqrt).
 

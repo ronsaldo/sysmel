@@ -5583,12 +5583,41 @@ MIR::Operation::Float32UnorderedGreaterOrEqualsBranch
             x86::jmp: (instruction thirdOperandRegister x86::relCall32OrInt32For: codegen)
     }.
 
-MIR::Operation::Float32x2WithAll
+MIR::Operation::Float32x2BroadcastElement
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::movss: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
             x86::shufps: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen) mask: 0u8 asAsmImmediate.
+    }.
+
+MIR::Operation::Float32x2ExtractElement
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterForInstruction: instruction operandAt: 0sz;
+            allocateImmediateU8ForInstruction: instruction operandAt: 1sz;
+            allocateRegisterForInstructionResult: instruction trySharingWithOperandAt: 0sz
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        let index := instruction secondOperand getConstantValueUInt8.
+        codegen textSection
+            x86::movaps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::shufps: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen) mask: index asAsmImmediate
+    }.
+
+MIR::Operation::Float32x2InsertElement
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterForInstruction: instruction operandAt: 0sz;
+            allocateRegisterForInstruction: instruction operandAt: 1sz;
+            allocateImmediateU8ForInstruction: instruction operandAt: 2sz;
+            allocateRegisterForInstructionResult: instruction trySharingWithOperandAt: 0sz
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        let index := instruction thirdOperand getConstantValueUInt8.
+        codegen textSection
+            x86::movaps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::insertps: (instruction resultRegister x86::vector128For: codegen) src: (instruction secondOperandRegister x86::vector128For: codegen) mask: (index << 4u8) asAsmImmediate
     }.
 
 MIR::Operation::Float32x2Add
@@ -5654,12 +5683,41 @@ MIR::Operation::Float32x2Sqrt
             x86::sqrtps: (instruction resultRegister x86::vector128For: codegen) with: (instruction firstOperandRegister x86::vector128For: codegen).
     }.
 
-MIR::Operation::Float32x3WithAll
+MIR::Operation::Float32x3BroadcastElement
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::movss: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
             x86::shufps: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen) mask: 0u8 asAsmImmediate.
+    }.
+
+MIR::Operation::Float32x3ExtractElement
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterForInstruction: instruction operandAt: 0sz;
+            allocateImmediateU8ForInstruction: instruction operandAt: 1sz;
+            allocateRegisterForInstructionResult: instruction trySharingWithOperandAt: 0sz
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        let index := instruction secondOperand getConstantValueUInt8.
+        codegen textSection
+            x86::movaps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::shufps: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen) mask: index asAsmImmediate
+    }.
+
+MIR::Operation::Float32x3InsertElement
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterForInstruction: instruction operandAt: 0sz;
+            allocateRegisterForInstruction: instruction operandAt: 1sz;
+            allocateImmediateU8ForInstruction: instruction operandAt: 2sz;
+            allocateRegisterForInstructionResult: instruction trySharingWithOperandAt: 0sz
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        let index := instruction thirdOperand getConstantValueUInt8.
+        codegen textSection
+            x86::movaps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::insertps: (instruction resultRegister x86::vector128For: codegen) src: (instruction secondOperandRegister x86::vector128For: codegen) mask: (index << 4u8) asAsmImmediate
     }.
 
 MIR::Operation::Float32x3Add
@@ -5725,12 +5783,41 @@ MIR::Operation::Float32x3Sqrt
             x86::sqrtps: (instruction resultRegister x86::vector128For: codegen) with: (instruction firstOperandRegister x86::vector128For: codegen).
     }.
 
-MIR::Operation::Float32x4WithAll
+MIR::Operation::Float32x4BroadcastElement
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::movss: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
             x86::shufps: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen) mask: 0u8 asAsmImmediate.
+    }.
+
+MIR::Operation::Float32x4ExtractElement
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterForInstruction: instruction operandAt: 0sz;
+            allocateImmediateU8ForInstruction: instruction operandAt: 1sz;
+            allocateRegisterForInstructionResult: instruction trySharingWithOperandAt: 0sz
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        let index := instruction secondOperand getConstantValueUInt8.
+        codegen textSection
+            x86::movaps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::shufps: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen) mask: index asAsmImmediate
+    }.
+
+MIR::Operation::Float32x4InsertElement
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterForInstruction: instruction operandAt: 0sz;
+            allocateRegisterForInstruction: instruction operandAt: 1sz;
+            allocateImmediateU8ForInstruction: instruction operandAt: 2sz;
+            allocateRegisterForInstructionResult: instruction trySharingWithOperandAt: 0sz
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        let index := instruction thirdOperand getConstantValueUInt8.
+        codegen textSection
+            x86::movaps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::insertps: (instruction resultRegister x86::vector128For: codegen) src: (instruction secondOperandRegister x86::vector128For: codegen) mask: (index << 4u8) asAsmImmediate
     }.
 
 MIR::Operation::Float32x4Add
@@ -5859,12 +5946,53 @@ MIR::Operation::Float64Sqrt
             x86::sqrtsd: (instruction resultRegister x86::float64For: codegen) with: (instruction firstOperandRegister x86::float64For: codegen).
     }.
 
-MIR::Operation::Float64x2WithAll
+MIR::Operation::Float64x2BroadcastElement
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::movsd: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
             x86::shufpd: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen) mask: 0u8 asAsmImmediate.
+    }.
+
+MIR::Operation::Float64x2ExtractElement
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterForInstruction: instruction operandAt: 0sz;
+            allocateImmediateU8ForInstruction: instruction operandAt: 1sz;
+            allocateRegisterForInstructionResult: instruction
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        let index := instruction secondOperand getConstantValueUInt8.
+        switch: index withCases: #{
+            0u8 : (codegen textSection x86::movsd: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)).
+            1u8 : (codegen textSection x86::movhlps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)).
+            _: error("Invalid index.").
+        }.
+    }.
+
+MIR::Operation::Float64x2InsertElement
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterForInstruction: instruction operandAt: 0sz;
+            allocateRegisterForInstruction: instruction operandAt: 1sz;
+            allocateImmediateU8ForInstruction: instruction operandAt: 2sz;
+            allocateRegisterForInstructionResult: instruction trySharingWithOperandAt: 0sz
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        let index := instruction thirdOperand getConstantValueUInt8.
+        switch: index withCases: #{
+            0u8 : (
+                codegen textSection
+                    x86::movaps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+                    x86::movsd: (instruction resultRegister x86::vector128For: codegen) src: (instruction secondOperandRegister x86::vector128For: codegen)
+            ).
+            1u8 : (
+                codegen textSection
+                    x86::movaps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+                    x86::movlhps: (instruction resultRegister x86::vector128For: codegen) src: (instruction secondOperandRegister x86::vector128For: codegen)
+            ).
+            _: error("Invalid index.").
+        }.
     }.
 
 MIR::Operation::Float64x2Add
@@ -5930,17 +6058,66 @@ MIR::Operation::Float64x2Sqrt
             x86::sqrtpd: (instruction resultRegister x86::vector128For: codegen) with: (instruction firstOperandRegister x86::vector128For: codegen)
     }.
 
-MIR::Operation::Float64x3WithAll
+MIR::Operation::Float64x3BroadcastElement
     forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
         allocator
             allocateRegisterOrMemoryForInstruction: instruction operandAt: 0sz;
-            allocateRegisterPairForInstructionResult: instruction trySharingWithOperandAt: 0sz
+            allocateRegisterPairForInstructionResult: instruction
     };
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::movsd: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
             x86::movsd: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
             x86::shufpd: (instruction resultRegister firstComponent x86::vector128For: codegen) with: (instruction resultRegister firstComponent x86::vector128For: codegen) mask: 0u8 asAsmImmediate.
+    }.
+
+MIR::Operation::Float64x3ExtractElement
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterPairForInstruction: instruction operandAt: 0sz;
+            allocateImmediateU8ForInstruction: instruction operandAt: 1sz;
+            allocateRegisterForInstructionResult: instruction
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        let index := instruction secondOperand getConstantValueUInt8.
+        switch: index withCases: #{
+            0u8 : (codegen textSection x86::movsd: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen)).
+            1u8 : (codegen textSection x86::movhlps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen)).
+            2u8 : (codegen textSection x86::movsd: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen)).
+            _: error("Invalid index.").
+        }.
+    }.
+
+MIR::Operation::Float64x3InsertElement
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterPairForInstruction: instruction operandAt: 0sz;
+            allocateRegisterForInstruction: instruction operandAt: 1sz;
+            allocateImmediateU8ForInstruction: instruction operandAt: 2sz;
+            allocateRegisterPairForInstructionResult: instruction trySharingWithOperandAt: 0sz
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        let index := instruction thirdOperand getConstantValueUInt8.
+        switch: index withCases: #{
+            0u8 : (
+                codegen textSection
+                    x86::movaps: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+                    x86::movsd: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+                    x86::movsd: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction secondOperandRegister x86::vector128For: codegen)
+            ).
+            1u8 : (
+                codegen textSection
+                    x86::movaps: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+                    x86::movsd: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+                    x86::movlhps: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction secondOperandRegister x86::vector128For: codegen)
+            ).
+            2u8 : (
+                codegen textSection
+                    x86::movaps: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+                    x86::movsd: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction secondOperandRegister x86::vector128For: codegen)
+            ).
+            _: error("Invalid index.").
+        }.
     }.
 
 MIR::Operation::Float64x3Add
@@ -6021,11 +6198,11 @@ MIR::Operation::Float64x3Sqrt
             x86::sqrtsd: (instruction resultRegister secondComponent x86::vector128For: codegen) with: (instruction firstOperandRegister secondComponent x86::vector128For: codegen)
     }.
 
-MIR::Operation::Float64x4WithAll
+MIR::Operation::Float64x4BroadcastElement
     forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
         allocator
             allocateRegisterOrMemoryForInstruction: instruction operandAt: 0sz;
-            allocateRegisterPairForInstructionResult: instruction trySharingWithOperandAt: 0sz
+            allocateRegisterPairForInstructionResult: instruction
     };
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
@@ -6033,6 +6210,63 @@ MIR::Operation::Float64x4WithAll
             x86::movsd: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
             x86::shufpd: (instruction resultRegister firstComponent x86::vector128For: codegen) with: (instruction resultRegister firstComponent x86::vector128For: codegen) mask: 0u8 asAsmImmediate;
             x86::shufpd: (instruction resultRegister secondComponent x86::vector128For: codegen) with: (instruction resultRegister secondComponent x86::vector128For: codegen) mask: 0u8 asAsmImmediate.
+    }.
+
+MIR::Operation::Float64x4ExtractElement
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterPairForInstruction: instruction operandAt: 0sz;
+            allocateImmediateU8ForInstruction: instruction operandAt: 1sz;
+            allocateRegisterForInstructionResult: instruction
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        let index := instruction secondOperand getConstantValueUInt8.
+        switch: index withCases: #{
+            0u8 : (codegen textSection x86::movsd: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen)).
+            1u8 : (codegen textSection x86::movhlps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen)).
+            2u8 : (codegen textSection x86::movsd: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen)).
+            3u8 : (codegen textSection x86::movhlps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen)).
+            _: error("Invalid index.").
+        }.
+    }.
+
+MIR::Operation::Float64x4InsertElement
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterPairForInstruction: instruction operandAt: 0sz;
+            allocateRegisterForInstruction: instruction operandAt: 1sz;
+            allocateImmediateU8ForInstruction: instruction operandAt: 2sz;
+            allocateRegisterPairForInstructionResult: instruction trySharingWithOperandAt: 0sz
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        let index := instruction thirdOperand getConstantValueUInt8.
+        switch: index withCases: #{
+            0u8 : (
+                codegen textSection
+                    x86::movaps: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+                    x86::movaps: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+                    x86::movsd: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction secondOperandRegister x86::vector128For: codegen)
+            ).
+            1u8 : (
+                codegen textSection
+                    x86::movaps: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+                    x86::movaps: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+                    x86::movlhps: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction secondOperandRegister x86::vector128For: codegen)
+            ).
+            2u8 : (
+                codegen textSection
+                    x86::movaps: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+                    x86::movaps: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+                    x86::movsd: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction secondOperandRegister x86::vector128For: codegen)
+            ).
+            3u8 : (
+                codegen textSection
+                    x86::movaps: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+                    x86::movaps: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+                    x86::movlhps: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction secondOperandRegister x86::vector128For: codegen)
+            ).
+            _: error("Invalid index.").
+        }.
     }.
 
 MIR::Operation::Float64x4Add

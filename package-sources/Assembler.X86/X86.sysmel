@@ -2247,6 +2247,10 @@ let instructionDefinitionTable := #(
         (OpRxRmx #[16rf3] #[16r0f 16r5e])
     )
 
+    (insertps (dst src mask) "Insert PS"
+        (OpRxRmxI8 #[16r66] #[16r0f 16r3A 16r21])
+    )
+
     (movapd (dst src) "Move aligned packed double"
         (OpRxRmx #[16r66] #[16r0f 16r28])
         (OpRmxRx #[16r66] #[16r0f 16r29])
@@ -2279,6 +2283,36 @@ let instructionDefinitionTable := #(
     (movdqu (dst src) "Move double-word quad unaligned"
         (OpRxRmx #[16rF3] #[16r0f 16r6F])
         (OpRmxRx #[16rF3] #[16r0f 16r7F])
+    )
+
+    (movhlps (dst src) "Move packed single float low to high"
+        (OpRxRmx #[] #[16r0f 16r12])
+    )
+    (movhpd (dst src) "Move packed single float low to high"
+        (OpRxRmx #[16r66] #[16r0f 16r16])
+        (OpRmxRx #[16r66] #[16r0f 16r17])
+    )
+    (movhps (dst src) "Move packed single float low to high"
+        (OpRxRmx #[] #[16r0f 16r16])
+        (OpRmxRx #[] #[16r0f 16r17])
+    )
+
+    (movlhps (dst src) "Move packed single float low to high"
+        (OpRxRmx #[] #[16r0f 16r16])
+    )
+    (movlpd (dst src) "Move packed single float low to high"
+        (OpRxRmx #[16r66] #[16r0f 16r12])
+        (OpRmxRx #[16r66] #[16r0f 16r13])
+    )
+    (movlps (dst src) "Move packed single float low to high"
+        (OpRxRmx #[] #[16r0f 16r12])
+        (OpRmxRx #[] #[16r0f 16r13])
+    )
+    (movshdup (dst src) "Replicate single fp values"
+        (OpRxRmx #[16rF3] #[16r0f 16r16])
+    )
+    (movsldup (dst src) "Replicate single fp values"
+        (OpRxRmx #[16rF3] #[16r0f 16r12])
     )
 
     (maxpd (dst with) "Maximum packed double"
