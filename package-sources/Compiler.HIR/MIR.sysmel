@@ -1107,18 +1107,25 @@ ValueType extend: {
     }.
 
     public override method emitMirCheckAndUnbox: (value: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
-        ## TODO: Implement this via some kind of memcpy for the generic case.
-        codegen notYetImplementedError: "Generic value type unbox"
+        let typecheckFunction := codegen translateRuntimeFunction: ObjectModel::typecheckValue.
+        codegen blockBuilder callVoid: typecheckFunction with: (codegen moduleCodeGenerator translateGenericObjectPointer: self) with: value.
+
+        let headerSize := (AnyValue objectHeaderSizeForObjectModel: codegen compilationTarget objectModel) asInt64.
+        self emitMirLoadFromPointer: value constantOffset: headerSize withBlockBuilder: codegen blockBuilder
     }.
 
     public override method emitMirUncheckedUnbox: (value: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
-        ## TODO: Implement this via some kind of memcpy for the generic case.
-        codegen notYetImplementedError: "Generic value type unbox"
+        let headerSize := (AnyValue objectHeaderSizeForObjectModel: codegen compilationTarget objectModel) asInt64.
+        self emitMirLoadFromPointer: value constantOffset: headerSize withBlockBuilder: codegen blockBuilder
     }.
 
     public override method emitMirBox: (value: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
-        ## TODO: Implement this via some kind of memcpy.
-        codegen notYetImplementedError: "Generic value type box"
+        let boxAllocationFunction := codegen translateRuntimeFunction: ObjectModel::allocateBoxForValueOfTypeWithSize.
+        let boxSize := codegen blockBuilder pointerConstantWith: self alignedInstanceSize asUInt64.
+        let box := codegen blockBuilder callPointer: boxAllocationFunction with: (codegen moduleCodeGenerator translateGenericObjectPointer: self) with: boxSize type: AnyValue.
+        let headerSize := (AnyValue objectHeaderSizeForObjectModel: codegen compilationTarget objectModel) asInt64.
+        self emitMirStore: value intoPointer: box constantOffset: headerSize in: box with: codegen.
+        box
     }.
 
     public override method emitMirCall: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) withArguments: (arguments: Array) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
@@ -1322,15 +1329,6 @@ FixedArrayType definition: {
 }.
 
 EnumType extend: {
-    public override method emitMirUncheckedUnbox: (boxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
-        := self shouldBeImplemented.
-
-    public override method emitMirCheckAndUnbox: (boxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
-        := self shouldBeImplemented.
-
-    public override method emitMirBox: (unboxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
-        := self shouldBeImplemented.
-
     public override method emitMirCall: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) withArguments: (arguments: Array) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
         := valueType emitMirCall: function convention: callingConvention withArguments: arguments withBlockBuilder: builder.
 
@@ -1366,21 +1364,6 @@ EnumType extend: {
 }.
 
 PrimitiveVectorType extend: {
-    public override method emitMirCheckAndUnbox: (value: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
-        ## TODO: Implement this via some kind of memcpy for the generic case.
-        codegen notYetImplementedError: "Primitive vector type unbox"
-    }.
-
-    public override method emitMirUncheckedUnbox: (value: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
-        ## TODO: Implement this via some kind of memcpy for the generic case.
-        codegen notYetImplementedError: "Primitive vector type unbox"
-    }.
-
-    public override method emitMirBox: (value: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
-        ## TODO: Implement this via some kind of memcpy.
-        codegen notYetImplementedError: "Primitive vector type box"
-    }.
-
     public override method emitMirCall: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) withArguments: (arguments: Array) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue := {
         switch: self alignedBitWidth asUInt32 withCases: #{
              32u32 : (builder callVector32:  function convention: callingConvention arguments: arguments type: self).
