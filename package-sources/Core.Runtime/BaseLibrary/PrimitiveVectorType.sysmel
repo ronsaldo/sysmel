@@ -119,33 +119,38 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
 
         public method at: (index: Size) ::=> ElementType := {
             <primitive: #PrimitiveVector::at:>
+            <targetDefinedPrimitive>
             ObjectModel::isLogical() ifTrue: {
                 index >= Elements ifTrue: (error("Index is out of bounds.")).
                 ElementGetterFunction(self, index * ElementByteSize)
             } ifFalse: {
-                primitiveFailedError()
+                self at: index
             }
         }.
 
         public inline method x => ElementType := {
             <primitive: #PrimitiveVector::x>
+            <targetDefinedPrimitive>
             self at: 0sz
         }.
 
         public inline method y => ElementType := {
             <primitive: #PrimitiveVector::y>
+            <targetDefinedPrimitive>
             self at: 1sz
         }.
 
         Elements >= 3sz ifTrue: {
             public inline method z => ElementType := {
                 <primitive: #PrimitiveVector::z>
+                <targetDefinedPrimitive>
                 self at: 2sz
             }.
 
             Elements >= 4sz ifTrue: {
                 public inline method w => ElementType := {
                     <primitive: #PrimitiveVector::w>
+                    <targetDefinedPrimitive>
                     self at: 3sz
                 }.
             }.
@@ -154,52 +159,57 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
         __Meta__ definition: {
             public method x: (x: ElementType) ::=> VectorType := {
                 <primitive: #PrimitiveVector::makeWithX:>
+                <targetDefinedPrimitive>
                 ObjectModel::isLogical() ifTrue: {
                     let result := VectorType basicAllocate.
                     ElementSetterFunction(result, 0sz, x).
                     result
                 } ifFalse: {
-                    primitiveFailedError()
+                    VectorType x: x
                 }
             }.
 
             public method y: (y: ElementType) ::=> VectorType := {
                 <primitive: #PrimitiveVector::makeWithY:>
+                <targetDefinedPrimitive>
                 ObjectModel::isLogical() ifTrue: {
                     let result := VectorType basicAllocate.
                     ElementSetterFunction(result, ElementByteSize, y).
                     result
                 } ifFalse: {
-                    primitiveFailedError()
+                    VectorType y: y
                 }
             }.
 
             public method x: (x: ElementType) y: (y: ElementType) ::=> VectorType := {
                 <primitive: #PrimitiveVector::makeWithX:y:>
+                <targetDefinedPrimitive>
                 ObjectModel::isLogical() ifTrue: {
                     let result := VectorType basicAllocate.
                     ElementSetterFunction(result, 0sz, x).
                     ElementSetterFunction(result, ElementByteSize, y).
                     result
                 } ifFalse: {
-                    primitiveFailedError()
+                    VectorType x: x y: y
                 }
             }.
 
             Elements >= 3sz ifTrue: {
                 public method z: (z: ElementType) ::=> VectorType := {
                     <primitive: #PrimitiveVector::makeWithZ:>
+                    <targetDefinedPrimitive>
                     ObjectModel::isLogical() ifTrue: {
                         let result := VectorType basicAllocate.
                         ElementSetterFunction(result, ElementByteSize*2sz, z).
                         result
                     } ifFalse: {
-                        primitiveFailedError()
+                        VectorType z: z
                     }
                 }.
 
                 public method x: (x: ElementType) y: (y: ElementType) z: (z: ElementType) ::=> VectorType := {
                     <primitive: #PrimitiveVector::makeWithX:y:z:>
+                    <targetDefinedPrimitive>
                     ObjectModel::isLogical() ifTrue: {
                         let result := VectorType basicAllocate.
                         ElementSetterFunction(result, 0sz, x).
@@ -207,24 +217,26 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                         ElementSetterFunction(result, ElementByteSize*2sz, z).
                         result
                     } ifFalse: {
-                        primitiveFailedError()
+                        VectorType x: x y: y z: z
                     }
                 }.
 
                 Elements >= 4sz ifTrue: {
                     public method w: (w: ElementType) ::=> VectorType := {
                         <primitive: #PrimitiveVector::makeWithW:>
+                        <targetDefinedPrimitive>
                         ObjectModel::isLogical() ifTrue: {
                             let result := VectorType basicAllocate.
                             ElementSetterFunction(result, ElementByteSize*3sz, w).
                             result
                         } ifFalse: {
-                            primitiveFailedError()
+                            VectorType w: w
                         }
                     }.
 
                     public method x: (x: ElementType) y: (y: ElementType) z: (z: ElementType) w: (w: ElementType) ::=> VectorType := {
                         <primitive: #PrimitiveVector::makeWithX:y:z:w:>
+                        <targetDefinedPrimitive>
                         ObjectModel::isLogical() ifTrue: {
                             let result := VectorType basicAllocate.
                             ElementSetterFunction(result, 0sz, x).
@@ -233,7 +245,7 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                             ElementSetterFunction(result, ElementByteSize*3sz, w).
                             result
                         } ifFalse: {
-                            primitiveFailedError()
+                            VectorType x: x y: y z: z w: w
                         }
                     }.
                 }.
@@ -245,7 +257,12 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                 __Meta__ definition: {
                     public pure method withAll: (element: ElementType) ::=> VectorType := {
                         <primitive: #PrimitiveVector::withAll:>
-                        VectorType x: element y: element
+                        <targetDefinedPrimitive>
+                        ObjectModel::isLogical() ifTrue: {
+                            VectorType x: element y: element
+                        } ifFalse: {
+                            VectorType withAll: element
+                        }
                     }.
                 }.
 
@@ -275,7 +292,12 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                 __Meta__ definition: {
                     public pure method withAll: (element: ElementType) ::=> VectorType := {
                         <primitive: #PrimitiveVector::withAll:>
-                        VectorType x: element y: element z: element
+                        <targetDefinedPrimitive>
+                        ObjectModel::isLogical() ifTrue: {
+                            VectorType x: element y: element z: element
+                        } ifFalse: {
+                            VectorType withAll: element
+                        }
                     }.
                 }.
 
@@ -307,7 +329,12 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                 __Meta__ definition: {
                     public pure method withAll: (element: ElementType) ::=> VectorType := {
                         <primitive: #PrimitiveVector::withAll:>
-                        VectorType x: element y: element z: element w: element
+                        <targetDefinedPrimitive>
+                        ObjectModel::isLogical() ifTrue: {
+                            VectorType x: element y: element z: element w: element
+                        } ifFalse: {
+                            VectorType withAll: element
+                        }
                     }.
                 }.
 
