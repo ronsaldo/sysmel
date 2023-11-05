@@ -1052,7 +1052,7 @@ public final class MIRFunctionAsmCodeGenerator superclass: MIRAsmCodeGenerator; 
             let symbol := AsmSymbol new
                 name: #vectorConstant;
                 yourself.
-            self rodataSection align: vector __type__ instanceAlignment; label: symbol; vector: vector.
+            self rodataSection align: vector __type__ instanceAlignment; label: symbol; vector: vector size: vector __type__ alignedInstanceSize.
             symbol
         }.
 

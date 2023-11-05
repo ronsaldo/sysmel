@@ -1063,7 +1063,7 @@ AsmObjectCodeStream definition: {
     public abstract method nextPutStructure: (structure: AnyValue) withSize: (structureSize: Size) ::=> Void
         := self subclassResponsibility.
 
-    public abstract method nextPutVector: (structure: AnyValue) withSize: (structureSize: Size) ::=> Void
+    public abstract method nextPutVector: (vector: AnyValue) withSize: (vectorSize: Size) ::=> Void
         := self subclassResponsibility.
 
     public abstract method nextReserveBytes: (size: Size) ::=> Void
@@ -1161,8 +1161,8 @@ AsmObjectCodeSizeStream definition: {
         activeSection increaseSizeBy: structureSize
     }.
 
-    public override method nextPutVector: (structure: AnyValue) withSize: (structureSize: Size) ::=> Void := {
-        activeSection increaseSizeBy: structureSize
+    public override method nextPutVector: (vector: AnyValue) withSize: (vectorSize: Size) ::=> Void := {
+        activeSection increaseSizeBy: vectorSize
     }.
 
     public override method nextReserveBytes: (size: Size) ::=> Void := {
@@ -1267,8 +1267,8 @@ AsmObjectCodeWriteStream definition: {
         activeSection nextPutStructure: structure withSize: structureSize
     }.
 
-    public override method nextPutVector: (structure: AnyValue) withSize: (structureSize: Size) ::=> Void := {
-        activeSection nextPutVector: structure withSize: structureSize
+    public override method nextPutVector: (vector: AnyValue) withSize: (vectorSize: Size) ::=> Void := {
+        activeSection nextPutVector: vector withSize: vectorSize
     }.
 
     public override method nextReserveBytes: (size: Size) ::=> Void := {

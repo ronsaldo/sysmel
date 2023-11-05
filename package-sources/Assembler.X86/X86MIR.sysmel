@@ -198,12 +198,12 @@ MIRPhysicalLocationRegisterPair extend: {
             value size = 24u64 ifTrue: {
                 value isFloatingPoint ifTrue: {
                     codegen textSection
-                        x86::movaps: (firstComponent x86::vector128For: codegen) src: valuePointer qword;
-                        x86::movsd: (secondComponent x86::vector128For: codegen) src: valuePointer qword + 16i32 asAsmImmediate.
+                        x86::movaps: valuePointer qword src: (firstComponent x86::vector128For: codegen);
+                        x86::movsd: valuePointer qword + 16i32 asAsmImmediate src: (secondComponent x86::vector128For: codegen).
                 } ifFalse: {
                     codegen textSection
-                        x86::movdqa: (firstComponent x86::vector128For: codegen) src: valuePointer qword;
-                        x86::movq: (secondComponent x86::vector128For: codegen) src: valuePointer qword + 16i32 asAsmImmediate
+                        x86::movdqa: valuePointer qword src: (firstComponent x86::vector128For: codegen);
+                        x86::movq: valuePointer qword + 16i32 asAsmImmediate src: (secondComponent x86::vector128For: codegen)
                 }.
                 return: void
             }.
@@ -211,12 +211,12 @@ MIRPhysicalLocationRegisterPair extend: {
             value size = 32u64 ifTrue: {
                 value isFloatingPoint ifTrue: {
                     codegen textSection
-                        x86::movaps: (firstComponent x86::vector128For: codegen) src: valuePointer qword;
-                        x86::movaps: (secondComponent x86::vector128For: codegen) src: valuePointer qword + 16i32 asAsmImmediate.
+                        x86::movaps: valuePointer qword src: (firstComponent x86::vector128For: codegen);
+                        x86::movaps: valuePointer qword + 16i32 asAsmImmediate src: (secondComponent x86::vector128For: codegen).
                 } ifFalse: {
                     codegen textSection
-                        x86::movdqa: (firstComponent x86::vector128For: codegen) src: valuePointer qword;
-                        x86::movdqa: (secondComponent x86::vector128For: codegen) src: valuePointer qword + 16i32 asAsmImmediate
+                        x86::movdqa: valuePointer qword src: (firstComponent x86::vector128For: codegen);
+                        x86::movdqa: valuePointer qword + 16i32 asAsmImmediate src: (secondComponent x86::vector128For: codegen)
                 }.
                 return: void
             }.
@@ -2613,7 +2613,7 @@ MIRVectorConstant extend: {
                 16u32 : (codegen textSection x86::movaps: (register x86::vector128For: codegen) src: constantSymbol x86::owordPtr).
                 24u32 : (codegen textSection
                     x86::movaps: (register firstComponent x86::vector128For: codegen) src: constantSymbol x86::owordPtr;
-                    x86::movsd: (register secondComponent x86::vector128For: codegen) src: constantSymbol x86::owordPtr + 16i32 asAsmImmediate
+                    x86::movsd: (register secondComponent x86::vector128For: codegen) src: constantSymbol x86::qwordPtr + 16i32 asAsmImmediate
                 ).
                 32u32 : (codegen textSection
                     x86::movaps: (register firstComponent x86::vector128For: codegen) src: constantSymbol x86::owordPtr;
@@ -2627,6 +2627,14 @@ MIRVectorConstant extend: {
                 8u32 : (codegen textSection x86::movq: (register x86::vector128For: codegen) src: constantSymbol x86::qwordPtr).
                 12u32 : (codegen textSection x86::movdqa: (register x86::vector128For: codegen) src: constantSymbol x86::owordPtr).
                 16u32 : (codegen textSection x86::movdqa: (register x86::vector128For: codegen) src: constantSymbol x86::owordPtr).
+                24u32 : (codegen textSection
+                    x86::movdqa: (register firstComponent x86::vector128For: codegen) src: constantSymbol x86::owordPtr;
+                    x86::movq: (register secondComponent x86::vector128For: codegen) src: constantSymbol x86::qwordPtr + 16i32 asAsmImmediate
+                ).
+                32u32 : (codegen textSection
+                    x86::movdqa: (register firstComponent x86::vector128For: codegen) src: constantSymbol x86::owordPtr;
+                    x86::movdqa: (register secondComponent x86::vector128For: codegen) src: constantSymbol x86::owordPtr + 16i32 asAsmImmediate
+                ).
                 _: {self error: "Unsupported register size"}
             }
         }.
