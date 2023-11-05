@@ -2154,6 +2154,27 @@ Boolean __type__ extend: {
     }.
 }.
 
+Boolean16 __type__ extend: {
+    public override method dwarf::fillTypeInfo: (die: Dwarf::DebugInfoEntry) with: (debugGenerator: Dwarf::ObjectDebugInformationGenerator) ::=> Void := {
+        super dwarf::fillTypeInfo: die with: debugGenerator.
+        die encodingBoolean
+    }.
+}.
+
+Boolean32 __type__ extend: {
+    public override method dwarf::fillTypeInfo: (die: Dwarf::DebugInfoEntry) with: (debugGenerator: Dwarf::ObjectDebugInformationGenerator) ::=> Void := {
+        super dwarf::fillTypeInfo: die with: debugGenerator.
+        die encodingBoolean
+    }.
+}.
+
+Boolean64 __type__ extend: {
+    public override method dwarf::fillTypeInfo: (die: Dwarf::DebugInfoEntry) with: (debugGenerator: Dwarf::ObjectDebugInformationGenerator) ::=> Void := {
+        super dwarf::fillTypeInfo: die with: debugGenerator.
+        die encodingBoolean
+    }.
+}.
+
 Void __type__ extend: {
     public override method dwarf::createTypeDieWith: (debugGenerator: Dwarf::ObjectDebugInformationGenerator) ::=> Dwarf::DebugInfoEntry := {
         debugGenerator setType: self die: nil.

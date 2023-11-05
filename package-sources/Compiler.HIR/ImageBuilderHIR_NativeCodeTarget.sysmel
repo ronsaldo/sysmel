@@ -5,7 +5,7 @@ public class ImageBuilderHIR_NativeCodeTarget superclass: ImageBuilderHIRTarget;
 
     public override method initialize => Void := {
         super initialize.
-        keepingTextIR := true.
+        keepingTextIR := false.
     }.
 
     private method buildHIRModuleFor: (builder: ImageBuilder) on: (image: ImageBuilderHIR_NativeCodeImage) ::=> Void := {

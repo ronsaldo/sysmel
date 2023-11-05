@@ -107,6 +107,33 @@
             if: self >= other then: self else: other.
         }.
 
+        public pure final eager method sum => SelfType := {
+            <primitive: #yourself>
+            <targetDefinedPrimitive>
+            self
+        }.
+
+        public pure final eager method max => SelfType := {
+            <primitive: #yourself>
+            <targetDefinedPrimitive>
+            self
+        }.
+
+        public pure final eager method min => SelfType := {
+            <primitive: #yourself>
+            <targetDefinedPrimitive>
+            self
+        }.
+
+        public pure inline final eager method dot: (other: SelfType) ::=> SelfType
+            := self * other.
+
+        public pure inline final eager method length2 => SelfType
+            := self * self.
+
+        public pure inline final eager method length => SelfType
+            := self abs.
+
         public pure final eager method asUInt8 ::=> UInt8 := {
             <primitive: (primitivePrefix -- "asUInt8") asSymbol>
             <targetDefinedPrimitive>

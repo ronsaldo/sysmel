@@ -3183,6 +3183,7 @@ Type
     withSelector: #alignedValueSize addMethod: {:(Type)self :: Size |
         self valueSize alignedTo: self valueAlignment
     } makeFinal;
+    withSelector: #isPrimitiveBooleanType addMethod: {:(Type)self :: Boolean | false } makeVirtual;
     withSelector: #isPrimitiveNumberType addMethod: {:(Type)self :: Boolean | false } makeVirtual;
     withSelector: #isPrimitiveCharacterType addMethod: {:(Type)self :: Boolean | false } makeVirtual;
     withSelector: #isPrimitiveFloatType addMethod: {:(Type)self :: Boolean | false } makeVirtual;
@@ -3211,6 +3212,7 @@ PointerLikeType
         self addressSpace addValueOntoGCLayoutBuilder: builder offset: offset
     } makeOverride.
 
+PrimitiveBoolean __type__ withSelector: #isPrimitiveBooleanType addMethod: {:(Type)self :: Boolean | true } makeOverride.
 PrimitiveNumber __type__ withSelector: #isPrimitiveNumberType addMethod: {:(Type)self :: Boolean | true } makeOverride.
 PrimitiveCharacter __type__ withSelector: #isPrimitiveCharacterType addMethod: {:(Type)self :: Boolean | true } makeOverride.
 PrimitiveFloat __type__ withSelector: #isPrimitiveFloatType addMethod: {:(Type)self :: Boolean | true } makeOverride.

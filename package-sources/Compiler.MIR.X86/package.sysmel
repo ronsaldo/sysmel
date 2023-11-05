@@ -1,0 +1,9 @@
+loadSourceNamed: "MIR.sysmel".
+loadSourceNamed: "ControlFlowRules.sysmel".
+loadSourceNamed: "IntegerRules.sysmel".
+loadSourceNamed: "MiscRules.sysmel".
+
+loadSourceNamed: "FloatRules.sysmel".
+loadSourceNamed: "VectorRules.sysmel".
+loadSourceNamed: "VectorIntegerRules.sysmel".
+loadSourceNamed: "VectorFloatRules.sysmel".

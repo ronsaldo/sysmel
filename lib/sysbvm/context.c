@@ -602,12 +602,23 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
     // Some basic types
     context->roots.voidType = sysbvm_context_createIntrinsicPrimitiveValueType(context, "Void", context->roots.anyValueType, 0, 1);
 
+    context->roots.primitiveBooleanType = sysbvm_context_createIntrinsicAbstractPrimitiveValueType(context, "PrimitiveBoolean", context->roots.anyValueType, 0, 1);
     context->roots.primitiveNumberType = sysbvm_context_createIntrinsicAbstractPrimitiveValueType(context, "PrimitiveNumber", context->roots.anyValueType, 0, 1);
     context->roots.primitiveIntegerType = sysbvm_context_createIntrinsicAbstractPrimitiveValueType(context, "PrimitiveInteger", context->roots.primitiveNumberType, 0, 1);
     context->roots.primitiveCharacterType = sysbvm_context_createIntrinsicAbstractPrimitiveValueType(context, "PrimitiveCharacter", context->roots.primitiveIntegerType, 0, 1);
     context->roots.primitiveUnsignedIntegerType = sysbvm_context_createIntrinsicAbstractPrimitiveValueType(context, "PrimitiveUnsignedInteger", context->roots.primitiveIntegerType, 0, 1);
     context->roots.primitiveSignedIntegerType = sysbvm_context_createIntrinsicAbstractPrimitiveValueType(context, "PrimitiveSignedInteger", context->roots.primitiveIntegerType, 0, 1);
     context->roots.primitiveFloatType = sysbvm_context_createIntrinsicAbstractPrimitiveValueType(context, "PrimitiveFloat", context->roots.primitiveNumberType, 0, 1);
+
+    context->roots.booleanType = sysbvm_context_createIntrinsicPrimitiveValueType(context, "Boolean", context->roots.primitiveBooleanType, 1, 1);
+    context->roots.trueType = sysbvm_context_createIntrinsicPrimitiveValueType(context, "True", context->roots.booleanType, 1, 1);
+    context->roots.falseType = sysbvm_context_createIntrinsicPrimitiveValueType(context, "False", context->roots.booleanType, 1, 1);
+
+    context->roots.boolean8Type =  context->roots.booleanType;
+    sysbvm_context_setIntrinsicSymbolBindingValue(context, sysbvm_symbol_internWithCString(context, "Boolean8"), context->roots.boolean8Type);
+    context->roots.boolean16Type = sysbvm_context_createIntrinsicPrimitiveValueType(context, "Boolean16", context->roots.primitiveBooleanType, 2, 2);
+    context->roots.boolean32Type = sysbvm_context_createIntrinsicPrimitiveValueType(context, "Boolean32", context->roots.primitiveBooleanType, 4, 4);
+    context->roots.boolean64Type = sysbvm_context_createIntrinsicPrimitiveValueType(context, "Boolean64", context->roots.primitiveBooleanType, 8, 8);
 
     context->roots.char8Type = sysbvm_context_createIntrinsicPrimitiveValueType(context, "Char8", context->roots.primitiveCharacterType, 1, 1);
     context->roots.uint8Type = sysbvm_context_createIntrinsicPrimitiveValueType(context, "UInt8", context->roots.primitiveUnsignedIntegerType, 1, 1);
@@ -633,10 +644,6 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
     context->roots.sizeType = context->targetWordSize == 4 ? context->roots.uint32Type : context->roots.uint64Type;
     context->roots.uintptrType = context->targetWordSize == 4 ? context->roots.uint32Type : context->roots.uint64Type;
     context->roots.intptrType = context->targetWordSize == 4 ? context->roots.int32Type : context->roots.int64Type;
-
-    context->roots.booleanType = sysbvm_context_createIntrinsicPrimitiveValueType(context, "Boolean", context->roots.anyValueType, 1, 1);
-    context->roots.trueType = sysbvm_context_createIntrinsicPrimitiveValueType(context, "True", context->roots.booleanType, 1, 1);
-    context->roots.falseType = sysbvm_context_createIntrinsicPrimitiveValueType(context, "False", context->roots.booleanType, 1, 1);
 
     context->roots.integerType = sysbvm_context_createIntrinsicClass(context, "Integer", SYSBVM_NULL_TUPLE, NULL);
     context->roots.smallIntegerType = sysbvm_context_createIntrinsicClass(context, "SmallInteger", context->roots.integerType, NULL);

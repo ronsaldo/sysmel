@@ -111,7 +111,6 @@ typedef struct sysbvm_context_roots_s
     sysbvm_tuple_t arrayedCollectionType;
     sysbvm_tuple_t associationType;
     sysbvm_tuple_t addressSpaceType;
-    sysbvm_tuple_t booleanType;
     sysbvm_tuple_t byteArrayType;
     sysbvm_tuple_t byteStreamType;
     sysbvm_tuple_t classType;
@@ -122,7 +121,6 @@ typedef struct sysbvm_context_roots_s
     sysbvm_tuple_t analysisQueueType;
     sysbvm_tuple_t analysisQueueEntryType;
     sysbvm_tuple_t environmentType;
-    sysbvm_tuple_t falseType;
     sysbvm_tuple_t functionActivationEnvironmentType;
     sysbvm_tuple_t functionAnalysisEnvironmentType;
     sysbvm_tuple_t functionType;
@@ -199,7 +197,6 @@ typedef struct sysbvm_context_roots_s
     sysbvm_tuple_t symbolValueBindingNativeCodeDefinitionType;
     sysbvm_tuple_t tombstoneType;
     sysbvm_tuple_t temporaryReferenceType;
-    sysbvm_tuple_t trueType;
     sysbvm_tuple_t typeType;
     sysbvm_tuple_t metatypeType;
     sysbvm_tuple_t typeSlotType;
@@ -231,12 +228,21 @@ typedef struct sysbvm_context_roots_s
     sysbvm_tuple_t receiverTypeInferenceType;
     sysbvm_tuple_t directTypeInferenceType;
 
+    sysbvm_tuple_t primitiveBooleanType;
     sysbvm_tuple_t primitiveNumberType;
     sysbvm_tuple_t primitiveIntegerType;
     sysbvm_tuple_t primitiveCharacterType;
     sysbvm_tuple_t primitiveUnsignedIntegerType;
     sysbvm_tuple_t primitiveSignedIntegerType;
     sysbvm_tuple_t primitiveFloatType;
+
+    sysbvm_tuple_t booleanType;
+    sysbvm_tuple_t boolean8Type;
+    sysbvm_tuple_t boolean16Type;
+    sysbvm_tuple_t boolean32Type;
+    sysbvm_tuple_t boolean64Type;
+    sysbvm_tuple_t falseType;
+    sysbvm_tuple_t trueType;
 
     sysbvm_tuple_t char8Type;
     sysbvm_tuple_t uint8Type;

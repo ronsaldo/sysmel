@@ -1635,6 +1635,38 @@ True __type__ extend: {
         := codegen mirContext uint8: 1u8.
 }.
 
+Boolean16 __type__ extend: {
+    public override method emitMirCall: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) withArguments: (arguments: Array) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder callInt16: function convention: callingConvention arguments: arguments type: self.
+
+    public override method emitMirMove: (value: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder moveUInt16: value.
+
+    public override method emitMirPhiWithBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder phiUInt16.
+
+    public override method emitMirReturn: (value: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder returnInt16: value.
+
+    public override method emitMirLoadFromPointer: (pointer: MIRValue) constantOffset: (constantOffset: Int64) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder loadUInt16: pointer constantOffset: constantOffset.
+
+    public override method emitMirStore: (value: MIRValue) intoPointer: (pointer: MIRValue) constantOffset: (constantOffset: Int64) in: (object: MIRValue) with: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
+        := codegen blockBuilder storeInt16: value into: pointer constantOffset: constantOffset.
+
+    public override method emitMirEquals: (left: MIRValue) with: (right: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder int16Equals: left with: right.
+
+    public override method emitMirNotEquals: (left: MIRValue) with: (right: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder int16NotEquals: left with: right.
+
+    public override method translateUndefinedConstant: (constant: HIRUndefinedConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
+        := codegen mirContext uint16: 0u16.
+
+    public override method emitMirSwitch: (value: MIRValue) keys: (keys: Array) destinations: (destinations: Array) defaultDestination: (defaultDestination: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder switchInt16: value keys: keys destinations: destinations defaultDestination: defaultDestination.
+}.
+
 Char16 __type__ extend: {
     public override method emitMirUncheckedUnbox: (boxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
         := codegen blockBuilder callInt16: (codegen translateRuntimeFunction: ObjectModel::unboxChar16) with: boxedValue type: self.
@@ -1767,6 +1799,38 @@ UInt16 __type__ extend: {
         := builder switchUInt16: value keys: keys destinations: destinations defaultDestination: defaultDestination.
 }.
 
+Boolean32 __type__ extend: {
+    public override method emitMirCall: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) withArguments: (arguments: Array) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder callInt32: function convention: callingConvention arguments: arguments type: self.
+
+    public override method emitMirMove: (value: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder moveUInt32: value.
+
+    public override method emitMirPhiWithBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder phiUInt32.
+
+    public override method emitMirReturn: (value: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder returnInt32: value.
+
+    public override method emitMirLoadFromPointer: (pointer: MIRValue) constantOffset: (constantOffset: Int64) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder loadUInt32: pointer constantOffset: constantOffset.
+
+    public override method emitMirStore: (value: MIRValue) intoPointer: (pointer: MIRValue) constantOffset: (constantOffset: Int64) in: (object: MIRValue) with: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
+        := codegen blockBuilder storeInt32: value into: pointer constantOffset: constantOffset.
+
+    public override method emitMirEquals: (left: MIRValue) with: (right: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder int32Equals: left with: right.
+
+    public override method emitMirNotEquals: (left: MIRValue) with: (right: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder int32NotEquals: left with: right.
+
+    public override method translateUndefinedConstant: (constant: HIRUndefinedConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
+        := codegen mirContext uint32: 0u32.
+
+    public override method emitMirSwitch: (value: MIRValue) keys: (keys: Array) destinations: (destinations: Array) defaultDestination: (defaultDestination: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder switchInt32: value keys: keys destinations: destinations defaultDestination: defaultDestination.
+}.
+
 Char32 __type__ extend: {
     public override method emitMirUncheckedUnbox: (boxedValue: MIRValue) withHIRCodeGenerator: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
         := codegen blockBuilder callInt32: (codegen translateRuntimeFunction: ObjectModel::unboxChar32) with: boxedValue type: self.
@@ -1897,6 +1961,38 @@ UInt32 __type__ extend: {
 
     public override method emitMirSwitch: (value: MIRValue) keys: (keys: Array) destinations: (destinations: Array) defaultDestination: (defaultDestination: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
         := builder switchUInt32: value keys: keys destinations: destinations defaultDestination: defaultDestination.
+}.
+
+Boolean64 __type__ extend: {
+    public override method emitMirCall: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) withArguments: (arguments: Array) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder callInt64: function convention: callingConvention arguments: arguments type: self.
+
+    public override method emitMirMove: (value: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder moveUInt64: value.
+
+    public override method emitMirPhiWithBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder phiUInt64.
+
+    public override method emitMirReturn: (value: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder returnInt64: value.
+
+    public override method emitMirLoadFromPointer: (pointer: MIRValue) constantOffset: (constantOffset: Int64) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder loadUInt64: pointer constantOffset: constantOffset.
+
+    public override method emitMirStore: (value: MIRValue) intoPointer: (pointer: MIRValue) constantOffset: (constantOffset: Int64) in: (object: MIRValue) with: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
+        := codegen blockBuilder storeInt64: value into: pointer constantOffset: constantOffset.
+
+    public override method emitMirEquals: (left: MIRValue) with: (right: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder int64Equals: left with: right.
+
+    public override method emitMirNotEquals: (left: MIRValue) with: (right: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder int64NotEquals: left with: right.
+
+    public override method translateUndefinedConstant: (constant: HIRUndefinedConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
+        := codegen mirContext uint64: 0u64.
+
+    public override method emitMirSwitch: (value: MIRValue) keys: (keys: Array) destinations: (destinations: Array) defaultDestination: (defaultDestination: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
+        := builder switchInt64: value keys: keys destinations: destinations defaultDestination: defaultDestination.
 }.
 
 Int64 __type__ extend: {
@@ -2191,6 +2287,72 @@ HIRSwitchInstruction extend: {
             self error: "Generate non-integer or non-constant switch"
         }.
     }.
+}.
+
+UInt32x2 __type__ definition: {
+    public override method emitMirVectorBroadcastElement: (element: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x2BroadcastElement with: element type: self.
+
+    public override method emitMirVector: (vector: MIRValue) extractElementAt: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x2ExtractElement with: vector with: index type: elementType.
+
+    public override method emitMirVector: (vector: MIRValue) insertElement: (value: MIRValue) at: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x2InsertElement with: vector with: value with: index type: self.
+}.
+
+UInt32x3 __type__ definition: {
+    public override method emitMirVectorBroadcastElement: (element: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x3BroadcastElement with: element type: self.
+
+    public override method emitMirVector: (vector: MIRValue) extractElementAt: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x3ExtractElement with: vector with: index type: elementType.
+
+    public override method emitMirVector: (vector: MIRValue) insertElement: (value: MIRValue) at: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x3InsertElement with: vector with: value with: index type: self.
+}.
+
+UInt32x4 __type__ definition: {
+    public override method emitMirVectorBroadcastElement: (element: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x4BroadcastElement with: element type: self.
+
+    public override method emitMirVector: (vector: MIRValue) extractElementAt: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x4ExtractElement with: vector with: index type: elementType.
+
+    public override method emitMirVector: (vector: MIRValue) insertElement: (value: MIRValue) at: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x4InsertElement with: vector with: value with: index type: self.
+}.
+
+Int32x2 __type__ definition: {
+    public override method emitMirVectorBroadcastElement: (element: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x2BroadcastElement with: element type: self.
+
+    public override method emitMirVector: (vector: MIRValue) extractElementAt: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x2ExtractElement with: vector with: index type: elementType.
+
+    public override method emitMirVector: (vector: MIRValue) insertElement: (value: MIRValue) at: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x2InsertElement with: vector with: value with: index type: self.
+}.
+
+Int32x3 __type__ definition: {
+    public override method emitMirVectorBroadcastElement: (element: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x3BroadcastElement with: element type: self.
+
+    public override method emitMirVector: (vector: MIRValue) extractElementAt: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x3ExtractElement with: vector with: index type: elementType.
+
+    public override method emitMirVector: (vector: MIRValue) insertElement: (value: MIRValue) at: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x3InsertElement with: vector with: value with: index type: self.
+}.
+
+Int32x4 __type__ definition: {
+    public override method emitMirVectorBroadcastElement: (element: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x4BroadcastElement with: element type: self.
+
+    public override method emitMirVector: (vector: MIRValue) extractElementAt: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x4ExtractElement with: vector with: index type: elementType.
+
+    public override method emitMirVector: (vector: MIRValue) insertElement: (value: MIRValue) at: (index: MIRValue) withBlockBuilder: (blockBuilder: MIRBlockBuilder) ::=> MIRValue
+        := blockBuilder operation: MIR::Operation::Int32x4InsertElement with: vector with: value with: index type: self.
 }.
 
 Float32x2 __type__ definition: {

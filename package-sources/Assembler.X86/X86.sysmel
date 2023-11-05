@@ -1562,6 +1562,50 @@ let instructionTemplateTable := #{
                 nextPutX86ModRM: registerAddress reg: register
         };
         yourself).
+    OpRxRmwI8: (AsmX86InstructionTemplate new
+        when: {:(AsmX86InstructionTemplate)templ :(AsmX86Instruction)instruction :: Boolean | 
+            (instruction operandCount = 3sz) &&
+                instruction firstOperand isVectorRegister && 
+                instruction secondOperand isRegisterOrRegisterAddress && 
+                instruction thirdOperand isImmediate8
+        };
+        writeWith: {:(AsmX86InstructionTemplate)templ :(AsmX86Instruction)instruction :(AsmObjectCodeStream)stream :: Void |
+            let register := instruction firstOperand.
+            let registerAddress := instruction secondOperand.
+            let operandSize := registerAddress size.
+            let immediate := instruction thirdOperand.
+            stream 
+                nextPutAll: templ mandatoryPrefix;
+                nextPutX86SegmentOverride: registerAddress;
+                nextPutX86SizeOverride: operandSize;
+                nextPutX86RexSize: operandSize rm: registerAddress reg: register;
+                nextPutAll: templ opcode;
+                nextPutX86ModRM: registerAddress reg: register;
+                nextPutImmediate: immediate withSize: 1sz
+        };
+        yourself).
+    OpRmwRxI8: (AsmX86InstructionTemplate new
+        when: {:(AsmX86InstructionTemplate)templ :(AsmX86Instruction)instruction :: Boolean | 
+            (instruction operandCount = 3sz) &&
+                instruction firstOperand isRegisterOrRegisterAddress && 
+                instruction secondOperand isVectorRegister && 
+                instruction thirdOperand isImmediate8
+        };
+        writeWith: {:(AsmX86InstructionTemplate)templ :(AsmX86Instruction)instruction :(AsmObjectCodeStream)stream :: Void |
+            let register := instruction secondOperand.
+            let registerAddress := instruction firstOperand.
+            let operandSize := registerAddress size.
+            let immediate := instruction thirdOperand.
+            stream 
+                nextPutAll: templ mandatoryPrefix;
+                nextPutX86SegmentOverride: registerAddress;
+                nextPutX86SizeOverride: operandSize;
+                nextPutX86RexSize: operandSize rm: registerAddress reg: register;
+                nextPutAll: templ opcode;
+                nextPutX86ModRM: registerAddress reg: register;
+                nextPutImmediate: immediate withSize: 1sz
+        };
+        yourself).
     OpRwRmx: (AsmX86InstructionTemplate new
         when: {:(AsmX86InstructionTemplate)templ :(AsmX86Instruction)instruction :: Boolean | 
             (instruction operandCount = 2sz) &&
@@ -2361,6 +2405,19 @@ let instructionDefinitionTable := #(
         (OpRxRmx #[] #[16r0f 16r56])
     )
 
+    (roundpd (dst with mode) "Round packed double with specific mode."
+        (OpRxRmxI8 #[16r66] #[16r0f 16r3A 16r09])
+    )
+    (roundps (dst with mode) "Round packed single with specific mode."
+        (OpRxRmxI8 #[16r66] #[16r0f 16r3A 16r08])
+    )
+    (roundsd (dst with mode) "Round scalar double with specific mode."
+        (OpRxRmxI8 #[16r66] #[16r0f 16r3A 16r0B])
+    )
+    (roundss (dst with mode) "Round scalar single with specific mode."
+        (OpRxRmxI8 #[16r66] #[16r0f 16r3A 16r0A])
+    )
+
     (sqrtpd (dst with) "Sqrt packed double"
         (OpRxRmx #[16r66] #[16r0f 16r51])
     )
@@ -2372,6 +2429,58 @@ let instructionDefinitionTable := #(
     )
     (sqrtss (dst with) "Sqrt scalar single"
         (OpRxRmx #[16rf3] #[16r0f 16r51])
+    )
+
+    (pextrb (dst src mask) "Extract packed byte"
+        (OpRmwRxI8 #[16r66] #[16r0f 16r3A 16r14])
+    )
+    (pextrw (dst src mask) "Extract packed word"
+        (OpRmwRxI8 #[16r66] #[16r0f 16r3A 16r15])
+    )
+    (pextrd (dst src mask) "Extract packed double-word"
+        (OpRmwRxI8 #[16r66] #[16r0f 16r3A 16r16])
+    )
+    (pextrq (dst src mask) "Extract packed quad-word"
+        (OpRmwRxI8 #[16r66] #[16r0f 16r3A 16r16])
+    )
+
+    (pinsrb (dst src mask) "Insert packed byte"
+        (OpRxRmwI8 #[16r66] #[16r0f 16r3A 16r20])
+    )
+    (pinsrw (dst src mask) "Insert packed word"
+        (OpRxRmwI8 #[16r66] #[16r0f 16rC4])
+    )
+    (pinsrd (dst src mask) "Insert packed double-word"
+        (OpRxRmwI8 #[16r66] #[16r0f 16r3A 16r22])
+    )
+    (pinsrq (dst src mask) "Insert packed quad-word"
+        (OpRxRmwI8 #[16r66] #[16r0f 16r3A 16r22])
+    )
+
+    (pshufb (dst with mask) "Suffle packed byte"
+        (OpRxRmxI8 #[16r66] #[16r0f 16r38 16r00])
+    )
+    (pshufhw (dst with mask) "Suffle packed high word"
+        (OpRxRmxI8 #[16rF3] #[16r0f 16r70])
+    )
+    (pshuflw (dst with mask) "Suffle packed low word"
+        (OpRxRmxI8 #[16rF2] #[16r0f 16r70])
+    )
+    (pshufd (dst with mask) "Suffle packed double word"
+        (OpRxRmxI8 #[16r66] #[16r0f 16r70])
+    )
+
+    (pand (dst with) "And packed integers"
+        (OpRxRmx #[16r66] #[16r0f 16rDB])
+    )
+    (pandn (dst with) "And not packed integers"
+        (OpRxRmx #[16r66] #[16r0f 16rDF])
+    )
+    (por (dst with) "Or packed integers"
+        (OpRxRmx #[16r66] #[16r0f 16rEB])
+    )
+    (pxor (dst with) "Xor packed integers"
+        (OpRxRmx #[16r66] #[16r0f 16rEF])
     )
 
     (shufps (dst with mask) "Suffle packed single"

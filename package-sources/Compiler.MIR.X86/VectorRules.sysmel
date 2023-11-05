@@ -1,0 +1,170 @@
+let x86::vectorMoveRegisterConstraints := {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+    allocator
+        allocateRegisterOrMemoryForInstruction: instruction operandAt: 0sz;
+        allocateRegisterForInstructionResult: instruction trySharingWithOperandAt: 0sz
+}.
+
+let x86::vectorPhiRegisterConstraints := {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+    allocator allocateRegisterForInstructionResult: instruction
+}.
+
+let x86::vectorStorePointerRegisterContraints := {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+    allocator
+        allocateRegisterOrImmediate32ForInstruction: instruction operandAt: 1sz;
+        allocateImmediate32ForInstruction: instruction operandAt: 2sz;
+        allocateRegisterForInstruction: instruction operandAt: 0sz
+}.
+
+let x86::loadPointerRegisterContraints := {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+    allocator
+        allocateRegisterOrImmediate32PointerForInstruction: instruction operandAt: 0sz;
+        allocateImmediate32ForInstruction: instruction operandAt: 1sz;
+        allocateRegisterForInstructionResult: instruction
+}.
+
+MIR::Operation::MoveVector32
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorMoveRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::movaps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::MoveVector64
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorMoveRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::movaps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::MoveVector128
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorMoveRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::movaps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::MoveVector256
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterPairForInstruction: instruction operandAt: 0sz;
+            allocateRegisterPairForInstructionResult: instruction trySharingWithOperandAt: 0sz
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movaps: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+            x86::movaps: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen)
+    }.
+
+MIR::Operation::PhiVector32
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPhiRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |}.
+
+MIR::Operation::PhiVector64
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPhiRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |}.
+
+MIR::Operation::PhiVector128
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPhiRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |}.
+
+MIR::Operation::PhiVector256
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator allocateRegisterPairForInstructionResult: instruction
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |}.
+
+MIR::Operation::LoadVector32
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::loadPointerRegisterContraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        instruction isFloatingPoint ifTrue: {
+            codegen textSection x86::movss: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::float32PointerWithOffset: instruction secondOperandRegister for: codegen)
+        } ifFalse: {
+            codegen textSection x86::movd: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::float32PointerWithOffset: instruction secondOperandRegister for: codegen)
+        }.
+    }.
+
+MIR::Operation::LoadVector64
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::loadPointerRegisterContraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        instruction isFloatingPoint ifTrue: {
+            codegen textSection x86::movsd: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::float64PointerWithOffset: instruction secondOperandRegister for: codegen)
+        } ifFalse: {
+            codegen textSection x86::movq: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::float64PointerWithOffset: instruction secondOperandRegister for: codegen)
+        }.
+    }.
+
+MIR::Operation::LoadVector128
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::loadPointerRegisterContraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        instruction isFloatingPoint ifTrue: {
+            codegen textSection x86::movaps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128PointerWithOffset: instruction secondOperandRegister for: codegen)
+        } ifFalse: {
+            codegen textSection x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128PointerWithOffset: instruction secondOperandRegister for: codegen)
+        }.
+    }.
+
+MIR::Operation::LoadVector256
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterOrImmediate32PointerForInstruction: instruction operandAt: 0sz;
+            allocateImmediate32ForInstruction: instruction operandAt: 1sz;
+            allocateRegisterPairForInstructionResult: instruction
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        instruction isFloatingPoint ifTrue: {
+            codegen textSection
+                x86::movaps: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128PointerWithOffset: instruction secondOperandRegister for: codegen);
+                x86::movaps: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128PointerWithOffset: instruction secondOperandRegister offset: 16i32 for: codegen)
+        } ifFalse: {
+            codegen textSection
+                x86::movdqa: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128PointerWithOffset: instruction secondOperandRegister for: codegen);
+                x86::movdqa: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128PointerWithOffset: instruction secondOperandRegister offset: 16i32 for: codegen)
+        }.
+    }.
+
+MIR::Operation::StoreVector32
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorStorePointerRegisterContraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        instruction firstOperand isFloatingPoint ifTrue: {
+            codegen textSection x86::movss: (instruction secondOperandRegister x86::float32PointerWithOffset: instruction thirdOperandRegister for: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+        } ifFalse: {
+            codegen textSection x86::movd: (instruction secondOperandRegister x86::float32PointerWithOffset: instruction thirdOperandRegister for: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+        }
+    }.
+
+MIR::Operation::StoreVector64
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorStorePointerRegisterContraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        instruction firstOperand isFloatingPoint ifTrue: {
+            codegen textSection x86::movsd: (instruction secondOperandRegister x86::float64PointerWithOffset: instruction thirdOperandRegister for: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+        } ifFalse: {
+            codegen textSection x86::movq: (instruction secondOperandRegister x86::float64PointerWithOffset: instruction thirdOperandRegister for: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+        }
+    }.
+
+MIR::Operation::StoreVector128
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorStorePointerRegisterContraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        instruction firstOperand isFloatingPoint ifTrue: {
+            codegen textSection x86::movaps: (instruction secondOperandRegister x86::vector128PointerWithOffset: instruction thirdOperandRegister for: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+        } ifFalse: {
+            codegen textSection x86::movdqa: (instruction secondOperandRegister x86::vector128PointerWithOffset: instruction thirdOperandRegister for: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+        }
+    }.
+
+MIR::Operation::StoreVector256
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterOrImmediate32ForInstruction: instruction operandAt: 1sz;
+            allocateImmediate32ForInstruction: instruction operandAt: 2sz;
+            allocateRegisterPairForInstruction: instruction operandAt: 0sz
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        instruction firstOperand isFloatingPoint ifTrue: {
+            codegen textSection
+                x86::movaps: (instruction secondOperandRegister x86::vector128PointerWithOffset: instruction thirdOperandRegister for: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+                x86::movaps: (instruction secondOperandRegister x86::vector128PointerWithOffset: instruction thirdOperandRegister offset: 16i32 for: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen)
+        } ifFalse: {
+            codegen textSection
+                x86::movdqa: (instruction secondOperandRegister x86::vector128PointerWithOffset: instruction thirdOperandRegister for: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+                x86::movdqa: (instruction secondOperandRegister x86::vector128PointerWithOffset: instruction thirdOperandRegister offset: 16i32 for: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen)
+        }
+    }.
+

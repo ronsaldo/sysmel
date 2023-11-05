@@ -122,6 +122,61 @@ PrimitiveValueType definition: {
         := self subclassResponsibility.
 }.
 
+Boolean __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__booleanAt__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__booleanAt__:put:.
+}.
+
+Boolean16 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__boolean16At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__boolean16At__:put:.
+}.
+
+Boolean32 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__boolean32At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__boolean32At__:put:.
+}.
+
+Boolean64 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__boolean64At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__boolean64At__:put:.
+}.
+
+Char8 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__char8At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__char8At__:put:.
+}.
+
+UInt8 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__uint8At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__uint8At__:put:.
+}.
+
+Char16 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__char16At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__char16At__:put:.
+}.
+
+Int8 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__int8At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__int8At__:put:.
+}.
+
+UInt16 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__uint16At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__uint16At__:put:.
+}.
+
+Int16 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__int16At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__int16At__:put:.
+}.
+
+Char32 __type__ definition: {
+    public override method bytesElementGetter => Function := AnyValue >> #__char32At__:.
+    public override method bytesElementSetter => Function := AnyValue >> #__char32At__:put:.
+}.
+
 UInt32 __type__ definition: {
     public override method bytesElementGetter => Function := AnyValue >> #__uint32At__:.
     public override method bytesElementSetter => Function := AnyValue >> #__uint32At__:put:.

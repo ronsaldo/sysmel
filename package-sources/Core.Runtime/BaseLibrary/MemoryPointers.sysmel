@@ -67,6 +67,14 @@ Int8 __type__ extend: {
         := (pointer reinterpretCastTo: Int8 memberPointer) store: value.
 }.
 
+Boolean16 __type__ extend: {
+    public override method loadValueFromPointer: (pointer: Void const memberPointer) ::=> Untyped
+        := (pointer reinterpretCastTo: Boolean16 const memberPointer) load.
+
+    public override method storeValue: (value: Untyped) inPointer: (pointer: Void memberPointer) ::=> Void
+        := (pointer reinterpretCastTo: Boolean16 memberPointer) store: value.
+}.
+
 Char16 __type__ extend: {
     public override method loadValueFromPointer: (pointer: Void const memberPointer) ::=> Untyped
         := (pointer reinterpretCastTo: Char16 const memberPointer) load.
@@ -91,6 +99,14 @@ Int16 __type__ extend: {
         := (pointer reinterpretCastTo: Int16 memberPointer) store: value.
 }.
 
+Boolean32 __type__ extend: {
+    public override method loadValueFromPointer: (pointer: Void const memberPointer) ::=> Untyped
+        := (pointer reinterpretCastTo: Boolean32 const memberPointer) load.
+
+    public override method storeValue: (value: Untyped) inPointer: (pointer: Void memberPointer) ::=> Void
+        := (pointer reinterpretCastTo: Boolean32 memberPointer) store: value.
+}.
+
 Char32 __type__ extend: {
     public override method loadValueFromPointer: (pointer: Void const memberPointer) ::=> Untyped
         := (pointer reinterpretCastTo: Char32 const memberPointer) load.
@@ -113,6 +129,14 @@ Int32 __type__ extend: {
 
     public override method storeValue: (value: Untyped) inPointer: (pointer: Void memberPointer) ::=> Void
         := (pointer reinterpretCastTo: Int32 memberPointer) store: value.
+}.
+
+Boolean64 __type__ extend: {
+    public override method loadValueFromPointer: (pointer: Void const memberPointer) ::=> Untyped
+        := (pointer reinterpretCastTo: Boolean64 const memberPointer) load.
+
+    public override method storeValue: (value: Untyped) inPointer: (pointer: Void memberPointer) ::=> Void
+        := (pointer reinterpretCastTo: Boolean64 memberPointer) store: value.
 }.
 
 UInt64 __type__ extend: {

@@ -11,4 +11,4 @@ loadSourceNamed: "MacOS.sysmel".
 loadSourceNamed: "Windows.sysmel".
 loadSourceNamed: "ImageFunctionDefinitionEntryPointAsmPatch.sysmel".
 loadSourceNamed: "ImageSymbolValueBindingDefinitionAsmPatch.sysmel".
-loadSourceNamed: "MIR.sysmel".
+

@@ -577,6 +577,9 @@ MIRLocalValue definition: {
     public field sourceBinding => SymbolBinding.
     public field coalescedParent => MIRLocalValue.
 
+    public field isFloatingPoint => Boolean.
+    public field isVector => Boolean.
+
     __Meta__ definition: {
         public method withName: (name: Symbol) type: (type: Type) compilationTarget: (compilationTarget: MIRCompilationTarget) ::=> self
             := self new
@@ -596,6 +599,9 @@ MIRLocalValue definition: {
         gcRootEntryType := type gcRootEntryType.
         physicalLocationClass := type valueMirPhysicalLocationClass.
         coalescedParent := self.
+
+        isFloatingPoint := type asDecayedType isPrimitiveFloatOrFloatVectorType.
+        isVector := type asDecayedType isPrimitiveVectorType.
     }.
 
     public method isGCRoot => Boolean
@@ -661,10 +667,6 @@ MIRLocalValue definition: {
     }.
 
     public override method isLocalValue => Boolean := true.
-
-    public override method isFloatingPoint => Boolean := type asDecayedType isPrimitiveFloatOrFloatVectorType.
-    public override method isVector => Boolean := type asDecayedType isPrimitiveVectorType.
-
     public method hasValidType => Boolean := type isVoidType not.
 }.
 
@@ -1620,6 +1622,13 @@ public global MIR::Operation::ReturnVector128  := MIROperation terminatorNamed: 
 public global MIR::Operation::ReturnVector256  := MIROperation terminatorNamed: #returnVector256.
 public global MIR::Operation::ReturnVector512  := MIROperation terminatorNamed: #returnVector512.
 public global MIR::Operation::ReturnVoid       := MIROperation terminatorNamed: #returnVoid.
+
+public global MIR::Operation::Int32x2ExtractElement := MIROperation named: #int32x2ExtractElement.
+public global MIR::Operation::Int32x2InsertElement  := MIROperation named: #int32x2InsertElement.
+public global MIR::Operation::Int32x3ExtractElement := MIROperation named: #int32x3ExtractElement.
+public global MIR::Operation::Int32x3InsertElement  := MIROperation named: #int32x3InsertElement.
+public global MIR::Operation::Int32x4ExtractElement := MIROperation named: #int32x4ExtractElement.
+public global MIR::Operation::Int32x4InsertElement  := MIROperation named: #int32x4InsertElement.
 
 public global MIR::Operation::Float32x2ExtractElement := MIROperation named: #float32x2ExtractElement.
 public global MIR::Operation::Float32x2InsertElement  := MIROperation named: #float32x2InsertElement.
@@ -2915,6 +2924,18 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int8HighBit Int16HighBit Int32HighBit Int64HighBit
     Int8PopCount Int16PopCount Int32PopCount Int64PopCount
 
+    Int32x2BitNot
+    Int32x2Negate
+    Int32x2BroadcastElement
+
+    Int32x3BitNot
+    Int32x3Negate
+    Int32x3BroadcastElement
+
+    Int32x4BitNot
+    Int32x4Negate
+    Int32x4BroadcastElement
+
     Float32Negate Float64Negate
     Float32Sqrt   Float64Sqrt
 
@@ -2980,6 +3001,51 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int8ArithmeticShiftRight Int16ArithmeticShiftRight Int32ArithmeticShiftRight Int64ArithmeticShiftRight
     Int8LogicalShiftLeft Int16LogicalShiftLeft Int32LogicalShiftLeft Int64LogicalShiftLeft
     Int8LogicalShiftRight Int16LogicalShiftRight Int32LogicalShiftRight Int64LogicalShiftRight
+
+    Int32x2Add
+    Int32x2Sub
+    Int32x2Mul
+    Int32x2SDiv
+    Int32x2UDiv
+    Int32x2SRem
+    Int32x2URem
+
+    Int32x2BitAnd
+    Int32x2BitOr
+    Int32x2BitXor
+    Int32x2ArithmeticShiftRight
+    Int32x2LogicalShiftLeft
+    Int32x2LogicalShiftRight
+
+    Int32x3Add
+    Int32x3Sub
+    Int32x3Mul
+    Int32x3SDiv
+    Int32x3UDiv
+    Int32x3SRem
+    Int32x3URem
+
+    Int32x3BitAnd
+    Int32x3BitOr
+    Int32x3BitXor
+    Int32x3ArithmeticShiftRight
+    Int32x3LogicalShiftLeft
+    Int32x3LogicalShiftRight
+    
+    Int32x4Add
+    Int32x4Sub
+    Int32x4Mul
+    Int32x4SDiv
+    Int32x4UDiv
+    Int32x4SRem
+    Int32x4URem
+
+    Int32x4BitAnd
+    Int32x4BitOr
+    Int32x4BitXor
+    Int32x4ArithmeticShiftRight
+    Int32x4LogicalShiftLeft
+    Int32x4LogicalShiftRight
 
     Int8Compare Int16Compare Int32Compare Int64Compare
 

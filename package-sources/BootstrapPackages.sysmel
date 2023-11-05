@@ -18,14 +18,16 @@ loadSourceNamed: "BootstrapCore.sysmel".
 
     "ImageBuilder"
 
-    "Compiler.MIR"
-    "Compiler.MIR.Tests"
-
     "Assembler"
     "Assembler.X86"
     "Assembler.Arm"
     "Assembler.Arm64"
     "Assembler.RiscV"
+
+    "Compiler.MIR"
+    "Compiler.MIR.Tests"
+    "Compiler.MIR.Assembler"
+    "Compiler.MIR.X86"
 
     "Compiler.HIR"
     "Compiler.HIR.Tests"

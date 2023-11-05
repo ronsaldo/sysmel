@@ -48,7 +48,7 @@ loadSourceNamed: "DwarfNativeCodeDebugInformationBuilder.sysmel".
 loadSourceNamed: "Elf.sysmel".
 loadSourceNamed: "IO.sysmel".
 loadSourceNamed: "FileSystem.sysmel".
-loadSourceNamed: "Math.sysmel".
+loadSourceNamed: "MathPrimitives.sysmel".
 loadSourceNamed: "Integer.sysmel".
 loadSourceNamed: "OrderedInsertionIdentitySet.sysmel".
 loadSourceNamed: "OrderedOffsetTable.sysmel".
