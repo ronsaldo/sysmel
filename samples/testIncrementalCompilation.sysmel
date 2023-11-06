@@ -154,7 +154,7 @@ public function addVector32x2(a: Int32x2, b: Int32x2) => Int32x2
 public function addVector32x3(a: Int32x3, b: Int32x3) => Int32x3
     := a + b.
 
-public function addVector32x4(a: Int32x4, b: Int32x4) => Int32x4
+public function addVector32x4(a: UInt32x4, b: UInt32x4) => UInt32x4
     := a + b.
 
 public function addVector64x2(a: Int32x2, b: Int32x2) => Int32x2
@@ -163,12 +163,12 @@ public function addVector64x2(a: Int32x2, b: Int32x2) => Int32x2
 public function addVector64x3(a: Int32x3, b: Int32x3) => Int32x3
     := a + b.
 
-public function addVector64x4(a: Int32x4, b: Int32x4) => Int32x4
+public function addVector64x4(a: UInt32x4, b: UInt32x4) => UInt32x4
     := a + b.
 *#
 
-public function makeInt32WithAll(element: Int32) => Int32x4
-    := Int32x4 withAll: element.
+public function makeInt32WithAll(element: UInt32) => UInt32x4
+    := UInt32x4 withAll: element.
 
 public function makeVectorWithAll(element: Boolean64) => Boolean64x2
     := Boolean64x2 withAll: element.
@@ -191,6 +191,42 @@ public function vectorAt(v: Boolean64x2, index: Size) => Boolean64
 public function myVectorY(v: Boolean64x2) => Boolean64
     := v at: 1sz.
 
+public function negated(v: UInt32x4) => UInt32x4
+    := v negated.
+
+public function add(a: UInt32x4, b: UInt32x4) => UInt32x4
+    := a + b.
+
+public function sub(a: UInt32x4, b: UInt32x4) => UInt32x4
+    := a - b.
+
+public function mul(a: UInt32x4, b: UInt32x4) => UInt32x4
+    := a * b.
+
+public function shiftLeft(a: UInt32x4, b: UInt32x4) => UInt32x4
+    := a << b.
+
+public function shiftRight(a: UInt32x4, b: UInt32x4) => UInt32x4
+    := a >> b.
+
+public function min(a: UInt32x4, b: UInt32x4) => UInt32x4
+    := a min: b.
+
+public function max(a: UInt32x4, b: UInt32x4) => UInt32x4
+    := a max: b.
+
+public function bitInvert(v: UInt32x4) => UInt32x4
+    := v bitInvert.
+
+public function bitAnd(a: UInt32x4, b: UInt32x4) => UInt32x4
+    := a & b.
+
+public function bitOr(a: UInt32x4, b: UInt32x4) => UInt32x4
+    := a | b.
+
+public function bitXor(a: UInt32x4, b: UInt32x4) => UInt32x4
+    := a ^ b.
+
 ##public function myOnes() => Boolean64x2
 ##    := Boolean64x2 withAll: 1i32.
 
@@ -198,8 +234,7 @@ let asmCompilationTarget := AsmCompilationTarget x86_64 setForLinux.
 
 let hirModule := (HIRModuleCompilationContext forTarget: asmCompilationTarget asMirCompilationTarget asHIRCompilationTarget)
     exclusiveCompilationMode: true;
-    ##compileFunctionsWithDefinitions: (getVectorX, makeVectorX, makeVector,);
-    compileFunctionsWithDefinitions: (Float32x2 >> #isZeros,);
+    compileFunctionsWithDefinitions: (negated, bitInvert, add, sub, mul, min, max, bitAnd, bitOr, bitXor, shiftLeft, shiftRight);
     finish.
 
 hirModule performStandardOptimizations.

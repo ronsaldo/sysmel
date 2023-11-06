@@ -64,6 +64,126 @@ MIR::Operation::Int32x2InsertElement
             x86::pinsrd: (instruction resultRegister x86::vector128For: codegen) src: (instruction secondOperandRegister x86::int32For: codegen) mask: index asAsmImmediate
     }.
 
+MIR::Operation::Int32x2Negate
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::pxor: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen);
+            x86::psubd: (instruction resultRegister x86::vector128For: codegen) with: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2BitNot
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pandn: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2BitAnd
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pand: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2BitOr
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::por: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2BitXor
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pxor: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2ArithmeticShiftRight
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::psrad: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2LogicalShiftLeft
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pslld: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2LogicalShiftRight
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::psrld: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2Add
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::paddd: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2Sub
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::psubd: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2Mul
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pmulld: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2SMin
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pminsd: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2UMin
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pminud: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2SMax
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pmaxsd: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2UMax
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pmaxud: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
 MIR::Operation::Int32x3BroadcastElement
     forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
         allocator
@@ -102,6 +222,126 @@ MIR::Operation::Int32x3InsertElement
         codegen textSection
             x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
             x86::pinsrd: (instruction resultRegister x86::vector128For: codegen) src: (instruction secondOperandRegister x86::int32For: codegen) mask: index asAsmImmediate
+    }.
+
+MIR::Operation::Int32x3Negate
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::pxor: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen);
+            x86::psubd: (instruction resultRegister x86::vector128For: codegen) with: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3BitNot
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pandn: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3BitAnd
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pand: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3BitOr
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::por: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3BitXor
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pxor: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3ArithmeticShiftRight
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::psrad: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3LogicalShiftLeft
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pslld: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3LogicalShiftRight
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::psrld: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3Add
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::paddd: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3Sub
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::psubd: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3Mul
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pmulld: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3SMin
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pminsd: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3UMin
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pminud: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3SMax
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pmaxsd: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3UMax
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pmaxud: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
     }.
 
 MIR::Operation::Int32x4BroadcastElement
@@ -144,6 +384,126 @@ MIR::Operation::Int32x4InsertElement
             x86::pinsrd: (instruction resultRegister x86::vector128For: codegen) src: (instruction secondOperandRegister x86::int32For: codegen) mask: index asAsmImmediate
     }.
 
+MIR::Operation::Int32x4Negate
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::pxor: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen);
+            x86::psubd: (instruction resultRegister x86::vector128For: codegen) with: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4BitNot
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pandn: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4BitAnd
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pand: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4BitOr
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::por: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4BitXor
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pxor: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4ArithmeticShiftRight
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::psrad: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4LogicalShiftLeft
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pslld: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4LogicalShiftRight
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::psrld: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4Add
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::paddd: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4Sub
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::psubd: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4Mul
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pmulld: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4SMin
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pminsd: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4UMin
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pminud: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4SMax
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pmaxsd: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4UMax
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pmaxud: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
 MIR::Operation::Int64x2BroadcastElement
     forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
         allocator
@@ -182,6 +542,38 @@ MIR::Operation::Int64x2InsertElement
         codegen textSection
             x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
             x86::pinsrq: (instruction resultRegister x86::vector128For: codegen) src: (instruction secondOperandRegister x86::int64For: codegen) mask: index asAsmImmediate
+    }.
+
+MIR::Operation::Int64x2BitNot
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pandn: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int64x2BitAnd
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pand: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int64x2BitOr
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::por: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int64x2BitXor
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::pxor: (instruction resultRegister x86::vector128For: codegen) with: (instruction secondOperandRegister x86::vector128For: codegen)
     }.
 
 MIR::Operation::Int64x3BroadcastElement
@@ -237,6 +629,46 @@ MIR::Operation::Int64x3InsertElement
         }.
     }.
 
+MIR::Operation::Int64x3BitNot
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPairUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+            x86::movdqa: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+            x86::pandn: (instruction resultRegister firstComponent x86::vector128For: codegen) with: (instruction resultRegister firstComponent x86::vector128For: codegen);
+            x86::pandn: (instruction resultRegister secondComponent x86::vector128For: codegen) with: (instruction resultRegister secondComponent x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int64x3BitAnd
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPairAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+            x86::movdqa: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+            x86::pand: (instruction resultRegister firstComponent x86::vector128For: codegen) with: (instruction secondOperandRegister firstComponent x86::vector128For: codegen);
+            x86::pand: (instruction resultRegister secondComponent x86::vector128For: codegen) with: (instruction secondOperandRegister secondComponent x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int64x3BitOr
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPairAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+            x86::movdqa: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+            x86::por: (instruction resultRegister firstComponent x86::vector128For: codegen) with: (instruction secondOperandRegister firstComponent x86::vector128For: codegen);
+            x86::por: (instruction resultRegister secondComponent x86::vector128For: codegen) with: (instruction secondOperandRegister secondComponent x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int64x3BitXor
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPairAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+            x86::movdqa: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+            x86::pxor: (instruction resultRegister firstComponent x86::vector128For: codegen) with: (instruction secondOperandRegister firstComponent x86::vector128For: codegen);
+            x86::pxor: (instruction resultRegister secondComponent x86::vector128For: codegen) with: (instruction secondOperandRegister secondComponent x86::vector128For: codegen)
+    }.
+
 MIR::Operation::Int64x4BroadcastElement
     forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
         allocator
@@ -290,4 +722,44 @@ MIR::Operation::Int64x4InsertElement
                 x86::movdqa: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
                 x86::pinsrq: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction secondOperandRegister x86::int64For: codegen) mask: (index - 2u8) asAsmImmediate
         }.
+    }.
+
+MIR::Operation::Int64x4BitNot
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPairUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+            x86::movdqa: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+            x86::pandn: (instruction resultRegister firstComponent x86::vector128For: codegen) with: (instruction resultRegister firstComponent x86::vector128For: codegen);
+            x86::pandn: (instruction resultRegister secondComponent x86::vector128For: codegen) with: (instruction resultRegister secondComponent x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int64x4BitAnd
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPairAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+            x86::movdqa: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+            x86::pand: (instruction resultRegister firstComponent x86::vector128For: codegen) with: (instruction secondOperandRegister firstComponent x86::vector128For: codegen);
+            x86::pand: (instruction resultRegister secondComponent x86::vector128For: codegen) with: (instruction secondOperandRegister secondComponent x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int64x4BitOr
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPairAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+            x86::movdqa: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+            x86::por: (instruction resultRegister firstComponent x86::vector128For: codegen) with: (instruction secondOperandRegister firstComponent x86::vector128For: codegen);
+            x86::por: (instruction resultRegister secondComponent x86::vector128For: codegen) with: (instruction secondOperandRegister secondComponent x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int64x4BitXor
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPairAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction resultRegister firstComponent x86::vector128For: codegen) src: (instruction firstOperandRegister firstComponent x86::vector128For: codegen);
+            x86::movdqa: (instruction resultRegister secondComponent x86::vector128For: codegen) src: (instruction firstOperandRegister secondComponent x86::vector128For: codegen);
+            x86::pxor: (instruction resultRegister firstComponent x86::vector128For: codegen) with: (instruction secondOperandRegister firstComponent x86::vector128For: codegen);
+            x86::pxor: (instruction resultRegister secondComponent x86::vector128For: codegen) with: (instruction secondOperandRegister secondComponent x86::vector128For: codegen)
     }.

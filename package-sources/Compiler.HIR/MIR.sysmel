@@ -2648,6 +2648,7 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Boolean::asInt8  : translateYourselfPrimitive.
     #Boolean::asUInt8 : translateYourselfPrimitive.
 
+    ## Boolean16 primitives
     #Boolean16::not :  translateUnaryPrimitiveInto(MIR::Operation::Int16BitNot).
     #Boolean16::&   : translateBinaryPrimitiveInto(MIR::Operation::Int16BitAnd).
     #Boolean16::|   : translateBinaryPrimitiveInto(MIR::Operation::Int16BitOr).
@@ -2656,6 +2657,7 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Boolean16::asInt16  : translateYourselfPrimitive.
     #Boolean16::asUInt16 : translateYourselfPrimitive.
 
+    ## Boolean32 primitives
     #Boolean32::not :  translateUnaryPrimitiveInto(MIR::Operation::Int32BitNot).
     #Boolean32::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32BitAnd).
     #Boolean32::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32BitOr).
@@ -2664,6 +2666,25 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Boolean32::asInt32  : translateYourselfPrimitive.
     #Boolean32::asUInt32 : translateYourselfPrimitive.
 
+    ## Boolean32x2 primitives
+    #Boolean32x2::not :  translateUnaryPrimitiveInto(MIR::Operation::Int32x2BitNot).
+    #Boolean32x2::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x2BitAnd).
+    #Boolean32x2::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x2BitOr).
+    #Boolean32x2::^   : translateBinaryPrimitiveInto(MIR::Operation::Int32x2BitXor).
+
+    ## Boolean32x3 primitives
+    #Boolean32x3::not :  translateUnaryPrimitiveInto(MIR::Operation::Int32x3BitNot).
+    #Boolean32x3::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x3BitAnd).
+    #Boolean32x3::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x3BitOr).
+    #Boolean32x3::^   : translateBinaryPrimitiveInto(MIR::Operation::Int32x3BitXor).
+
+    ## Boolean32x4 primitives
+    #Boolean32x4::not :  translateUnaryPrimitiveInto(MIR::Operation::Int32x4BitNot).
+    #Boolean32x4::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitAnd).
+    #Boolean32x4::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitOr).
+    #Boolean32x4::^   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitXor).
+
+    ## Boolean64 primitives
     #Boolean64::not :  translateUnaryPrimitiveInto(MIR::Operation::Int64BitNot).
     #Boolean64::&   : translateBinaryPrimitiveInto(MIR::Operation::Int64BitAnd).
     #Boolean64::|   : translateBinaryPrimitiveInto(MIR::Operation::Int64BitOr).
@@ -3014,6 +3035,57 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #UInt32::asFloat64   : translateUnaryPrimitiveInto(MIR::Operation::UInt32ToFloat64).
     #UInt32::asIEEEFloat32Decoded : translateUnaryPrimitiveInto(MIR::Operation::IEEEUInt32ToFloat32). 
 
+    ## UInt32x2
+    #UInt32x2::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int32x2Negate).
+    #UInt32x2::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32x2BitNot).
+
+    #UInt32x2::+ : translateBinaryPrimitiveInto(MIR::Operation::Int32x2Add).
+    #UInt32x2::- : translateBinaryPrimitiveInto(MIR::Operation::Int32x2Sub).
+    #UInt32x2::* : translateBinaryPrimitiveInto(MIR::Operation::Int32x2Mul).
+
+    #UInt32x2::min: : translateBinaryPrimitiveInto(MIR::Operation::Int32x2UMin).
+    #UInt32x2::max: : translateBinaryPrimitiveInto(MIR::Operation::Int32x2UMax).
+
+    #UInt32x2::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x2BitAnd).
+    #UInt32x2::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x2BitOr).
+    #UInt32x2::^   : translateBinaryPrimitiveInto(MIR::Operation::Int32x2BitXor).
+    #UInt32x2::<<  : translateBinaryPrimitiveInto(MIR::Operation::Int32x2LogicalShiftLeft).
+    #UInt32x2::>>  : translateBinaryPrimitiveInto(MIR::Operation::Int32x2LogicalShiftRight).
+
+    ## UInt32x3
+    #UInt32x3::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int32x3Negate).
+    #UInt32x3::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32x3BitNot).
+
+    #UInt32x3::+ : translateBinaryPrimitiveInto(MIR::Operation::Int32x3Add).
+    #UInt32x3::- : translateBinaryPrimitiveInto(MIR::Operation::Int32x3Sub).
+    #UInt32x3::* : translateBinaryPrimitiveInto(MIR::Operation::Int32x3Mul).
+
+    #UInt32x3::min: : translateBinaryPrimitiveInto(MIR::Operation::Int32x3UMin).
+    #UInt32x3::max: : translateBinaryPrimitiveInto(MIR::Operation::Int32x3UMax).
+
+    #UInt32x3::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x3BitAnd).
+    #UInt32x3::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x3BitOr).
+    #UInt32x3::^   : translateBinaryPrimitiveInto(MIR::Operation::Int32x3BitXor).
+    #UInt32x3::<<  : translateBinaryPrimitiveInto(MIR::Operation::Int32x3LogicalShiftLeft).
+    #UInt32x3::>>  : translateBinaryPrimitiveInto(MIR::Operation::Int32x3LogicalShiftRight).
+
+    ## UInt32x4
+    #UInt32x4::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int32x4Negate).
+    #UInt32x4::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32x4BitNot).
+
+    #UInt32x4::+ : translateBinaryPrimitiveInto(MIR::Operation::Int32x4Add).
+    #UInt32x4::- : translateBinaryPrimitiveInto(MIR::Operation::Int32x4Sub).
+    #UInt32x4::* : translateBinaryPrimitiveInto(MIR::Operation::Int32x4Mul).
+
+    #UInt32x4::min: : translateBinaryPrimitiveInto(MIR::Operation::Int32x4UMin).
+    #UInt32x4::max: : translateBinaryPrimitiveInto(MIR::Operation::Int32x4UMax).
+
+    #UInt32x4::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitAnd).
+    #UInt32x4::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitOr).
+    #UInt32x4::^   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitXor).
+    #UInt32x4::<<  : translateBinaryPrimitiveInto(MIR::Operation::Int32x4LogicalShiftLeft).
+    #UInt32x4::>>  : translateBinaryPrimitiveInto(MIR::Operation::Int32x4LogicalShiftRight).
+
     ## Int32 primitives
     #Int32::negated : translateUnaryPrimitiveInto(MIR::Operation::Int32Negate).
     #Int32::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32BitNot).
@@ -3057,8 +3129,59 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Int32::asFloat32   : translateUnaryPrimitiveInto(MIR::Operation::Int32ToFloat32).
     #Int32::asFloat64   : translateUnaryPrimitiveInto(MIR::Operation::Int32ToFloat64).
 
+    ## Int32x2
+    #Int32x2::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int32x2Negate).
+    #Int32x2::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32x2BitNot).
+
+    #Int32x2::+ : translateBinaryPrimitiveInto(MIR::Operation::Int32x2Add).
+    #Int32x2::- : translateBinaryPrimitiveInto(MIR::Operation::Int32x2Sub).
+    #Int32x2::* : translateBinaryPrimitiveInto(MIR::Operation::Int32x2Mul).
+
+    #Int32x2::min: : translateBinaryPrimitiveInto(MIR::Operation::Int32x2SMin).
+    #Int32x2::max: : translateBinaryPrimitiveInto(MIR::Operation::Int32x2SMax).
+
+    #Int32x2::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x2BitAnd).
+    #Int32x2::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x2BitOr).
+    #Int32x2::^   : translateBinaryPrimitiveInto(MIR::Operation::Int32x2BitXor).
+    #Int32x2::<<  : translateBinaryPrimitiveInto(MIR::Operation::Int32x2LogicalShiftLeft).
+    #Int32x2::>>  : translateBinaryPrimitiveInto(MIR::Operation::Int32x2ArithmeticShiftRight).
+
+    ## Int32x3
+    #Int32x3::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int32x3Negate).
+    #Int32x3::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32x3BitNot).
+
+    #Int32x3::+ : translateBinaryPrimitiveInto(MIR::Operation::Int32x3Add).
+    #Int32x3::- : translateBinaryPrimitiveInto(MIR::Operation::Int32x3Sub).
+    #Int32x3::* : translateBinaryPrimitiveInto(MIR::Operation::Int32x3Mul).
+
+    #Int32x3::min: : translateBinaryPrimitiveInto(MIR::Operation::Int32x3SMin).
+    #Int32x3::max: : translateBinaryPrimitiveInto(MIR::Operation::Int32x3SMax).
+
+    #Int32x3::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x3BitAnd).
+    #Int32x3::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x3BitOr).
+    #Int32x3::^   : translateBinaryPrimitiveInto(MIR::Operation::Int32x3BitXor).
+    #Int32x3::<<  : translateBinaryPrimitiveInto(MIR::Operation::Int32x3LogicalShiftLeft).
+    #Int32x3::>>  : translateBinaryPrimitiveInto(MIR::Operation::Int32x3ArithmeticShiftRight).
+
+    ## Int32x4
+    #Int32x4::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int32x4Negate).
+    #Int32x4::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32x4BitNot).
+
+    #Int32x4::+ : translateBinaryPrimitiveInto(MIR::Operation::Int32x4Add).
+    #Int32x4::- : translateBinaryPrimitiveInto(MIR::Operation::Int32x4Sub).
+    #Int32x4::* : translateBinaryPrimitiveInto(MIR::Operation::Int32x4Mul).
+
+    #Int32x4::min: : translateBinaryPrimitiveInto(MIR::Operation::Int32x4SMin).
+    #Int32x4::max: : translateBinaryPrimitiveInto(MIR::Operation::Int32x4SMax).
+
+    #Int32x4::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitAnd).
+    #Int32x4::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitOr).
+    #Int32x4::^   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitXor).
+    #Int32x4::<<  : translateBinaryPrimitiveInto(MIR::Operation::Int32x4LogicalShiftLeft).
+    #Int32x4::>>  : translateBinaryPrimitiveInto(MIR::Operation::Int32x4ArithmeticShiftRight).
+
     ## Int64 primitives
-    #Int64::negated : translateUnaryPrimitiveInto(MIR::Operation::Int64Negate).
+    #Int64::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int64Negate).
     #Int64::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int64BitNot).
 
     #Int64::+ : translateBinaryPrimitiveInto(MIR::Operation::Int64Add).

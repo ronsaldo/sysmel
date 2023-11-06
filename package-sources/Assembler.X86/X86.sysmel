@@ -2483,6 +2483,77 @@ let instructionDefinitionTable := #(
         (OpRxRmxI8 #[16r66] #[16r0f 16r70])
     )
 
+    (paddb (dst with) "Add packed bytes"
+        (OpRxRmx #[16r66] #[16r0f 16rFC])
+    )
+    (paddw (dst with) "Add packed words"
+        (OpRxRmx #[16r66] #[16r0f 16rFD])
+    )
+    (paddd (dst with) "Add packed double-words"
+        (OpRxRmx #[16r66] #[16r0f 16rFE])
+    )
+    (paddq (dst with) "Add packed quad-words"
+        (OpRxRmx #[16r66] #[16r0f 16rD4])
+    )
+
+    (psubb (dst with) "Subtract packed bytes"
+        (OpRxRmx #[16r66] #[16r0f 16rF8])
+    )
+    (psubw (dst with) "Subtract packed words"
+        (OpRxRmx #[16r66] #[16r0f 16rF9])
+    )
+    (psubd (dst with) "Subtract packed double-words"
+        (OpRxRmx #[16r66] #[16r0f 16rFA])
+    )
+    (psubq (dst with) "Subtract packed quad-words"
+        (OpRxRmx #[16r66] #[16r0f 16rFB])
+    )
+
+    (pmullw (dst with) "Packed multiply signed integer store low words"
+        (OpRxRmx #[16r66] #[16r0f 16rD5])
+    )
+    (pmulld (dst with) "Packed multiply signed integer store low double-words"
+        (OpRxRmx #[16r66] #[16r0f 16r38 16r40])
+    )
+
+    (pmaxsb (dst with) "Packed maximum signed byte"
+        (OpRxRmx #[16r66] #[16r0f 16r38 16r3C])
+    )
+    (pmaxsw (dst with) "Packed maximum signed word"
+        (OpRxRmx #[16r66] #[16r0f 16rEE])
+    )
+    (pmaxsd (dst with) "Packed maximum signed double-word"
+        (OpRxRmx #[16r66] #[16r0f 16r38 16r3D])
+    )
+    (pmaxub (dst with) "Packed maximum unsigned byte"
+        (OpRxRmx #[16r66] #[16r0f 16rDE])
+    )
+    (pmaxuw (dst with) "Packed maximum unsigned word"
+        (OpRxRmx #[16r66] #[16r0f 16r38 16r3E])
+    )
+    (pmaxud (dst with) "Packed maximum unsigned double-word"
+        (OpRxRmx #[16r66] #[16r0f 16r38 16r3F])
+    )
+
+    (pminsb (dst with) "Packed minimum signed byte"
+        (OpRxRmx #[16r66] #[16r0f 16r38 16r38])
+    )
+    (pminsw (dst with) "Packed minimum signed word"
+        (OpRxRmx #[16r66] #[16r0f 16rEA])
+    )
+    (pminsd (dst with) "Packed minimum signed double-word"
+        (OpRxRmx #[16r66] #[16r0f 16r38 16r39])
+    )
+    (pminub (dst with) "Packed minimum unsigned byte"
+        (OpRxRmx #[16r66] #[16r0f 16rDA])
+    )
+    (pminuw (dst with) "Packed minimum unsigned word"
+        (OpRxRmx #[16r66] #[16r0f 16r38 16r3A])
+    )
+    (pminud (dst with) "Packed minimum unsigned double-word"
+        (OpRxRmx #[16r66] #[16r0f 16r38 16r3B])
+    )
+
     (pand (dst with) "And packed integers"
         (OpRxRmx #[16r66] #[16r0f 16rDB])
     )
@@ -2494,6 +2565,37 @@ let instructionDefinitionTable := #(
     )
     (pxor (dst with) "Xor packed integers"
         (OpRxRmx #[16r66] #[16r0f 16rEF])
+    )
+
+    (psllw (dst with) "Packed shift-left word"
+        (OpRxRmx #[16r66] #[16r0f 16rF1])
+    )
+    (pslld (dst with) "Packed shift-left double-word"
+        (OpRxRmx #[16r66] #[16r0f 16rF2])
+    )
+    (psllq (dst with) "Packed shift-left quad-word"
+        (OpRxRmx #[16r66] #[16r0f 16rF3])
+    )
+
+    (psraw (dst with) "Packed arithmetic shift-right word"
+        (OpRxRmx #[16r66] #[16r0f 16rE1])
+    )
+    (psrad (dst with) "Packed arithmetic shift-right double-word"
+        (OpRxRmx #[16r66] #[16r0f 16rE2])
+    )
+
+    (psraw (dst with) "Packed arithmetic shift-right word"
+        (OpRxRmx #[16r66] #[16r0f 16rE1])
+    )
+    (psrad (dst with) "Packed arithmetic shift-right double-word"
+        (OpRxRmx #[16r66] #[16r0f 16rE2])
+    )
+
+    (psrlw (dst with) "Packed logical shift-right word"
+        (OpRxRmx #[16r66] #[16r0f 16rD1])
+    )
+    (psrld (dst with) "Packed logical shift-right double-word"
+        (OpRxRmx #[16r66] #[16r0f 16rD2])
     )
 
     (shufps (dst with mask) "Suffle packed single"

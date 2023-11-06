@@ -2934,15 +2934,15 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int8PopCount Int16PopCount Int32PopCount Int64PopCount
 
     Int32x2BitNot Int64x2BitNot
-    Int32x2Negate Int64x2Negate
+    Int32x2Negate
     Int32x2BroadcastElement Int64x2BroadcastElement
 
     Int32x3BitNot Int64x3BitNot
-    Int32x3Negate Int64x3Negate
+    Int32x3Negate
     Int32x3BroadcastElement Int64x3BroadcastElement
 
     Int32x4BitNot Int64x4BitNot
-    Int32x4Negate Int64x4Negate
+    Int32x4Negate
     Int32x4BroadcastElement Int64x4BroadcastElement
 
     Float32Negate    Float64Negate
@@ -3019,6 +3019,10 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int8UDiv Int16UDiv Int32UDiv Int64UDiv
     Int8SRem Int16SRem Int32SRem Int64SRem
     Int8URem Int16URem Int32URem Int64URem
+    Int8SMin Int16SMin Int32SMin Int64SMin
+    Int8UMin Int16UMin Int32UMin Int64UMin
+    Int8SMax Int16SMax Int32SMax Int64SMax
+    Int8UMax Int16UMax Int32UMax Int64UMax
 
     Int8BitAnd Int16BitAnd Int32BitAnd Int64BitAnd BooleanAnd 
     Int8BitOr Int16BitOr Int32BitOr Int64BitOr BooleanOr
@@ -3034,10 +3038,14 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int32x2UDiv
     Int32x2SRem
     Int32x2URem
+    Int32x2SMin
+    Int32x2UMin
+    Int32x2SMax
+    Int32x2UMax
 
-    Int32x2BitAnd
-    Int32x2BitOr
-    Int32x2BitXor
+    Int32x2BitAnd Int64x2BitAnd
+    Int32x2BitOr  Int64x2BitOr
+    Int32x2BitXor Int64x2BitXor
     Int32x2ArithmeticShiftRight
     Int32x2LogicalShiftLeft
     Int32x2LogicalShiftRight
@@ -3049,10 +3057,14 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int32x3UDiv
     Int32x3SRem
     Int32x3URem
+    Int32x3SMin
+    Int32x3UMin
+    Int32x3SMax
+    Int32x3UMax
 
-    Int32x3BitAnd
-    Int32x3BitOr
-    Int32x3BitXor
+    Int32x3BitAnd Int64x3BitAnd
+    Int32x3BitOr  Int64x3BitOr
+    Int32x3BitXor Int64x3BitXor
     Int32x3ArithmeticShiftRight
     Int32x3LogicalShiftLeft
     Int32x3LogicalShiftRight
@@ -3064,10 +3076,14 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int32x4UDiv
     Int32x4SRem
     Int32x4URem
+    Int32x4SMin
+    Int32x4UMin
+    Int32x4SMax
+    Int32x4UMax
 
-    Int32x4BitAnd
-    Int32x4BitOr
-    Int32x4BitXor
+    Int32x4BitAnd Int64x4BitAnd
+    Int32x4BitOr  Int64x4BitOr
+    Int32x4BitXor Int64x4BitXor
     Int32x4ArithmeticShiftRight
     Int32x4LogicalShiftLeft
     Int32x4LogicalShiftRight
