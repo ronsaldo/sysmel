@@ -2342,6 +2342,16 @@ let instructionDefinitionTable := #(
         (OpRmxRx #[16rF3] #[16r0f 16r7F])
     )
 
+    (movmskps (dst src) "Extract packed single precision floating point sign mask"
+        (OpRwRmx #[] #[16r0f 16r50])
+    )
+    (movmskpd (dst src) "Extract packed double precision floating point sign mask"
+        (OpRwRmx #[16r66] #[16r0f 16r50])
+    )
+    (pmovmkb (dst src) "Move byte mask"
+        (OpRwRmx #[16r66] #[16r0f 16rD7])
+    )
+
     (movhlps (dst src) "Move packed single float low to high"
         (OpRxRmx #[] #[16r0f 16r12])
     )
