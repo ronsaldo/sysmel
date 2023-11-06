@@ -2146,10 +2146,10 @@ Float64 class
     withSelector: #zero addMethod: {:(Float64 class)self :: Float64 | 0.0 } makePure makeFinal;
     withSelector: #one addMethod: {:(Float64 class)self :: Float64 | 1.0 } makePure makeFinal;
     withSelector: #minusOne addMethod: {:(Float64 class)self :: Float64 | -1.0 } makePure makeFinal;
-    withSelector: #pi addMethod: {:(Float32 class)self :: Float64 | 16r400921FB54442D18 u64 asIEEEFloat64Decoded } makePure makeFinal;
-    withSelector: #e addMethod: {:(Float32 class)self :: Float64 | 16r4005BF0A8B145769 u64 asIEEEFloat64Decoded } makePure makeFinal;
-    withSelector: #infinity addMethod: {:(Float32 class)self :: Float64 | 16r7FF0000000000000 u64 asIEEEFloat64Decoded } makePure makeFinal;
-    withSelector: #negativeInfinity addMethod: {:(Float32 class)self :: Float64 | 16rFFF0000000000000 u64 asIEEEFloat64Decoded } makePure makeFinal.
+    withSelector: #pi addMethod: {:(Float64 class)self :: Float64 | 16r400921FB54442D18 u64 asIEEEFloat64Decoded } makePure makeFinal;
+    withSelector: #e addMethod: {:(Float64 class)self :: Float64 | 16r4005BF0A8B145769 u64 asIEEEFloat64Decoded } makePure makeFinal;
+    withSelector: #infinity addMethod: {:(Float64 class)self :: Float64 | 16r7FF0000000000000 u64 asIEEEFloat64Decoded } makePure makeFinal;
+    withSelector: #negativeInfinity addMethod: {:(Float64 class)self :: Float64 | 16rFFF0000000000000 u64 asIEEEFloat64Decoded } makePure makeFinal.
 
 Integer class
     withSelector: #defaultValue addMethod: {:(Integer class)self :: Integer | 0 } makeOverride;

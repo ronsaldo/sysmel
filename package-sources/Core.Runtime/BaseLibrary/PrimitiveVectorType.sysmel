@@ -487,6 +487,9 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
             public method isOnes => Boolean
                 := self = Ones.
 
+            public method isMinusOnes => Boolean
+                := self = MinusOnes.
+
             public pure method negated => SelfType := {
                 <primitive: (VectorTypeName -- "::negated") asSymbol>
                 <targetDefinedPrimitive>
@@ -576,6 +579,18 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
             }.
 
             ElementType isPrimitiveFloatType ifTrue: {
+                let Pi := SelfType withAll: ElementType pi.
+                let E := SelfType withAll: ElementType e.
+                let Infinity := SelfType withAll: ElementType infinity.
+                let NegativeInfinity := SelfType withAll: ElementType negativeInfinity.
+
+                __Meta__ definition: {
+                    public pure inline method pi => VectorType := Pi.
+                    public pure inline method e => VectorType := E.
+                    public pure inline method infinity => VectorType := Infinity.
+                    public pure inline method negativeInfinity => VectorType := NegativeInfinity.
+                }.
+
                 public pure method length => ElementType := {
                     <primitive: (VectorTypeName -- "::length") asSymbol>
                     <targetDefinedPrimitive>
@@ -668,3 +683,79 @@ public global Float32x4 := PrimitiveVectorTypeTemplate(Float32, 4sz).
 public global Float64x2 := PrimitiveVectorTypeTemplate(Float64, 2sz).
 public global Float64x3 := PrimitiveVectorTypeTemplate(Float64, 3sz).
 public global Float64x4 := PrimitiveVectorTypeTemplate(Float64, 4sz).
+
+Integer definition: {
+    public pure inline method i32x2 => Int32x2
+        := Int32x2 withAll: self i32.
+
+    public pure inline method i32x3 => Int32x3
+        := Int32x3 withAll: self i32.
+
+    public pure inline method i32x4 => Int32x4
+        := Int32x4 withAll: self i32.
+
+    public pure inline method u32x2 => UInt32x2
+        := UInt32x2 withAll: self u32.
+
+    public pure inline method u32x3 => UInt32x3
+        := UInt32x3 withAll: self u32.
+
+    public pure inline method u32x4 => UInt32x4
+        := UInt32x4 withAll: self u32.
+
+    public pure inline method f32x2 => Float32x2
+        := Float32x2 withAll: self f32.
+
+    public pure inline method f32x3 => Float32x3
+        := Float32x3 withAll: self f32.
+
+    public pure inline method f32x4 => Float32x4
+        := Float32x4 withAll: self f32.
+
+    public pure inline method f64x2 => Float64x2
+        := Float64x2 withAll: self f64.
+
+    public pure inline method f64x3 => Float64x3
+        := Float64x3 withAll: self f64.
+
+    public pure inline method f64x4 => Float64x4
+        := Float64x4 withAll: self f64.
+}.
+
+Float64 definition: {
+    public pure inline method f32x2 => Float32x2 := {
+        <primitive: #PrimitiveVector::withAll:>
+        <targetDefinedPrimitive>
+        Float32x2 withAll: self f32
+    }.
+
+    public pure inline method f32x3 => Float32x3 := {
+        <primitive: #PrimitiveVector::withAll:>
+        <targetDefinedPrimitive>
+        Float32x3 withAll: self f32
+    }.
+
+    public pure inline method f32x4 => Float32x4 := {
+        <primitive: #PrimitiveVector::withAll:>
+        <targetDefinedPrimitive>
+        Float32x4 withAll: self f32
+    }.
+
+    public pure inline method f64x2 => Float64x2 := {
+        <primitive: #PrimitiveVector::withAll:>
+        <targetDefinedPrimitive>
+        Float64x2 withAll: self f64
+    }.
+
+    public pure inline method f64x3 => Float64x3 := {
+        <primitive: #PrimitiveVector::withAll:>
+        <targetDefinedPrimitive>
+        Float64x3 withAll: self f64
+    }.
+
+    public pure inline method f64x4 => Float64x4 := {
+        <primitive: #PrimitiveVector::withAll:>
+        <targetDefinedPrimitive>
+        Float64x4 withAll: self f64
+    }.
+}.
