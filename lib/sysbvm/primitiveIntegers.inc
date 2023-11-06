@@ -261,6 +261,42 @@ static sysbvm_tuple_t PRIMITIVE_INTEGER_FUNCTION(primitive_greaterEquals)(sysbvm
     return sysbvm_tuple_boolean_encode(left >= right);
 }
 
+static sysbvm_tuple_t PRIMITIVE_INTEGER_FUNCTION(primitive_asBoolean)(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
+
+    return sysbvm_tuple_boolean_encode((uint8_t)primitiveInteger_decode(arguments[0]));
+}
+
+static sysbvm_tuple_t PRIMITIVE_INTEGER_FUNCTION(primitive_asBoolean16)(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
+
+    return sysbvm_tuple_boolean16_encode(context, (uint8_t)primitiveInteger_decode(arguments[0]));
+}
+
+static sysbvm_tuple_t PRIMITIVE_INTEGER_FUNCTION(primitive_asBoolean32)(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
+
+    return sysbvm_tuple_boolean32_encode(context, (uint8_t)primitiveInteger_decode(arguments[0]));
+}
+
+static sysbvm_tuple_t PRIMITIVE_INTEGER_FUNCTION(primitive_asBoolean64)(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
+
+    return sysbvm_tuple_boolean64_encode(context, (uint8_t)primitiveInteger_decode(arguments[0]));
+}
+
 static sysbvm_tuple_t PRIMITIVE_INTEGER_FUNCTION(primitive_asUInt8)(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
 {
     (void)context;
@@ -411,6 +447,11 @@ static void PRIMITIVE_INTEGER_FUNCTION(registerPrimitives)(void)
     sysbvm_primitiveTable_registerFunction(PRIMITIVE_INTEGER_FUNCTION(primitive_greaterThan), INTEGER_TYPE_NAME "::>");
     sysbvm_primitiveTable_registerFunction(PRIMITIVE_INTEGER_FUNCTION(primitive_greaterEquals), INTEGER_TYPE_NAME "::>=");
 
+    sysbvm_primitiveTable_registerFunction(PRIMITIVE_INTEGER_FUNCTION(primitive_asBoolean),   INTEGER_TYPE_NAME "::asBoolean");
+    sysbvm_primitiveTable_registerFunction(PRIMITIVE_INTEGER_FUNCTION(primitive_asBoolean16), INTEGER_TYPE_NAME "::asBoolean16");
+    sysbvm_primitiveTable_registerFunction(PRIMITIVE_INTEGER_FUNCTION(primitive_asBoolean32), INTEGER_TYPE_NAME "::asBoolean32");
+    sysbvm_primitiveTable_registerFunction(PRIMITIVE_INTEGER_FUNCTION(primitive_asBoolean64), INTEGER_TYPE_NAME "::asBoolean64");
+
     sysbvm_primitiveTable_registerFunction(PRIMITIVE_INTEGER_FUNCTION(primitive_asUInt8), INTEGER_TYPE_NAME "::asUInt8");
     sysbvm_primitiveTable_registerFunction(PRIMITIVE_INTEGER_FUNCTION(primitive_asInt8), INTEGER_TYPE_NAME "::asInt8");
     sysbvm_primitiveTable_registerFunction(PRIMITIVE_INTEGER_FUNCTION(primitive_asChar8), INTEGER_TYPE_NAME "::asChar8");
@@ -460,6 +501,11 @@ static void PRIMITIVE_INTEGER_FUNCTION(setupPrimitives)(sysbvm_context_t *contex
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.INTEGER_TYPE_ROOT_NAME, "<=", 2, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, PRIMITIVE_INTEGER_FUNCTION(primitive_lessEquals));
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.INTEGER_TYPE_ROOT_NAME, ">", 2, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, PRIMITIVE_INTEGER_FUNCTION(primitive_greaterThan));
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.INTEGER_TYPE_ROOT_NAME, ">=", 2, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, PRIMITIVE_INTEGER_FUNCTION(primitive_greaterEquals));
+
+    sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.INTEGER_TYPE_ROOT_NAME, "asBoolean",   1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, PRIMITIVE_INTEGER_FUNCTION(primitive_asBoolean));
+    sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.INTEGER_TYPE_ROOT_NAME, "asBoolean16", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, PRIMITIVE_INTEGER_FUNCTION(primitive_asBoolean16));
+    sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.INTEGER_TYPE_ROOT_NAME, "asBoolean32", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, PRIMITIVE_INTEGER_FUNCTION(primitive_asBoolean32));
+    sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.INTEGER_TYPE_ROOT_NAME, "asBoolean64", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, PRIMITIVE_INTEGER_FUNCTION(primitive_asBoolean64));
 
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.INTEGER_TYPE_ROOT_NAME, "asUInt8", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, PRIMITIVE_INTEGER_FUNCTION(primitive_asUInt8));
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.INTEGER_TYPE_ROOT_NAME, "asInt8", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, PRIMITIVE_INTEGER_FUNCTION(primitive_asInt8));

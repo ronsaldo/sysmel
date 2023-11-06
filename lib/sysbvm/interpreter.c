@@ -3529,7 +3529,7 @@ static sysbvm_tuple_t sysbvm_astMessageChainMessageNode_analyzeAndEvaluate(sysbv
                 sysbvm_array_atPut(gcFrame.argument, i, gcFrame.argument);
             }
 
-            gcFrame.message = sysbvm_message_create(context, gcFrame.selector, gcFrame.arguments);
+            gcFrame.message = sysbvm_message_create(context, gcFrame.selector, gcFrame.arguments, gcFrame.node->super.sourcePosition);
             gcFrame.result = sysbvm_function_apply2(context, gcFrame.method, *receiver, gcFrame.message);
             SYSBVM_STACKFRAME_POP_SOURCE_POSITION(sourcePositionRecord);
             SYSBVM_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
@@ -3656,7 +3656,7 @@ static sysbvm_tuple_t sysbvm_astMessageChainMessageNode_evaluate(sysbvm_context_
                 sysbvm_array_atPut(gcFrame.argument, i, gcFrame.argument);
             }
 
-            gcFrame.message = sysbvm_message_create(context, gcFrame.selector, gcFrame.arguments);
+            gcFrame.message = sysbvm_message_create(context, gcFrame.selector, gcFrame.arguments, gcFrame.node->super.sourcePosition);
             gcFrame.result = sysbvm_function_applyNoCheck2(context, gcFrame.method, *receiver, gcFrame.message);
             SYSBVM_STACKFRAME_POP_SOURCE_POSITION(sourcePositionRecord);
             SYSBVM_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
@@ -4050,7 +4050,7 @@ static sysbvm_tuple_t sysbvm_astMessageSendNode_primitiveAnalyzeAndEvaluate(sysb
                     sysbvm_array_atPut(gcFrame.argument, i, gcFrame.argument);
                 }
 
-                gcFrame.message = sysbvm_message_create(context, gcFrame.selector, gcFrame.arguments);
+                gcFrame.message = sysbvm_message_create(context, gcFrame.selector, gcFrame.arguments, (*sendNode)->super.sourcePosition);
                 gcFrame.result = sysbvm_function_applyNoCheck2(context, gcFrame.method, gcFrame.receiver, gcFrame.message);
                 SYSBVM_STACKFRAME_POP_SOURCE_POSITION(sourcePositionRecord);
                 SYSBVM_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
@@ -4175,7 +4175,7 @@ static sysbvm_tuple_t sysbvm_astMessageSendNode_primitiveEvaluate(sysbvm_context
                 sysbvm_array_atPut(gcFrame.argument, i, gcFrame.argument);
             }
 
-            gcFrame.message = sysbvm_message_create(context, gcFrame.selector, gcFrame.arguments);
+            gcFrame.message = sysbvm_message_create(context, gcFrame.selector, gcFrame.arguments, (*sendNode)->super.sourcePosition);
             gcFrame.result = sysbvm_function_applyNoCheck2(context, gcFrame.method, gcFrame.receiver, gcFrame.message);
             SYSBVM_STACKFRAME_POP_SOURCE_POSITION(sourcePositionRecord);
             SYSBVM_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);

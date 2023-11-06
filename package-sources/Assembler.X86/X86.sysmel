@@ -2316,6 +2316,14 @@ let instructionDefinitionTable := #(
         (OpRxRmx #[16rf3] #[16r0f 16r10])
         (OpRmxRx #[16rf3] #[16r0f 16r11])
     )
+    (movupd (dst src) "Move unaligned packed double"
+        (OpRxRmx #[16r66] #[16r0f 16r10])
+        (OpRmxRx #[16r66] #[16r0f 16r11])
+    )
+    (movups (dst src) "Move unaligned packed single"
+        (OpRxRmx #[] #[16r0f 16r10])
+        (OpRmxRx #[] #[16r0f 16r11])
+    )
 
     (movd (dst src) "Move double-word"
         (OpRxRmw #[16r66] #[16r0f 16r6E])
@@ -2580,6 +2588,18 @@ AsmStreamBuilder extend: {
             ifFalse: (nil)        
     }.
 
+    public method x86::movups: (destination: AsmInstructionOperand) src: (source: AsmInstructionOperand) ::=> AsmX86InstructionWithTwoOperands := {
+        destination ~= source
+            ifTrue: (self x86::direct::movups: destination src: source)
+            ifFalse: (nil)        
+    }.
+
+    public method x86::movupd: (destination: AsmInstructionOperand) src: (source: AsmInstructionOperand) ::=> AsmX86InstructionWithTwoOperands := {
+        destination ~= source
+            ifTrue: (self x86::direct::movupd: destination src: source)
+            ifFalse: (nil)        
+    }.
+
     public method x86::movss: (destination: AsmInstructionOperand) src: (source: AsmInstructionOperand) ::=> AsmX86InstructionWithTwoOperands := {
         destination ~= source
             ifTrue: (self x86::direct::movss: destination src: source)
@@ -2589,6 +2609,18 @@ AsmStreamBuilder extend: {
     public method x86::movsd: (destination: AsmInstructionOperand) src: (source: AsmInstructionOperand) ::=> AsmX86InstructionWithTwoOperands := {
         destination ~= source
             ifTrue: (self x86::direct::movsd: destination src: source)
+            ifFalse: (nil)        
+    }.
+
+    public method x86::movdqa: (destination: AsmInstructionOperand) src: (source: AsmInstructionOperand) ::=> AsmX86InstructionWithTwoOperands := {
+        destination ~= source
+            ifTrue: (self x86::direct::movdqa: destination src: source)
+            ifFalse: (nil)        
+    }.
+
+    public method x86::movdqu: (destination: AsmInstructionOperand) src: (source: AsmInstructionOperand) ::=> AsmX86InstructionWithTwoOperands := {
+        destination ~= source
+            ifTrue: (self x86::direct::movdqu: destination src: source)
             ifFalse: (nil)        
     }.
 }.

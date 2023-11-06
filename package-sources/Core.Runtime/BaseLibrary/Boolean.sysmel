@@ -5,9 +5,207 @@ Boolean eagerDefinitionBody: {
         if: self then: false else: true
     }.
 
-    public final pure eager method xor: (other: Boolean) ::=> Boolean := {
-        <primitive: #Boolean::xor:>
+    public final pure eager method ^ (other: Boolean) ::=> Boolean := {
+        <primitive: #Boolean::^ >
         <targetDefinedPrimitive>
         if: self == other then: false else: true
+    }.
+
+    public final pure eager method & (other: Boolean) ::=> Boolean := {
+        <primitive: #Boolean::& >
+        <targetDefinedPrimitive>
+        if: self then: other else: false
+    }.
+
+    public final pure eager method | (other: Boolean) ::=> Boolean := {
+        <primitive: #Boolean::| >
+        <targetDefinedPrimitive>
+        if: self then: false else: other
+    }.
+
+    public final pure eager method asInt8 => Int8 := {
+        <primitive: #Boolean::asInt8>
+        <targetDefinedPrimitive>
+        if: self then: 1i8 else: 0i8
+    }.
+
+    public final pure eager method asUInt8 => UInt8 := {
+        <primitive: #Boolean::asUInt8>
+        <targetDefinedPrimitive>
+        if: self then: 1u8 else: 0u8
+    }.
+}.
+
+Boolean16 eagerDefinitionBody: {
+    __Meta__ definition: {
+        public final method zero => Boolean16
+            := 0i16 asBoolean16.
+    }.
+
+    public override method hash => Size
+        := self asInt16 hash.
+
+    public final pure eager override method = (other: Boolean16) => Boolean := {
+        <primitive: #Boolean16::= >
+        <targetDefinedPrimitive>
+        self asInt16 = other asInt16
+    }.
+
+    public final pure eager override method ~= (other: Boolean16) => Boolean := {
+        <primitive: #Boolean16::~= >
+        <targetDefinedPrimitive>
+        self asInt16 ~= other asInt16
+    }.
+
+    public final pure eager method not => Boolean16 := {
+        <primitive: #Boolean16::not>
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method ^ (other: Boolean16) ::=> Boolean16 := {
+        <primitive: #Boolean16::^ >
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method & (other: Boolean16) ::=> Boolean16 := {
+        <primitive: #Boolean16::& >
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method | (other: Boolean16) ::=> Boolean16 := {
+        <primitive: #Boolean16::| >
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method asInt16 => Int16 := {
+        <primitive: #Boolean16::asInt16>
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method asUInt16 => UInt16 := {
+        <primitive: #Boolean16::asUInt16>
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+}.
+
+Boolean32 eagerDefinitionBody: {
+    __Meta__ definition: {
+        public final method zero => Boolean32
+            := 0i32 asBoolean32.
+    }.
+
+    public override method hash => Size
+        := self asInt32 hash.
+
+    public final pure eager override method = (other: Boolean32) => Boolean := {
+        <primitive: #Boolean32::= >
+        <targetDefinedPrimitive>
+        self asInt32 = other asInt32
+    }.
+
+    public final pure eager override method ~= (other: Boolean32) => Boolean := {
+        <primitive: #Boolean32::~= >
+        <targetDefinedPrimitive>
+        self asInt32 ~= other asInt32
+    }.
+
+    public final pure eager method not => Boolean32 := {
+        <primitive: #Boolean32::not>
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method ^ (other: Boolean32) ::=> Boolean32 := {
+        <primitive: #Boolean32::^ >
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method & (other: Boolean32) ::=> Boolean32 := {
+        <primitive: #Boolean32::& >
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method | (other: Boolean32) ::=> Boolean32 := {
+        <primitive: #Boolean32::| >
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method asInt32 => Int32 := {
+        <primitive: #Boolean32::asInt32>
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method asUInt32 => UInt32 := {
+        <primitive: #Boolean32::asUInt32>
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+}.
+
+Boolean64 eagerDefinitionBody: {
+    __Meta__ definition: {
+        public final method zero => Boolean64
+            := 0i64 asBoolean64.
+    }.
+
+    public override method hash => Size
+        := self asInt64 hash.
+
+    public final pure eager override method = (other: Boolean64) => Boolean := {
+        <primitive: #Boolean64::= >
+        <targetDefinedPrimitive>
+        self asInt64 = other asInt64
+    }.
+
+    public final pure eager override method ~= (other: Boolean64) => Boolean := {
+        <primitive: #Boolean64::~= >
+        <targetDefinedPrimitive>
+        self asInt64 ~= other asInt64
+    }.
+
+    public final pure eager method not => Boolean64 := {
+        <primitive: #Boolean64::not>
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method ^ (other: Boolean64) ::=> Boolean64 := {
+        <primitive: #Boolean64::^ >
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method & (other: Boolean64) ::=> Boolean64 := {
+        <primitive: #Boolean64::& >
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method | (other: Boolean64) ::=> Boolean64 := {
+        <primitive: #Boolean64::| >
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method asInt64 => Int64 := {
+        <primitive: #Boolean64::asInt64>
+        <targetDefinedPrimitive>
+        primitiveFailedError()
+    }.
+
+    public final pure eager method asUInt64 => UInt64 := {
+        <primitive: #Boolean64::asUInt64>
+        <targetDefinedPrimitive>
+        primitiveFailedError()
     }.
 }.

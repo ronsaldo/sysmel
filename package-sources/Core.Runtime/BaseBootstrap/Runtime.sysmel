@@ -2061,37 +2061,44 @@ MethodDictionary
 Char8 class
     withSelector: #defaultValue addMethod: {:(Char8 class)self :: Char8 | 0c8 } makeOverride;
     withSelector: #zero addMethod: {:(Char8 class)self :: Char8 | 0c8 } makePure makeFinal;
-    withSelector: #one addMethod: {:(Char8 class)self :: Char8 | 1c8 } makePure makeFinal.
+    withSelector: #one addMethod: {:(Char8 class)self :: Char8 | 1c8 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(Char8 class)self :: Char8 | -1c8 } makePure makeFinal.
 
 UInt8 class
     withSelector: #defaultValue addMethod: {:(UInt8 class)self :: UInt8 | 0u8 } makeOverride;
     withSelector: #zero addMethod: {:(UInt8 class)self :: UInt8 | 0u8 } makePure makeFinal;
-    withSelector: #one addMethod: {:(UInt8 class)self :: UInt8 | 1u8 } makePure makeFinal.
+    withSelector: #one addMethod: {:(UInt8 class)self :: UInt8 | 1u8 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(UInt8 class)self :: UInt8 | -1u8 } makePure makeFinal.
 
 Int8 class
     withSelector: #defaultValue addMethod: {:(Int8 class)self :: Int8 | 0i8 } makeOverride;
     withSelector: #zero addMethod: {:(Int8 class)self :: Int8 | 0i8 } makePure makeFinal;
-    withSelector: #one addMethod: {:(Int8 class)self :: Int8 | 1i8 } makePure makeFinal.
+    withSelector: #one addMethod: {:(Int8 class)self :: Int8 | 1i8 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(Int8 class)self :: Int8 | -1i8 } makePure makeFinal.
 
 Char16 class
     withSelector: #defaultValue addMethod: {:(Char16 class)self :: Char16 | 0c16 } makeOverride;
     withSelector: #zero addMethod: {:(Char16 class)self :: Char16 | 0c16 } makePure makeFinal;
-    withSelector: #one addMethod: {:(Char16 class)self :: Char16 | 1c16 } makePure makeFinal.
+    withSelector: #one addMethod: {:(Char16 class)self :: Char16 | 1c16 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(Char16 class)self :: Char16 | -1c16 } makePure makeFinal.
 
 UInt16 class
     withSelector: #defaultValue addMethod: {:(UInt16 class)self :: UInt16 | 0u16 } makeOverride;
     withSelector: #zero addMethod: {:(UInt16 class)self :: UInt16 | 0u16 } makePure makeFinal;
-    withSelector: #one addMethod: {:(UInt16 class)self :: UInt16 | 1u16 } makePure makeFinal.
+    withSelector: #one addMethod: {:(UInt16 class)self :: UInt16 | 1u16 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(UInt16 class)self :: UInt16 | 1u16 } makePure makeFinal.
 
 Int16 class
     withSelector: #defaultValue addMethod: {:(Int16 class)self :: Int16 | 0i16 } makeOverride;
     withSelector: #zero addMethod: {:(Int16 class)self :: Int16 | 0i16 } makePure makeFinal;
-    withSelector: #one addMethod: {:(Int16 class)self :: Int16 | 1i16 } makePure makeFinal.
+    withSelector: #one addMethod: {:(Int16 class)self :: Int16 | 1i16 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(Int16 class)self :: Int16 | 1i16 } makePure makeFinal.
 
 Char32 class
     withSelector: #defaultValue addMethod: {:(Char32 class)self :: Char32 | 0c32 } makeOverride;
     withSelector: #zero addMethod: {:(Char32 class)self :: Char32 | 0c32 } makePure makeFinal;
-    withSelector: #one addMethod: {:(Char32 class)self :: Char32 | 1c32 } makePure makeFinal.
+    withSelector: #one addMethod: {:(Char32 class)self :: Char32 | 1c32 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(Char32 class)self :: Char32 | -1c32 } makePure makeFinal.
 
 Char32
     withSelector: #c8 addMethod: Char32 >> #asChar8;
@@ -2101,42 +2108,59 @@ Char32
 UInt32 class
     withSelector: #defaultValue addMethod: {:(UInt32 class)self :: UInt32 | 0u32 } makeOverride;
     withSelector: #zero addMethod: {:(UInt32 class)self :: UInt32 | 0u32 } makePure makeFinal;
-    withSelector: #one addMethod: {:(UInt32 class)self :: UInt32 | 1u32 } makePure makeFinal.
+    withSelector: #one addMethod: {:(UInt32 class)self :: UInt32 | 1u32 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(UInt32 class)self :: UInt32 | -1u32 } makePure makeFinal.
 
 Int32 class
     withSelector: #defaultValue addMethod: {:(Int32 class)self :: Int32 | 0i32 } makeOverride;
     withSelector: #zero addMethod: {:(Int32 class)self :: Int32 | 0i32 } makePure makeFinal;
     withSelector: #one addMethod: {:(Int32 class)self :: Int32 | 1i32 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(Int32 class)self :: Int32 | -1i32 } makePure makeFinal;
     withSelector: #minVal addMethod: {:(Int32 class)self :: Int32 | 16r80000000 i32 } makePure makeFinal;
     withSelector: #maxVal addMethod: {:(Int32 class)self :: Int32 | 16r7FFFFFFF i32 } makePure makeFinal.
 
 Int64 class
     withSelector: #defaultValue addMethod: {:(Int64 class)self :: Int64 | 0i64 } makeOverride;
     withSelector: #zero addMethod: {:(Int64 class)self :: Int64 | 0i64 } makePure makeFinal;
-    withSelector: #one addMethod: {:(Int64 class)self :: Int64 | 1i64 } makePure makeFinal.
+    withSelector: #one addMethod: {:(Int64 class)self :: Int64 | 1i64 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(Int64 class)self :: Int64 | -1i64 } makePure makeFinal.
 
 UInt64 class
     withSelector: #defaultValue addMethod: {:(UInt64 class)self :: UInt64 | 0u64 } makeOverride;
     withSelector: #zero addMethod: {:(UInt64 class)self :: UInt64 | 0u64 } makePure makeFinal;
-    withSelector: #one addMethod: {:(UInt64 class)self :: UInt64 | 1u64 } makePure makeFinal.
+    withSelector: #one addMethod: {:(UInt64 class)self :: UInt64 | 1u64 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(UInt64 class)self :: UInt64 | -1u64 } makePure makeFinal.
 
 Float32 class
     withSelector: #defaultValue addMethod: {:(Float32 class)self :: Float32 | 0.0f32 } makeOverride;
     withSelector: #zero addMethod: {:(Float32 class)self :: Float32 | 0.0f32 } makePure makeFinal;
-    withSelector: #one addMethod: {:(Float32 class)self :: Float32 | 1.0f32 } makePure makeFinal.
+    withSelector: #one addMethod: {:(Float32 class)self :: Float32 | 1.0f32 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(Float32 class)self :: Float32 | -1.0f32 } makePure makeFinal;
+    withSelector: #pi addMethod: {:(Float32 class)self :: Float32 | 16r40490FDB u32 asIEEEFloat32Decoded } makePure makeFinal;
+    withSelector: #e addMethod: {:(Float32 class)self :: Float32 | 16r402DF854 u32 asIEEEFloat32Decoded } makePure makeFinal;
+    withSelector: #infinity addMethod: {:(Float32 class)self :: Float32 | 16r7F800000 u32 asIEEEFloat32Decoded } makePure makeFinal;
+    withSelector: #negativeInfinity addMethod: {:(Float32 class)self :: Float32 | 16rFF800000 u32 asIEEEFloat32Decoded } makePure makeFinal.
 
 Float64 class
     withSelector: #defaultValue addMethod: {:(Float64 class)self :: Float64 | 0.0 } makeOverride;
     withSelector: #zero addMethod: {:(Float64 class)self :: Float64 | 0.0 } makePure makeFinal;
-    withSelector: #one addMethod: {:(Float64 class)self :: Float64 | 1.0 } makePure makeFinal.
+    withSelector: #one addMethod: {:(Float64 class)self :: Float64 | 1.0 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(Float64 class)self :: Float64 | -1.0 } makePure makeFinal;
+    withSelector: #pi addMethod: {:(Float32 class)self :: Float64 | 16r400921FB54442D18 u64 asIEEEFloat64Decoded } makePure makeFinal;
+    withSelector: #e addMethod: {:(Float32 class)self :: Float64 | 16r4005BF0A8B145769 u64 asIEEEFloat64Decoded } makePure makeFinal;
+    withSelector: #infinity addMethod: {:(Float32 class)self :: Float64 | 16r7FF0000000000000 u64 asIEEEFloat64Decoded } makePure makeFinal;
+    withSelector: #negativeInfinity addMethod: {:(Float32 class)self :: Float64 | 16rFFF0000000000000 u64 asIEEEFloat64Decoded } makePure makeFinal.
 
 Integer class
     withSelector: #defaultValue addMethod: {:(Integer class)self :: Integer | 0 } makeOverride;
     withSelector: #zero addMethod: {:(Integer class)self :: Integer | 0 } makePure makeFinal;
-    withSelector: #one addMethod: {:(Integer class)self :: Integer | 1 } makePure makeFinal.
+    withSelector: #one addMethod: {:(Integer class)self :: Integer | 1 } makePure makeFinal;
+    withSelector: #minusOne addMethod: {:(Integer class)self :: Integer | -1 } makePure makeFinal.
 
 Boolean class
-    withSelector: #defaultValue addMethod: {:(Boolean class)self :: Boolean | false } makeOverride makePure makeFinal.
+    withSelector: #defaultValue addMethod: {:(Boolean class)self :: Boolean | false } makeOverride makePure makeFinal;
+    withSelector: #zero addMethod: {:(Boolean class)self :: Boolean | false } makePure makeFinal;
+    withSelector: #one addMethod: {:(Boolean class)self :: Boolean | true } makePure makeFinal.
 
 TypeSlot
     withSelector: #requiresBasicInitialization addMethod: {:(TypeSlot)self :: Boolean |
@@ -2716,6 +2740,11 @@ SimpleFunctionType
         if: method ~~ nil then: (method __type__: (SelfType => targetType))
     }.
 
+    setConversionTypeFunction((SelfType >> #asBoolean), Boolean).
+    setConversionTypeFunction((SelfType >> #asBoolean16), Boolean16).
+    setConversionTypeFunction((SelfType >> #asBoolean32), Boolean32).
+    setConversionTypeFunction((SelfType >> #asBoolean64), Boolean64).
+
     setConversionTypeFunction((SelfType >> #asChar8), Char8).
     setConversionTypeFunction((SelfType >> #asUInt8), UInt8).
     setConversionTypeFunction((SelfType >> #asInt8), Int8).
@@ -2738,6 +2767,15 @@ SimpleFunctionType
     setConversionTypeFunction((SelfType >> #asFloat32), Float32).
     setConversionTypeFunction((SelfType >> #asFloat64), Float64).
 }.
+
+(Boolean   >> #asInt8 ) __type__: (Boolean   =>    Int8).
+(Boolean   >> #asUInt8) __type__: (Boolean   =>   UInt8).
+(Boolean16 >>  #asInt16) __type__: (Boolean16 =>  Int16).
+(Boolean16 >> #asUInt16) __type__: (Boolean16 => UInt16).
+(Boolean32 >>  #asInt32) __type__: (Boolean32 =>  Int32).
+(Boolean32 >> #asUInt32) __type__: (Boolean32 => UInt32).
+(Boolean64 >>  #asInt64) __type__: (Boolean64 =>  Int64).
+(Boolean64 >> #asUInt64) __type__: (Boolean64 => UInt64).
 
 (Integer >> #i8) __type__: (Integer => Int8).
 (Integer >> #u8) __type__: (Integer => UInt8).

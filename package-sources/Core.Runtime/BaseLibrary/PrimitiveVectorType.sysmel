@@ -1,4 +1,4 @@
-public global TypeFlags::PrimitiveVectorDefaultFlags := TypeFlags::Value | TypeFlags::Bytes.
+public global TypeFlags::PrimitiveVectorDefaultFlags := TypeFlags::Value | TypeFlags::Bytes | TypeFlags::Final.
 
 public class PrimitiveVectorType superclass: ValueType; definition: {
     private field elementType => PrimitiveValueType.
@@ -288,6 +288,19 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                 public inline method reduce: (aBlock: (ElementType, ElementType) => ElementType) ::=> ElementType := {
                     aBlock(self x, self y)
                 }.
+
+                public override method hash => Size
+                    := self x hash hashConcatenate: self y hash.
+
+                public override method = (other: SelfType) ::=> Boolean := {
+                    <primitive: (VectorTypeName -- "::=") asSymbol>
+                    (self x = other x) && (self y = other y)
+                }.
+
+                public override method ~= (other: SelfType) ::=> Boolean := {
+                    <primitive: (VectorTypeName -- "::~=") asSymbol>
+                    (self x ~= other x) || (self y ~= other y)
+                }.
             }.
             3sz : {
                 __Meta__ definition: {
@@ -328,6 +341,19 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
 
                 public inline method reduce: (aBlock: (ElementType, ElementType) => ElementType) ::=> ElementType := {
                     aBlock(aBlock(self x, self y), self z)
+                }.
+
+                public override method hash => Size
+                    := (self x hash hashConcatenate: self y hash) hashConcatenate: self z hash.
+
+                public override method = (other: SelfType) ::=> Boolean := {
+                    <primitive: (VectorTypeName -- "::=") asSymbol>
+                    (self x = other x) && (self y = other y) && (self z = other z)
+                }.
+
+                public override method ~= (other: SelfType) ::=> Boolean := {
+                    <primitive: (VectorTypeName -- "::~=") asSymbol>
+                    (self x ~= other x) || (self y ~= other y) || (self z ~= other z)
                 }.
             }.
             4sz : {
@@ -372,15 +398,36 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                 public inline method reduce: (aBlock: (ElementType, ElementType) => ElementType) ::=> ElementType := {
                     aBlock(aBlock(self x, self y), aBlock(self x, self z))
                 }.
+
+                public override method hash => Size
+                    := ((self x hash hashConcatenate: self y hash) hashConcatenate: self z hash) hashConcatenate: self w hash.
+
+                public override method = (other: SelfType) ::=> Boolean := {
+                    <primitive: (VectorTypeName -- "::=") asSymbol>
+                    (self x = other x) && (self y = other y) && (self z = other z) && (self w = other w)
+                }.
+
+                public override method ~= (other: SelfType) ::=> Boolean := {
+                    <primitive: (VectorTypeName -- "::~=") asSymbol>
+                    (self x ~= other x) || (self y ~= other y) || (self z ~= other z) || (self w ~= other w)
+                }.
             }.
             _: error("Unsupported primitive vector with " -- Elements asString -- " elements.")
         }.
 
         ElementType isPrimitiveFloatType ifFalse: {
-            public pure method bitInvert => SelfType := {
-                <primitive: (VectorTypeName -- "::bitInvert") asSymbol>
-                <targetDefinedPrimitive>
-                self collect: {:(ElementType)element :: ElementType | element bitInvert }
+            ElementType isPrimitiveBooleanType ifTrue: {
+                public pure method not => SelfType := {
+                    <primitive: (VectorTypeName -- "::not") asSymbol>
+                    <targetDefinedPrimitive>
+                    self collect: {:(ElementType)element :: ElementType | element not }
+                }.
+            } ifFalse: {
+                public pure method bitInvert => SelfType := {
+                    <primitive: (VectorTypeName -- "::bitInvert") asSymbol>
+                    <targetDefinedPrimitive>
+                    self collect: {:(ElementType)element :: ElementType | element bitInvert }
+                }.
             }.
 
             public pure method & (other: SelfType) => SelfType := {
@@ -416,14 +463,29 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
             }.
         }.
 
+        let Zeros := SelfType withAll: ElementType zero.
+
+        __Meta__ definition: {
+            public pure inline method zero => VectorType := Zeros.
+            public pure inline method zeros => VectorType := Zeros.
+        }.
+
+        public method isZeros => Boolean
+            := self = Zeros.
+
         ElementType isPrimitiveNumberType ifTrue: {
-            let Zeros := SelfType withAll: ElementType zero.
             let Ones := SelfType withAll: ElementType one.
+            let MinusOnes := SelfType withAll: ElementType minusOne.
 
             __Meta__ definition: {
-                public pure method zeros => VectorType := Zeros.
-                public pure method ones => VectorType := Ones.
+                public pure inline method one => VectorType := Ones.
+                public pure inline method ones => VectorType := Ones.
+                public pure inline method minusOne => VectorType := MinusOnes.
+                public pure inline method minusOnes => VectorType := MinusOnes.
             }.
+
+            public method isOnes => Boolean
+                := self = Ones.
 
             public pure method negated => SelfType := {
                 <primitive: (VectorTypeName -- "::negated") asSymbol>
@@ -583,7 +645,6 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
     }; yourself
 }.
 
-#*
 public global Boolean32x2 := PrimitiveVectorTypeTemplate(Boolean32, 2sz).
 public global Boolean32x3 := PrimitiveVectorTypeTemplate(Boolean32, 3sz).
 public global Boolean32x4 := PrimitiveVectorTypeTemplate(Boolean32, 4sz).
@@ -591,7 +652,6 @@ public global Boolean32x4 := PrimitiveVectorTypeTemplate(Boolean32, 4sz).
 public global Boolean64x2 := PrimitiveVectorTypeTemplate(Boolean64, 2sz).
 public global Boolean64x3 := PrimitiveVectorTypeTemplate(Boolean64, 3sz).
 public global Boolean64x4 := PrimitiveVectorTypeTemplate(Boolean64, 4sz).
-*#
 
 public global Int32x2 := PrimitiveVectorTypeTemplate(Int32, 2sz).
 public global Int32x3 := PrimitiveVectorTypeTemplate(Int32, 3sz).

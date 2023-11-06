@@ -185,6 +185,30 @@
         public pure inline final eager method length => SelfType
             := self abs.
 
+        public pure final eager method asBoolean ::=> Boolean := {
+            <primitive: (primitivePrefix -- "asBoolean") asSymbol>
+            <targetDefinedPrimitive>
+            primitiveFailedError()
+        }.
+
+        public pure final eager method asBoolean16 ::=> Boolean16 := {
+            <primitive: (primitivePrefix -- "asBoolean16") asSymbol>
+            <targetDefinedPrimitive>
+            primitiveFailedError()
+        }.
+
+        public pure final eager method asBoolean32 ::=> Boolean32 := {
+            <primitive: (primitivePrefix -- "asBoolean32") asSymbol>
+            <targetDefinedPrimitive>
+            primitiveFailedError()
+        }.
+
+        public pure final eager method asBoolean64 ::=> Boolean64 := {
+            <primitive: (primitivePrefix -- "asBoolean64") asSymbol>
+            <targetDefinedPrimitive>
+            primitiveFailedError()
+        }.
+
         public pure final eager method asUInt8 ::=> UInt8 := {
             <primitive: (primitivePrefix -- "asUInt8") asSymbol>
             <targetDefinedPrimitive>

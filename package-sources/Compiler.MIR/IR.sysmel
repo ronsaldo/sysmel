@@ -257,7 +257,7 @@ PrimitiveInteger class extend: {
         := MIRPhysicalIntegerRegister.
 }.
 
-Boolean class extend: {
+PrimitiveBoolean class extend: {
     public override method valueMirPhysicalLocationClass => MIRPhysicalLocation class
         := MIRPhysicalIntegerRegister.
 }.
@@ -906,6 +906,8 @@ public final class MIRVectorConstant superclass: MIRConstant; definition: {
 
     public override method physicalLocationClass => MIRPhysicalLocation class
         := MIRPhysicalVectorRegister.
+
+    public override method isVector => Boolean := true.
 
     public override method printOn: (stream: Stream) ::=> Void := {
         stream nextPutAll: "vectorConstant("; print: value; nextPut: ')'c8
@@ -1629,6 +1631,13 @@ public global MIR::Operation::Int32x3ExtractElement := MIROperation named: #int3
 public global MIR::Operation::Int32x3InsertElement  := MIROperation named: #int32x3InsertElement.
 public global MIR::Operation::Int32x4ExtractElement := MIROperation named: #int32x4ExtractElement.
 public global MIR::Operation::Int32x4InsertElement  := MIROperation named: #int32x4InsertElement.
+
+public global MIR::Operation::Int64x2ExtractElement := MIROperation named: #int64x2ExtractElement.
+public global MIR::Operation::Int64x2InsertElement  := MIROperation named: #int64x2InsertElement.
+public global MIR::Operation::Int64x3ExtractElement := MIROperation named: #int64x3ExtractElement.
+public global MIR::Operation::Int64x3InsertElement  := MIROperation named: #int64x3InsertElement.
+public global MIR::Operation::Int64x4ExtractElement := MIROperation named: #int64x4ExtractElement.
+public global MIR::Operation::Int64x4InsertElement  := MIROperation named: #int64x4InsertElement.
 
 public global MIR::Operation::Float32x2ExtractElement := MIROperation named: #float32x2ExtractElement.
 public global MIR::Operation::Float32x2InsertElement  := MIROperation named: #float32x2InsertElement.
@@ -2924,17 +2933,17 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int8HighBit Int16HighBit Int32HighBit Int64HighBit
     Int8PopCount Int16PopCount Int32PopCount Int64PopCount
 
-    Int32x2BitNot
-    Int32x2Negate
-    Int32x2BroadcastElement
+    Int32x2BitNot Int64x2BitNot
+    Int32x2Negate Int64x2Negate
+    Int32x2BroadcastElement Int64x2BroadcastElement
 
-    Int32x3BitNot
-    Int32x3Negate
-    Int32x3BroadcastElement
+    Int32x3BitNot Int64x3BitNot
+    Int32x3Negate Int64x3Negate
+    Int32x3BroadcastElement Int64x3BroadcastElement
 
-    Int32x4BitNot
-    Int32x4Negate
-    Int32x4BroadcastElement
+    Int32x4BitNot Int64x4BitNot
+    Int32x4Negate Int64x4Negate
+    Int32x4BroadcastElement Int64x4BroadcastElement
 
     Float32Negate    Float64Negate
     Float32Sqrt      Float64Sqrt
@@ -3011,8 +3020,8 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int8SRem Int16SRem Int32SRem Int64SRem
     Int8URem Int16URem Int32URem Int64URem
 
-    Int8BitAnd Int16BitAnd Int32BitAnd Int64BitAnd
-    Int8BitOr Int16BitOr Int32BitOr Int64BitOr
+    Int8BitAnd Int16BitAnd Int32BitAnd Int64BitAnd BooleanAnd 
+    Int8BitOr Int16BitOr Int32BitOr Int64BitOr BooleanOr
     Int8BitXor Int16BitXor Int32BitXor Int64BitXor BooleanXor
     Int8ArithmeticShiftRight Int16ArithmeticShiftRight Int32ArithmeticShiftRight Int64ArithmeticShiftRight
     Int8LogicalShiftLeft Int16LogicalShiftLeft Int32LogicalShiftLeft Int64LogicalShiftLeft

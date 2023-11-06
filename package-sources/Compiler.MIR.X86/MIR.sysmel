@@ -182,8 +182,7 @@ MIRPhysicalLocationRegisterPair extend: {
             }.
         }.
 
-
-        error("Unsupported register pair.")
+        error(value fullPrintString -- " " -- value type printString -- ": " -- value size printString -- " unsupported register pair " -- firstComponent printString -- " " -- secondComponent printString)
     }.
 
     public override method x86_64::storeValue: (value: MIRValue) inPointer: (valuePointer: AsmX86RegisterAddress) isCallArgument: (isCallArgument: Boolean) with: (codegen: MIRFunctionAsmCodeGenerator) ::=> Void := {
@@ -2614,10 +2613,39 @@ MIRConstantFloat64 extend: {
 
 MIRVectorConstant extend: {
     public override method x86_64::moveIntoRegister: (register: MIRPhysicalLocation) with: (codegen: MIRFunctionAsmCodeGenerator) ::=> Void := {
+        let constantSize := self size asUInt32.
+
+        ## Avoid loadin from memory the zero constant.
+        if: value isZeros then: {
+            type isPrimitiveFloatOrFloatVectorType ifTrue: {
+                constantSize <= 16u32 ifTrue: {
+                    codegen textSection x86::xorps: (register x86::vector128For: codegen) with: (register x86::vector128For: codegen).
+                    return: void
+                }.
+                constantSize <= 32u32 ifTrue: {
+                    codegen textSection
+                        x86::xorps: (register firstComponent x86::vector128For: codegen) with: (register firstComponent x86::vector128For: codegen);
+                        x86::xorps: (register secondComponent x86::vector128For: codegen) with: (register secondComponent x86::vector128For: codegen).
+                    return: void
+                }.
+            } ifFalse: {
+                constantSize <= 16u32 ifTrue: {
+                    codegen textSection x86::pxor: (register x86::vector128For: codegen) with: (register x86::vector128For: codegen).
+                    return: void
+                }.
+                constantSize <= 32u32 ifTrue: {
+                    codegen textSection
+                        x86::pxor: (register firstComponent x86::vector128For: codegen) with: (register firstComponent x86::vector128For: codegen);
+                        x86::pxor: (register secondComponent x86::vector128For: codegen) with: (register secondComponent x86::vector128For: codegen).
+                    return: void
+                }.
+            }.
+        }.
+
         let constantSymbol := codegen symbolForVectorConstant: value.
 
         type isPrimitiveFloatOrFloatVectorType ifTrue: {
-            switch: self size asUInt32 withCases: #{
+            switch: constantSize withCases: #{
                 4u32 : (codegen textSection x86::movss: (register x86::vector128For: codegen) src: constantSymbol x86::dwordPtr).
                 8u32 : (codegen textSection x86::movsd: (register x86::vector128For: codegen) src: constantSymbol x86::qwordPtr).
                 12u32 : (codegen textSection x86::movaps: (register x86::vector128For: codegen) src: constantSymbol x86::owordPtr).
@@ -2633,7 +2661,7 @@ MIRVectorConstant extend: {
                 _: {self error: "Unsupported register size"}
             }
         } ifFalse: {
-            switch: self size asUInt32 withCases: #{
+            switch: constantSize withCases: #{
                 4u32 : (codegen textSection x86::movd: (register x86::vector128For: codegen) src: constantSymbol x86::dwordPtr).
                 8u32 : (codegen textSection x86::movq: (register x86::vector128For: codegen) src: constantSymbol x86::qwordPtr).
                 12u32 : (codegen textSection x86::movdqa: (register x86::vector128For: codegen) src: constantSymbol x86::owordPtr).

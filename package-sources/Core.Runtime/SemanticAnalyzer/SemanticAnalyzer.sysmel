@@ -1000,6 +1000,7 @@ Type eagerDefinitionBody: {
                 staticMethod foundMethod(receiver, Message new
                     selector: selector;
                     arguments: arguments;
+                    sourcePosition: node sourcePosition;
                     yourself)
             } ifFalse: {
                 staticMethod foundMethod applyWithArguments: (Array with: receiver) -- arguments
@@ -1614,6 +1615,7 @@ ASTMessageSendNode definition: {
             doesNotUnderstand(receiver, Message new
                 selector: selector;
                 arguments: arguments;
+                sourcePosition: sourcePosition;
                 yourself
             )
         }

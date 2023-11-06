@@ -290,6 +290,26 @@ Integer eagerDefinitionBody: {
     public pure final eager override method ~= other ::=> Boolean
         := (self = other) not.
 
+    public pure final eager method asBoolean ::=> Boolean := {
+        <primitive: #Integer::asBoolean>
+        self asUInt8 asBoolean
+    }.
+
+    public pure final eager method asBoolean16 ::=> Boolean16 := {
+        <primitive: #Integer::asBoolean16>
+        self asInt16 asBoolean16
+    }.
+
+    public pure final eager method asBoolean32 ::=> Boolean32 := {
+        <primitive: #Integer::asBoolean32>
+        self asInt32 asBoolean32
+    }.
+
+    public pure final eager method asBoolean64 ::=> Boolean64 := {
+        <primitive: #Integer::asBoolean64>
+        self asInt64 asBoolean64
+    }.
+
     public pure final eager method asChar8 ::=> Char8 := {
         <primitive: #Integer::asChar8>
         self asUInt32 asChar8

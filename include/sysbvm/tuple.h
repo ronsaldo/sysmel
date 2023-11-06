@@ -19,6 +19,10 @@
 
 typedef struct sysbvm_context_s sysbvm_context_t;
 
+typedef uint16_t sysbvm_boolean16_t;
+typedef uint32_t sysbvm_boolean32_t;
+typedef uint64_t sysbvm_boolean64_t;
+
 typedef uint8_t sysbvm_char8_t;
 typedef uint16_t sysbvm_char16_t;
 typedef uint32_t sysbvm_char32_t;
@@ -975,6 +979,36 @@ SYSBVM_INLINE sysbvm_tuple_t sysbvm_tuple_boolean_encode(bool value)
 {
     return value ? SYSBVM_TRUE_TUPLE : SYSBVM_FALSE_TUPLE;
 }
+
+/**
+ * Decodes a boolean16 from a tuple.
+ */
+SYSBVM_API sysbvm_boolean16_t sysbvm_tuple_boolean16_decode(sysbvm_tuple_t tuple);
+
+/**
+ * Encodes a boolean16 as a tuple.
+ */
+SYSBVM_API sysbvm_tuple_t sysbvm_tuple_boolean16_encode(sysbvm_context_t *context, sysbvm_boolean16_t value);
+
+/**
+ * Decodes a boolean32 from a tuple.
+ */
+SYSBVM_API sysbvm_boolean32_t sysbvm_tuple_boolean32_decode(sysbvm_tuple_t tuple);
+
+/**
+ * Encodes a boolean32 as a tuple.
+ */
+SYSBVM_API sysbvm_tuple_t sysbvm_tuple_boolean32_encode(sysbvm_context_t *context, sysbvm_boolean32_t value);
+
+/**
+ * Decodes a boolean64 from a tuple.
+ */
+SYSBVM_API sysbvm_boolean64_t sysbvm_tuple_boolean64_decode(sysbvm_tuple_t tuple);
+
+/**
+ * Encodes a boolean64 as a tuple.
+ */
+SYSBVM_API sysbvm_tuple_t sysbvm_tuple_boolean64_encode(sysbvm_context_t *context, sysbvm_boolean64_t value);
 
 /**
  * Encodes a boolean value.

@@ -1175,6 +1175,7 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
     context->roots.messageType = sysbvm_context_createIntrinsicClass(context, "Message", SYSBVM_NULL_TUPLE,
         "selector", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.symbolType,
         "arguments", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.arrayType,
+        "sourcePosition", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.sourcePositionType,
         NULL);
     context->roots.pragmaType = sysbvm_context_createIntrinsicClass(context, "Pragma", SYSBVM_NULL_TUPLE,
         "selector", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.symbolType,

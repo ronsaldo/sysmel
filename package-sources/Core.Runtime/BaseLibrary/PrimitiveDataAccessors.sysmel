@@ -8,6 +8,30 @@ AnyValue definition: {
         index >= self __byteSize__ ifTrue: (self errorSubscriptBounds: index).
         self __uncheckedByteSlotAt__: index put: value
     }.
+
+    public final alwaysInline method __booleanAt__: (index: Size) ::=> Boolean
+        := (self __uint8At__: index) asBoolean.
+
+    public final alwaysInline method __booleanAt__: (index: Size) put: (value: Boolean) ::=> Void
+        := self __uint8At__: index put: value asUInt8.
+
+    public final alwaysInline method __boolean16At__: (index: Size) ::=> Boolean16
+        := (self __int16At__: index) asBoolean16.
+
+    public final alwaysInline method __boolean16At__: (index: Size) put: (value: Boolean16) ::=> Void
+        := self __int16At__: index put: value asInt16.
+
+    public final alwaysInline method __boolean32At__: (index: Size) ::=> Boolean32
+        := (self __int32At__: index) asBoolean32.
+
+    public final alwaysInline method __boolean32At__: (index: Size) put: (value: Boolean32) ::=> Void
+        := self __int32At__: index put: value asInt32.
+
+    public final alwaysInline method __boolean64At__: (index: Size) ::=> Boolean64
+        := (self __int64At__: index) asBoolean64.
+
+    public final alwaysInline method __boolean64At__: (index: Size) put: (value: Boolean64) ::=> Void
+        := self __int64At__: index put: value asInt64.
 }.
 
 AnyValue

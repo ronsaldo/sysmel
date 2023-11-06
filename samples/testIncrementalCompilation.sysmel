@@ -148,58 +148,66 @@ nativeLinkedObjectCode writeObjectToFileNamed: "test.o".
 {
 #*
 
-public function addVector32x2(a: Float32x2, b: Float32x2) => Float32x2
+public function addVector32x2(a: Int32x2, b: Int32x2) => Int32x2
     := a + b.
 
-public function addVector32x3(a: Float32x3, b: Float32x3) => Float32x3
+public function addVector32x3(a: Int32x3, b: Int32x3) => Int32x3
     := a + b.
 
-public function addVector32x4(a: Float32x4, b: Float32x4) => Float32x4
+public function addVector32x4(a: Int32x4, b: Int32x4) => Int32x4
     := a + b.
 
-public function addVector64x2(a: Float64x2, b: Float64x2) => Float64x2
+public function addVector64x2(a: Int32x2, b: Int32x2) => Int32x2
     := a + b.
 
-public function addVector64x3(a: Float64x3, b: Float64x3) => Float64x3
+public function addVector64x3(a: Int32x3, b: Int32x3) => Int32x3
     := a + b.
 
-public function addVector64x4(a: Float64x4, b: Float64x4) => Float64x4
+public function addVector64x4(a: Int32x4, b: Int32x4) => Int32x4
     := a + b.
 *#
 
-public function makeVectorWithAll(element: Float32) => Float32x4
-    := Float32x4 withAll: element.
+public function makeInt32WithAll(element: Int32) => Int32x4
+    := Int32x4 withAll: element.
 
-public function ones() => Float32x4
-    := Float32x4 ones.
+public function makeVectorWithAll(element: Boolean64) => Boolean64x2
+    := Boolean64x2 withAll: element.
 
-public function getVectorX(v: Float32x4) => Float32
+##public function ones() => Boolean64x2
+##    := Boolean64x2 ones.
+
+public function getVectorX(v: Boolean64x2) => Boolean64
     := v x.
 
-public function makeVectorX(x: Float32) => Float32x4
-    := Float32x4 x: x.
+public function makeVectorX(x: Boolean64) => Boolean64x2
+    := Boolean64x2 x: x.
 
-public function makeVector(x: Float32, y: Float32, z: Float32, w: Float32) => Float32x4
-    := Float32x4 x: x y: y z: z w: w.
+public function makeVector(x: Boolean64, y: Boolean64) => Boolean64x2
+    := Boolean64x2 x: x y: y.
 
-public function vectorAt(v: Float32x4, index: Size) => Float32
+public function vectorAt(v: Boolean64x2, index: Size) => Boolean64
     := v at: index.
 
-public function myVectorY(v: Float32x4) => Float32
+public function myVectorY(v: Boolean64x2) => Boolean64
     := v at: 1sz.
 
-let hirModule := HIRModuleCompilationContext forDefaultTarget
+##public function myOnes() => Boolean64x2
+##    := Boolean64x2 withAll: 1i32.
+
+let asmCompilationTarget := AsmCompilationTarget x86_64 setForLinux.
+
+let hirModule := (HIRModuleCompilationContext forTarget: asmCompilationTarget asMirCompilationTarget asHIRCompilationTarget)
     exclusiveCompilationMode: true;
-    compileFunctionsWithDefinitions: (getVectorX, myVectorY, vectorAt,);
+    ##compileFunctionsWithDefinitions: (getVectorX, makeVectorX, makeVector,);
+    compileFunctionsWithDefinitions: (Float32x2 >> #isZeros,);
     finish.
 
-##hirModule performStandardOptimizations.
+hirModule performStandardOptimizations.
 ##printLine(hirModule fullPrintString).
 
 ##let nativeCodes := hirModule asNativeCodesFor: AsmCompilationTarget x86_64 setForLinux asMirCompilationTarget keepingIRTextForDebugging: true.
 ##printLine(nativeCodes fullPrintString).
 
-let asmCompilationTarget := AsmCompilationTarget x86_64 setForLinux.
 let nativeCode := hirModule asNativeCodeFor: asmCompilationTarget asMirCompilationTarget keepingIRTextForDebugging: true.
 printLine(nativeCode hirTextIR).
 printLine(nativeCode mirTextIR).

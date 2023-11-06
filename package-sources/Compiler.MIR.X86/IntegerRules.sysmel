@@ -211,6 +211,32 @@ MIR::Operation::BooleanNot
             x86::sete: (instruction resultRegister x86::int8For: codegen)
     }.
 
+MIR::Operation::BooleanAnd
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterOrImmediate32ForInstruction: instruction operandAt: 0sz;
+            allocateRegisterOrImmediate32ForInstruction: instruction operandAt: 1sz;
+            allocateRegisterForInstructionResult: instruction trySharingWithOperandAt: 0sz
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::mov: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::int32For: codegen);
+            x86::and: (instruction resultRegister x86::int32For: codegen) with: (instruction secondOperandRegister x86::int32For: codegen)
+    }.
+
+MIR::Operation::BooleanOr
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        allocator
+            allocateRegisterOrImmediate32ForInstruction: instruction operandAt: 0sz;
+            allocateRegisterOrImmediate32ForInstruction: instruction operandAt: 1sz;
+            allocateRegisterForInstructionResult: instruction trySharingWithOperandAt: 0sz
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::mov: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::int32For: codegen);
+            x86::or: (instruction resultRegister x86::int32For: codegen) with: (instruction secondOperandRegister x86::int32For: codegen)
+    }.
+
 MIR::Operation::BooleanXor
     forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
         allocator
