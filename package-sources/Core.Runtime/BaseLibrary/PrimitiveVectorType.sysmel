@@ -376,6 +376,46 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
             _: error("Unsupported primitive vector with " -- Elements asString -- " elements.")
         }.
 
+        ElementType isPrimitiveFloatType ifFalse: {
+            public pure method bitInvert => SelfType := {
+                <primitive: (VectorTypeName -- "::bitInvert") asSymbol>
+                <targetDefinedPrimitive>
+                self collect: {:(ElementType)element :: ElementType | element bitInvert }
+            }.
+
+            public pure method & (other: SelfType) => SelfType := {
+                <primitive: (VectorTypeName -- "::&") asSymbol>
+                <targetDefinedPrimitive>
+                self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a & b }
+            }.
+
+            public pure method | (other: SelfType) => SelfType := {
+                <primitive: (VectorTypeName -- "::|") asSymbol>
+                <targetDefinedPrimitive>
+                self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a | b }
+            }.
+
+            public pure method ^ (other: SelfType) => SelfType := {
+                <primitive: (VectorTypeName -- "::^") asSymbol>
+                <targetDefinedPrimitive>
+                self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a ^ b }
+            }.
+        }.
+
+        ElementType isPrimitiveIntegerType ifTrue: {
+            public pure method << (other: SelfType) => SelfType := {
+                <primitive: (VectorTypeName -- "::<<") asSymbol>
+                <targetDefinedPrimitive>
+                self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a << b }
+            }.
+
+            public pure method >> (other: SelfType) => SelfType := {
+                <primitive: (VectorTypeName -- "::>>") asSymbol>
+                <targetDefinedPrimitive>
+                self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a >> b }
+            }.
+        }.
+
         ElementType isPrimitiveNumberType ifTrue: {
             let Zeros := SelfType withAll: ElementType zero.
             let Ones := SelfType withAll: ElementType one.
@@ -478,6 +518,56 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                     <primitive: (VectorTypeName -- "::length") asSymbol>
                     <targetDefinedPrimitive>
                     self length2 sqrt
+                }.
+            }.
+            
+            ElementType isPrimitiveFloatType ifTrue: {
+                public pure method floor => SelfType := {
+                    <primitive: (VectorTypeName -- "::floor") asSymbol>
+                    <targetDefinedPrimitive>
+                    self collect: {:(ElementType)element :: ElementType | element floor }
+                }.
+
+                public pure method ceiling => SelfType := {
+                    <primitive: (VectorTypeName -- "::ceiling") asSymbol>
+                    <targetDefinedPrimitive>
+                    self collect: {:(ElementType)element :: ElementType | element ceiling }
+                }.
+
+                public pure method truncated => SelfType := {
+                    <primitive: (VectorTypeName -- "::truncated") asSymbol>
+                    <targetDefinedPrimitive>
+                    self collect: {:(ElementType)element :: ElementType | element truncated }
+                }.
+
+                public pure method rounded => SelfType := {
+                    <primitive: (VectorTypeName -- "::rounded") asSymbol>
+                    <targetDefinedPrimitive>
+                    self collect: {:(ElementType)element :: ElementType | element rounded }
+                }.
+            } ifFalse: {
+                public pure method floor => SelfType := {
+                    <primitive: #yourself>
+                    <targetDefinedPrimitive>
+                    self
+                }.
+
+                public pure method ceiling => SelfType := {
+                    <primitive: #yourself>
+                    <targetDefinedPrimitive>
+                    self
+                }.
+
+                public pure method truncated => SelfType := {
+                    <primitive: #yourself>
+                    <targetDefinedPrimitive>
+                    self
+                }.
+
+                public pure method rounded => SelfType := {
+                    <primitive: #yourself>
+                    <targetDefinedPrimitive>
+                    self
                 }.
             }.
         }.

@@ -110,6 +110,34 @@ MIR::Operation::Float32Negate
             x86::subss: (instruction resultRegister x86::float32For: codegen) with: (instruction firstOperandRegister x86::float32For: codegen).
     }.
 
+MIR::Operation::Float32Ceiling
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::roundss: (instruction resultRegister x86::float32For: codegen) with: (instruction firstOperandRegister x86::float32For: codegen) mode: X86::RC::RoundUp asAsmImmediate.
+    }.
+
+MIR::Operation::Float32Floor
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::roundss: (instruction resultRegister x86::float32For: codegen) with: (instruction firstOperandRegister x86::float32For: codegen) mode: X86::RC::RoundDown asAsmImmediate.
+    }.
+
+MIR::Operation::Float32Rounded
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::roundss: (instruction resultRegister x86::float32For: codegen) with: (instruction firstOperandRegister x86::float32For: codegen) mode: X86::RC::RoundToNearestEven asAsmImmediate.
+    }.
+
+MIR::Operation::Float32Truncated
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::roundss: (instruction resultRegister x86::float32For: codegen) with: (instruction firstOperandRegister x86::float32For: codegen) mode: X86::RC::RoundTowardZero asAsmImmediate.
+    }.
+
 MIR::Operation::Float32Sub
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorAluRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
@@ -285,6 +313,34 @@ MIR::Operation::Float64Negate
         codegen textSection
             x86::xorpd: (instruction resultRegister x86::float64For: codegen) with: (instruction resultRegister x86::float64For: codegen);
             x86::subsd: (instruction resultRegister x86::float64For: codegen) with: (instruction firstOperandRegister x86::float64For: codegen).
+    }.
+
+MIR::Operation::Float64Ceiling
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::roundsd: (instruction resultRegister x86::float64For: codegen) with: (instruction firstOperandRegister x86::float64For: codegen) mode: X86::RC::RoundUp asAsmImmediate.
+    }.
+
+MIR::Operation::Float64Floor
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::roundsd: (instruction resultRegister x86::float64For: codegen) with: (instruction firstOperandRegister x86::float64For: codegen) mode: X86::RC::RoundDown asAsmImmediate.
+    }.
+
+MIR::Operation::Float64Rounded
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::roundsd: (instruction resultRegister x86::float64For: codegen) with: (instruction firstOperandRegister x86::float64For: codegen) mode: X86::RC::RoundToNearestEven asAsmImmediate.
+    }.
+
+MIR::Operation::Float64Truncated
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::roundsd: (instruction resultRegister x86::float64For: codegen) with: (instruction firstOperandRegister x86::float64For: codegen) mode: X86::RC::RoundTowardZero asAsmImmediate.
     }.
 
 MIR::Operation::Float64Sub

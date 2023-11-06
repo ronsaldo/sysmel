@@ -2994,8 +2994,12 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #UInt64::asIEEEFloat64Decoded : translateUnaryPrimitiveInto(MIR::Operation::IEEEUInt64ToFloat64). 
 
     ## Float32 primitives
-    #Float32::negated : translateUnaryPrimitiveInto(MIR::Operation::Float32Negate).
-    #Float32::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float32Sqrt).
+    #Float32::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float32Negate).
+    #Float32::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float32Sqrt).
+    #Float32::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float32Ceiling).
+    #Float32::floor     : translateUnaryPrimitiveInto(MIR::Operation::Float32Floor).
+    #Float32::rounded   : translateUnaryPrimitiveInto(MIR::Operation::Float32Rounded).
+    #Float32::truncated : translateUnaryPrimitiveInto(MIR::Operation::Float32Truncated).
 
     #Float32::+ : translateBinaryPrimitiveInto(MIR::Operation::Float32Add).
     #Float32::- : translateBinaryPrimitiveInto(MIR::Operation::Float32Sub).
@@ -3029,41 +3033,60 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float32::asIEEEFloat32Encoding : translateUnaryPrimitiveInto(MIR::Operation::Float32ToIEEEUInt32). 
 
     ## Float32x2 primitives
-    #Float32x2::negated : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Negate).
-    #Float32x2::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Sqrt).
+    #Float32x2::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Negate).
+    #Float32x2::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Sqrt).
+    #Float32x2::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Ceiling).
+    #Float32x2::floor     : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Floor).
+    #Float32x2::rounded   : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Rounded).
+    #Float32x2::truncated : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Truncated).
 
     #Float32x2::+ : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Add).
     #Float32x2::- : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Sub).
     #Float32x2::* : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Mul).
     #Float32x2::/ : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Div).
+
     #Float32x2::min: : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Min).
     #Float32x2::max: : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Max).
 
     ## Float32x3 primitives
-    #Float32x3::negated : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Negate).
-    #Float32x3::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Sqrt).
+    #Float32x3::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Negate).
+    #Float32x3::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Sqrt).
+    #Float32x3::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Ceiling).
+    #Float32x3::floor     : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Floor).
+    #Float32x3::rounded   : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Rounded).
+    #Float32x3::truncated : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Truncated).
 
     #Float32x3::+ : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Add).
     #Float32x3::- : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Sub).
     #Float32x3::* : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Mul).
     #Float32x3::/ : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Div).
+
     #Float32x3::min: : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Min).
     #Float32x3::max: : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Max).
 
     ## Float32x4 primitives
-    #Float32x4::negated : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Negate).
-    #Float32x4::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Sqrt).
+    #Float32x4::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Negate).
+    #Float32x4::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Sqrt).
+    #Float32x4::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Ceiling).
+    #Float32x4::floor     : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Floor).
+    #Float32x4::rounded   : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Rounded).
+    #Float32x4::truncated : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Truncated).
 
     #Float32x4::+ : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Add).
     #Float32x4::- : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Sub).
     #Float32x4::* : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Mul).
     #Float32x4::/ : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Div).
+
     #Float32x4::min: : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Min).
     #Float32x4::max: : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Max).
 
     ## Float64 primitives
-    #Float64::negated : translateUnaryPrimitiveInto(MIR::Operation::Float64Negate).
-    #Float64::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float64Sqrt).
+    #Float64::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float64Negate).
+    #Float64::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float64Sqrt).
+    #Float64::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float64Ceiling).
+    #Float64::floor     : translateUnaryPrimitiveInto(MIR::Operation::Float64Floor).
+    #Float64::rounded   : translateUnaryPrimitiveInto(MIR::Operation::Float64Rounded).
+    #Float64::truncated : translateUnaryPrimitiveInto(MIR::Operation::Float64Truncated).
 
     #Float64::+ : translateBinaryPrimitiveInto(MIR::Operation::Float64Add).
     #Float64::- : translateBinaryPrimitiveInto(MIR::Operation::Float64Sub).
@@ -3097,38 +3120,52 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float64::asIEEEFloat64Encoding : translateUnaryPrimitiveInto(MIR::Operation::Float64ToIEEEUInt64). 
 
     ## Float64x3 primitives
-    #Float64x2::negated : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Negate).
-    #Float64x2::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Sqrt).
+    #Float64x2::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Negate).
+    #Float64x2::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Sqrt).
+    #Float64x2::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Ceiling).
+    #Float64x2::floor     : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Floor).
+    #Float64x2::rounded   : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Rounded).
+    #Float64x2::truncated : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Truncated).
 
     #Float64x2::+ : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Add).
     #Float64x2::- : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Sub).
     #Float64x2::* : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Mul).
     #Float64x2::/ : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Div).
+
     #Float64x2::min: : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Min).
     #Float64x2::max: : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Max).
 
     ## Float64x3 primitives
-    #Float64x3::negated : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Negate).
-    #Float64x3::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Sqrt).
+    #Float64x3::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Negate).
+    #Float64x3::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Sqrt).
+    #Float64x3::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Ceiling).
+    #Float64x3::floor     : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Floor).
+    #Float64x3::rounded   : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Rounded).
+    #Float64x3::truncated : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Truncated).
 
     #Float64x3::+ : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Add).
     #Float64x3::- : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Sub).
     #Float64x3::* : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Mul).
     #Float64x3::/ : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Div).
+
     #Float64x3::min: : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Min).
     #Float64x3::max: : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Max).
 
     ## Float64x4 primitives
-    #Float64x4::negated : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Negate).
-    #Float64x4::sqrt : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Sqrt).
+    #Float64x4::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Negate).
+    #Float64x4::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Sqrt).
+    #Float64x4::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Ceiling).
+    #Float64x4::floor     : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Floor).
+    #Float64x4::rounded   : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Rounded).
+    #Float64x4::truncated : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Truncated).
 
     #Float64x4::+ : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Add).
     #Float64x4::- : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Sub).
     #Float64x4::* : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Mul).
     #Float64x4::/ : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Div).
+
     #Float64x4::min: : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Min).
     #Float64x4::max: : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Max).
-
 }.
 
 HIRFunctionDefinitionMIRCodeGenerator extend: {

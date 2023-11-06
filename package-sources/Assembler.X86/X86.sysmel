@@ -662,6 +662,11 @@ public global X86::XMM15 := AsmX86VectorRegister name: #XMM15 value: 15u8 dwarf6
 public global X86::NativeCodeDebugValueMap := Dictionary new.
 public global X86_64::NativeCodeDebugValueMap := Dictionary new.
 
+public global X86::RC::RoundToNearestEven := 0u8.
+public global X86::RC::RoundDown := 1u8.
+public global X86::RC::RoundUp := 2u8.
+public global X86::RC::RoundTowardZero := 3u8.
+
 (
     X86::EAX, X86::ECX, X86::EDX, X86::EBX, X86::ESP, X86::EBP, X86::ESI, X86::EDI,
     X86::XMM0, X86::XMM1, X86::XMM2, X86::XMM3, X86::XMM4, X86::XMM5, X86::XMM6, X86::XMM7

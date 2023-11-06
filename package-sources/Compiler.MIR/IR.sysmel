@@ -2936,20 +2936,36 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int32x4Negate
     Int32x4BroadcastElement
 
-    Float32Negate Float64Negate
-    Float32Sqrt   Float64Sqrt
+    Float32Negate    Float64Negate
+    Float32Sqrt      Float64Sqrt
+    Float32Ceiling   Float64Ceiling
+    Float32Floor     Float64Floor
+    Float32Rounded   Float64Rounded
+    Float32Truncated Float64Truncated
 
-    Float32x2Negate Float64x2Negate
-    Float32x2Sqrt   Float64x2Sqrt
-    Float32x2BroadcastElement   Float64x2BroadcastElement
+    Float32x2Negate           Float64x2Negate
+    Float32x2Sqrt             Float64x2Sqrt
+    Float32x2Ceiling          Float64x2Ceiling
+    Float32x2Floor            Float64x2Floor
+    Float32x2Rounded          Float64x2Rounded
+    Float32x2Truncated        Float64x2Truncated
+    Float32x2BroadcastElement Float64x2BroadcastElement
 
-    Float32x3Negate Float64x3Negate
-    Float32x3Sqrt   Float64x3Sqrt
-    Float32x3BroadcastElement   Float64x3BroadcastElement
+    Float32x3Negate           Float64x3Negate
+    Float32x3Sqrt             Float64x3Sqrt
+    Float32x3Ceiling          Float64x3Ceiling
+    Float32x3Floor            Float64x3Floor
+    Float32x3Rounded          Float64x3Rounded
+    Float32x3Truncated        Float64x3Truncated
+    Float32x3BroadcastElement Float64x3BroadcastElement
 
-    Float32x4Negate Float64x4Negate
-    Float32x4Sqrt   Float64x4Sqrt
-    Float32x4BroadcastElement   Float64x4BroadcastElement
+    Float32x4Negate           Float64x4Negate
+    Float32x4Sqrt             Float64x4Sqrt
+    Float32x4Ceiling          Float64x4Ceiling
+    Float32x4Floor            Float64x4Floor
+    Float32x4Rounded          Float64x4Rounded
+    Float32x4Truncated        Float64x4Truncated
+    Float32x4BroadcastElement Float64x4BroadcastElement
 
     TruncateInt64ToInt32 TruncateInt64ToInt16 TruncateInt64ToInt8
     TruncateInt32ToInt16 TruncateInt32ToInt8
