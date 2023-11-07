@@ -1,0 +1,51 @@
+Symbol extend: {
+    public virtual method isFunctionTypeTrampolineSymbol => Boolean := false.
+
+    public virtual method isFunctionTypeUncheckedToCapturelessTrampolineSymbol => Boolean := false.
+    public virtual method isFunctionTypeCheckedToUncheckedTrampolineSymbol => Boolean := false.
+    public virtual method isFunctionTypeBoxingTrampolineSymbol => Boolean := false.
+}.
+
+public abstract class FunctionTypeTrampolineSymbol superclass: CallableEntryPointSymbol; definition: {
+    public field functionType => FunctionType.
+
+    __Meta__ definition:{
+        public method for: (functionType: FunctionType) ::=> self
+            := self new functionType: functionType; yourself.
+    }.
+
+    public override method isFunctionTypeTrampolineSymbol => Boolean := true.
+
+    public override method hash => Size
+        := self class identityHash hashConcatenate: functionType identityHash.
+
+    public override method = other => Boolean
+        := (self class == other class) && (functionType == (other uncheckedDownCastTo: FunctionTypeTrampolineSymbol) functionType).
+}.
+
+public final class FunctionTypeUncheckedToCapturelesTrampolineSymbol superclass: FunctionTypeTrampolineSymbol; definition: {
+    public override method isFunctionTypeUncheckedToCapturelessTrampolineSymbol => Boolean := true.
+
+    public override method printOn: (stream: Stream) ::=> Void := {
+        functionType printQualifiedSymbolNameOn: stream.
+        stream string: ".uncheckedToCapturelessTrampoline"
+    }.
+}.
+
+public final class FunctionTypeCheckedTrampolineSymbol superclass: FunctionTypeTrampolineSymbol; definition: {
+    public override method isFunctionTypeCheckedToUncheckedTrampolineSymbol => Boolean := true.
+
+    public override method printOn: (stream: Stream) ::=> Void := {
+        functionType printQualifiedSymbolNameOn: stream.
+        stream string: ".checkedTrampoline"
+    }.
+}.
+
+public final class FunctionTypeBoxingTrampolineSymbol superclass: FunctionTypeTrampolineSymbol; definition: {
+    public override method isFunctionTypeBoxingTrampolineSymbol => Boolean := true.
+
+    public override method printOn: (stream: Stream) ::=> Void := {
+        functionType printQualifiedSymbolNameOn: stream.
+        stream string: ".checkedTrampoline"
+    }.
+}.

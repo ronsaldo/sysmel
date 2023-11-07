@@ -1,0 +1,100 @@
+Symbol extend: {
+    public virtual method isCallableEntryPointSymbol => Boolean := false.
+    public virtual method isFunctionEntryPointSymbol => Boolean := false.
+
+    public virtual method isFunctionCapturelesUncheckedEntryPointSymbol => Boolean := false.
+    public virtual method isFunctionUncheckedEntryPointSymbol => Boolean := false.
+    public virtual method isFunctionCheckedEntryPointSymbol => Boolean := false.
+
+    public virtual method asCheckedEntryPointNameSymbol => Symbol
+        := self error: "Not a function name symbol".
+
+    public virtual method asUncheckedEntryPointNameSymbol => Symbol
+        := self error: "Not a function name symbol".
+
+    public virtual method asCapturelessUncheckedEntryPointNameSymbol => Symbol
+        := self error: "Not a function name symbol".
+}.
+
+ProgramEntityQualifiedNameSymbol extend: {
+    public field programEntity => ProgramEntity.
+
+    public override method asCapturelessUncheckedEntryPointNameSymbol => Symbol
+        := programEntity capturelessUncheckedEntryPointNameSymbol.
+
+    public override method asCheckedEntryPointNameSymbol => Symbol
+        := programEntity checkedEntryPointNameSymbol.
+
+    public override method asUncheckedEntryPointNameSymbol => Symbol
+        := programEntity uncheckedEntryPointNameSymbol.
+}.
+
+public abstract class CallableEntryPointSymbol superclass: Symbol; definition: {
+    public override method isCallableEntryPointSymbol => Boolean := true.
+}.
+
+public abstract class FunctionEntryPointSymbol superclass: CallableEntryPointSymbol; definition: {
+    public field function => FunctionDefinition.
+
+    __Meta__ definition:{
+        public method for: (function: FunctionDefinition) ::=> self
+            := self new function: function; yourself.
+    }.
+
+    public override method isFunctionEntryPointSymbol => Boolean := true.
+
+    public override method hash => Size
+        := self class identityHash hashConcatenate: function identityHash.
+
+    public override method = other => Boolean
+        := (self class == other class) && (function == (other uncheckedDownCastTo: FunctionEntryPointSymbol) function).
+}.
+
+public final class FunctionCapturelessUncheckedEntryPointSymbol superclass: FunctionEntryPointSymbol; definition: {
+    public override method isFunctionCapturelesUncheckedEntryPointSymbol => Boolean := false.
+
+    public override method printOn: (stream: Stream) ::=> Void := {
+        function printQualifiedSymbolNameOn: stream.
+        stream nextPutAll: ".captureless".
+    }.
+}.
+
+public final class FunctionUncheckedEntryPointSymbol superclass: FunctionEntryPointSymbol; definition: {
+    public override method isFunctionUncheckedEntryPointSymbol => Boolean := false.
+
+    public override method printOn: (stream: Stream) ::=> Void := {
+        function printQualifiedSymbolNameOn: stream.
+        stream nextPutAll: ".unchecked".
+    }.
+}.
+
+public final class FunctionCheckedEntryPointSymbol superclass: FunctionEntryPointSymbol; definition: {
+    public override method isFunctionCheckedEntryPointSymbol => Boolean := false.
+
+    public override method printOn: (stream: Stream) ::=> Void := {
+        function printQualifiedSymbolNameOn: stream.
+        stream nextPutAll: ".checked".
+    }.
+}.
+
+ProgramEntity extend: {
+    public abstract method capturelessUncheckedEntryPointNameSymbol => FunctionCapturelessUncheckedEntryPointSymbol
+        := self error: "Not a function definition".
+
+    public abstract method checkedEntryPointNameSymbol => FunctionCheckedEntryPointSymbol
+        := self error: "Not a function definition".
+
+    public abstract method uncheckedEntryPointNameSymbol => FunctionUncheckedEntryPointSymbol
+        := self error: "Not a function definition".
+}.
+
+FunctionDefinition extend: {
+    public override method checkedEntryPointNameSymbol => FunctionCheckedEntryPointSymbol
+        := FunctionCheckedEntryPointSymbol for: self.
+
+    public override method uncheckedEntryPointNameSymbol => FunctionUncheckedEntryPointSymbol
+        := FunctionUncheckedEntryPointSymbol for: self.
+
+    public override method capturelessUncheckedEntryPointNameSymbol => Symbol
+        := FunctionCapturelessUncheckedEntryPointSymbol for: self.
+}.

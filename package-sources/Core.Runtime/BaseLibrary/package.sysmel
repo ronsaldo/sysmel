@@ -32,6 +32,10 @@ loadSourceNamed: "VirtualTableSetSource.sysmel".
 loadSourceNamed: "ImageBuilderVirtualTableSetSource.sysmel".
 loadSourceNamed: "CurrentImageVirtualTableSetSource.sysmel".
 
+loadSourceNamed: "ProgramEntitySymbol.sysmel".
+loadSourceNamed: "FunctionEntryPointSymbol.sysmel".
+loadSourceNamed: "FunctionTrampolineSymbol.sysmel".
+
 loadSourceNamed: "ByteStream.sysmel".
 loadSourceNamed: "Exception.sysmel".
 loadSourceNamed: "NativeCodeRelocation.sysmel".
@@ -61,7 +65,6 @@ loadSourceNamed: "NativeCodeLocationListEncoder.sysmel".
 loadSourceNamed: "NativeCodeSection.sysmel".
 loadSourceNamed: "NativeCodeSymbol.sysmel".
 loadSourceNamed: "NativeCodeSymbolTable.sysmel".
-loadSourceNamed: "ProgramEntity.sysmel".
 loadSourceNamed: "NativeCodeLoader.sysmel".
 loadSourceNamed: "NativeCodeLoaderElf.sysmel".
 loadSourceNamed: "ProgrammingLanguage.sysmel".

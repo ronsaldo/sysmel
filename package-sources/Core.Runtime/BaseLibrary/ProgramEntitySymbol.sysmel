@@ -1,0 +1,96 @@
+public final class ProgramEntityQualifiedNameSymbol superclass: Symbol; definition: {
+    public field programEntity => ProgramEntity.
+
+    __Meta__ definition:{
+        public method for: (programEntity: ProgramEntity) ::=> self
+            := self new programEntity: programEntity; yourself.
+    }.
+
+    public override method hash => Size
+        := self class identityHash hashConcatenate: programEntity identityHash.
+
+    public override method = other => Boolean
+        := (self class == other class) && (programEntity == (other uncheckedDownCastTo: ProgramEntityQualifiedNameSymbol) programEntity).
+
+    public override method printOn: (stream: Stream) ::=> Void := {
+        programEntity printQualifiedSymbolNameOn: stream.
+    }.
+}.
+
+public global ProgramEntity::NextSerialToken mutable => UInt32 := 0u32.
+
+ProgramEntity definition: {
+    public virtual method programEntityKindName => Symbol
+        := self class name.
+
+    public method validSerialToken => UInt32 := {
+        self serialToken ifNil: {
+            self serialToken: ProgramEntity::NextSerialToken.
+            ProgramEntity::NextSerialToken := ProgramEntity::NextSerialToken + 1u32.
+        }.
+
+        self serialToken
+    }.
+
+    public method printQualifiedSymbolNameOn: (stream: Stream) ::=> Void := {
+        self printQualifiedNameOn: stream.
+        stream nextPutAll: ".S"; string: self programEntityKindName.
+        stream nextPut: '_'c8.
+        self validSerialToken printHexOn: stream.
+    }.
+
+    public virtual method printQualifiedNameOn: (stream: Stream) ::=> Void := {
+        owner ifNotNil: {
+            owner printQualifiedNameOn: stream.
+            stream nextPut: '.'c8
+        }.
+
+        self name ifNotNil: (stream string: self name)
+    }.
+
+    public method qualifiedName => String := {
+        let stream := StringStream new.
+        self printQualifiedNameOn: stream.
+        stream asString
+    }.
+
+    public method programEntityQualifiedNameSymbol => ProgramEntityQualifiedNameSymbol
+        := ProgramEntityQualifiedNameSymbol for: self.
+
+}.
+
+Type definition: {
+    public override method programEntityKindName => Symbol
+        := #T.
+}.
+
+SymbolValueBinding definition: {
+    public override method programEntityKindName => Symbol
+        := #G.
+}.
+
+Metatype definition: {
+    public override method printQualifiedNameOn: (stream: Stream) ::=> Void := {
+        thisType ifNotNil: {
+            thisType printQualifiedNameOn: stream.
+            stream nextPutAll: ".__Meta__".
+        } ifNil: {
+            super printQualifiedNameOn: stream
+        }
+    }
+}.
+
+Namespace definition: {
+    public override method programEntityKindName => Symbol
+        := #N.
+}.
+
+Function definition: {
+    public override method programEntityKindName => Symbol
+        := #C.
+}.
+
+FunctionDefinition definition: {
+    public override method programEntityKindName => Symbol
+        := #F.
+}.
