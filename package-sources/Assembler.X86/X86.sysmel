@@ -1950,47 +1950,92 @@ let instructionDefinitionTable := #(
 		(OpRwRmw #[] #[16r0F 16rB7])
     )
 
+    (cmovb (dst stc) "Conditional move, if below"
+        (OpRwRmw #[] #[16r0F 16r42])
+    )
+    (cmovae (dst stc) "Conditional move, if above or equals"
+        (OpRwRmw #[] #[16r0F 16r43])
+    )
+    (cmovz (dst stc) "Conditional move, if zero"
+        (OpRwRmw #[] #[16r0F 16r44])
+    )
+    (cmovnz (dst stc) "Conditional move, if not zero"
+        (OpRwRmw #[] #[16r0F 16r45])
+    )
+    (cmovbe (dst stc) "Conditional move, if below or equals"
+        (OpRwRmw #[] #[16r0F 16r46])
+    )
+    (cmova (dst stc) "Conditional move, if above"
+        (OpRwRmw #[] #[16r0F 16r47])
+    )
+    (cmovs (dst stc) "Conditional move, if sign"
+        (OpRwRmw #[] #[16r0F 16r48])
+    )
+    (cmovns (dst stc) "Conditional move, if not sign"
+        (OpRwRmw #[] #[16r0F 16r49])
+    )
+    (cmovpe (dst stc) "Conditional move, if parity even"
+        (OpRwRmw #[] #[16r0F 16r4A])
+    )
+    (cmovpo (dst stc) "Conditional move, if parity odd"
+        (OpRwRmw #[] #[16r0F 16r4B])
+    )
+    (cmovl (dst stc) "Conditional move, if less"
+        (OpRwRmw #[] #[16r0F 16r4C])
+    )
+    (cmovge (dst stc) "Conditional move, if greater or equals"
+        (OpRwRmw #[] #[16r0F 16r4D])
+    )
+    (cmovle (dst stc) "Conditional move, if less or equals"
+        (OpRwRmw #[] #[16r0F 16r4E])
+    )
+    (cmovg (dst stc) "Conditional move, if greater"
+        (OpRwRmw #[] #[16r0F 16r4F])
+    )
+
     (jmp (target) "Jumps into the specified address"
         (OpBranch32 #[] #[16rE9])
         (OpRm #[] #[16rFF] 4)
     )
-
     (jb (target) "Jumps into the specified address, if below"
         (OpBranch32 #[] #[16r0F 16r82])
     )
-
     (jae (target) "Jumps into the specified address, if above or equals"
         (OpBranch32 #[] #[16r0F 16r83])
     )
-
     (jz (target) "Jumps into the specified address, if zero"
         (OpBranch32 #[] #[16r0F 16r84])
     )
-
     (jnz (target) "Jumps into the specified address, if not zero"
         (OpBranch32 #[] #[16r0F 16r85])
     )
-
     (jbe (target) "Jumps into the specified address, if below or equals"
         (OpBranch32 #[] #[16r0F 16r86])
     )
-
     (ja (target) "Jumps into the specified address, if above"
         (OpBranch32 #[] #[16r0F 16r87])
     )
-
+    (js (dst stc) "Conditional move, if sign"
+        (OpRwRmw #[] #[16r0F 16r88])
+    )
+    (jns (dst stc) "Conditional move, if not sign"
+        (OpRwRmw #[] #[16r0F 16r89])
+    )
+    (jpe (dst stc) "Conditional move, if parity even"
+        (OpRwRmw #[] #[16r0F 16r8A])
+    )
+    (jpo (dst stc) "Conditional move, if parity odd"
+        (OpRwRmw #[] #[16r0F 16r8B])
+    )
     (jl (target) "Jumps into the specified address, if less"
         (OpBranch32 #[] #[16r0F 16r8C])
     )
-
     (jge (target) "Jumps into the specified address, if greater or equals"
         (OpBranch32 #[] #[16r0F 16r8D])
     )
-
     (jle (target) "Jumps into the specified address, if less"
         (OpBranch32 #[] #[16r0F 16r8E])
     )
-
     (jg (target) "Jumps into the specified address, if greater"
         (OpBranch32 #[] #[16r0F 16r8F])
     )
