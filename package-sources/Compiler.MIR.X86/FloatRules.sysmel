@@ -524,37 +524,37 @@ MIR::Operation::Float32ToFloat64
 MIR::Operation::Float32ToInt8
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+        codegen textSection x86::cvttss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
     }.
 
 MIR::Operation::Float32ToUInt8
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+        codegen textSection x86::cvttss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
     }.
 
 MIR::Operation::Float32ToInt16
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+        codegen textSection x86::cvttss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
     }.
 
 MIR::Operation::Float32ToUInt16
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+        codegen textSection x86::cvttss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
     }.
 
 MIR::Operation::Float32ToInt32
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+        codegen textSection x86::cvttss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
     }.
 
 MIR::Operation::Float32ToUInt32
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+        codegen textSection x86::cvttss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
     }.
 
 MIR::Operation::Float32ToIEEEUInt32
@@ -566,10 +566,58 @@ MIR::Operation::Float32ToIEEEUInt32
 MIR::Operation::Float32ToInt64
     forTarget: #x86_64 registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTarget: #x86_64 generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+        codegen textSection x86::cvttss2si: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
     }.
 
 MIR::Operation::Float32ToUInt64
+    forTarget: #x86_64 registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTarget: #x86_64 generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvttss2si: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+    }.
+
+MIR::Operation::Float32ToRoundedInt8
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+    }.
+
+MIR::Operation::Float32ToRoundedUInt8
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+    }.
+
+MIR::Operation::Float32ToRoundedInt16
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+    }.
+
+MIR::Operation::Float32ToRoundedUInt16
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+    }.
+
+MIR::Operation::Float32ToRoundedInt32
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+    }.
+
+MIR::Operation::Float32ToRoundedUInt32
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+    }.
+
+MIR::Operation::Float32ToRoundedInt64
+    forTarget: #x86_64 registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTarget: #x86_64 generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+    }.
+
+MIR::Operation::Float32ToRoundedUInt64
     forTarget: #x86_64 registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTarget: #x86_64 generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection x86::cvtss2si: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
@@ -584,55 +632,115 @@ MIR::Operation::Float64ToFloat32
 MIR::Operation::Float64ToInt8
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+        codegen textSection x86::cvttsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
     }.
 
 MIR::Operation::Float64ToUInt8
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+        codegen textSection x86::cvttsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
     }.
 
 MIR::Operation::Float64ToInt16
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+        codegen textSection x86::cvttsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
     }.
 
 MIR::Operation::Float64ToUInt16
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+        codegen textSection x86::cvttsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
     }.
 
 MIR::Operation::Float64ToInt32
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+        codegen textSection x86::cvttsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
     }.
 
 MIR::Operation::Float64ToUInt32
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+        codegen textSection x86::cvttsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
     }.
 
 MIR::Operation::Float64ToInt64
     forTarget: #x86_64 registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTarget: #x86_64 generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+        codegen textSection x86::cvttsd2si: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
     }.
 
 MIR::Operation::Float64ToUInt64
     forTarget: #x86_64 registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTarget: #x86_64 generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
-        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+        codegen textSection x86::cvttsd2si: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
     }.
 
 MIR::Operation::Float64ToIEEEUInt64
     forTarget: #x86_64 registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
     forTarget: #x86_64 generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection x86::movq: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+    }.
+
+MIR::Operation::Float32ToRoundedInt64
+    forTarget: #x86_64 registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTarget: #x86_64 generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+    }.
+
+MIR::Operation::Float32ToRoundedUInt64
+    forTarget: #x86_64 registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTarget: #x86_64 generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtss2si: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float32For: codegen)
+    }.
+
+MIR::Operation::Float64ToRoundedInt8
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+    }.
+
+MIR::Operation::Float64ToRoundedUInt8
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+    }.
+
+MIR::Operation::Float64ToRoundedInt16
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+    }.
+
+MIR::Operation::Float64ToRoundedUInt16
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+    }.
+
+MIR::Operation::Float64ToRoundedInt32
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+    }.
+
+MIR::Operation::Float64ToRoundedUInt32
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int32For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+    }.
+
+MIR::Operation::Float64ToRoundedInt64
+    forTarget: #x86_64 registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTarget: #x86_64 generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
+    }.
+
+MIR::Operation::Float64ToRoundedUInt64
+    forTarget: #x86_64 registerConstraintsWith: x86::vectorScalarIntegerConversionRegisterConstrations;
+    forTarget: #x86_64 generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection x86::cvtsd2si: (instruction resultRegister x86::int64For: codegen) src: (instruction firstOperandRegister x86::float64For: codegen)
     }.
 
 MIR::Operation::Int8ToFloat32

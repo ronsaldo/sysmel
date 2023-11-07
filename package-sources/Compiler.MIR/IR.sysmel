@@ -2992,16 +2992,26 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     UInt8ToFloat64 Int8ToFloat64 UInt16ToFloat64 Int16ToFloat64 UInt32ToFloat64 Int32ToFloat64 UInt64ToFloat64 Int64ToFloat64
 
     Float32ToFloat64 Float32ToUInt8 Float32ToInt8 Float32ToUInt16 Float32ToInt16 Float32ToUInt32 Float32ToInt32 Float32ToUInt64 Float32ToInt64
+    Float32ToRoundedUInt8 Float32ToRoundedInt8 Float32ToRoundedUInt16 Float32ToRoundedInt16 Float32ToRoundedUInt32 Float32ToRoundedInt32 Float32ToRoundedUInt64 Float32ToRoundedInt64
+
     Float64ToFloat32 Float64ToUInt8 Float64ToInt8 Float64ToUInt16 Float64ToInt16 Float64ToUInt32 Float64ToInt32 Float64ToUInt64 Float64ToInt64
+    Float64ToRoundedUInt8 Float64ToRoundedInt8 Float64ToRoundedUInt16 Float64ToRoundedInt16 Float64ToRoundedUInt32 Float64ToRoundedInt32 Float64ToRoundedUInt64 Float64ToRoundedInt64
+
     Float32ToIEEEUInt32 Float64ToIEEEUInt64 IEEEUInt32ToFloat32 IEEEUInt64ToFloat64
 
     Float32x2ToInt32x2 Float32x3ToInt32x3 Float32x4ToInt32x4
     Float32x2ToUInt32x2 Float32x3ToUInt32x3 Float32x4ToUInt32x4
+    Float32x2ToRoundedInt32x2 Float32x3ToRoundedInt32x3 Float32x4ToRoundedInt32x4
+    Float32x2ToRoundedUInt32x2 Float32x3ToRoundedUInt32x3 Float32x4ToRoundedUInt32x4
+
     Int32x2ToFloat32x2 Int32x3ToFloat32x3 Int32x4ToFloat32x4
     UInt32x2ToFloat32x2 UInt32x3ToFloat32x3 UInt32x4ToFloat32x4
     
     Int32x4ToPackedUInt8x4 Int32x4ToPackedInt8x4
     Int32x2ToPackedUInt16x2 Int32x2ToPackedInt16x2
+
+    PackedUInt8x4ToInt32x4 PackedInt8x4ToInt32x4
+    PackedUInt16x2ToInt32x2 PackedInt16x2ToInt32x2
 
     FatPointerExtractFirst FatPointerExtractSecond
 ) do: {:(Symbol)operationName :: Void |

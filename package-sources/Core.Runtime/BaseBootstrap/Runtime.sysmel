@@ -2760,6 +2760,21 @@ SimpleFunctionType
     setConversionTypeFunction((SelfType >> #asUInt64), UInt64).
     setConversionTypeFunction((SelfType >> #asInt64), Int64).
 
+    setConversionTypeFunction((SelfType >> #asRoundedChar8), Char8).
+    setConversionTypeFunction((SelfType >> #asRoundedUInt8), UInt8).
+    setConversionTypeFunction((SelfType >> #asRoundedInt8), Int8).
+
+    setConversionTypeFunction((SelfType >> #asRoundedChar16), Char16).
+    setConversionTypeFunction((SelfType >> #asRoundedUInt16), UInt16).
+    setConversionTypeFunction((SelfType >> #asRoundedInt16), Int16).
+
+    setConversionTypeFunction((SelfType >> #asRoundedChar32), Char32).
+    setConversionTypeFunction((SelfType >> #asRoundedUInt32), UInt32).
+    setConversionTypeFunction((SelfType >> #asRoundedInt32), Int32).
+
+    setConversionTypeFunction((SelfType >> #asRoundedUInt64), UInt64).
+    setConversionTypeFunction((SelfType >> #asRoundedInt64), Int64).
+
     setConversionTypeFunction((SelfType >> #asSize), Size).
     setConversionTypeFunction((SelfType >> #asIntPointer), IntPointer).
     setConversionTypeFunction((SelfType >> #asUIntPointer), UIntPointer).

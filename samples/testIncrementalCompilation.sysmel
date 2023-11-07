@@ -237,7 +237,9 @@ let asmCompilationTarget := AsmCompilationTarget x86_64 setForLinux.
 
 let hirModule := (HIRModuleCompilationContext forTarget: asmCompilationTarget asMirCompilationTarget asHIRCompilationTarget)
     exclusiveCompilationMode: true;
-    compileFunctionsWithDefinitions: (Float32x4 >> #packUnorm4x8,);
+    compileFunctionsWithDefinitions: (
+        Float32x2 >> #packUnorm2x16, Float32x2 >> #packSnorm2x16,
+        Float32x4 >> #packUnorm4x8, Float32x4 >> #packSnorm4x8,);
     finish.
 
 hirModule performStandardOptimizations.

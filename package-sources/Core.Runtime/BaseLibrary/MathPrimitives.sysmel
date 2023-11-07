@@ -335,6 +335,112 @@
             <targetDefinedPrimitive>
             primitiveFailedError()
         }.
+
+        if: isFloatingPoint then: {
+            public pure final eager method asRoundedUInt8 ::=> UInt8 := {
+                <primitive: (primitivePrefix -- "asRoundedUInt8") asSymbol>
+                <targetDefinedPrimitive>
+                primitiveFailedError()
+            }.
+
+            public pure final eager method asRoundedInt8 ::=> Int8 := {
+                <primitive: (primitivePrefix -- "asRoundedInt8") asSymbol>
+                <targetDefinedPrimitive>
+                primitiveFailedError()
+            }.
+
+            public pure final eager method asRoundedChar8 ::=> Char8 := {
+                <primitive: (primitivePrefix -- "asRoundedChar8") asSymbol>
+                <targetDefinedPrimitive>
+                primitiveFailedError()
+            }.
+
+            public pure final eager method asRoundedUInt16 ::=> UInt16 := {
+                <primitive: (primitivePrefix -- "asRoundedUInt16") asSymbol>
+                <targetDefinedPrimitive>
+                primitiveFailedError()
+            }.
+
+            public pure final eager method asRoundedInt16 ::=> Int16 := {
+                <primitive: (primitivePrefix -- "asRoundedInt16") asSymbol>
+                <targetDefinedPrimitive>
+                primitiveFailedError()
+            }.
+
+            public pure final eager method asRoundedChar16 ::=> Char16 := {
+                <primitive: (primitivePrefix -- "asRoundedChar16") asSymbol>
+                <targetDefinedPrimitive>
+                primitiveFailedError()
+            }.
+
+            public pure final eager method asRoundedUInt32 ::=> UInt32 := {
+                <primitive: (primitivePrefix -- "asRoundedUInt32") asSymbol>
+                <targetDefinedPrimitive>
+                primitiveFailedError()
+            }.
+
+            public pure final eager method asRoundedInt32 ::=> Int32 := {
+                <primitive: (primitivePrefix -- "asRoundedInt32") asSymbol>
+                <targetDefinedPrimitive>
+                primitiveFailedError()
+            }.
+
+            public pure final eager method asRoundedChar32 ::=> Char32 := {
+                <primitive: (primitivePrefix -- "asRoundedChar32") asSymbol>
+                <targetDefinedPrimitive>
+                primitiveFailedError()
+            }.
+
+            public pure final eager method asRoundedUInt64 ::=> UInt64 := {
+                <primitive: (primitivePrefix -- "asRoundedUInt64") asSymbol>
+                <targetDefinedPrimitive>
+                primitiveFailedError()
+            }.
+
+            public pure final eager method asRoundedInt64 ::=> Int64 := {
+                <primitive: (primitivePrefix -- "asRoundedInt64") asSymbol>
+                <targetDefinedPrimitive>
+                primitiveFailedError()
+            }.
+
+            if: Size == UInt64 then: {
+                public pure final eager method asSizeRounded ::=> Size := {
+                    <primitive: (primitivePrefix -- "asRoundedUInt64") asSymbol>
+                    <targetDefinedPrimitive>
+                    primitiveFailedError()
+                }.
+
+                public pure final eager method asIntPointerRounded ::=> IntPointer := {
+                    <primitive: (primitivePrefix -- "asRoundedInt64") asSymbol>
+                    <targetDefinedPrimitive>
+                    primitiveFailedError()
+                }.
+
+                public pure final eager method asUIntPointer ::=> UIntPointer := {
+                    <primitive: (primitivePrefix -- "asRoundedUInt64") asSymbol>
+                    <targetDefinedPrimitive>
+                    primitiveFailedError()
+                }.
+            } else: {
+                public pure final eager method asSizeRounded ::=> Size := {
+                    <primitive: (primitivePrefix -- "asRoundedUInt32") asSymbol>
+                    <targetDefinedPrimitive>
+                    primitiveFailedError()
+                }.
+
+                public pure final eager method asIntPointerRounded ::=> IntPointer := {
+                    <primitive: (primitivePrefix -- "asRoundedInt32") asSymbol>
+                    <targetDefinedPrimitive>
+                    primitiveFailedError()
+                }.
+
+                public pure final eager method asUIntPointerRounded ::=> UIntPointer := {
+                    <primitive: (primitivePrefix -- "asRoundedUInt32") asSymbol>
+                    <targetDefinedPrimitive>
+                    primitiveFailedError()
+                }.
+            }.
+        }.
     }
 }.
 

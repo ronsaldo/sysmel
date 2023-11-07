@@ -3045,6 +3045,11 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #UInt32::asFloat64   : translateUnaryPrimitiveInto(MIR::Operation::UInt32ToFloat64).
     #UInt32::asIEEEFloat32Decoded : translateUnaryPrimitiveInto(MIR::Operation::IEEEUInt32ToFloat32). 
 
+    #UInt32::unpackInt16x2  : translateUnaryPrimitiveInto(MIR::Operation::PackedInt16x2ToInt32x2).
+    #UInt32::unpackUInt16x2 : translateUnaryPrimitiveInto(MIR::Operation::PackedUInt16x2ToInt32x2).
+    #UInt32::unpackInt8x4   : translateUnaryPrimitiveInto(MIR::Operation::PackedInt8x4ToInt32x4).
+    #UInt32::unpackUInt8x4  : translateUnaryPrimitiveInto(MIR::Operation::PackedUInt8x4ToInt32x4).
+
     ## UInt32x2
     #UInt32x2::abs       : translateYourselfPrimitive.
     #UInt32x2::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int32x2Negate).
@@ -3162,6 +3167,11 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Int32::asUInt64    : translateUnaryPrimitiveInto(MIR::Operation::ZeroExtendInt32ToInt64).
     #Int32::asFloat32   : translateUnaryPrimitiveInto(MIR::Operation::Int32ToFloat32).
     #Int32::asFloat64   : translateUnaryPrimitiveInto(MIR::Operation::Int32ToFloat64).
+
+    #Int32::unpackInt16x2  : translateUnaryPrimitiveInto(MIR::Operation::PackedInt16x2ToInt32x2).
+    #Int32::unpackUInt16x2 : translateUnaryPrimitiveInto(MIR::Operation::PackedUInt16x2ToInt32x2).
+    #Int32::unpackInt8x4   : translateUnaryPrimitiveInto(MIR::Operation::PackedInt8x4ToInt32x4).
+    #Int32::unpackUInt8x4  : translateUnaryPrimitiveInto(MIR::Operation::PackedUInt8x4ToInt32x4).
 
     ## Int32x2
     #Int32x2::abs       : translateUnaryPrimitiveInto(MIR::Operation::Int32x2Abs).
@@ -3368,6 +3378,19 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float32::asUInt64    : translateUnaryPrimitiveInto(MIR::Operation::Float32ToUInt64).
     #Float32::asFloat32   : translateYourselfPrimitive.
     #Float32::asFloat64   : translateUnaryPrimitiveInto(MIR::Operation::Float32ToFloat64).
+
+    #Float32::asRoundedChar8     : translateUnaryPrimitiveInto(MIR::Operation::Float32ToRoundedUInt8).
+    #Float32::asRoundedInt8      : translateUnaryPrimitiveInto(MIR::Operation::Float32ToRoundedInt8).
+    #Float32::asRoundedUInt8     : translateUnaryPrimitiveInto(MIR::Operation::Float32ToRoundedUInt8).
+    #Float32::asRoundedChar16    : translateUnaryPrimitiveInto(MIR::Operation::Float32ToRoundedUInt16).
+    #Float32::asRoundedInt16     : translateUnaryPrimitiveInto(MIR::Operation::Float32ToRoundedInt16).
+    #Float32::asRoundedUInt16    : translateUnaryPrimitiveInto(MIR::Operation::Float32ToRoundedUInt16).
+    #Float32::asRoundedChar32    : translateUnaryPrimitiveInto(MIR::Operation::Float32ToRoundedUInt32).
+    #Float32::asRoundedInt32     : translateUnaryPrimitiveInto(MIR::Operation::Float32ToRoundedInt32).
+    #Float32::asRoundedUInt32    : translateUnaryPrimitiveInto(MIR::Operation::Float32ToRoundedUInt32).
+    #Float32::asRoundedInt64     : translateUnaryPrimitiveInto(MIR::Operation::Float32ToRoundedInt64).
+    #Float32::asRoundedUInt64    : translateUnaryPrimitiveInto(MIR::Operation::Float32ToRoundedUInt64).
+
     #Float32::asIEEEFloat32Encoding : translateUnaryPrimitiveInto(MIR::Operation::Float32ToIEEEUInt32). 
 
     ## Float32x2 primitives
@@ -3391,6 +3414,8 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Float32x2::asInt32x2 : translateUnaryPrimitiveInto(MIR::Operation::Float32x2ToInt32x2).
     #Float32x2::asUInt32x2 : translateUnaryPrimitiveInto(MIR::Operation::Float32x2ToUInt32x2).
+    #Float32x2::asRoundedInt32x2 : translateUnaryPrimitiveInto(MIR::Operation::Float32x2ToRoundedInt32x2).
+    #Float32x2::asRoundedUInt32x2 : translateUnaryPrimitiveInto(MIR::Operation::Float32x2ToRoundedUInt32x2).
 
     ## Float32x3 primitives
     #Float32x3::abs       : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Abs).
@@ -3413,6 +3438,8 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Float32x3::asInt32x3 : translateUnaryPrimitiveInto(MIR::Operation::Float32x3ToInt32x3).
     #Float32x3::asUInt32x3 : translateUnaryPrimitiveInto(MIR::Operation::Float32x3ToUInt32x3).
+    #Float32x3::asRoundedInt32x3 : translateUnaryPrimitiveInto(MIR::Operation::Float32x3ToRoundedInt32x3).
+    #Float32x3::asRoundedUInt32x3 : translateUnaryPrimitiveInto(MIR::Operation::Float32x3ToRoundedUInt32x3).
 
     ## Float32x4 primitives
     #Float32x4::abs       : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Abs).
@@ -3435,6 +3462,8 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Float32x4::asInt32x4 : translateUnaryPrimitiveInto(MIR::Operation::Float32x4ToInt32x4).
     #Float32x4::asUInt32x4 : translateUnaryPrimitiveInto(MIR::Operation::Float32x4ToUInt32x4).
+    #Float32x4::asRoundedInt32x4 : translateUnaryPrimitiveInto(MIR::Operation::Float32x4ToRoundedInt32x4).
+    #Float32x4::asRoundedInt32x4 : translateUnaryPrimitiveInto(MIR::Operation::Float32x4ToRoundedUInt32x4).
 
     ## Float64 primitives
     #Float64::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float64Negate).
@@ -3479,6 +3508,19 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float64::asUInt64    : translateUnaryPrimitiveInto(MIR::Operation::Float64ToUInt64).
     #Float64::asFloat32   : translateUnaryPrimitiveInto(MIR::Operation::Float64ToFloat32).
     #Float64::asFloat64   : translateYourselfPrimitive.
+
+    #Float64::asRoundedChar8     : translateUnaryPrimitiveInto(MIR::Operation::Float64ToRoundedUInt8).
+    #Float64::asRoundedInt8      : translateUnaryPrimitiveInto(MIR::Operation::Float64ToRoundedInt8).
+    #Float64::asRoundedUInt8     : translateUnaryPrimitiveInto(MIR::Operation::Float64ToRoundedUInt8).
+    #Float64::asRoundedChar16    : translateUnaryPrimitiveInto(MIR::Operation::Float64ToRoundedUInt16).
+    #Float64::asRoundedInt16     : translateUnaryPrimitiveInto(MIR::Operation::Float64ToRoundedInt16).
+    #Float64::asRoundedUInt16    : translateUnaryPrimitiveInto(MIR::Operation::Float64ToRoundedUInt16).
+    #Float64::asRoundedChar32    : translateUnaryPrimitiveInto(MIR::Operation::Float64ToRoundedUInt32).
+    #Float64::asRoundedInt32     : translateUnaryPrimitiveInto(MIR::Operation::Float64ToRoundedInt32).
+    #Float64::asRoundedUInt32    : translateUnaryPrimitiveInto(MIR::Operation::Float64ToRoundedUInt32).
+    #Float64::asRoundedInt64     : translateUnaryPrimitiveInto(MIR::Operation::Float64ToRoundedInt64).
+    #Float64::asRoundedUInt64    : translateUnaryPrimitiveInto(MIR::Operation::Float64ToRoundedUInt64).
+
     #Float64::asIEEEFloat64Encoding : translateUnaryPrimitiveInto(MIR::Operation::Float64ToIEEEUInt64). 
 
     ## Float64x2 primitives

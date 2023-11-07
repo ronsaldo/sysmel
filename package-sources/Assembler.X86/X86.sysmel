@@ -2280,11 +2280,17 @@ let instructionDefinitionTable := #(
         (OpRwRmx #[16rF3] #[16r0f 16r2d])
     )
 
-    (cvttss2si (dst src) "Convert scalar single into scalar integer with truncation"
-        (OpRwRmx #[16rF3] #[16r0f 16r2c])
+    (cvttpd2dq (dst src) "Convert packed double into double-words with truncation"
+        (OpRwRmx #[16r66] #[16r0f 16re6])
+    )
+    (cvttps2dq (dst src) "Convert packed scaled into double-words with truncation"
+        (OpRwRmx #[16rF3] #[16r0f 16r5b])
     )
     (cvttsd2si (dst src) "Convert scalar double into scalar integer with truncation"
         (OpRwRmx #[16rF2] #[16r0f 16r2c])
+    )
+    (cvttss2si (dst src) "Convert scalar single into scalar integer with truncation"
+        (OpRwRmx #[16rF3] #[16r0f 16r2c])
     )
 
     (packsswb (dst with) "Pack with signed saturation, words to bytes"
