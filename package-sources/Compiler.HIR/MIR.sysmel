@@ -2544,31 +2544,40 @@ HIRVectorInsertElementInstruction extend: {
     }.
 }.
 
-let translateUnaryPrimitiveInto := {:(MIROperation)operation :: ((Array, Type, HIRFunctionDefinitionMIRCodeGenerator) => MIRValue) |
-    {:(Array)arguments :(Type)type :(HIRFunctionDefinitionMIRCodeGenerator)codegen :: MIRValue |
+let MIRPrimitiveGeneratorFunctionType := ((Array, Type, HIRFunctionDefinitionMIRCodeGenerator) => MIRValue).
+
+function translateUnaryPrimitiveInto(operation: MIROperation) => MIRPrimitiveGeneratorFunctionType
+    := {:(Array)arguments :(Type)type :(HIRFunctionDefinitionMIRCodeGenerator)codegen :: MIRValue |
         let operand := codegen translateValue: arguments first.
         codegen blockBuilder operation: operation with: operand type: type
-    }
-}.
+    }.
 
-let translateBinaryPrimitiveInto := {:(MIROperation)operation :: ((Array, Type, HIRFunctionDefinitionMIRCodeGenerator) => MIRValue) |
-    {:(Array)arguments :(Type)type :(HIRFunctionDefinitionMIRCodeGenerator)codegen :: MIRValue |
+function translateBinaryPrimitiveInto(operation: MIROperation) => MIRPrimitiveGeneratorFunctionType
+    := {:(Array)arguments :(Type)type :(HIRFunctionDefinitionMIRCodeGenerator)codegen :: MIRValue |
         let left := codegen translateValue: arguments first.
         let right := codegen translateValue: arguments second.
         codegen blockBuilder operation: operation with: left with: right type: type
-    }
-}.
+    }.
 
-let translateVectorWithAll := {:(MIROperation)operation :: ((Array, Type, HIRFunctionDefinitionMIRCodeGenerator) => MIRValue) |
-    {:(Array)arguments :(Type)type :(HIRFunctionDefinitionMIRCodeGenerator)codegen :: MIRValue |
+function translateVectorWithAll(operation: MIROperation) => MIRPrimitiveGeneratorFunctionType
+    := {:(Array)arguments :(Type)type :(HIRFunctionDefinitionMIRCodeGenerator)codegen :: MIRValue |
         let element := codegen translateValue: arguments last.
         codegen blockBuilder operation: operation with: element type: type
-    }
-}.
+    }.
 
-let translateYourselfPrimitive := {:(Array)arguments :(Type)type :(HIRFunctionDefinitionMIRCodeGenerator)codegen :: MIRValue |
-    codegen translateValue: arguments first
-}.
+function translateYourselfPrimitive(arguments: Array, type: Type, codegen: HIRFunctionDefinitionMIRCodeGenerator) => MIRValue
+    := codegen translateValue: arguments first.
+
+function translateChainedMinMax(firstOperation: MIROperation, secondOperation: MIROperation) => MIRPrimitiveGeneratorFunctionType
+    := {:(Array)arguments :(Type)type :(HIRFunctionDefinitionMIRCodeGenerator)codegen :: MIRValue |
+        let first := codegen translateValue: arguments first.
+        let second := codegen translateValue: arguments second.
+        let third := codegen translateValue: arguments third.
+        codegen blockBuilder operation: secondOperation
+            with: (codegen blockBuilder operation: firstOperation with: first with: second type: type)
+            with: third
+            type: type.
+    }.
 
 public global HIRMirPrimitiveCallGenerationTable := #{
     ## Pointer primitive
@@ -2992,6 +3001,7 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Char32::asFloat64   : translateUnaryPrimitiveInto(MIR::Operation::UInt32ToFloat64).
 
     ## UInt32 primitives
+    #UInt32::abs       : translateYourselfPrimitive.
     #UInt32::negated : translateUnaryPrimitiveInto(MIR::Operation::Int32Negate).
     #UInt32::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32BitNot).
     #UInt32::highBit : translateUnaryPrimitiveInto(MIR::Operation::Int32HighBit).
@@ -3036,6 +3046,7 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #UInt32::asIEEEFloat32Decoded : translateUnaryPrimitiveInto(MIR::Operation::IEEEUInt32ToFloat32). 
 
     ## UInt32x2
+    #UInt32x2::abs       : translateYourselfPrimitive.
     #UInt32x2::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int32x2Negate).
     #UInt32x2::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32x2BitNot).
 
@@ -3045,6 +3056,8 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #UInt32x2::min: : translateBinaryPrimitiveInto(MIR::Operation::Int32x2UMin).
     #UInt32x2::max: : translateBinaryPrimitiveInto(MIR::Operation::Int32x2UMax).
+    #UInt32x2::min:max:      : translateChainedMinMax(MIR::Operation::Int32x2UMin, MIR::Operation::Int32x2UMax).
+    #UInt32x2::clampMin:max: : translateChainedMinMax(MIR::Operation::Int32x2UMax, MIR::Operation::Int32x2UMin).
 
     #UInt32x2::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x2BitAnd).
     #UInt32x2::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x2BitOr).
@@ -3052,7 +3065,14 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #UInt32x2::<<  : translateBinaryPrimitiveInto(MIR::Operation::Int32x2LogicalShiftLeft).
     #UInt32x2::>>  : translateBinaryPrimitiveInto(MIR::Operation::Int32x2LogicalShiftRight).
 
+    #UInt32x2::asFloat32x2 : translateUnaryPrimitiveInto(MIR::Operation::UInt32x2ToFloat32x2).
+    #UInt32x2::asInt32x2 : translateYourselfPrimitive.
+
+    #UInt32x2::packInt16x2 : translateUnaryPrimitiveInto(MIR::Operation::Int32x2ToPackedInt16x2).
+    #UInt32x2::packUInt16x2 : translateUnaryPrimitiveInto(MIR::Operation::Int32x2ToPackedUInt16x2).
+
     ## UInt32x3
+    #UInt32x3::abs       : translateYourselfPrimitive.
     #UInt32x3::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int32x3Negate).
     #UInt32x3::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32x3BitNot).
 
@@ -3062,6 +3082,8 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #UInt32x3::min: : translateBinaryPrimitiveInto(MIR::Operation::Int32x3UMin).
     #UInt32x3::max: : translateBinaryPrimitiveInto(MIR::Operation::Int32x3UMax).
+    #UInt32x3::min:max:      : translateChainedMinMax(MIR::Operation::Int32x3UMin, MIR::Operation::Int32x3UMax).
+    #UInt32x3::clampMin:max: : translateChainedMinMax(MIR::Operation::Int32x3UMax, MIR::Operation::Int32x3UMin).
 
     #UInt32x3::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x3BitAnd).
     #UInt32x3::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x3BitOr).
@@ -3069,7 +3091,11 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #UInt32x3::<<  : translateBinaryPrimitiveInto(MIR::Operation::Int32x3LogicalShiftLeft).
     #UInt32x3::>>  : translateBinaryPrimitiveInto(MIR::Operation::Int32x3LogicalShiftRight).
 
+    #UInt32x3::asFloat32x3 : translateUnaryPrimitiveInto(MIR::Operation::UInt32x3ToFloat32x3).
+    #UInt32x3::asInt32x3 : translateYourselfPrimitive.
+
     ## UInt32x4
+    #UInt32x4::abs       : translateYourselfPrimitive.
     #UInt32x4::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int32x4Negate).
     #UInt32x4::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32x4BitNot).
 
@@ -3079,12 +3105,20 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #UInt32x4::min: : translateBinaryPrimitiveInto(MIR::Operation::Int32x4UMin).
     #UInt32x4::max: : translateBinaryPrimitiveInto(MIR::Operation::Int32x4UMax).
+    #UInt32x4::min:max:      : translateChainedMinMax(MIR::Operation::Int32x4UMin, MIR::Operation::Int32x4UMax).
+    #UInt32x4::clampMin:max: : translateChainedMinMax(MIR::Operation::Int32x4UMax, MIR::Operation::Int32x4UMin).
 
     #UInt32x4::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitAnd).
     #UInt32x4::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitOr).
     #UInt32x4::^   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitXor).
     #UInt32x4::<<  : translateBinaryPrimitiveInto(MIR::Operation::Int32x4LogicalShiftLeft).
     #UInt32x4::>>  : translateBinaryPrimitiveInto(MIR::Operation::Int32x4LogicalShiftRight).
+
+    #UInt32x4::asFloat32x4 : translateUnaryPrimitiveInto(MIR::Operation::UInt32x4ToFloat32x4).
+    #UInt32x4::asInt32x4 : translateYourselfPrimitive.
+
+    #UInt32x4::packInt8x4 : translateUnaryPrimitiveInto(MIR::Operation::Int32x4ToPackedInt8x4).
+    #UInt32x4::packUInt8x4 : translateUnaryPrimitiveInto(MIR::Operation::Int32x4ToPackedUInt8x4).
 
     ## Int32 primitives
     #Int32::negated : translateUnaryPrimitiveInto(MIR::Operation::Int32Negate).
@@ -3130,6 +3164,7 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Int32::asFloat64   : translateUnaryPrimitiveInto(MIR::Operation::Int32ToFloat64).
 
     ## Int32x2
+    #Int32x2::abs       : translateUnaryPrimitiveInto(MIR::Operation::Int32x2Abs).
     #Int32x2::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int32x2Negate).
     #Int32x2::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32x2BitNot).
 
@@ -3139,6 +3174,8 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Int32x2::min: : translateBinaryPrimitiveInto(MIR::Operation::Int32x2SMin).
     #Int32x2::max: : translateBinaryPrimitiveInto(MIR::Operation::Int32x2SMax).
+    #Int32x2::min:max:      : translateChainedMinMax(MIR::Operation::Int32x2SMin, MIR::Operation::Int32x2SMax).
+    #Int32x2::clampMin:max: : translateChainedMinMax(MIR::Operation::Int32x2SMax, MIR::Operation::Int32x2SMin).
 
     #Int32x2::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x2BitAnd).
     #Int32x2::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x2BitOr).
@@ -3146,7 +3183,14 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Int32x2::<<  : translateBinaryPrimitiveInto(MIR::Operation::Int32x2LogicalShiftLeft).
     #Int32x2::>>  : translateBinaryPrimitiveInto(MIR::Operation::Int32x2ArithmeticShiftRight).
 
+    #Int32x2::asFloat32x2 : translateUnaryPrimitiveInto(MIR::Operation::Int32x2ToFloat32x2).
+    #Int32x2::asUInt32x2 : translateYourselfPrimitive.
+
+    #Int32x2::packInt16x2 : translateUnaryPrimitiveInto(MIR::Operation::Int32x2ToPackedInt16x2).
+    #Int32x2::packUInt16x2 : translateUnaryPrimitiveInto(MIR::Operation::Int32x2ToPackedUInt16x2).
+
     ## Int32x3
+    #Int32x3::abs       : translateUnaryPrimitiveInto(MIR::Operation::Int32x3Abs).
     #Int32x3::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int32x3Negate).
     #Int32x3::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32x3BitNot).
 
@@ -3156,6 +3200,8 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Int32x3::min: : translateBinaryPrimitiveInto(MIR::Operation::Int32x3SMin).
     #Int32x3::max: : translateBinaryPrimitiveInto(MIR::Operation::Int32x3SMax).
+    #Int32x3::min:max:      : translateChainedMinMax(MIR::Operation::Int32x3SMin, MIR::Operation::Int32x3SMax).
+    #Int32x3::clampMin:max: : translateChainedMinMax(MIR::Operation::Int32x3SMax, MIR::Operation::Int32x3SMin).
 
     #Int32x3::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x3BitAnd).
     #Int32x3::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x3BitOr).
@@ -3163,7 +3209,11 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Int32x3::<<  : translateBinaryPrimitiveInto(MIR::Operation::Int32x3LogicalShiftLeft).
     #Int32x3::>>  : translateBinaryPrimitiveInto(MIR::Operation::Int32x3ArithmeticShiftRight).
 
+    #Int32x3::asFloat32x3 : translateUnaryPrimitiveInto(MIR::Operation::Int32x3ToFloat32x3).
+    #Int32x3::asUInt32x3 : translateYourselfPrimitive.
+
     ## Int32x4
+    #Int32x4::abs       : translateUnaryPrimitiveInto(MIR::Operation::Int32x4Abs).
     #Int32x4::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int32x4Negate).
     #Int32x4::bitInvert : translateUnaryPrimitiveInto(MIR::Operation::Int32x4BitNot).
 
@@ -3173,12 +3223,20 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Int32x4::min: : translateBinaryPrimitiveInto(MIR::Operation::Int32x4SMin).
     #Int32x4::max: : translateBinaryPrimitiveInto(MIR::Operation::Int32x4SMax).
+    #Int32x4::min:max:      : translateChainedMinMax(MIR::Operation::Int32x4SMin, MIR::Operation::Int32x4SMax).
+    #Int32x4::clampMin:max: : translateChainedMinMax(MIR::Operation::Int32x4SMax, MIR::Operation::Int32x4SMin).
 
     #Int32x4::&   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitAnd).
     #Int32x4::|   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitOr).
     #Int32x4::^   : translateBinaryPrimitiveInto(MIR::Operation::Int32x4BitXor).
     #Int32x4::<<  : translateBinaryPrimitiveInto(MIR::Operation::Int32x4LogicalShiftLeft).
     #Int32x4::>>  : translateBinaryPrimitiveInto(MIR::Operation::Int32x4ArithmeticShiftRight).
+
+    #Int32x4::asFloat32x4 : translateUnaryPrimitiveInto(MIR::Operation::Int32x4ToFloat32x4).
+    #Int32x4::asUInt32x4 : translateYourselfPrimitive.
+
+    #Int32x4::packInt8x4 : translateUnaryPrimitiveInto(MIR::Operation::Int32x4ToPackedInt8x4).
+    #Int32x4::packUInt8x4 : translateUnaryPrimitiveInto(MIR::Operation::Int32x4ToPackedUInt8x4).
 
     ## Int64 primitives
     #Int64::negated   : translateUnaryPrimitiveInto(MIR::Operation::Int64Negate).
@@ -3282,6 +3340,8 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Float32::min: : translateBinaryPrimitiveInto(MIR::Operation::Float32Min).
     #Float32::max: : translateBinaryPrimitiveInto(MIR::Operation::Float32Max).
+    #Float32::min:max:      : translateChainedMinMax(MIR::Operation::Float32Min, MIR::Operation::Float32Max).
+    #Float32::clampMin:max: : translateChainedMinMax(MIR::Operation::Float32Max, MIR::Operation::Float32Min).
 
     #Float32::=   : translateBinaryPrimitiveInto(MIR::Operation::Float32UnorderedEquals).
     #Float32::~=  : translateBinaryPrimitiveInto(MIR::Operation::Float32UnorderedNotEquals).
@@ -3311,6 +3371,7 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float32::asIEEEFloat32Encoding : translateUnaryPrimitiveInto(MIR::Operation::Float32ToIEEEUInt32). 
 
     ## Float32x2 primitives
+    #Float32x2::abs       : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Abs).
     #Float32x2::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Negate).
     #Float32x2::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Sqrt).
     #Float32x2::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float32x2Ceiling).
@@ -3325,8 +3386,14 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Float32x2::min: : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Min).
     #Float32x2::max: : translateBinaryPrimitiveInto(MIR::Operation::Float32x2Max).
+    #Float32x2::min:max:      : translateChainedMinMax(MIR::Operation::Float32x2Min, MIR::Operation::Float32x2Max).
+    #Float32x2::clampMin:max: : translateChainedMinMax(MIR::Operation::Float32x2Max, MIR::Operation::Float32x2Min).
+
+    #Float32x2::asInt32x2 : translateUnaryPrimitiveInto(MIR::Operation::Float32x2ToInt32x2).
+    #Float32x2::asUInt32x2 : translateUnaryPrimitiveInto(MIR::Operation::Float32x2ToUInt32x2).
 
     ## Float32x3 primitives
+    #Float32x3::abs       : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Abs).
     #Float32x3::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Negate).
     #Float32x3::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Sqrt).
     #Float32x3::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float32x3Ceiling).
@@ -3341,8 +3408,14 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Float32x3::min: : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Min).
     #Float32x3::max: : translateBinaryPrimitiveInto(MIR::Operation::Float32x3Max).
+    #Float32x3::min:max:      : translateChainedMinMax(MIR::Operation::Float32x3Min, MIR::Operation::Float32x3Max).
+    #Float32x3::clampMin:max: : translateChainedMinMax(MIR::Operation::Float32x3Max, MIR::Operation::Float32x3Min).
+
+    #Float32x3::asInt32x3 : translateUnaryPrimitiveInto(MIR::Operation::Float32x3ToInt32x3).
+    #Float32x3::asUInt32x3 : translateUnaryPrimitiveInto(MIR::Operation::Float32x3ToUInt32x3).
 
     ## Float32x4 primitives
+    #Float32x4::abs       : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Abs).
     #Float32x4::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Negate).
     #Float32x4::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Sqrt).
     #Float32x4::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float32x4Ceiling).
@@ -3357,6 +3430,11 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Float32x4::min: : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Min).
     #Float32x4::max: : translateBinaryPrimitiveInto(MIR::Operation::Float32x4Max).
+    #Float32x4::min:max:      : translateChainedMinMax(MIR::Operation::Float32x4Min, MIR::Operation::Float32x4Max).
+    #Float32x4::clampMin:max: : translateChainedMinMax(MIR::Operation::Float32x4Max, MIR::Operation::Float32x4Min).
+
+    #Float32x4::asInt32x4 : translateUnaryPrimitiveInto(MIR::Operation::Float32x4ToInt32x4).
+    #Float32x4::asUInt32x4 : translateUnaryPrimitiveInto(MIR::Operation::Float32x4ToUInt32x4).
 
     ## Float64 primitives
     #Float64::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float64Negate).
@@ -3373,6 +3451,8 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Float64::min: : translateBinaryPrimitiveInto(MIR::Operation::Float64Min).
     #Float64::max: : translateBinaryPrimitiveInto(MIR::Operation::Float64Max).
+    #Float64::min:max:      : translateChainedMinMax(MIR::Operation::Float64Min, MIR::Operation::Float64Max).
+    #Float64::clampMin:max: : translateChainedMinMax(MIR::Operation::Float64Max, MIR::Operation::Float64Min).
 
     #Float64::=   : translateBinaryPrimitiveInto(MIR::Operation::Float64UnorderedEquals).
     #Float64::~=  : translateBinaryPrimitiveInto(MIR::Operation::Float64UnorderedNotEquals).
@@ -3401,7 +3481,8 @@ public global HIRMirPrimitiveCallGenerationTable := #{
     #Float64::asFloat64   : translateYourselfPrimitive.
     #Float64::asIEEEFloat64Encoding : translateUnaryPrimitiveInto(MIR::Operation::Float64ToIEEEUInt64). 
 
-    ## Float64x3 primitives
+    ## Float64x2 primitives
+    #Float64x2::abs       : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Abs).
     #Float64x2::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Negate).
     #Float64x2::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Sqrt).
     #Float64x2::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float64x2Ceiling).
@@ -3416,8 +3497,11 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Float64x2::min: : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Min).
     #Float64x2::max: : translateBinaryPrimitiveInto(MIR::Operation::Float64x2Max).
+    #Float64x2::min:max:      : translateChainedMinMax(MIR::Operation::Float64x2Min, MIR::Operation::Float64x2Max).
+    #Float64x2::clampMin:max: : translateChainedMinMax(MIR::Operation::Float64x2Max, MIR::Operation::Float64x2Min).
 
     ## Float64x3 primitives
+    #Float64x3::abs       : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Abs).
     #Float64x3::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Negate).
     #Float64x3::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Sqrt).
     #Float64x3::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float64x3Ceiling).
@@ -3432,8 +3516,11 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Float64x3::min: : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Min).
     #Float64x3::max: : translateBinaryPrimitiveInto(MIR::Operation::Float64x3Max).
+    #Float64x3::min:max:      : translateChainedMinMax(MIR::Operation::Float64x3Min, MIR::Operation::Float64x3Max).
+    #Float64x3::clampMin:max: : translateChainedMinMax(MIR::Operation::Float64x3Max, MIR::Operation::Float64x3Min).
 
     ## Float64x4 primitives
+    #Float64x4::abs       : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Abs).
     #Float64x4::negated   : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Negate).
     #Float64x4::sqrt      : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Sqrt).
     #Float64x4::ceiling   : translateUnaryPrimitiveInto(MIR::Operation::Float64x4Ceiling).
@@ -3448,12 +3535,14 @@ public global HIRMirPrimitiveCallGenerationTable := #{
 
     #Float64x4::min: : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Min).
     #Float64x4::max: : translateBinaryPrimitiveInto(MIR::Operation::Float64x4Max).
+    #Float64x4::min:max:      : translateChainedMinMax(MIR::Operation::Float64x4Min, MIR::Operation::Float64x4Max).
+    #Float64x4::clampMin:max: : translateChainedMinMax(MIR::Operation::Float64x4Max, MIR::Operation::Float64x4Min).
 }.
 
 HIRFunctionDefinitionMIRCodeGenerator extend: {
     public method compilePrimitiveFunctionBody => Boolean := {
         ## Attempt to use the primitive generator first.
-        let primitiveGenerator type: (Array, Type, HIRFunctionDefinitionMIRCodeGenerator) => MIRValue := HIRMirPrimitiveCallGenerationTable atOrNil: ssaFunctionDefinition primitiveName.
+        let primitiveGenerator type: MIRPrimitiveGeneratorFunctionType := HIRMirPrimitiveCallGenerationTable atOrNil: ssaFunctionDefinition primitiveName.
         let primitiveResultValue mutable => MIRValue := nil.
         primitiveGenerator ifNotNil: {
             functionBuilder basicBlock: #primitive build: {:(MIRBlockBuilder)asm :: Void |
@@ -3473,7 +3562,7 @@ HIRFunctionDefinitionMIRCodeGenerator extend: {
         ## Attempt to use the primitive generator first.
         let primitiveName := calledFunction primitiveName.
         (#(Exception::setjmp Exception::longjmp) includes: primitiveName) ifFalse: {
-            let primitiveGenerator type: (Array, Type, HIRFunctionDefinitionMIRCodeGenerator) => MIRValue := HIRMirPrimitiveCallGenerationTable atOrNil: primitiveName.
+            let primitiveGenerator type: MIRPrimitiveGeneratorFunctionType := HIRMirPrimitiveCallGenerationTable atOrNil: primitiveName.
             primitiveGenerator ifNotNil: {
                 let primitiveValue := primitiveGenerator(arguments, resultType, self).
                 primitiveValue ifNotNil: {

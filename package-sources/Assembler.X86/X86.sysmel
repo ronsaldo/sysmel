@@ -2242,6 +2242,25 @@ let instructionDefinitionTable := #(
         (OpRxRmx #[16rf3] #[16r0f 16r58])
     )
 
+    (cvtdq2pd (dst src) "Convert packed double-words into packed doubles"
+        (OpRwRmx #[16rF3] #[16r0F 16rE6])
+    )
+    (cvtdq2ps (dst src) "Convert packed double-words into packed singles"
+        (OpRwRmx #[] #[16r0F 16r5B])
+    )
+    (cvtpd2dq (dst src) "Convert packed doubles into packed double-words"
+        (OpRwRmx #[16rF2] #[16r0F 16rE6])
+    )
+    (cvtpd2ps (dst src) "Convert packed doubles into packed singles"
+        (OpRwRmx #[16r66] #[16r0F 16r5A])
+    )
+    (cvtps2dq (dst src) "Convert packed singles into packed double-word"
+        (OpRwRmx #[16r66] #[16r0F 16r5B])
+    )
+    (cvtps2pd (dst src) "Convert packed singles into packed doubles"
+        (OpRwRmx #[] #[16r0F 16r5A])
+    )
+
     (cvtsd2si (dst src) "Convert scalar double into scalar integer"
         (OpRwRmx #[16rF2] #[16r0f 16r2D])
     )
@@ -2266,6 +2285,19 @@ let instructionDefinitionTable := #(
     )
     (cvttsd2si (dst src) "Convert scalar double into scalar integer with truncation"
         (OpRwRmx #[16rF2] #[16r0f 16r2c])
+    )
+
+    (packsswb (dst with) "Pack with signed saturation, words to bytes"
+        (OpRwRmx #[16r66] #[16r0f 16r63])
+    )
+    (packssdw (dst with) "Pack with signed saturation, double-words to bytes"
+        (OpRwRmx #[16r66] #[16r0f 16r6B])
+    )
+    (packuswb (dst with) "Pack with unsigned saturation, words to bytes"
+        (OpRwRmx #[16r66] #[16r0f 16r67])
+    )
+    (packusdw (dst with) "Pack with unsigned saturation, double-words to bytes"
+        (OpRwRmx #[16r66] #[16r0f 16r38 16r2B])
     )
 
     (andpd (dst with) "And packed double"
@@ -2350,6 +2382,44 @@ let instructionDefinitionTable := #(
     )
     (pmovmkb (dst src) "Move byte mask"
         (OpRwRmx #[16r66] #[16r0f 16rD7])
+    )
+
+    (pmovsxbw (dst src) "Sign extend 8 packed bytes into words"
+        (OpRwRmx #[16r66] #[16r0F 16r38 16r20])
+    )
+    (pmovsxbd (dst src) "Sign extend 4 packed bytes into double-words"
+        (OpRwRmx #[16r66] #[16r0F 16r38 16r21])
+    )
+    (pmovsxbq (dst src) "Sign extend 8 packed bytes into quad-words"
+        (OpRwRmx #[16r66] #[16r0F 16r38 16r22])
+    )
+    (pmovsxwd (dst src) "Sign extend 4 packed words into double-words"
+        (OpRwRmx #[16r66] #[16r0F 16r38 16r23])
+    )
+    (pmovsxwq (dst src) "Sign extend 2 packed words into quad-words"
+        (OpRwRmx #[16r66] #[16r0F 16r38 16r24])
+    )
+    (pmovsxdq (dst src) "Sign extend 2 packed double-words into quad-words"
+        (OpRwRmx #[16r66] #[16r0F 16r38 16r25])
+    )
+
+    (pmovzxbw (dst src) "Zero extend 8 packed bytes into words"
+        (OpRwRmx #[16r66] #[16r0F 16r38 16r30])
+    )
+    (pmovzxbd (dst src) "Zero extend 4 packed bytes into double-words"
+        (OpRwRmx #[16r66] #[16r0F 16r38 16r31])
+    )
+    (pmovzxbq (dst src) "Zero extend 8 packed bytes into quad-words"
+        (OpRwRmx #[16r66] #[16r0F 16r38 16r32])
+    )
+    (pmovzxwd (dst src) "Zero extend 4 packed words into double-words"
+        (OpRwRmx #[16r66] #[16r0F 16r38 16r33])
+    )
+    (pmovzxwq (dst src) "Zero extend 2 packed words into quad-words"
+        (OpRwRmx #[16r66] #[16r0F 16r38 16r34])
+    )
+    (pmovzxdq (dst src) "Zero extend 2 packed double-words into quad-words"
+        (OpRwRmx #[16r66] #[16r0F 16r38 16r35])
     )
 
     (movhlps (dst src) "Move packed single float low to high"
@@ -2524,6 +2594,16 @@ let instructionDefinitionTable := #(
     )
     (pmulld (dst with) "Packed multiply signed integer store low double-words"
         (OpRxRmx #[16r66] #[16r0f 16r38 16r40])
+    )
+
+    (pabsb (dst with) "Packed absolute value"
+        (OpRxRmx #[16r66] #[16r0f 16r38 16r1C])
+    )
+    (pabsw (dst with) "Packed absolute value"
+        (OpRxRmx #[16r66] #[16r0f 16r38 16r1D])
+    )
+    (pabsd (dst with) "Packed absolute value"
+        (OpRxRmx #[16r66] #[16r0f 16r38 16r1E])
     )
 
     (pmaxsb (dst with) "Packed maximum signed byte"

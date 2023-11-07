@@ -548,33 +548,38 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                 self with: other collect: {:(ElementType)a :(ElementType)b :: ElementType | a max: b}
             }.
 
+            public pure inline method min: (min: SelfType) max: (max: SelfType) ::=> SelfType := {
+                <primitive: (VectorTypeName -- "::min:max:") asSymbol>
+                (self min: min) max: max
+            }.
+
+            public pure inline method clampMin: (min: SelfType) max: (max: SelfType) ::=> SelfType := {
+                <primitive: (VectorTypeName -- "::clampMin:max:") asSymbol>
+                (self max: min) min: max
+            }.
+
             public pure method sum => ElementType := {
                 <primitive: (VectorTypeName -- "::sum") asSymbol>
-                <targetDefinedPrimitive>
                 self reduce: {:(ElementType)a :(ElementType)b :: ElementType | a + b }
             }.
 
             public pure method max => ElementType := {
                 <primitive: (VectorTypeName -- "::max") asSymbol>
-                <targetDefinedPrimitive>
                 self reduce: {:(ElementType)a :(ElementType)b :: ElementType | a max: b }
             }.
 
             public pure method min => ElementType := {
                 <primitive: (VectorTypeName -- "::min") asSymbol>
-                <targetDefinedPrimitive>
                 self reduce: {:(ElementType)a :(ElementType)b :: ElementType | a min: b }
             }.
 
             public pure method dot: (other: SelfType) ::=> ElementType := {
                 <primitive: (VectorTypeName -- "::dot") asSymbol>
-                <targetDefinedPrimitive>
                 (self * other) sum
             }.
 
             public pure method length2 => ElementType := {
                 <primitive: (VectorTypeName -- "::length2") asSymbol>
-                <targetDefinedPrimitive>
                 self dot: self
             }.
 
@@ -593,7 +598,6 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
 
                 public pure method length => ElementType := {
                     <primitive: (VectorTypeName -- "::length") asSymbol>
-                    <targetDefinedPrimitive>
                     self length2 sqrt
                 }.
             }.
@@ -757,5 +761,55 @@ Float64 definition: {
         <primitive: #PrimitiveVector::withAll:>
         <targetDefinedPrimitive>
         Float64x4 withAll: self f64
+    }.
+}.
+
+Int32x4 definition: {
+    public pure method asFloat32x4 => Float32x4 := {
+        <primitive: #Int32x4::asFloat32x4>
+        <targetDefinedPrimitive>
+        Float32x4 x: self x asFloat32 y: self y asFloat32 z: self z asFloat32 w: self w asFloat32
+    }.
+
+    public pure method asUInt32x4 => UInt32x4 := {
+        <primitive: #Int32x4::asUInt32x4>
+        <targetDefinedPrimitive>
+        UInt32x4 x: self x asUInt32 y: self y asUInt32 z: self z asUInt32 w: self w asUInt32
+    }.
+
+    public pure method packInt8x4 => UInt32 := {
+        <primitive: #Int32x4::packInt8x4>
+        <targetDefinedPrimitive>
+        self x asUInt32 | (self y asUInt32 << 8u32) | (self z asUInt32 << 16u32) | (self w asUInt32 << 24u32)
+    }.
+
+    public pure method packUInt8x4 => UInt32 := {
+        <primitive: #Int32x4::packUInt8x4>
+        <targetDefinedPrimitive>
+        self x asUInt32 | (self y asUInt32 << 8u32) | (self z asUInt32 << 16u32) | (self w asUInt32 << 24u32)
+    }.
+}.
+
+Float32x4 definition: {
+    public pure method asUInt32x4 => UInt32x4 := {
+        <primitive: #Float32x4::asUInt32x4>
+        <targetDefinedPrimitive>
+        UInt32x4 x: self x asUInt32 y: self y asUInt32 z: self z asUInt32 w: self w asUInt32
+    }.
+
+    public pure method asInt32x4 => Int32x4 := {
+        <primitive: #Float32x4::asInt32x4>
+        <targetDefinedPrimitive>
+        Int32x4 x: self x asInt32 y: self y asInt32 z: self z asInt32 w: self w asInt32
+    }.
+
+    public pure inline method packUnorm4x8 => UInt32 := {
+        <primitive: #Float32x4::packUnorm4x8>
+        ((self clampMin: 0f32x4 max: 1f32x4) * 255f32x4) asInt32x4 packUInt8x4
+    }.
+
+    public pure inline method packSnorm4x8 => UInt32 := {
+        <primitive: #Float32x4::packSnorm4x8>
+        ((self clampMin: -1f32x4 max: 1f32x4) * 127f32x4) asInt32x4 packInt8x4
     }.
 }.

@@ -227,6 +227,9 @@ public function bitOr(a: UInt32x4, b: UInt32x4) => UInt32x4
 public function bitXor(a: UInt32x4, b: UInt32x4) => UInt32x4
     := a ^ b.
 
+public function abs(v: Int32x4) => Int32x4
+    := v abs.
+
 ##public function myOnes() => Boolean64x2
 ##    := Boolean64x2 withAll: 1i32.
 
@@ -234,7 +237,7 @@ let asmCompilationTarget := AsmCompilationTarget x86_64 setForLinux.
 
 let hirModule := (HIRModuleCompilationContext forTarget: asmCompilationTarget asMirCompilationTarget asHIRCompilationTarget)
     exclusiveCompilationMode: true;
-    compileFunctionsWithDefinitions: (negated, bitInvert, add, sub, mul, min, max, bitAnd, bitOr, bitXor, shiftLeft, shiftRight);
+    compileFunctionsWithDefinitions: (Float32x4 >> #packUnorm4x8,);
     finish.
 
 hirModule performStandardOptimizations.

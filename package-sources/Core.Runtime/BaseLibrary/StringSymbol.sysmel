@@ -18,6 +18,12 @@ StringSymbol extend: {
 
             newSymbol
         }.
+
+        public final method streamContents: (aBlock: (StringStream) => Void) ::=> StringSymbol := {
+            let stream := StringStream new.
+            aBlock(stream).
+            stream asSymbol
+        }.
     }.
 
     public method <=> (other: StringSymbol) ::=> Int32 := {

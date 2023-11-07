@@ -32,6 +32,12 @@ String extend: {
             reverseMemcpy(result __rawContentsPointer__, string reinterpretCastTo: Void const pointer, stringLength).
             result
         }.
+
+        public final method streamContents: (aBlock: (StringStream) => Void) ::=> String := {
+            let stream := StringStream new.
+            aBlock(stream).
+            stream asString
+        }.
     }.
 
     public override final pure method hash ::=> Size := {
@@ -324,6 +330,9 @@ UInt8 extend: {
             ifFalse: (stream nextPut: self asChar8 + 'A'c8 - 10c8).
     }.
 
+    public method hex => String
+        := String streamContents: {:(StringStream)out :: Void | self printHexOn: out }.
+
     public method printHexOn: (stream: Stream) ::=> Void := {
         self >> 4u8 printHexDigitOn: stream.
         self & 16rF u8 printHexDigitOn: stream.
@@ -340,6 +349,9 @@ UInt8 extend: {
 }.
 
 UInt16 extend: {
+    public method hex => String
+        := String streamContents: {:(StringStream)out :: Void | self printHexOn: out }.
+
     public method printHexOn: (stream: Stream) ::=> Void := {
         (self >> 8u16) asUInt8 printHexOn: stream.
         self asUInt8 printHexOn: stream.
@@ -356,6 +368,9 @@ UInt16 extend: {
 }.
 
 UInt32 extend: {
+    public method hex => String
+        := String streamContents: {:(StringStream)out :: Void | self printHexOn: out }.
+
     public method printHexOn: (stream: Stream) ::=> Void := {
         (self >> 16u32) asUInt16 printHexOn: stream.
         self asUInt16 printHexOn: stream.
@@ -392,6 +407,9 @@ UInt32 extend: {
 }.
 
 UInt64 extend: {
+    public method hex => String
+        := String streamContents: {:(StringStream)out :: Void | self printHexOn: out }.
+
     public method printHexOn: (stream: Stream) ::=> Void := {
         (self >> 32u64) asUInt32 printHexOn: stream.
         self asUInt32 printHexOn: stream.
@@ -428,6 +446,9 @@ UInt64 extend: {
 }.
 
 Int8 extend: {
+    public method hex => String
+        := String streamContents: {:(StringStream)out :: Void | self printHexOn: out }.
+
     public method printHexOn: (stream: Stream) ::=> Void := {
         self asUInt8 printHexOn: stream.
     }.
@@ -443,6 +464,9 @@ Int8 extend: {
 }.
 
 Int16 extend: {
+    public method hex => String
+        := String streamContents: {:(StringStream)out :: Void | self printHexOn: out }.
+
     public method printHexOn: (stream: Stream) ::=> Void := {
         self asUInt16 printHexOn: stream.
     }.
@@ -458,6 +482,9 @@ Int16 extend: {
 }.
 
 Int32 extend: {
+    public method hex => String
+        := String streamContents: {:(StringStream)out :: Void | self printHexOn: out }.
+
     public method printHexOn: (stream: Stream) ::=> Void := {
         self asUInt32 printHexOn: stream.
     }.
@@ -492,6 +519,9 @@ Int32 extend: {
 }.
 
 Int64 extend: {
+    public method hex => String
+        := String streamContents: {:(StringStream)out :: Void | self printHexOn: out }.
+
     public method printHexOn: (stream: Stream) ::=> Void := {
         self asUInt64 printHexOn: stream.
     }.

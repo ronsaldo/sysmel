@@ -108,6 +108,16 @@
             if: self >= other then: self else: other.
         }.
 
+        public pure final eager inline method min: (min: SelfType) max: (max: SelfType) ::=> SelfType := {
+            <primitive: (primitivePrefix -- "min:max:") asSymbol>
+            (self min: min) max: max
+        }.
+
+        public pure final eager inline method clampMin: (min: SelfType) max: (max: SelfType) ::=> SelfType := {
+            <primitive: (primitivePrefix -- "clampMin:max:") asSymbol>
+            (self max: min) min: max
+        }.
+
         public pure final eager method sum => SelfType := {
             <primitive: #yourself>
             <targetDefinedPrimitive>

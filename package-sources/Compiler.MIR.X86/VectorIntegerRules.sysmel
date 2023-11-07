@@ -64,6 +64,13 @@ MIR::Operation::Int32x2InsertElement
             x86::pinsrd: (instruction resultRegister x86::vector128For: codegen) src: (instruction secondOperandRegister x86::int32For: codegen) mask: index asAsmImmediate
     }.
 
+MIR::Operation::Int32x2Abs
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::pabsd: (instruction resultRegister x86::vector128For: codegen) with: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
 MIR::Operation::Int32x2Negate
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
@@ -224,6 +231,13 @@ MIR::Operation::Int32x3InsertElement
             x86::pinsrd: (instruction resultRegister x86::vector128For: codegen) src: (instruction secondOperandRegister x86::int32For: codegen) mask: index asAsmImmediate
     }.
 
+MIR::Operation::Int32x3Abs
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::pabsd: (instruction resultRegister x86::vector128For: codegen) with: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
 MIR::Operation::Int32x3Negate
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
@@ -382,6 +396,13 @@ MIR::Operation::Int32x4InsertElement
         codegen textSection
             x86::movdqa: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
             x86::pinsrd: (instruction resultRegister x86::vector128For: codegen) src: (instruction secondOperandRegister x86::int32For: codegen) mask: index asAsmImmediate
+    }.
+
+MIR::Operation::Int32x4Abs
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::pabsd: (instruction resultRegister x86::vector128For: codegen) with: (instruction firstOperandRegister x86::vector128For: codegen)
     }.
 
 MIR::Operation::Int32x4Negate

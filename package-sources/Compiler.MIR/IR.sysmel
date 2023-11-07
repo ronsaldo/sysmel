@@ -2995,6 +2995,14 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Float64ToFloat32 Float64ToUInt8 Float64ToInt8 Float64ToUInt16 Float64ToInt16 Float64ToUInt32 Float64ToInt32 Float64ToUInt64 Float64ToInt64
     Float32ToIEEEUInt32 Float64ToIEEEUInt64 IEEEUInt32ToFloat32 IEEEUInt64ToFloat64
 
+    Float32x2ToInt32x2 Float32x3ToInt32x3 Float32x4ToInt32x4
+    Float32x2ToUInt32x2 Float32x3ToUInt32x3 Float32x4ToUInt32x4
+    Int32x2ToFloat32x2 Int32x3ToFloat32x3 Int32x4ToFloat32x4
+    UInt32x2ToFloat32x2 UInt32x3ToFloat32x3 UInt32x4ToFloat32x4
+    
+    Int32x4ToPackedUInt8x4 Int32x4ToPackedInt8x4
+    Int32x2ToPackedUInt16x2 Int32x2ToPackedInt16x2
+
     FatPointerExtractFirst FatPointerExtractSecond
 ) do: {:(Symbol)operationName :: Void |
     let operationNameString := operationName asString.
@@ -3042,6 +3050,7 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int32x2UMin
     Int32x2SMax
     Int32x2UMax
+    Int32x2Abs
 
     Int32x2BitAnd Int64x2BitAnd
     Int32x2BitOr  Int64x2BitOr
@@ -3061,6 +3070,7 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int32x3UMin
     Int32x3SMax
     Int32x3UMax
+    Int32x3Abs
 
     Int32x3BitAnd Int64x3BitAnd
     Int32x3BitOr  Int64x3BitOr
@@ -3080,6 +3090,7 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Int32x4UMin
     Int32x4SMax
     Int32x4UMax
+    Int32x4Abs
 
     Int32x4BitAnd Int64x4BitAnd
     Int32x4BitOr  Int64x4BitOr
@@ -3096,6 +3107,7 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Float32Div Float64Div
     Float32Min Float64Min
     Float32Max Float64Max
+    Float32Abs Float64Abs
 
     Float32x2Add Float64x2Add
     Float32x2Sub Float64x2Sub
@@ -3103,6 +3115,7 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Float32x2Div Float64x2Div
     Float32x2Min Float64x2Min
     Float32x2Max Float64x2Max
+    Float32x2Abs Float64x2Abs
 
     Float32x3Add Float64x3Add
     Float32x3Sub Float64x3Sub
@@ -3110,6 +3123,7 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Float32x3Div Float64x3Div
     Float32x3Min Float64x3Min
     Float32x3Max Float64x3Max
+    Float32x3Abs Float64x3Abs
 
     Float32x4Add Float64x4Add
     Float32x4Sub Float64x4Sub
@@ -3117,6 +3131,7 @@ public final class MIRFunctionBuilder superclass: Object; definition: {
     Float32x4Div Float64x4Div
     Float32x4Min Float64x4Min
     Float32x4Max Float64x4Max
+    Float32x4Abs Float64x4Abs
 
     Float32UnorderedCompare Float64UnorderedCompare
 

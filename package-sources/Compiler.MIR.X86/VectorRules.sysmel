@@ -22,6 +22,12 @@ let x86::loadPointerRegisterContraints := {:(MIRInstruction)instruction :(MIRReg
         allocateRegisterForInstructionResult: instruction
 }.
 
+let x86::vectorUnaryAluRegisterConstraints := {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+    allocator
+        allocateRegisterOrMemoryForInstruction: instruction operandAt: 0sz;
+        allocateRegisterForInstructionResult: instruction trySharingWithOperandAt: 0sz
+}.
+
 MIR::Operation::MoveVector32
     forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorMoveRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
@@ -168,3 +174,155 @@ MIR::Operation::StoreVector256
         }
     }.
 
+MIR::Operation::Float32x2ToInt32x2
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::cvtps2dq: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Float32x3ToInt32x3
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::cvtps2dq: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Float32x4ToInt32x4
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        ## FIXME: Perform the proper conversion that is required here.
+        codegen textSection
+            x86::cvtps2dq: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Float32x2ToUInt32x2
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        ## FIXME: Perform the proper conversion that is required here.
+        codegen textSection
+            x86::cvtps2dq: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Float32x3ToUInt32x3
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        ## FIXME: Perform the proper conversion that is required here.
+        codegen textSection
+            x86::cvtps2dq: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Float32x4ToUInt32x4
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        ## FIXME: Perform the proper conversion that is required here.
+        codegen textSection
+            x86::cvtps2dq: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2ToFloat32x2
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::cvtdq2ps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x3ToFloat32x3
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::cvtdq2ps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4ToFloat32x4
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::cvtdq2ps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::UInt32x2ToFloat32x2
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        ## FIXME: Perform the proper conversion that is required here.
+        codegen textSection
+            x86::cvtdq2ps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::UInt32x3ToFloat32x3
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        ## FIXME: Perform the proper conversion that is required here.
+        codegen textSection
+            x86::cvtdq2ps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::UInt32x4ToFloat32x4
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        ## FIXME: Perform the proper conversion that is required here.
+        codegen textSection
+            x86::cvtdq2ps: (instruction resultRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4ToPackedUInt8x4
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        instruction scratchRegisterCount: 1sz.
+        allocator
+            allocateRegisterOrMemoryForInstruction: instruction operandAt: 0sz;
+            allocateVectorRegisterForInstruction: instruction scratchAt: 0sz;
+            allocateRegisterForInstructionResult: instruction
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction firstScratchRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::packssdw: (instruction firstScratchRegister x86::vector128For: codegen) with: (instruction firstScratchRegister x86::vector128For: codegen);
+            x86::packuswb: (instruction firstScratchRegister x86::vector128For: codegen) with: (instruction firstScratchRegister x86::vector128For: codegen);
+            x86::movd: (instruction resultRegister x86::int32For: codegen) src: (instruction firstScratchRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x4ToPackedInt8x4
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        instruction scratchRegisterCount: 1sz.
+        allocator
+            allocateRegisterOrMemoryForInstruction: instruction operandAt: 0sz;
+            allocateVectorRegisterForInstruction: instruction scratchAt: 0sz;
+            allocateRegisterForInstructionResult: instruction
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction firstScratchRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::packssdw: (instruction firstScratchRegister x86::vector128For: codegen) with: (instruction firstScratchRegister x86::vector128For: codegen);
+            x86::packsswb: (instruction firstScratchRegister x86::vector128For: codegen) with: (instruction firstScratchRegister x86::vector128For: codegen);
+            x86::movd: (instruction resultRegister x86::int32For: codegen) src: (instruction firstScratchRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2ToPackedUInt16x2
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        instruction scratchRegisterCount: 1sz.
+        allocator
+            allocateRegisterOrMemoryForInstruction: instruction operandAt: 0sz;
+            allocateVectorRegisterForInstruction: instruction scratchAt: 0sz;
+            allocateRegisterForInstructionResult: instruction
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction firstScratchRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::packusdw: (instruction firstScratchRegister x86::vector128For: codegen) with: (instruction firstScratchRegister x86::vector128For: codegen);
+            x86::movd: (instruction resultRegister x86::int32For: codegen) src: (instruction firstScratchRegister x86::vector128For: codegen)
+    }.
+
+MIR::Operation::Int32x2ToPackedInt16x2
+    forTargets: #(x86 x86_64) registerConstraintsWith: {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+        instruction scratchRegisterCount: 1sz.
+        allocator
+            allocateRegisterOrMemoryForInstruction: instruction operandAt: 0sz;
+            allocateVectorRegisterForInstruction: instruction scratchAt: 0sz;
+            allocateRegisterForInstructionResult: instruction
+    };
+    forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
+        codegen textSection
+            x86::movdqa: (instruction firstScratchRegister x86::vector128For: codegen) src: (instruction firstOperandRegister x86::vector128For: codegen);
+            x86::packssdw: (instruction firstScratchRegister x86::vector128For: codegen) with: (instruction firstScratchRegister x86::vector128For: codegen);
+            x86::movd: (instruction resultRegister x86::int32For: codegen) src: (instruction firstScratchRegister x86::vector128For: codegen)
+    }.
