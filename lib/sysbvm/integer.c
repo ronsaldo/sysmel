@@ -293,7 +293,7 @@ int64_t sysbvm_tuple_integer_decodeInt64(sysbvm_context_t *context, sysbvm_tuple
 
     sysbvm_integer_t *integer = (sysbvm_integer_t *)value;
     int64_t decodedValue = 0;
-    if(byteSize < 8)
+    if(byteSize >= 8)
         decodedValue = (uint64_t)integer->words[0] | ((uint64_t)integer->words[1] << 32);
     else
         decodedValue = (uint64_t)integer->words[0];
