@@ -43,6 +43,8 @@ public final class HIRModuleMIRCodeGenerator superclass: HIRMIRCodeGenerator; de
     public field capturelessUncheckedEntryPointDictionary => ObjectPointerDictionary.
     public field uncheckedEntryPointDictionary => ObjectPointerDictionary.
     public field checkedEntryPointDictionary => ObjectPointerDictionary.
+
+    public field uncheckedToCapturelessEntryPointDictionary => Dictionary.
     public field uncheckedInterpreterTrampolinesDictionary => Dictionary.
     public field boxingApplicationTrampolinesDictionary => Dictionary.
 
@@ -62,11 +64,15 @@ public final class HIRModuleMIRCodeGenerator superclass: HIRMIRCodeGenerator; de
             yourself.
         globalValueDictionary := ObjectPointerDictionary new.
         runtimeFunctionDictionary := ObjectPointerDictionary new.
+
         capturelessUncheckedEntryPointDictionary := ObjectPointerDictionary new.
         uncheckedEntryPointDictionary := ObjectPointerDictionary new.
         checkedEntryPointDictionary := ObjectPointerDictionary new.
+
+        uncheckedToCapturelessEntryPointDictionary := Dictionary new.
         uncheckedInterpreterTrampolinesDictionary := Dictionary new.
         boxingApplicationTrampolinesDictionary := Dictionary new.
+
         genericObjectPointerConstants := ObjectPointerDictionary new.
         structureConstants := ObjectPointerDictionary new.
         primitiveVectorConstants := Dictionary new.
@@ -230,7 +236,25 @@ public final class HIRModuleMIRCodeGenerator superclass: HIRMIRCodeGenerator; de
         }.
     }.
 
+    public method getOrCreateUncheckedToCapturelessTrampolineForFunctionType: (functionType: FunctionType) ::=> MIRProgramEntity
+        := uncheckedToCapturelessEntryPointDictionary at: functionType ifAbsentPut: {:: MIRProgramEntity |
+            let trampoline := (MIRImportedFunction forContext: mirContext)
+                name: (FunctionTypeUncheckedToCapturelessTrampolineSymbol for: functionType);
+                compilationTarget: compilationTarget;
+                callingConvention: compilationTarget defaultCallingConvention;
+                yourself.
+            targetModule addProgramEntity: trampoline.
+            trampoline
+        }.
+
     public method compileUncheckedFunctionEntryPoint: (functionDefinition: HIRFunctionDefinition) ::=> MIRProgramEntity := {
+        self assert: functionDefinition functionType isNotNil.
+        importTrampolines && functionDefinition isCaptureless ifTrue: {
+            let trampoline := self getOrCreateUncheckedToCapturelessTrampolineForFunctionType: functionDefinition functionType.
+            uncheckedEntryPointDictionary at: functionDefinition put: trampoline.
+            return: trampoline
+        }.
+
         (hirModule includesGlobalValue: functionDefinition) ifTrue: {
             let entryPoint := (MIRFunction forContext: mirContext)
                 compilationTarget: compilationTarget;
@@ -269,7 +293,26 @@ public final class HIRModuleMIRCodeGenerator superclass: HIRMIRCodeGenerator; de
         }.
     }.
 
+    public method getOrCreateCheckedTrampolineForFunctionType: (functionType: FunctionType) ::=> MIRProgramEntity
+        := checkedEntryPointDictionary at: functionType ifAbsentPut: {:: MIRProgramEntity |
+            let trampoline := (MIRImportedFunction forContext: mirContext)
+                name: (FunctionTypeCheckedTrampolineSymbol for: functionType);
+                compilationTarget: compilationTarget;
+                callingConvention: compilationTarget defaultCallingConvention;
+                yourself.
+            targetModule addProgramEntity: trampoline.
+
+            trampoline
+        }.
+
     public method compileCheckedFunctionEntryPoint: (functionDefinition: HIRFunctionDefinition) ::=> MIRProgramEntity := {
+        self assert: functionDefinition functionType isNotNil.
+        importTrampolines ifTrue: {
+            let trampoline := self getOrCreateCheckedTrampolineForFunctionType: functionDefinition functionType.
+            checkedEntryPointDictionary at: functionDefinition put: trampoline.
+            return: trampoline
+        }.
+
         (hirModule includesGlobalValue: functionDefinition) ifTrue: {
             let entryPoint := (MIRFunction forContext: mirContext)
                 compilationTarget: compilationTarget;
@@ -682,6 +725,89 @@ public final class HIRFunctionDefinitionMIRCodeGenerator superclass: HIRMIRCodeG
         symbol compileIntoHIR_MIRTrampoline: trampoline with: self
     }.
 
+    public method compileUncheckedToCapturelessTrampolineWithFunctionType: (functionType: FunctionType) into: (trampoline: MIRFunction) ::=> Void := {
+        let mirArguments := OrderedCollection new.
+        functionArgument := trampoline newArgument: #closure withType: Function.
+        mirArguments add: functionArgument.
+
+        let argumentTypes := functionType canonicalArgumentTypes.
+        let resultType := functionType canonicalResultType.
+
+        let callArguments := argumentTypes collect: {:(Type)argumentType :: MIRValue |
+            let mirArgument := trampoline newArgumentWithType: argumentType.
+            mirArguments add: mirArgument.
+            mirArgument
+        }.
+
+        trampoline arguments: mirArguments asArray.
+
+        trampoline build: {:(MIRFunctionBuilder)functionBuilder :: Void |
+            mirFunction := functionBuilder function.
+            self functionBuilder: functionBuilder.
+
+            functionBuilder basicBlock: #trampoline build: {:(MIRBlockBuilder)asm :: Void |
+                self blockBuilder: asm.
+
+                ## Fetch the captureless unchecked entry point.
+                let capturelessEntryPoint := asm callPointer: (self translateRuntimeFunction: ObjectModel::fetchUncheckedCapturelessEntryPoint)
+                    with: functionArgument
+                    type: Void pointer.
+
+                ## Perform the call.
+                ## FIXME: Use the correct calling convention.
+                let result := resultType emitMirCall: capturelessEntryPoint convention: self compilationTarget defaultCallingConvention withArguments: callArguments withBlockBuilder: asm.
+
+                ## Return the value.
+                resultType emitMirReturn: result withBlockBuilder: asm.
+            }
+        }.
+    }.
+
+    public method compileCheckedTrampolineWithFunctionType: (functionType: FunctionType) into: (trampoline: MIRFunction) ::=> Void := {
+        let mirArguments := OrderedCollection new.
+        functionArgument := trampoline newArgument: #closure withType: Function.
+        mirArguments add: functionArgument.
+
+        let argumentTypes := functionType canonicalArgumentTypes.
+        let resultType := functionType canonicalResultType.
+
+        let uncheckedArguments := argumentTypes collect: {:(Type)argumentType :: MIRValue |
+            let mirArgument := trampoline newArgumentWithType: Untyped.
+            mirArguments add: mirArgument.
+            mirArgument
+        }.
+
+        trampoline arguments: mirArguments asArray.
+
+        trampoline build: {:(MIRFunctionBuilder)functionBuilder :: Void |
+            mirFunction := functionBuilder function.
+            self functionBuilder: functionBuilder.
+
+            functionBuilder basicBlock: #trampoline build: {:(MIRBlockBuilder)asm :: Void |
+                self blockBuilder: asm.
+
+                ## Fetch the unchecked entry point.
+                let uncheckedEntryPoint := asm callPointer: (self translateRuntimeFunction: ObjectModel::fetchUncheckedEntryPoint)
+                    with: functionArgument
+                    type: Void pointer.
+
+                ## Check and unbox the arguments.
+                let checkedAndConvertedArguments := argumentTypes collectWithIndex: {:(Type)argumentType :(Size)index :: MIRValue |
+                    let uncheckedArgument => MIRValue := uncheckedArguments at: index.
+                    argumentType emitMirCheckAndUnbox: uncheckedArgument withHIRCodeGenerator: self
+                }.
+
+                let result := resultType emitMirCall: uncheckedEntryPoint
+                    convention: self compilationTarget defaultCallingConvention
+                    withArguments: (Array with: functionArgument) -- checkedAndConvertedArguments
+                    withBlockBuilder: asm.
+
+                let boxedResult := resultType emitMirBox: result withHIRCodeGenerator: self.
+                asm returnPointer: boxedResult
+            }
+        }.
+    }.
+
     public method compileUncheckedInterpreterTrampolineWithFunctionType: (functionType: FunctionType) into: (trampoline: MIRFunction) ::=> Void := {
         let mirArguments := OrderedCollection new.
         functionArgument := trampoline newArgument: #closure withType: Function.
@@ -1085,6 +1211,18 @@ public final class HIRFunctionDefinitionMIRCodeGenerator superclass: HIRMIRCodeG
 Symbol extend: {
     public abstract method compileIntoHIR_MIRTrampoline: (trampoline: MIRFunction) with: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> Void
         := self subclassResponsibility.
+}.
+
+FunctionTypeUncheckedToCapturelessTrampolineSymbol extend: {
+    public override method compileIntoHIR_MIRTrampoline: (trampoline: MIRFunction) with: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> Void := {
+        codegen compileUncheckedToCapturelessTrampolineWithFunctionType: functionType into: trampoline
+    }.
+}.
+
+FunctionTypeCheckedTrampolineSymbol extend: {
+    public override method compileIntoHIR_MIRTrampoline: (trampoline: MIRFunction) with: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> Void := {
+        codegen compileCheckedTrampolineWithFunctionType: functionType into: trampoline
+    }.
 }.
 
 FunctionTypeUncheckedInterpreterTrampolineSymbol extend: {
@@ -4326,13 +4464,6 @@ HIRModule extend: {
                 eachSymbolName isFunctionTypeTrampolineSymbol ifTrue: {
                     addTrampolineSymbol(eachSymbolName)
                 }.
-
-                #*
-                let solvedTrampolineSymbol := eachSymbolName solvedTrampolineSymbol.
-                solvedTrampolineSymbol ifNotNil: {
-                    addTrampolineSymbol(solvedTrampolineSymbol).
-                }.
-                *#
             }
         } continueWith: (i := i + 1sz).
 

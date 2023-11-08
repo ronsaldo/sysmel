@@ -24,7 +24,7 @@ public abstract class FunctionTypeTrampolineSymbol superclass: CallableEntryPoin
         := (self class == other class) && (functionType == (other uncheckedDownCastTo: FunctionTypeTrampolineSymbol) functionType).
 }.
 
-public final class FunctionTypeUncheckedToCapturelesTrampolineSymbol superclass: FunctionTypeTrampolineSymbol; definition: {
+public final class FunctionTypeUncheckedToCapturelessTrampolineSymbol superclass: FunctionTypeTrampolineSymbol; definition: {
     public override method isFunctionTypeUncheckedToCapturelessTrampolineSymbol => Boolean := true.
 
     public override method printOn: (stream: Stream) ::=> Void := {
@@ -56,6 +56,6 @@ public final class FunctionTypeBoxingTrampolineSymbol superclass: FunctionTypeTr
 
     public override method printOn: (stream: Stream) ::=> Void := {
         functionType printQualifiedSymbolNameOn: stream.
-        stream string: ".checkedTrampoline"
+        stream string: ".boxingTrampoline"
     }.
 }.
