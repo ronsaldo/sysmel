@@ -2630,6 +2630,17 @@ FunctionType
     withSelector: #passingArgumentCount addMethod: {:(FunctionType)self :: Size |
         self subclassResponsibility
     } makeAbstract;
+    withSelector: #canonicalArgumentTypes addMethod: {:(FunctionType)self :: Array |
+        let: #argumentCount with: self passingArgumentCount.
+        let: #argumentTypes with: (Array new: argumentCount).
+
+        let: #i mutableWith: 0sz.
+        while: i < argumentCount do: {
+            argumentTypes at: i put: (self canonicalTypeForApplicationArgumentWithIndex: i)
+        } continueWith: (i := i + 1sz).
+        
+        argumentTypes
+    } makeVirtual;
     withSelector: #applicationBoxDescriptor addMethod: {:(FunctionType)self :: UIntPointer |
         let: #descriptor mutableWith: 0uptr.
         let: #resultType with: self canonicalResultType.

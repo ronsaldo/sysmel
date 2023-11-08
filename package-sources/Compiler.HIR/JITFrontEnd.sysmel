@@ -22,6 +22,7 @@ public class HIR_MIRFunctionNativeCodeCompiler superclass: FunctionNativeCodeCom
         let mirModule := HIRModuleMIRCodeGenerator new
             initializeWithTarget: mirCompilationTarget;
             importRuntimeFunction: true;
+            importTrampolines: true;
             compileHIRModule: hirModule patchingFunctions: #() definitions: (Array with: definition);
             finish.
         mirModule performStandardOptimizations.

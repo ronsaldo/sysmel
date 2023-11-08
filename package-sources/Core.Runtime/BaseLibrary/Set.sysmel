@@ -34,7 +34,7 @@ Set eagerDefinitionBody: {
         let i mutable := naturalIndex.
         while: (i < capacity) do: {
             let element := storage untypedAt: i.
-            if: (Untyped::==)(element, __hashtableEmptyElement__) || key = element then: {
+            if: (Untyped::==)(element, __hashtableEmptyElement__) || (key = element) then: {
                 return: i asIntPointer
             }
         } continueWith: (i := i + 1sz).
@@ -42,7 +42,7 @@ Set eagerDefinitionBody: {
         i := 0sz.
         while: (i < capacity) do: {
             let element := storage untypedAt: i.
-            if: (Untyped::==)(element, __hashtableEmptyElement__) || key = element then: {
+            if: (Untyped::==)(element, __hashtableEmptyElement__) || (key = element) then: {
                 return: i asIntPointer
             }
         } continueWith: (i := i + 1sz).

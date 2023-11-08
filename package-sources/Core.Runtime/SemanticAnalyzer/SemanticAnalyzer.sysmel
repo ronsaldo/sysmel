@@ -350,7 +350,7 @@ ASTLambdaNode eagerDefinitionBody: {
         result analyzedType: functionDefinition type.
 
         ## Optimize the captureless lambdas.
-        functionDefinition captures isEmpty ifTrue: {
+        functionDefinition isCaptureless ifTrue: {
             let capturelessClosure => Function := functionDefinition type new.
             capturelessClosure setupWithFunctionDefinition: functionDefinition captureVector: functionDefinition captureVectorType basicAllocate.
             name ifNotNil: {
@@ -2320,7 +2320,7 @@ Function eagerDefinitionBody: {
             nativeCodeDefinition: nil;
 
             ensureAnalysis.
-        self assert: optimizedFunctionDefinition bytecode captures isEmpty.
+        self assert: optimizedFunctionDefinition isCaptureless.
         let optimizedCaptureVector => AnySequenceTuple := optimizedFunctionDefinition captureVectorType new.
 
         let optimizedFunction := Function new.

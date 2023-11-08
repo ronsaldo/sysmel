@@ -49,6 +49,7 @@ loadSourceNamed: "DwarfCallFrameInformationBuilder.sysmel".
 loadSourceNamed: "DwarfLineInformationBuilder.sysmel".
 loadSourceNamed: "DwarfDebugInformationSectionBuilder.sysmel".
 loadSourceNamed: "DwarfNativeCodeDebugInformationBuilder.sysmel".
+loadSourceNamed: "FunctionNativeCodeDefinition.sysmel".
 loadSourceNamed: "Elf.sysmel".
 loadSourceNamed: "IO.sysmel".
 loadSourceNamed: "FileSystem.sysmel".

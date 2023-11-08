@@ -6,6 +6,9 @@ Symbol extend: {
     public virtual method isFunctionUncheckedEntryPointSymbol => Boolean := false.
     public virtual method isFunctionCheckedEntryPointSymbol => Boolean := false.
 
+    public virtual method isSolvedViaTrampoline => Boolean := false.
+    public virtual method solvedTrampolineSymbol => Symbol := nil.
+
     public virtual method asCheckedEntryPointNameSymbol => Symbol
         := self error: "Not a function name symbol".
 
@@ -62,6 +65,14 @@ public final class FunctionCapturelessUncheckedEntryPointSymbol superclass: Func
 public final class FunctionUncheckedEntryPointSymbol superclass: FunctionEntryPointSymbol; definition: {
     public override method isFunctionUncheckedEntryPointSymbol => Boolean := false.
 
+    public virtual method isSolvedViaTrampoline => Boolean
+        := function ensureAnalysis; isCaptureless.
+
+    public virtual method solvedTrampolineSymbol => Symbol
+        := self isSolvedViaTrampoline
+            ifTrue: (FunctionTypeUncheckedToCapturelesTrampolineSymbol for: function type)
+            ifFalse: (nil).
+
     public override method printOn: (stream: Stream) ::=> Void := {
         function printQualifiedSymbolNameOn: stream.
         stream nextPutAll: ".unchecked".
@@ -70,6 +81,12 @@ public final class FunctionUncheckedEntryPointSymbol superclass: FunctionEntryPo
 
 public final class FunctionCheckedEntryPointSymbol superclass: FunctionEntryPointSymbol; definition: {
     public override method isFunctionCheckedEntryPointSymbol => Boolean := false.
+
+    public virtual method isSolvedViaTrampoline => Boolean
+        := true.
+
+    public virtual method solvedTrampolineSymbol => Symbol
+        := FunctionTypeCheckedTrampolineSymbol for: (function ensureTypeAnalysis; type) .
 
     public override method printOn: (stream: Stream) ::=> Void := {
         function printQualifiedSymbolNameOn: stream.

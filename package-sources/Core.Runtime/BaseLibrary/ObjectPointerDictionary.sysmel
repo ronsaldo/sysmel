@@ -10,6 +10,8 @@ public final class ObjectPointerDictionary superclass: HashedCollection; definit
         storage ifNil: { return: -1iptr }.
 
         let capacity := storage size / 2sz.
+        capacity = 0sz ifTrue: { return: -1iptr }.
+
         let naturalIndex := RawTuple::pointerIdentityHash(key) % capacity.
 
         let i mutable := naturalIndex.

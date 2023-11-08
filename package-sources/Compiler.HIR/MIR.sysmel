@@ -37,6 +37,7 @@ public final class HIRModuleMIRCodeGenerator superclass: HIRMIRCodeGenerator; de
 
     public field runtimeFunctionDictionary => ObjectPointerDictionary.
     public field importRuntimeFunction => Boolean.
+    public field importTrampolines => Boolean.
     private field runtimeFunctionCompilerFrontend => HIRModuleCompilationContext.
 
     public field capturelessUncheckedEntryPointDictionary => ObjectPointerDictionary.
@@ -122,6 +123,21 @@ public final class HIRModuleMIRCodeGenerator superclass: HIRMIRCodeGenerator; de
 
     public method compileHIRModule: (module: HIRModule) ::=> MIRModule
         := self compileHIRModule: module patchingFunctions: #() definitions: #().
+
+    public method compileTrampolineForSymbol: (symbol: Symbol) ::=> MIRModule := {
+        let trampoline := (MIRFunction forContext: mirContext)
+            compilationTarget: compilationTarget;
+            callingConvention: compilationTarget defaultCallingConvention;
+            name: symbol;
+            yourself.
+        targetModule addProgramEntity: trampoline.
+
+        HIRFunctionDefinitionMIRCodeGenerator new
+            moduleCodeGenerator: self;
+            compileTrampolineForSymbol: symbol into: trampoline.
+
+        targetModule
+    }.
 
     public method finish => MIRModule
         := targetModule.
@@ -290,45 +306,71 @@ public final class HIRModuleMIRCodeGenerator superclass: HIRMIRCodeGenerator; de
 
     public method getOrCreateUncheckedInterpreterTrampolineWithSignature: (signature: Array) ::=> MIRProgramEntity := {
         uncheckedInterpreterTrampolinesDictionary at: signature ifAbsent: {|
-            let nameBuilder := StringStream new.
-            nameBuilder nextPutAll: "uncheckedInterpreterTrampoline"; print: signature size; nextPutAll: ".SUIT".
-            signature hash printHexOn: nameBuilder.
+            importTrampolines ifTrue: {
+                let trampolineFunctionType := signature allButLast => signature last.
+                let trampoline := (MIRImportedFunction forContext: mirContext)
+                    compilationTarget: compilationTarget;
+                        callingConvention: compilationTarget defaultCallingConvention;
+                        name: (FunctionTypeUncheckedInterpreterTrampolineSymbol for: trampolineFunctionType);
+                        yourself.
+                targetModule addProgramEntity: trampoline.
 
-            let trampoline := (MIRFunction forContext: mirContext)
-                compilationTarget: compilationTarget;
-                callingConvention: compilationTarget defaultCallingConvention;
-                name: nameBuilder asSymbol;
-                yourself.
-            targetModule addProgramEntity: trampoline.
-            uncheckedInterpreterTrampolinesDictionary at: signature put: trampoline.
+                uncheckedInterpreterTrampolinesDictionary at: signature put: trampoline.
+                trampoline
+            } ifFalse: {
+                let nameBuilder := StringStream new.
+                nameBuilder nextPutAll: "uncheckedInterpreterTrampoline"; print: signature size; nextPutAll: ".SUIT".
+                signature hash printHexOn: nameBuilder.
 
-            HIRFunctionDefinitionMIRCodeGenerator new
-                moduleCodeGenerator: self;
-                compileUncheckedInterpreterTrampolineWithSignature: signature into: trampoline.
+                let trampoline := (MIRFunction forContext: mirContext)
+                    compilationTarget: compilationTarget;
+                    callingConvention: compilationTarget defaultCallingConvention;
+                    name: nameBuilder asSymbol;
+                    yourself.
+                targetModule addProgramEntity: trampoline.
+                uncheckedInterpreterTrampolinesDictionary at: signature put: trampoline.
 
-            trampoline
+                HIRFunctionDefinitionMIRCodeGenerator new
+                    moduleCodeGenerator: self;
+                    compileUncheckedInterpreterTrampolineWithSignature: signature into: trampoline.
+
+                trampoline
+            }.
         }.
     }.
 
     public method getOrCreateBoxingApplicationTrampolineWithSignature: (signature: Array) ::=> MIRProgramEntity := {
         boxingApplicationTrampolinesDictionary at: signature ifAbsent: {|
-            let nameBuilder := StringStream new.
-            nameBuilder nextPutAll: "boxingApplicationTrampoline"; print: signature size; nextPutAll: ".SUIT".
-            signature hash printHexOn: nameBuilder.
+            importTrampolines ifTrue: {
+                let trampolineFunctionType := signature allButLast => signature last.
+                let trampoline := (MIRImportedFunction forContext: mirContext)
+                    compilationTarget: compilationTarget;
+                    callingConvention: compilationTarget defaultCallingConvention;
+                    name: (FunctionTypeBoxingTrampolineSymbol for: trampolineFunctionType);
+                    yourself.
+                targetModule addProgramEntity: trampoline.
 
-            let trampoline := (MIRFunction forContext: mirContext)
-                compilationTarget: compilationTarget;
-                callingConvention: compilationTarget defaultCallingConvention;
-                name: nameBuilder asSymbol;
-                yourself.
-            targetModule addProgramEntity: trampoline.
-            boxingApplicationTrampolinesDictionary at: signature put: trampoline.
+                boxingApplicationTrampolinesDictionary at: signature put: trampoline.
+                trampoline
+            } ifFalse: {
+                let nameBuilder := StringStream new.
+                nameBuilder nextPutAll: "boxingApplicationTrampoline"; print: signature size; nextPutAll: ".SUIT".
+                signature hash printHexOn: nameBuilder.
 
-            HIRFunctionDefinitionMIRCodeGenerator new
-                moduleCodeGenerator: self;
-                compileBoxingApplicationTrampolineWithSignature: signature into: trampoline.
+                let trampoline := (MIRFunction forContext: mirContext)
+                    compilationTarget: compilationTarget;
+                    callingConvention: compilationTarget defaultCallingConvention;
+                    name: nameBuilder asSymbol;
+                    yourself.
+                targetModule addProgramEntity: trampoline.
+                boxingApplicationTrampolinesDictionary at: signature put: trampoline.
 
-            trampoline
+                HIRFunctionDefinitionMIRCodeGenerator new
+                    moduleCodeGenerator: self;
+                    compileBoxingApplicationTrampolineWithSignature: signature into: trampoline.
+
+                trampoline
+            }.
         }.
     }.
 
@@ -407,7 +449,7 @@ public final class HIRModuleMIRCodeGenerator superclass: HIRMIRCodeGenerator; de
 
     public method translateRuntimeFunction: (function: Function) ::=> MIRProgramEntity := {
         runtimeFunctionDictionary at: function ifAbsentPut: {:: MIRProgramEntity |
-            let ssaRuntimeFunction := hirModule getGlobalValueOrNilFor: function.
+            let ssaRuntimeFunction := hirModule ifNotNil: {hirModule getGlobalValueOrNilFor: function}.
             ssaRuntimeFunction ifNotNil: {
                 self translateCapturelessUncheckedFunctionEntryPoint: ssaRuntimeFunction
             } ifNil: {
@@ -633,6 +675,95 @@ public final class HIRFunctionDefinitionMIRCodeGenerator superclass: HIRMIRCodeG
                 let boxedResult := canonicalResultType emitMirBox: result withHIRCodeGenerator: self.
                 asm returnPointer: boxedResult
             }.
+        }
+    }.
+
+    public method compileTrampolineForSymbol: (symbol: Symbol) into: (trampoline: MIRFunction) ::=> Void := {
+        symbol compileIntoHIR_MIRTrampoline: trampoline with: self
+    }.
+
+    public method compileUncheckedInterpreterTrampolineWithFunctionType: (functionType: FunctionType) into: (trampoline: MIRFunction) ::=> Void := {
+        let mirArguments := OrderedCollection new.
+        functionArgument := trampoline newArgument: #closure withType: Function.
+        mirArguments add: functionArgument.
+
+        let argumentTypes := functionType canonicalArgumentTypes.
+        let resultType := functionType canonicalResultType.
+
+        let uncheckedArguments := argumentTypes collect: {:(Type)argumentType :: MIRValue |
+            let mirArgument := trampoline newArgumentWithType: argumentType.
+            mirArguments add: mirArgument.
+            mirArgument
+        }.
+
+        trampoline arguments: mirArguments asArray.
+
+        trampoline build: {:(MIRFunctionBuilder)functionBuilder :: Void |
+            mirFunction := functionBuilder function.
+            self functionBuilder: functionBuilder.
+
+            functionBuilder basicBlock: #trampoline build: {:(MIRBlockBuilder)asm :: Void |
+                self blockBuilder: asm.
+
+                ## Allocate the boxed argument vector.
+                let boxedArgumentVector := asm callPointer: (self translateRuntimeFunction: ObjectModel::makeArrayWithSize)
+                    with: (asm pointerConstantWith: uncheckedArguments size asUInt64)
+                    type: Array.
+
+                ## Box the arguments and store them in the vecotr
+                let headerSize := (Array objectHeaderSizeForObjectModel: self compilationTarget objectModel) asInt64.
+                let pointerSize := self compilationTarget pointerSize asInt64.
+                uncheckedArguments doWithIndex: {:(MIRValue)unboxedArgument :(Size)index :: Void |
+                    let argumentType => Type := argumentTypes at: index.
+                    let boxedArgument := argumentType emitMirBox: unboxedArgument withHIRCodeGenerator: self.
+                    self storePointer: boxedArgument into: boxedArgumentVector constantOffset: headerSize + (index asInt64 * pointerSize) in: boxedArgumentVector
+                }.
+
+                ## Call the interpreter.
+                let boxedResult := asm callPointer: (self translateRuntimeFunction: ObjectModel::interpretFunctionWithArguments)
+                    with: functionArgument with: boxedArgumentVector type: Untyped.
+
+                ## Unbox and return the result.
+                let unboxedResult := resultType emitMirCheckAndUnbox: boxedResult withHIRCodeGenerator: self.
+                resultType emitMirReturn: unboxedResult withBlockBuilder: asm.
+            }
+        }
+    }.
+
+    public method compileBoxingApplicationTrampolineWithFunctionType: (functionType: FunctionType) into: (trampoline: MIRFunction) ::=> Void := {
+        let mirArguments := OrderedCollection new.
+        functionArgument := trampoline newArgument: #closure withType: Function.
+        mirArguments add: functionArgument.
+
+        let argumentTypes := functionType canonicalArgumentTypes.
+        let resultType := functionType canonicalResultType.
+
+        let uncheckedArguments := argumentTypes collect: {:(Type)argumentType :: MIRValue |
+            let mirArgument := trampoline newArgumentWithType: argumentType.
+            mirArguments add: mirArgument.
+            mirArgument
+        }.
+
+        trampoline arguments: mirArguments asArray.
+        trampoline build: {:(MIRFunctionBuilder)functionBuilder :: Void |
+            mirFunction := functionBuilder function.
+            self functionBuilder: functionBuilder.
+
+            functionBuilder basicBlock: #trampoline build: {:(MIRBlockBuilder)asm :: Void |
+                self blockBuilder: asm.
+
+                let boxedArguments := uncheckedArguments collectWithIndex: {:(MIRValue)unboxedArgument :(Size)index :: MIRValue |
+                    let argumentType => Type := argumentTypes at: index.
+                    argumentType emitMirBox: unboxedArgument withHIRCodeGenerator: self
+                }.
+
+                let boxedResult := asm callPointer: (self translateRuntimeFunction: (ObjectModel::CheckedFunctionApplicationTrampolines at: uncheckedArguments size))
+                    arguments: (Array with: functionArgument) -- boxedArguments type: Untyped.
+
+                ## Unbox and return the result.
+                let unboxedResult := resultType emitMirCheckAndUnbox: boxedResult withHIRCodeGenerator: self.
+                resultType emitMirReturn: unboxedResult withBlockBuilder: asm.
+            }
         }
     }.
 
@@ -948,6 +1079,23 @@ public final class HIRFunctionDefinitionMIRCodeGenerator superclass: HIRMIRCodeG
     public method storeFatPointer: (value: MIRValue) into: (pointer: MIRValue) constantOffset: (constantOffset: Int64) in: (object: MIRValue) ::=> MIRInstruction := {
         self emitObjectWriteBarrier: object value: value.
         blockBuilder storeFatPointer: value into: pointer constantOffset: constantOffset.
+    }.
+}.
+
+Symbol extend: {
+    public abstract method compileIntoHIR_MIRTrampoline: (trampoline: MIRFunction) with: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> Void
+        := self subclassResponsibility.
+}.
+
+FunctionTypeUncheckedInterpreterTrampolineSymbol extend: {
+    public override method compileIntoHIR_MIRTrampoline: (trampoline: MIRFunction) with: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> Void := {
+        codegen compileUncheckedInterpreterTrampolineWithFunctionType: functionType into: trampoline
+    }.
+}.
+
+FunctionTypeBoxingTrampolineSymbol extend: {
+    public override method compileIntoHIR_MIRTrampoline: (trampoline: MIRFunction) with: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> Void := {
+        codegen compileBoxingApplicationTrampolineWithFunctionType: functionType into: trampoline
     }.
 }.
 
@@ -4111,6 +4259,7 @@ HIRModule extend: {
             let perValueMirModule := HIRModuleMIRCodeGenerator new
                 initializeWithTarget: target;
                 importRuntimeFunction: true;
+                importTrampolines: true;
                 compileHIRModule: perValueModule patchingFunctions: #() definitions: patchedFunctionDefinitionList;
                 finish.
             perValueMirModule performStandardOptimizations.
@@ -4133,6 +4282,61 @@ HIRModule extend: {
 
             result add: nativeCode.
         }.
+
+        let trampolineSymbolSet := Set new.
+
+        let addTrampolineSymbol := {:(Symbol)trampolineSymbol :: Void |
+            (trampolineSymbolSet includes: trampolineSymbol) ifTrue: {
+                return: void
+            }.
+
+            trampolineSymbolSet add: trampolineSymbol.
+
+            ## MIR
+            let perValueMirModule := HIRModuleMIRCodeGenerator new
+                initializeWithTarget: target;
+                importRuntimeFunction: true;
+                importTrampolines: true;
+                compileTrampolineForSymbol: trampolineSymbol;
+                finish.
+            perValueMirModule performStandardOptimizations.
+
+            let mirTextIR => String := keepingIRTextForDebugging
+                ifTrue: (perValueMirModule fullPrintString)
+                ifFalse: (nil).
+
+            ## Native code
+            let nativeCodeIR := perValueMirModule asTargetNativeCodeIR.
+            let nativeCodeTextIR => String := keepingIRTextForDebugging
+                ifTrue: (nativeCodeIR fullPrintString)
+                ifFalse: (nil).
+
+            let nativeCode => NativeCode := nativeCodeIR asNativeCode.
+            nativeCode
+                mirTextIR: mirTextIR;
+                asmTextIR: nativeCodeTextIR.
+
+            result add: nativeCode.
+        }.
+
+        let i mutable := 0sz.
+        while: i < result size do: {
+            let nativeCode => NativeCode := result at: i.
+            nativeCode allExternalSymbolNamesDo: {:(Symbol)eachSymbolName :: Void |
+                eachSymbolName isFunctionTypeTrampolineSymbol ifTrue: {
+                    addTrampolineSymbol(eachSymbolName)
+                }.
+
+                #*
+                let solvedTrampolineSymbol := eachSymbolName solvedTrampolineSymbol.
+                solvedTrampolineSymbol ifNotNil: {
+                    addTrampolineSymbol(solvedTrampolineSymbol).
+                }.
+                *#
+            }
+        } continueWith: (i := i + 1sz).
+
+        printLine("trampolineSymbolSet size ", trampolineSymbolSet size).
 
         result asArray
     }.

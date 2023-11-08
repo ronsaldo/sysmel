@@ -38,4 +38,8 @@ NativeCode definition: {
         stream string: "Symbol table:"; nl.
         stream fullPrint: symbolTable.
     }.
+
+    public method allExternalSymbolNamesDo: (aBlock: (Symbol) => Void) ::=> Void := {
+        symbolTable allExternalSymbolNamesDo: aBlock.
+    }.
 }.

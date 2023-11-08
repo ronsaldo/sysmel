@@ -11,6 +11,9 @@ FunctionDefinition eagerDefinitionBody: {
         error("Function definition is missing definition with capture list.")
     }.
 
+    public eager method isCaptureless => Boolean
+        := self captures isEmpty.
+
     public eager method clearEntryPoints => Void := {
         capturelessUncheckedEntryPoint := 0uptr.
         uncheckedEntryPoint := 0uptr.

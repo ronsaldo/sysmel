@@ -8,6 +8,16 @@ NativeCodeSymbolTable definition: {
             ifTrue: (symbols at: index asSize - 1sz)
             ifFalse: nil.
 
+    public method allExternalSymbolNamesDo: (aBlock: Symbol => Void) ::=> Void := {
+        symbols do: {:(NativeCodeSymbol)eachNativeCodeSymbol :: Void |
+            eachNativeCodeSymbol section ifNil: {
+                eachNativeCodeSymbol name ifNotNil: {
+                    aBlock(eachNativeCodeSymbol name)
+                }
+            }
+        }.
+    }.
+
     public override method fullPrintOn: (stream: Stream) ::=> Void := {
         symbols do: {:(NativeCodeSymbol)eachSymbol :: Void |
             stream string: "  "; fullPrint: eachSymbol; nl

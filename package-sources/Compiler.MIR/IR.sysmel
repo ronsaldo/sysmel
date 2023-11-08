@@ -513,14 +513,18 @@ public abstract class MIRImportedProgramEntity superclass: MIRProgramEntity; def
     public field callingConvention => MIRCallingConvention.
     public field alternativeSymbols => Array.
 
+    public override method size => UInt64
+        := compilationTarget pointerSize asUInt64.
+
+    public override method alignment => UInt64
+        := compilationTarget pointerAlignment asUInt64.
+
     public override method physicalLocationClass => MIRPhysicalLocation class
         := MIRPhysicalIntegerRegister.
 }.
 
 public final class MIRImportedVariable superclass: MIRImportedProgramEntity; definition: {
     public field type => Type.
-    public field size => UInt64.
-    public field alignment => UInt64.
     public field physicalLocationClass => MIRPhysicalLocation class.
 }.
 

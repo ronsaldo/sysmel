@@ -3,6 +3,7 @@ Symbol extend: {
 
     public virtual method isFunctionTypeUncheckedToCapturelessTrampolineSymbol => Boolean := false.
     public virtual method isFunctionTypeCheckedToUncheckedTrampolineSymbol => Boolean := false.
+    public virtual method isFunctionTypeUncheckedInterpreterTrampolineSymbol => Boolean := false.
     public virtual method isFunctionTypeBoxingTrampolineSymbol => Boolean := false.
 }.
 
@@ -38,6 +39,15 @@ public final class FunctionTypeCheckedTrampolineSymbol superclass: FunctionTypeT
     public override method printOn: (stream: Stream) ::=> Void := {
         functionType printQualifiedSymbolNameOn: stream.
         stream string: ".checkedTrampoline"
+    }.
+}.
+
+public final class FunctionTypeUncheckedInterpreterTrampolineSymbol superclass: FunctionTypeTrampolineSymbol; definition: {
+    public override method isFunctionTypeBoxingTrampolineSymbol => Boolean := true.
+
+    public override method printOn: (stream: Stream) ::=> Void := {
+        functionType printQualifiedSymbolNameOn: stream.
+        stream string: ".uncheckedInterpreterTrampoline"
     }.
 }.
 
