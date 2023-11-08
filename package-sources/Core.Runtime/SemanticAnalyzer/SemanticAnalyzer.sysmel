@@ -1520,7 +1520,7 @@ ASTFunctionApplicationNode definition: {
     }.
 }.
 
-ASTMessageSendNode definition: {
+ASTMessageSendNode eagerDefinitionBody: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) ::=> Untyped := {
         self receiver ifNotNil: {
             let receiver := self receiver analyzeAndEvaluateWithEnvironment: environment.

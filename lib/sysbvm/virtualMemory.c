@@ -55,6 +55,28 @@ void sysbvm_virtualMemory_unlockCodePagesForExecution(void *codePointer, size_t 
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
+
+static pthread_mutex_t codeZoneWriteLock = PTHREAD_MUTEX_INITIALIZER;
+
+bool sysbvm_virtualMemory_hasSupportForRWXMapping(void)
+{
+    static bool hasCachedResult = false;
+    static bool cachedResult;
+
+    if(!hasCachedResult)
+    {
+        size_t pageSize = getpagesize();
+        void * result = mmap(0, pageSize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANON, -1, 0);
+        cachedResult = result != MAP_FAILED;
+        if(result != MAP_FAILED)
+            munmap(result, pageSize);
+
+        hasCachedResult = true;
+    }
+
+    return cachedResult;
+}
 
 void *sysbvm_virtualMemory_allocateSystemMemory(size_t sizeToAllocate)
 {
@@ -125,22 +147,34 @@ size_t sysbvm_virtualMemory_getSystemAllocationAlignment(void)
     return getpagesize();
 }
 
-void sysbvm_virtualMemory_lockCodePagesForWriting(void *codePointer, size_t size)
+bool sysbvm_virtualMemory_lockCodePagesForWriting(void *writePointer, void *executablePointer, size_t size)
 {
-    size_t pageAlignment = sysbvm_virtualMemory_getSystemAllocationAlignment();
-    uintptr_t startAddress = (uintptr_t)codePointer & (-pageAlignment);
-    uintptr_t endAddress = ((uintptr_t)codePointer + size + pageAlignment - 1) & (-pageAlignment);
+    if(writePointer != executablePointer)
+        return true;
 
-    mprotect((void*)startAddress, endAddress - startAddress, PROT_READ | PROT_WRITE);
+    size_t pageAlignment = sysbvm_virtualMemory_getSystemAllocationAlignment();
+    uintptr_t startAddress = (uintptr_t)executablePointer & (-pageAlignment);
+    uintptr_t endAddress = ((uintptr_t)executablePointer + size + pageAlignment - 1) & (-pageAlignment);
+
+    pthread_mutex_lock(&codeZoneWriteLock);
+    bool success = mprotect((void*)startAddress, endAddress - startAddress, PROT_READ | PROT_WRITE | PROT_EXEC) == 0;
+    if(!success)
+        pthread_mutex_unlock(&codeZoneWriteLock);
+
+    return success;
 }
 
-void sysbvm_virtualMemory_unlockCodePagesForExecution(void *codePointer, size_t size)
+void sysbvm_virtualMemory_unlockCodePagesForExecution(void *writePointer, void *executablePointer, size_t size)
 {
+    if(writePointer != executablePointer)
+        return;
+
     size_t pageAlignment = sysbvm_virtualMemory_getSystemAllocationAlignment();
-    uintptr_t startAddress = (uintptr_t)codePointer & (-pageAlignment);
-    uintptr_t endAddress = ((uintptr_t)codePointer + size + pageAlignment - 1) & (-pageAlignment);
+    uintptr_t startAddress = (uintptr_t)executablePointer & (-pageAlignment);
+    uintptr_t endAddress = ((uintptr_t)executablePointer + size + pageAlignment - 1) & (-pageAlignment);
 
     mprotect((void*)startAddress, endAddress - startAddress, PROT_READ | PROT_EXEC);
+    pthread_mutex_unlock(&codeZoneWriteLock);
 }
 
 #endif

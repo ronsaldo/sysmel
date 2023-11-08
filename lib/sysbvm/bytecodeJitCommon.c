@@ -13,6 +13,7 @@
 #include "sysbvm/stackFrame.h"
 #include "sysbvm/type.h"
 #include "internal/context.h"
+#include "internal/virtualMemory.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -678,10 +679,13 @@ SYSBVM_API void sysbvm_bytecodeJit_jit(sysbvm_context_t *context, sysbvm_functio
     uint8_t *codeWriteablePointer = NULL;
     uint8_t *codeExecutablePointer = NULL;
     sysbvm_chunkedAllocator_allocateWithDualMapping(&context->heap.codeAllocator, requiredCodeSize, 16, (void**)&codeWriteablePointer, (void**)&codeExecutablePointer);
+    if(!sysbvm_virtualMemory_lockCodePagesForWriting(codeWriteablePointer, codeExecutablePointer, requiredCodeSize))
+        abort();
 
     memset(codeWriteablePointer + objectFileHeaderSize, 0xcc, textSectionSize); // int3;
     memset(codeWriteablePointer + objectFileHeaderSize + textSectionSize, 0, rodataSectionSize); // int3;
     uint8_t *entryPointPointer = sysbvm_jit_installIn(&jit, codeWriteablePointer, codeExecutablePointer);
+    sysbvm_virtualMemory_unlockCodePagesForExecution(codeWriteablePointer, codeExecutablePointer, requiredCodeSize);
 
     // Register the object file with gdb.
     if(jit.objectFileHeader.size > 0 && jit.objectFileContent.size > 0)

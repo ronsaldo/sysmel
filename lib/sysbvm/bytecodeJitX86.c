@@ -11,6 +11,7 @@
 #include "sysbvm/sourcePosition.h"
 #include "sysbvm/sourceCode.h"
 #include "internal/context.h"
+#include "internal/virtualMemory.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -674,9 +675,13 @@ static void *sysbvm_jit_getTrampolineOrEntryPointForBytecode(sysbvm_bytecodeJit_
     uint8_t *trampolineWritePointer = NULL;
     uint8_t *trampolineExecutablePointer = NULL;
     sysbvm_chunkedAllocator_allocateWithDualMapping(&jit->context->heap.codeAllocator, requiredCodeSize, 16, (void**)&trampolineWritePointer, (void**)&trampolineExecutablePointer);
+    if(!sysbvm_virtualMemory_lockCodePagesForWriting(trampolineWritePointer, trampolineExecutablePointer, requiredCodeSize))
+        abort();
 
     memset(trampolineWritePointer, 0xcc, requiredCodeSize); // int3;
     memcpy(trampolineWritePointer, trampolineCode, trampolineCodeSize);
+
+    sysbvm_virtualMemory_unlockCodePagesForExecution(trampolineWritePointer, trampolineExecutablePointer, requiredCodeSize);
 
     bytecode->jittedCodeTrampoline = sysbvm_tuple_systemHandle_encode(jit->context, (sysbvm_systemHandle_t)(uintptr_t)trampolineExecutablePointer);
     bytecode->jittedCodeTrampolineWritePointer = sysbvm_tuple_systemHandle_encode(jit->context, (sysbvm_systemHandle_t)(uintptr_t)trampolineWritePointer);
@@ -690,12 +695,18 @@ SYSBVM_API void sysbvm_jit_patchTrampolineWithRealEntryPoint(sysbvm_bytecodeJit_
     if(bytecode->jittedCodeTrampoline && bytecode->jittedCodeTrampolineWritePointer && bytecode->jittedCodeTrampolineSessionToken == jit->context->roots.sessionToken)
     {
         uint8_t *realEntryPoint = (uint8_t*)sysbvm_tuple_systemHandle_decode(bytecode->jittedCode);
+        uint8_t *trampolineEntryPointExecutePointer = (uint8_t*)sysbvm_tuple_systemHandle_decode(bytecode->jittedCodeTrampoline);
         uint8_t *trampolineEntryPointWritePointer = (uint8_t*)sysbvm_tuple_systemHandle_decode(bytecode->jittedCodeTrampolineWritePointer);
 
         size_t trampolineCodeSize = 16;
+        if(!sysbvm_virtualMemory_lockCodePagesForWriting(trampolineEntryPointWritePointer, trampolineEntryPointExecutePointer, trampolineCodeSize))
+            abort();
+
         size_t targetAddressOffset = trampolineCodeSize - 2 - sizeof(void*);
         uintptr_t *jumpAddressLocation = (uintptr_t*)(trampolineEntryPointWritePointer + targetAddressOffset);
         *jumpAddressLocation = (uintptr_t)realEntryPoint;
+
+        sysbvm_virtualMemory_unlockCodePagesForExecution(trampolineEntryPointWritePointer, trampolineEntryPointExecutePointer, trampolineCodeSize);
     }
 }
 
@@ -1481,20 +1492,17 @@ static void sysbvm_jit_emitObjectFile(sysbvm_bytecodeJit_t *jit)
 
     footer.sections.str.type = SYSBVM_SHT_STRTAB;
     footer.sections.str.offset = stringTableOffset;
-    footer.sections.str.address = stringTableOffset;
     footer.sections.str.addressAlignment = 1;
     footer.sections.str.size = stringTableSize;
 
     footer.sections.shstr.type = SYSBVM_SHT_STRTAB;
     footer.sections.shstr.offset = stringTableOffset;
-    footer.sections.shstr.address = stringTableOffset;
     footer.sections.shstr.addressAlignment = 1;
     footer.sections.shstr.size = stringTableSize;
 
     size_t symbolTableOffset = jit->objectFileContent.size;
     footer.sections.symtab.type = SYSBVM_SHT_SYMTAB;
     footer.sections.symtab.offset = symbolTableOffset;
-    footer.sections.symtab.address = symbolTableOffset;
     footer.sections.symtab.entrySize = sizeof(sysbvm_elf64_symbol_t);
     footer.sections.symtab.addressAlignment = 1;
     footer.sections.symtab.link = offsetof(sysbvm_jit_x64_elfSectionHeaders_t, str) / sizeof(sysbvm_elf64_sectionHeader_t);
@@ -1525,7 +1533,6 @@ static void sysbvm_jit_fixupObjectFile(sysbvm_bytecodeJit_t *jit,
 
     header->sectionHeadersOffset = (uintptr_t)&footer->sections - (uintptr_t)header;
     sysbvm_elf64_off_t contentOffset = (uintptr_t)objectFileContentExecutablePointer - (uintptr_t)headerExecutablePointer;
-    sysbvm_elf64_addr_t contentBaseAddress = (uintptr_t)objectFileContentExecutablePointer;
 
     footer->sections.text.offset = (uintptr_t)instructionsExecutablePointer - (uintptr_t)headerExecutablePointer;
     footer->sections.text.address = (sysbvm_elf64_addr_t)instructionsExecutablePointer;
@@ -1536,27 +1543,20 @@ static void sysbvm_jit_fixupObjectFile(sysbvm_bytecodeJit_t *jit,
     footer->sections.eh_frame.size = jit->dwarfEhBuilder.buffer.size;
 
     footer->sections.debug_line.offset = (uintptr_t)debugLineExecutablePointer - (uintptr_t)headerExecutablePointer;
-    footer->sections.debug_line.address = (sysbvm_elf64_addr_t)debugLineExecutablePointer;
     footer->sections.debug_line.size = jit->dwarfDebugInfoBuilder.line.size;
 
     footer->sections.debug_str.offset = (uintptr_t)debugStrExecutablePointer - (uintptr_t)headerExecutablePointer;
-    footer->sections.debug_str.address = (sysbvm_elf64_addr_t)debugStrExecutablePointer;
     footer->sections.debug_str.size = jit->dwarfDebugInfoBuilder.str.size;
 
     footer->sections.debug_abbrev.offset = (uintptr_t)debugAbbrevExecutablePointer - (uintptr_t)headerExecutablePointer;
-    footer->sections.debug_abbrev.address = (sysbvm_elf64_addr_t)debugAbbrevExecutablePointer;
     footer->sections.debug_abbrev.size = jit->dwarfDebugInfoBuilder.abbrev.size;
 
     footer->sections.debug_info.offset = (uintptr_t)debugInfoExecutablePointer - (uintptr_t)headerExecutablePointer;
-    footer->sections.debug_info.address = (sysbvm_elf64_addr_t)debugInfoExecutablePointer;
     footer->sections.debug_info.size = jit->dwarfDebugInfoBuilder.info.size;
 
     footer->sections.symtab.offset += contentOffset;
-    footer->sections.symtab.address += contentBaseAddress;
     footer->sections.str.offset += contentOffset;
-    footer->sections.str.address += contentBaseAddress;
     footer->sections.shstr.offset += contentOffset;
-    footer->sections.shstr.address += contentBaseAddress;
 }
 
 static void sysbvm_jit_emitPerfSymbolFor(sysbvm_bytecodeJit_t *jit, uint8_t *instructionsPointers)

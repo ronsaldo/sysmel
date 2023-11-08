@@ -1,6 +1,7 @@
 #include "sysbvm/chunkedAllocator.h"
 #include "sysbvm/assert.h"
 #include "internal/virtualMemory.h"
+#include <stdlib.h>
 #include <string.h>
 
 static size_t sysbvm_chunkedAllocator_sizeAlignedTo(size_t size, size_t alignment)
@@ -22,7 +23,7 @@ SYSBVM_API void sysbvm_chunkedAllocator_destroy(sysbvm_chunkedAllocator_t *alloc
         sysbvm_chunkedAllocatorChunk_t *nextChunk = chunk->next;
         size_t fullChunkSize = sizeof(sysbvm_chunkedAllocatorChunk_t) + chunk->capacity;
 
-        if(allocator->requiresExecutableMapping)
+        if(allocator->requiresExecutableMapping && chunk->writeableMapping != chunk->executableMapping)
         {
             sysbvm_chunkedAllocatorChunk_t *writeableMapping = chunk->writeableMapping;
             sysbvm_chunkedAllocatorChunk_t *executableMapping = chunk->executableMapping;
@@ -58,9 +59,17 @@ static sysbvm_chunkedAllocatorChunk_t *sysbvm_chunkedAllocator_ensureChunkWithRe
 
         if(allocator->requiresExecutableMapping)
         {
-            void *handle = sysbvm_virtualMemory_allocateSystemMemoryWithDualMapping(allocator->chunkSize, (void**)&newChunkWriteableMapping, (void**)&newChunkExecutableMapping);
-            memset(newChunkWriteableMapping, 0, sizeof(sysbvm_chunkedAllocatorChunk_t));
-            newChunkWriteableMapping->dualMappingHandle = handle;
+            if(sysbvm_virtualMemory_hasSupportForRWXMapping())
+            {
+                newChunkExecutableMapping = newChunkWriteableMapping = (sysbvm_chunkedAllocatorChunk_t*)sysbvm_virtualMemory_allocateSystemMemory(allocator->chunkSize);
+                memset(newChunkWriteableMapping, 0, sizeof(sysbvm_chunkedAllocatorChunk_t));
+            }
+            else
+            {
+                void *handle = sysbvm_virtualMemory_allocateSystemMemoryWithDualMapping(allocator->chunkSize, (void**)&newChunkWriteableMapping, (void**)&newChunkExecutableMapping);
+                memset(newChunkWriteableMapping, 0, sizeof(sysbvm_chunkedAllocatorChunk_t));
+                newChunkWriteableMapping->dualMappingHandle = handle;
+            }
         }
         else
         {
@@ -77,8 +86,15 @@ static sysbvm_chunkedAllocatorChunk_t *sysbvm_chunkedAllocator_ensureChunkWithRe
 
         if(allocator->lastChunk)
         {
+            if(allocator->requiresExecutableMapping &&
+                !sysbvm_virtualMemory_lockCodePagesForWriting(allocator->lastChunk->writeableMapping, allocator->lastChunk->executableMapping, sizeof(sysbvm_chunkedAllocatorChunk_t)))
+                abort();
+
             allocator->lastChunk->next = newChunkWriteableMapping;
             newChunkWriteableMapping->previous = allocator->lastChunk;
+
+            if(allocator->requiresExecutableMapping)
+                sysbvm_virtualMemory_unlockCodePagesForExecution(allocator->lastChunk->writeableMapping, allocator->lastChunk->executableMapping, sizeof(sysbvm_chunkedAllocatorChunk_t));
         }
         allocator->lastChunk = newChunkWriteableMapping;
 
@@ -113,6 +129,12 @@ SYSBVM_API void sysbvm_chunkedAllocator_allocateWithDualMapping(sysbvm_chunkedAl
         *writeableMapping = (uint8_t*)(chunk->writeableMapping + 1) + alignedOffset;
     if(executableMapping)
         *executableMapping = (uint8_t*)(chunk->executableMapping + 1) + alignedOffset;
+
+    if(!sysbvm_virtualMemory_lockCodePagesForWriting(chunk->writeableMapping, chunk->executableMapping, sizeof(sysbvm_chunkedAllocatorChunk_t)))
+        abort();
+
     chunk->size = alignedOffset + size;
     SYSBVM_ASSERT(chunk->size <= chunk->capacity);
+
+    sysbvm_virtualMemory_unlockCodePagesForExecution(chunk->writeableMapping, chunk->executableMapping, sizeof(sysbvm_chunkedAllocatorChunk_t));
 }
