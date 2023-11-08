@@ -1,5 +1,4 @@
 public final class AsmStream superclass: Object.
-public class AsmStreamElement superclass: AsmInstructionOperand.
 public abstract class AsmConstantExpression superclass: Object.
 
 let PrintingDebugInfo := false.
@@ -874,7 +873,7 @@ public final class AsmImmediateConstantFloat64 superclass: AsmImmediateConstant;
     }.
 }.
 
-public final class AsmStream superclass: Object; definition: {
+AsmStream definition: {
     public field compilationTarget => AsmCompilationTarget.
 
     public field firstElement => AsmStreamElement.

@@ -1433,7 +1433,8 @@ FunctionDefinition eagerDefinitionBody: {
             sourceAnalyzedDefinition resultTypeNode:  (sourceAnalyzedDefinition environment analyze: sourceDefinition resultTypeNode withExpectedType: Type)
         }.
 
-        type := DependentFunctionType new 
+        type := DependentFunctionType new
+            sourcePosition: sourceDefinition sourcePosition;
             initializeWithFunctionAnalysisEnvironment: sourceAnalyzedDefinition environment
                 argumentNodes: sourceAnalyzedDefinition argumentNodes resultTypeNode: sourceAnalyzedDefinition resultTypeNode functionFlags: flags & FunctionFlags::TypeFlags;
             canonicalize.

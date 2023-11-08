@@ -2674,7 +2674,7 @@ DependentFunctionType
         AnyValue
     } makeOverride;
     withSelector: #printOn: addMethod: {:(DependentFunctionType)self :(Stream)stream :: Void |
-        stream nextPutAll: "DependentFunctionType at "; print: self sourcePosition
+        stream nextPutAll: "DependentFunctionType "; print: self identityHash; nextPutAll: "at "; print: self sourcePosition
     } makeOverride.
 
 SimpleFunctionType
