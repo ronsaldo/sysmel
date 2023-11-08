@@ -4467,8 +4467,6 @@ HIRModule extend: {
             }
         } continueWith: (i := i + 1sz).
 
-        printLine("trampolineSymbolSet size ", trampolineSymbolSet size).
-
         result asArray
     }.
 

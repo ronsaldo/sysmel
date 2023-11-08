@@ -113,7 +113,7 @@ public function CLISysmelInterpreter::nativeRuntimeMain(argc: Int32, argv: Char8
 
     ## FIXME: Remove this line after generating global variables with initial values.
     FunctionBytecodeCompiler::Current := FunctionBytecodeDirectCompiler.
-    ##FunctionNativeCodeCompiler::Current := HIR_MIRFunctionNativeCodeCompiler.
+    FunctionNativeCodeCompiler::Current := HIR_MIRFunctionNativeCodeCompiler.
 
     let result := CLISysmelInterpreter::nativeMain(argc, argv).
     AnalysisQueue current waitPendingAnalysis.

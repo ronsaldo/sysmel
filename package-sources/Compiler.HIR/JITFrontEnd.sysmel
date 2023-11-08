@@ -35,8 +35,50 @@ public class HIR_MIRFunctionNativeCodeCompiler superclass: FunctionNativeCodeCom
         ## Native code.
         let nativeCode => NativeCode := nativeCodeIR asNativeCode.
 
+        ## Compile the required trampolines
+        let trampolineMirModuleGenerator := HIRModuleMIRCodeGenerator new
+            initializeWithTarget: mirCompilationTarget;
+            importRuntimeFunction: true;
+            importTrampolines: true;
+            yourself.
+
+        let trampolineSymbolSet := Set new.
+        let addTrampolineSymbol := {:(Symbol)trampolineSymbol :: Void |
+            (trampolineSymbolSet includes: trampolineSymbol) ifTrue: {
+                return: void
+            }.
+
+            trampolineSymbolSet add: trampolineSymbol.
+            trampolineMirModuleGenerator compileTrampolineForSymbol: trampolineSymbol.
+        }.
+
+        nativeCode allExternalSymbolNamesDo: {:(Symbol)eachSymbolName :: Void |
+            eachSymbolName isFunctionTypeTrampolineSymbol ifTrue: {
+                addTrampolineSymbol(eachSymbolName)
+            }.
+        }.
+
+        let nativeCodeWithTrampolines := trampolineSymbolSet isEmpty ifTrue: {
+            nativeCode
+        } ifFalse: {
+            let trampolineMirModule := trampolineMirModuleGenerator finish.
+            trampolineMirModule performStandardOptimizations.
+
+            let trampolineNativeCodeIR := trampolineMirModule asTargetNativeCodeIR.
+            ##printLine(nativeCodeIR fullPrintString).
+
+            ## Native code.
+            let trampolineNativeCode => NativeCode := trampolineNativeCodeIR asNativeCode.
+
+            ## Link the native code with the trampolines.
+            NativeCodeLinker new
+                addNativeCode: nativeCode;
+                addNativeCode: trampolineNativeCode;
+                finish.
+        }.
+
         ## Find the native code definition.
-        let nativeCodeDefinition := nativeCode findNativeCodeDefinitionFor: definition.
+        let nativeCodeDefinition := nativeCodeWithTrampolines findNativeCodeDefinitionFor: definition.
         ##printLine(nativeCodeDefinition).
 
         nativeCodeDefinition
