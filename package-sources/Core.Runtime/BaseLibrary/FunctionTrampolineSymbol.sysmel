@@ -28,8 +28,8 @@ public final class FunctionTypeUncheckedToCapturelessTrampolineSymbol superclass
     public override method isFunctionTypeUncheckedToCapturelessTrampolineSymbol => Boolean := true.
 
     public override method printOn: (stream: Stream) ::=> Void := {
-        functionType printQualifiedSymbolNameOn: stream.
-        stream string: ".uncheckedToCapturelessTrampoline"
+        functionType printOn: stream.
+        stream string: " [Unchecked To Captureless Trampoline]"
     }.
 }.
 
@@ -37,8 +37,8 @@ public final class FunctionTypeCheckedTrampolineSymbol superclass: FunctionTypeT
     public override method isFunctionTypeCheckedToUncheckedTrampolineSymbol => Boolean := true.
 
     public override method printOn: (stream: Stream) ::=> Void := {
-        functionType printQualifiedSymbolNameOn: stream.
-        stream string: ".checkedTrampoline"
+        functionType printOn: stream.
+        stream string: " [Checked Trampoline]"
     }.
 }.
 
@@ -46,8 +46,8 @@ public final class FunctionTypeUncheckedInterpreterTrampolineSymbol superclass: 
     public override method isFunctionTypeBoxingTrampolineSymbol => Boolean := true.
 
     public override method printOn: (stream: Stream) ::=> Void := {
-        functionType printQualifiedSymbolNameOn: stream.
-        stream string: ".uncheckedInterpreterTrampoline"
+        functionType printOn: stream.
+        stream string: " [Unchecked Interpreter Trampoline]"
     }.
 }.
 
@@ -55,7 +55,7 @@ public final class FunctionTypeBoxingTrampolineSymbol superclass: FunctionTypeTr
     public override method isFunctionTypeBoxingTrampolineSymbol => Boolean := true.
 
     public override method printOn: (stream: Stream) ::=> Void := {
-        functionType printQualifiedSymbolNameOn: stream.
-        stream string: ".boxingTrampoline"
+        functionType printOn: stream.
+        stream string: " [Boxing Trampoline]"
     }.
 }.
