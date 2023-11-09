@@ -83,6 +83,10 @@ public externC function sysmel_pal_free(pointer: Void pointer) => Void.
 public externC function sysmel_pal_allocateSystemMemory(size: Size) => Void pointer.
 public externC function sysmel_pal_freeSystemMemory(memoryPointer: Void pointer, size: Size) => Void.
 
+public externC function sysmel_pal_supportsMemoryWithRWXPermissions() => Boolean.
+public externC function sysmel_pal_lockCodeMemoryForWriting(memoryPointer: Void pointer, size: Size) => Boolean.
+public externC function sysmel_pal_unlockCodeMemoryForExecution(memoryPointer: Void pointer, size: Size) => Void.
+
 public externC function sysmel_pal_supportsMemoryWithDualMappingForJIT() => Boolean.
 public externC function sysmel_pal_allocateMemoryWithDualMappingForJIT(size: Size, outHandle: Void pointer ref, outWriteMemoryPointer: Void pointer ref, outExecuteMemoryPointer: Void pointer ref) => Boolean.
 public externC function sysmel_pal_freeMemoryWithDualMappingForJIT(size: Size, handle: Void pointer, writeMemoryPointer: Void pointer, executeMemoryPointer: Void pointer) => Void.

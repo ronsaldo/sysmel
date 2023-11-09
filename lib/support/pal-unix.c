@@ -122,6 +122,51 @@ SYSMEL_PAL_EXTERN_C void sysmel_pal_freeSystemMemory(void *memoryPointer, size_t
     munmap(memoryPointer, size);
 }
 
+static pthread_once_t sysmel_pal_hasRWXMemoryOnceFlag = PTHREAD_ONCE_INIT;
+static pthread_mutex_t sysmel_pal_rwxMemoryLockMutex = PTHREAD_MUTEX_INITIALIZER;
+
+static bool sysmel_pal_hasRWXMemory = false;
+
+static void sysmel_pal_checkMemoryForRWXPermissions(void)
+{
+    size_t pageSize = getpagesize();
+    void * result = mmap(0, pageSize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANON, -1, 0);
+    sysmel_pal_hasRWXMemory = result != MAP_FAILED;
+    if(result != MAP_FAILED)
+        munmap(result, pageSize);
+}
+
+SYSMEL_PAL_EXTERN_C bool sysmel_pal_supportsMemoryWithRWXPermissions(void)
+{
+    pthread_once(&sysmel_pal_hasRWXMemoryOnceFlag, sysmel_pal_checkMemoryForRWXPermissions);
+    return sysmel_pal_hasRWXMemory;
+}
+
+SYSMEL_PAL_EXTERN_C bool sysmel_pal_lockCodeMemoryForWriting(void *memoryPointer, size_t size)
+{
+    size_t pageAlignment = getpagesize();
+    uintptr_t startAddress = (uintptr_t)memoryPointer & (-pageAlignment);
+    uintptr_t endAddress = ((uintptr_t)memoryPointer + size + pageAlignment - 1) & (-pageAlignment);
+
+    pthread_mutex_lock(&sysmel_pal_rwxMemoryLockMutex);
+    bool success = mprotect((void*)startAddress, endAddress - startAddress, PROT_READ | PROT_WRITE | PROT_EXEC) == 0;
+    if(!success)
+        pthread_mutex_unlock(&sysmel_pal_rwxMemoryLockMutex);
+
+    return success;
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_unlockCodeMemoryForExecution(void *memoryPointer, size_t size)
+{
+    size_t pageAlignment = getpagesize();
+    uintptr_t startAddress = (uintptr_t)memoryPointer & (-pageAlignment);
+    uintptr_t endAddress = ((uintptr_t)memoryPointer + size + pageAlignment - 1) & (-pageAlignment);
+
+    mprotect((void*)startAddress, endAddress - startAddress, PROT_READ | PROT_EXEC);
+
+    pthread_mutex_unlock(&sysmel_pal_rwxMemoryLockMutex);
+}
+
 SYSMEL_PAL_EXTERN_C bool sysmel_pal_supportsMemoryWithDualMappingForJIT(void)
 {
     return true;

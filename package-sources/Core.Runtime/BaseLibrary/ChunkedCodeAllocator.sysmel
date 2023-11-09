@@ -35,10 +35,15 @@ public final struct ChunkedCodeAllocator definition: {
         while: position isNotNil do: {
             let next := position _ next.
             let capacity := position _ capacity.
-            let mappingHandle := position _ mappingHandle.
             let writeMapping := position _ writeMapping.
             let executableMapping := position _ executableMapping.
-            sysmel_pal_freeMemoryWithDualMappingForJIT(capacity, mappingHandle, writeMapping reinterpretCastTo: Void pointer, executableMapping reinterpretCastTo: Void pointer).
+            writeMapping == executableMapping ifTrue: {
+                sysmel_pal_freeSystemMemory(executableMapping reinterpretCastTo: Void pointer, capacity)
+            } ifFalse: {
+                let mappingHandle := position _ mappingHandle.
+                sysmel_pal_freeMemoryWithDualMappingForJIT(capacity, mappingHandle, writeMapping reinterpretCastTo: Void pointer, executableMapping reinterpretCastTo: Void pointer).
+            }.
+
             position := next.
         }.
 
@@ -59,8 +64,12 @@ public final struct ChunkedCodeAllocator definition: {
         let writeMemoryPointer mutable => Void pointer := nil.
         let executableMemoryPointer mutable => Void pointer := nil.
 
-        sysmel_pal_allocateMemoryWithDualMappingForJIT(chunkSize, mappingHandle, writeMemoryPointer, executableMemoryPointer) ifFalse: {
-            "Failed to allocate jit memory chunk with dual mapping." writeOntoStderr
+        sysmel_pal_supportsMemoryWithRWXPermissions() ifTrue: {
+            executableMemoryPointer := writeMemoryPointer := sysmel_pal_allocateSystemMemory(chunkSize).
+        } ifFalse: {
+            sysmel_pal_allocateMemoryWithDualMappingForJIT(chunkSize, mappingHandle, writeMemoryPointer, executableMemoryPointer) ifFalse: {
+                "Failed to allocate jit memory chunk with dual mapping." writeOntoStderr
+            }.
         }.
 
         let newChunk := writeMemoryPointer reinterpretCastTo: ChunkedCodeAllocatorChunk pointer.
@@ -74,7 +83,19 @@ public final struct ChunkedCodeAllocator definition: {
             size: ChunkedCodeAllocatorChunk::HeaderSize.
 
         lastChunk ifNotNil: {
+            writeMemoryPointer == executableMemoryPointer ifTrue: {
+                sysmel_pal_lockCodeMemoryForWriting(lastChunk reinterpretCastTo: Void pointer, lastChunk _ capacity) ifFalse: {
+                    "Failed to lock code memory for writing." writeOntoStderr.
+                    sysmel_pal_abort()
+                }
+            }.
+
             lastChunk _ next: newChunk.
+
+            writeMemoryPointer == executableMemoryPointer ifTrue: {
+                sysmel_pal_unlockCodeMemoryForExecution(lastChunk reinterpretCastTo: Void pointer, lastChunk _ capacity)
+            }.
+
             lastChunk := newChunk
         } ifNil: {
             firstChunk := lastChunk := newChunk
@@ -91,11 +112,27 @@ public final struct ChunkedCodeAllocator definition: {
 
         let offset := chunk _ size alignedTo: alignment.
         let alignedSize := size alignedTo: alignment.
+
+        let writeMapping := chunk _ writeMapping reinterpretCastTo: Void pointer.
+        let executableMapping := chunk _ executableMapping reinterpretCastTo: Void pointer.
+        let hasNonDualMapping := writeMapping == executableMapping.
+
+        hasNonDualMapping ifTrue: {
+            sysmel_pal_lockCodeMemoryForWriting(writeMapping, chunk _ capacity) ifFalse: {
+                "Failed to lock code memory for writing." writeOntoStderr.
+                sysmel_pal_abort()
+            }
+        }.
+        
         chunk _ size: offset + alignedSize.
 
+        hasNonDualMapping ifTrue: {
+            sysmel_pal_unlockCodeMemoryForExecution(writeMapping, lastChunk _ capacity)
+        }.
+
         mutex unlock.
-        writePointerResult := (chunk _ writeMapping reinterpretCastTo: UInt8 pointer) + offset asIntPointer reinterpretCastTo: Void pointer.
-        executablePointerResult := (chunk _ executableMapping reinterpretCastTo: UInt8 pointer) + offset asIntPointer reinterpretCastTo: Void pointer.
+        writePointerResult := (writeMapping reinterpretCastTo: UInt8 pointer) + offset asIntPointer reinterpretCastTo: Void pointer.
+        executablePointerResult := (executableMapping reinterpretCastTo: UInt8 pointer) + offset asIntPointer reinterpretCastTo: Void pointer.
         true
     }.
 }.

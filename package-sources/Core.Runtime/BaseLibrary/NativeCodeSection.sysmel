@@ -54,4 +54,9 @@ NativeCodeSection definition: {
     public method isDebugging => Boolean
         := (flags & NativeCodeSection::Flags::Debugging) ~= 0u32.
 
+    public inline method isTextSegmentAllocated => Boolean
+        := self isExecutable || self isWriteable not.
+
+    public inline method requiresExecPermissionChange => Boolean
+        := self isTextSegmentAllocated && (virtualAddress == writeableVirtualAddress).
 }.

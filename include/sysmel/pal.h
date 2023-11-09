@@ -73,6 +73,10 @@ SYSMEL_PAL_EXTERN_C void sysmel_pal_free(void *pointer);
 SYSMEL_PAL_EXTERN_C void *sysmel_pal_allocateSystemMemory(size_t size);
 SYSMEL_PAL_EXTERN_C void sysmel_pal_freeSystemMemory(void *memoryPointer, size_t size);
 
+SYSMEL_PAL_EXTERN_C bool sysmel_pal_supportsMemoryWithRWXPermissions(void);
+SYSMEL_PAL_EXTERN_C bool sysmel_pal_lockCodeMemoryForWriting(void *memoryPointer, size_t size);
+SYSMEL_PAL_EXTERN_C void sysmel_pal_unlockCodeMemoryForExecution(void *memoryPointer, size_t size);
+
 SYSMEL_PAL_EXTERN_C bool sysmel_pal_supportsMemoryWithDualMappingForJIT(void);
 SYSMEL_PAL_EXTERN_C bool sysmel_pal_allocateMemoryWithDualMappingForJIT(size_t size, void **outHandle, void **outWriteMemoryPointer, void **outExecuteMemoryPointer);
 SYSMEL_PAL_EXTERN_C void sysmel_pal_freeMemoryWithDualMappingForJIT(size_t size, void *handle, void *writeMemoryPointer, void *executeMemoryPointer);

@@ -140,29 +140,29 @@ AnyValue
             receiver: self;
             signal
     } makeVirtual withEagerAnalysis;
-    withSelector: #error: addMethod: {:(Object)self :(String)errorMessage :: Unwinds |
+    withSelector: #error: addMethod: {:(AnyValue)self :(String)errorMessage :: Unwinds |
         Error signal: errorMessage
     } makeFinal withEagerAnalysis;
-    withSelector: #primitiveFailed addMethod: {:(Object)self :: Unwinds |
+    withSelector: #primitiveFailed addMethod: {:(AnyValue)self :: Unwinds |
         error("Primitive failed")
     } makeFinal withEagerAnalysis;
-    withSelector: #errorSubscriptBounds: addMethod: {:(Object)self :(Size)index :: Unwinds |
+    withSelector: #errorSubscriptBounds: addMethod: {:(AnyValue)self :(Size)index :: Unwinds |
         error("Index is out of bounds")
     } makeFinal withEagerAnalysis;
-    withSelector: #assert: addMethod: {:(Object)self :(Boolean)condition :: Void |
+    withSelector: #assert: addMethod: {:(AnyValue)self :(Boolean)condition :: Void |
         if: condition then: void else: {
             AssertionFailure signal
         }
     } makeFinal withEagerAnalysis;
-    withSelector: #assertion:failedAt: addMethod: {:(Object)self :(String)assertionString :(SourcePosition)assertionLocation :: Unwinds |
+    withSelector: #assertion:failedAt: addMethod: {:(AnyValue)self :(String)assertionString :(SourcePosition)assertionLocation :: Unwinds |
         AssertionFailure new
             sourcePosition: assertionLocation;
             signal: assertionString
     } makeFinal withEagerAnalysis;
-    withSelector: #subclassResponsibility addMethod: {:(Object)self :: Unwinds |
+    withSelector: #subclassResponsibility addMethod: {:(AnyValue)self :: Unwinds |
         self error: self __type__ printString -- " Subclass responsibility."
     } makeFinal withEagerAnalysis;
-    withSelector: #shouldBeImplemented addMethod: {:(Object)self :: Unwinds |
+    withSelector: #shouldBeImplemented addMethod: {:(AnyValue)self :: Unwinds |
         self error: self __type__ printString -- " should be implemented."
     } makeFinal withEagerAnalysis.
 

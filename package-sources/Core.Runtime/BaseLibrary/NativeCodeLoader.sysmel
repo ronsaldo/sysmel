@@ -110,7 +110,7 @@ public final struct NativeCodeLoader definition: {
         ## Allocate the segment memory.
         let writePointer mutable => Void pointer := nil.
         let executablePointer mutable => Void pointer := nil.
-        eachSection isExecutable || eachSection isWriteable not ifTrue: {
+        eachSection isTextSegmentAllocated ifTrue: {
             (NativeCodeLoader::TextSegmentAllocator allocateWithSize: eachSection size alignment: eachSection alignment writePointerResult: writePointer executablePointerResult: executablePointer) ifFalse: {
                 error("Failed to allocate text segment memory.")
             }
@@ -121,6 +121,16 @@ public final struct NativeCodeLoader definition: {
             }
         }.
 
+        eachSection
+            virtualAddress: (executablePointer reinterpretCastTo: UIntPointer);
+            writeableVirtualAddress: (writePointer reinterpretCastTo: UIntPointer).
+
+        eachSection requiresExecPermissionChange ifTrue: {
+            sysmel_pal_lockCodeMemoryForWriting(executablePointer, eachSection size) ifFalse: {
+                error("Failed to lock executable memory for writing.")
+            }
+        }.
+
         ## Write the segment content.
         eachSection isNoBits || eachSection data isNil ifTrue: {
             memset(writePointer, 0i8, eachSection size)
@@ -128,9 +138,9 @@ public final struct NativeCodeLoader definition: {
             memcpy(writePointer, eachSection data __rawContentsPointer__, eachSection size)
         }.
 
-        eachSection
-            virtualAddress: (executablePointer reinterpretCastTo: UIntPointer);
-            writeableVirtualAddress: (writePointer reinterpretCastTo: UIntPointer).
+        eachSection requiresExecPermissionChange ifTrue: {
+            sysmel_pal_unlockCodeMemoryForExecution(executablePointer, eachSection size)
+        }.
     }.
 
     public method installSectionsFirstPass: (sections: SequenceableCollection) ::=> Void := {
@@ -195,9 +205,17 @@ public final struct NativeCodeLoader definition: {
         gotTable := (NativeCodeLoader::DataSegmentAllocator allocateWithSize: gotSectionSize alignment: NativeCode::GotEntryAlignment) reinterpretCastTo: UIntPointer pointer.
         let gotTableDestinationIndex mutable := 0sz.
 
-        (pltSymbolCount = 0sz) || (NativeCodeLoader::TextSegmentAllocator allocateWithSize: pltSectionSize alignment: NativeCode::X86_64::PltEntryAlignment writePointerResult: pltWritePointer executablePointerResult: pltExecutablePointer) ifFalse: {
+        pltSymbolCount = 0sz ifTrue: {return: void}.
+
+        (NativeCodeLoader::TextSegmentAllocator allocateWithSize: pltSectionSize alignment: NativeCode::X86_64::PltEntryAlignment writePointerResult: pltWritePointer executablePointerResult: pltExecutablePointer) ifFalse: {
             error("Failed to allocate text segment memory.")
         }.
+
+        pltWritePointer == pltExecutablePointer ifTrue: {
+            sysmel_pal_lockCodeMemoryForWriting(pltExecutablePointer, pltSectionSize) ifFalse: {
+                error("Failed to lock executable plt memory for writing.")
+            }
+        }
     }.
 
     public method buildGotAndPLTForSymbolTable: (symbolTable: NativeCodeSymbolTable) ::=> Void := {
@@ -242,6 +260,12 @@ public final struct NativeCodeLoader definition: {
     public method finishBuildingGotAndPLT => Void := {
         ##self assert: gotTableDestinationIndex = gotSymbolCount.
         ##self assert: pltTableDestinationIndex = pltSymbolCount.
+
+        pltSymbolCount = 0sz ifTrue: {return: void}.
+
+        pltWritePointer == pltExecutablePointer ifTrue: {
+            sysmel_pal_unlockCodeMemoryForExecution(pltExecutablePointer, pltSectionSize)
+        }
     }.
 
     public method installSectionRelocations: (eachSection: NativeCodeSection) ::=> Void := {
@@ -250,6 +274,12 @@ public final struct NativeCodeLoader definition: {
         }.
 
         eachSection relocations ifNil: {return: void}.
+
+        eachSection requiresExecPermissionChange ifTrue: {
+            sysmel_pal_lockCodeMemoryForWriting(eachSection virtualAddress reinterpretCastTo: Void pointer, eachSection size) ifFalse: {
+                error("Failed to lock executable memory for writing.")
+            }
+        }.
 
         eachSection relocations decodedRelocationsDo: {:(UInt8)type :(UInt32)symbolIndex :(UInt32)offset :(Int64)addend :: Void |
             let symbol := eachSection symbolTable atOrNil: symbolIndex.
@@ -305,7 +335,11 @@ public final struct NativeCodeLoader definition: {
                     error("Unsupported jit relocation of type " -- (NativeCodeRelocation::Type::NameTable at: type) asString).
                 }
             }
-        }
+        }.
+
+        eachSection requiresExecPermissionChange ifTrue: {
+            sysmel_pal_unlockCodeMemoryForExecution(eachSection virtualAddress reinterpretCastTo: Void pointer, eachSection size)
+        }.
     }.
 
     public method installSectionsRelocations: (sections: SequenceableCollection) ::=> Void := {
@@ -355,7 +389,7 @@ NativeCodeSection definition: {
         name == #".eh_frame" ifTrue: {
             sysmel_pal_eh_frame_registerSection(virtualAddress reinterpretCastTo: Void const pointer)
         }
-    }
+    }.
 }.
 
 NativeCode definition: {
