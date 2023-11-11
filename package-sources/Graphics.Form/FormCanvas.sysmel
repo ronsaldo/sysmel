@@ -1,0 +1,3 @@
+public class FormCanvas definition: {
+    public field form => Form.
+}.

@@ -5,6 +5,7 @@ window isAnimated: true.
 let renderbuffer := Form forRenderingWithExtent: 640u32 @ 480u32.
 
 let renderer := window newFormRenderer.
+let sgBuilder := FormSGBuilder new.
 
 let frameCount mutable := 0u32,
 let frameTime mutable := 0f64.
@@ -16,6 +17,9 @@ public class TestWindowEventHandler superclass: EventHandler; definition: {
         let gray := phase - phase floor.
         let grayColor := Color gray: gray asFloat32.
         renderbuffer fillWithColor: grayColor.
+
+        let sceneGraph := sgBuilder rectangle: (20f32@30f32 extent: 64f32@32f32) color: Color blue.
+        FormSGFormRenderer new renderSceneGraph: sceneGraph onForm: renderbuffer.
 
         renderer presentForm: renderbuffer.
     }.

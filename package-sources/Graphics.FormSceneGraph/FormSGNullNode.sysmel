@@ -1,0 +1,18 @@
+public final class FormSGNullNode superclass: FormSGNode; definition: {
+    __Meta__ definition: {
+        let UniqueInstance := FormSGNullNode basicNew.
+        public inline method uniqueInstance => FormSGNullNode := UniqueInstance.
+    }.
+
+    public override method accept: (visitor: FormSGVisitor)
+        := visitor visitNullNode: self.
+}.
+
+FormSGBuilder definition: {
+    public method null => FormSGNullNode := FormSGNullNode uniqueInstance.
+}.
+
+FormSGVisitor definition: {
+    public abstract method visitNullNode: (node: FormSGNullNode)
+        := self subclassResponsibility.
+}.

@@ -1,0 +1,13 @@
+loadSourceNamed: "FormSGBuilder.sysmel".
+loadSourceNamed: "FormSGVisitor.sysmel".
+
+loadSourceNamed: "FormSGNode.sysmel".
+loadSourceNamed: "FormSGContainerNode.sysmel".
+loadSourceNamed: "FormSGNullNode.sysmel".
+
+loadSourceNamed: "FormSGRectangleNode.sysmel".
+loadSourceNamed: "FormSGColorRectangleNode.sysmel".
+loadSourceNamed: "FormSGGradientNode.sysmel".
+loadSourceNamed: "FormSGLinearGradientNode.sysmel".
+
+loadSourceNamed: "FormSGFormRenderer.sysmel".

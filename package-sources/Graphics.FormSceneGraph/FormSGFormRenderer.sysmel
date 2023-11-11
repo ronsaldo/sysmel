@@ -1,0 +1,19 @@
+public class FormSGFormRenderer superclass: FormSGVisitor; definition: {
+    public field canvas => FormCanvas.
+
+    public method renderSceneGraph: (sceneGraph: FormSGNode) onForm: (targetForm: Form) ::=> Void := {
+        self renderSceneGraph: sceneGraph onCanvas: (FormCanvas new form: targetForm; yourself)
+    }.
+
+    public method renderSceneGraph: (sceneGraph: FormSGNode) onCanvas: (targetCanvas: FormCanvas) ::=> Void := {
+        canvas := targetCanvas.
+        self visitNode: sceneGraph.
+    }.
+
+    public override method visitNullNode: (node: FormSGNullNode) := void.
+
+    public override method visitColorNode: (node: FormSGColorRectangleNode) := {
+        ##printLine("visitColorNode: ", node).
+        void
+    }.
+}.

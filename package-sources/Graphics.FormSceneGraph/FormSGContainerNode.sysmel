@@ -1,0 +1,18 @@
+public final class FormSGContainerNode superclass: FormSGNode; definition: {
+    public field children => SequenceableCollection.
+
+    public override method accept: (visitor: FormSGVisitor)
+        := visitor visitContainerNode: self.
+}.
+
+FormSGBuilder definition: {
+    public method containerWith: (nodes: SequenceableCollection) ::=> FormSGContainerNode
+        := FormSGContainerNode new
+            children: nodes;
+            yourself.
+}.
+
+FormSGVisitor definition: {
+    public abstract method visitContainerNode: (node: FormSGContainerNode)
+        := self subclassResponsibility.
+}.

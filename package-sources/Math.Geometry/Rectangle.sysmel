@@ -1,0 +1,28 @@
+## FIXME: Use a struct and a template here
+public final class RectangleF32 definition: {
+    public field min => Float32x2.
+    public field max => Float32x2.
+
+    __Meta__ definition: {
+        public pure inline method min: (min: Float32x2) max: (max: Float32x2) ::=> RectangleF32
+            := RectangleF32 basicNew
+                min: min;
+                max: max;
+                yourself.
+
+        public pure inline method origin: (origin: Float32x2) extent: (extent: Float32x2) ::=> RectangleF32
+            := RectangleF32 basicNew
+                min: origin;
+                max: origin + extent;
+                yourself.
+
+    }.
+
+    public pure inline method origin => Float32x2 := min.
+    public pure inline method corner => Float32x2 := max.
+}.
+
+Float32x2 extend: {
+    public pure inline method extent: (extent: SelfType) ::=> RectangleF32
+        := RectangleF32 origin: self extent: extent.
+}.

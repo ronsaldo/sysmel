@@ -1,4 +1,6 @@
 #(
+    "Math.Geometry"
+    "Math.Geometry.Tests"
     "Graphics.Color"
     "Graphics.Color.Tests"
     "Graphics.Form"

@@ -1,0 +1,19 @@
+public final class FormSGColorRectangleNode superclass: FormSGRectangleNode; definition: {
+    public field color => Color.
+
+    public override method accept: (visitor: FormSGVisitor)
+        := visitor visitColorNode: self.
+}.
+
+FormSGBuilder definition: {
+    public method rectangle: (rectangle: RectangleF32) color: (color: Color) ::=> FormSGColorRectangleNode
+        := FormSGColorRectangleNode new
+            rectangle: rectangle;
+            color: color;
+            yourself.
+}.
+
+FormSGVisitor definition: {
+    public virtual method visitColorNode: (node: FormSGColorRectangleNode)
+        := self visitRectangleNode: node.
+}.

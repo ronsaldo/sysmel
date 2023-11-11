@@ -1,0 +1,15 @@
+public abstract class FormSGNode superclass: Object; definition: {
+    public abstract method accept: (visitor: FormSGVisitor)
+        := self subclassResponsibility.
+}.
+
+FormSGVisitor definition: {
+    public method visitNode: (node: FormSGNode)
+        := node accept: self.
+
+    public method visitNodes: (nodes: SequenceableCollection) ::=> Void := {
+        nodes do: {:(FormSGNode)eachNode :: Void |
+            self visitNode: eachNode
+        }
+    }.
+}.
