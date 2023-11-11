@@ -142,30 +142,28 @@ Untyped::identityHash adoptDefinitionOf: {:(Untyped)value :: Size |
     <targetDefinedPrimitive>
     primitiveFailedError()
 }.
+(PointerLikeType::load) ensureAnalysis.
 
 (PointerLikeType::store:) adoptDefinitionOf: {:(Untyped)pointer :(AnyValue)value :: Void |
     <primitive: #PointerLikeType::store:>
     <targetDefinedPrimitive>
     primitiveFailedError()
 }.
+(PointerLikeType::store:) ensureAnalysis.
 
 (PointerLikeType::at:) adoptDefinitionOf: {:(Untyped)pointer :(IntPointer)index :: Untyped |
     <primitive: #PointerLikeType::at:>
     <targetDefinedPrimitive>
     primitiveFailedError()
 }.
+(PointerLikeType::at:) ensureAnalysis.
 
 (PointerLikeType::reinterpretCast) adoptDefinitionOf: {:(Untyped)pointer :: Untyped |
     <primitive: #PointerLikeType::reinterpretCast>
     <targetDefinedPrimitive>
     primitiveFailedError()
 }.
-
-(PointerLikeType::reinterpretCast) adoptDefinitionOf: {:(Untyped)pointer :: Untyped |
-    <primitive: #PointerLikeType::reinterpretCast>
-    <targetDefinedPrimitive>
-    primitiveFailedError()
-}.
+(PointerLikeType::reinterpretCast) ensureAnalysis.
 
 {
     let: #EnsureBlockType with: SimpleFunctionTypeTemplate(#(), 0bflgs, Void).

@@ -100,7 +100,7 @@ static void sysmel_pal_sdl2Window_convertEvent(SDL_Event *sdlEvent, sysmel_pal_w
         break;
     case SDL_KEYMAPCHANGED:
         palEvent->type = SYSMEL_PAL_WINDOW_EVENT_TYPE_KEY_MAP_CHANGED;
-        palEvent->window = (sysmel_pal_window_t*)SDL_GetWindowFromID(sdlEvent->key.windowID);
+        palEvent->window = NULL;
         break;
     case SDL_WINDOWEVENT:
         palEvent->window = (sysmel_pal_window_t*)SDL_GetWindowFromID(sdlEvent->window.windowID);
