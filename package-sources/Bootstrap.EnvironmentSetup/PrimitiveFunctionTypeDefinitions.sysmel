@@ -99,6 +99,9 @@ methodWithSelectorAt(Float64, #printString) __type__: (SimpleFunctionTypeTemplat
 methodWithSelectorAt(String, #--) __type__: (SimpleFunctionTypeTemplate((String, SequenceableCollection), 0bflgs, String)).
 methodWithSelectorAt(StringStream, #asString) __type__: (SimpleFunctionTypeTemplate((StringStream,), 0bflgs, String)).
 
+methodWithSelectorAt(AnyValue, #__uint32At__:) __type__: (SimpleFunctionTypeTemplate((AnyValue, Size), 0bflgs, UInt32)).
+methodWithSelectorAt(AnyValue, #__uint32At__:put:) __type__: (SimpleFunctionTypeTemplate((AnyValue, Size, UInt32), 0bflgs, Void)).
+
 (==) adoptDefinitionOf: {:(AnyValue)left :(AnyValue)right :: Boolean |
     <primitive: #== >
     <targetDefinedPrimitive>

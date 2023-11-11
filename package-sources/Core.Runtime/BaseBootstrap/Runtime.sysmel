@@ -349,8 +349,21 @@ Type
     withSelector: #makeValue addMethod: {:(Type)self :: Type |
         self addFlags: TypeFlags::Value.
         self
-    } withEagerAnalysis;
+    } withEagerAnalysis.
 
+UndefinedObject class
+    withSelector: #coerceASTNode:into:withEnvironment: addMethod: {:(Type)self :(ASTNode)astNode :(Type)targetType :(AnalysisAndEvaluationEnvironment)environment :: ASTNode |
+        if: targetType isNullable
+        then: astNode
+        else: error("Cannot coerce nil into non-nullable type " -- targetType printString)
+    } makeOverride.
+
+ControlFlowEscapeType class
+    withSelector: #coerceASTNode:into:withEnvironment: addMethod: {:(Type)self :(ASTNode)astNode :(Type)targetType :(AnalysisAndEvaluationEnvironment)environment :: ASTNode |
+        astNode
+    } makeOverride.
+
+Type
     withSelector: #defaultValue addMethod: {:(Type)self :: self |
         if: self isNullable
             then: nil
@@ -425,6 +438,7 @@ Type
     withSelector: #invalidateLayout addMethod: {:(Type)self  :: Void |
         self instanceSize: 0sz.
         self instanceAlignment: 0sz.
+        self gcLayout: nil.
     } makeFinal withEagerAnalysis;
     withSelector: #addTypeSlot: addMethod: {:(Type)self :(TypeSlot)extraSlot :: Void |
         if: self totalSlotCount ~~ nil then: (self error: ((("Cannot add type slot " -- extraSlot printString) -- " into ") -- self printString) -- " when the total slot count has already been computed").
@@ -498,18 +512,6 @@ Type
                 else: (nil)
         }
     }.
-
-ControlFlowEscapeType class
-    withSelector: #coerceASTNode:into:withEnvironment: addMethod: {:(Type)self :(ASTNode)astNode :(Type)targetType :(AnalysisAndEvaluationEnvironment)environment :: ASTNode |
-        astNode
-    } makeOverride.
-
-UndefinedObject class
-    withSelector: #coerceASTNode:into:withEnvironment: addMethod: {:(Type)self :(ASTNode)astNode :(Type)targetType :(AnalysisAndEvaluationEnvironment)environment :: ASTNode |
-        if: targetType isNullable
-        then: astNode
-        else: error("Cannot coerce nil into non-nullable type " -- targetType printString)
-    } makeOverride.
 
 Type
     withSelector: #isPointedReinterpretableInto: addMethod: {:(Type)self :(Type)targetType :: Boolean |
@@ -3120,22 +3122,20 @@ GCLayout
     withSelector: #repetitions:strong:weak:fat: addClassMethod: {:(GCLayout class)self :(UInt32)repetitions :(Size)strongCount :(Size)weakCount :(Size)fatCount :: self |
         let: #result with: (self basicAllocate: (((4sz + strongCount) + weakCount) + fatCount) * 4sz).
         result
-            uint32At: 0sz put: repetitions;
-            uint32At: 4sz put: strongCount asUInt32;
-            uint32At: 8sz put: weakCount asUInt32;
-            uint32At: 12sz put: fatCount asUInt32.
+            __uint32At__: 0sz put: repetitions;
+            __uint32At__: 4sz put: strongCount asUInt32;
+            __uint32At__: 8sz put: weakCount asUInt32;
+            __uint32At__: 12sz put: fatCount asUInt32.
         result
     };
-    withSelector: #uint32At:put: addMethod: {:(GCLayout)self :(Size)index :(UInt32)value :: Void |
-        (index + 4sz) > self __byteSize__ ifTrue: (self errorSubscriptBounds: index).
-        self
-            __uncheckedByteSlotAt__: index put: value asUInt8;
-            __uncheckedByteSlotAt__: index + 1sz put: (value >> 8u32) asUInt8;
-            __uncheckedByteSlotAt__: index + 2sz put: (value >> 16u32) asUInt8;
-            __uncheckedByteSlotAt__: index + 3sz put: (value >> 24u32) asUInt8.
-    } makeFinal makeAlwaysInline;
+    withSelector: #at: addMethod: {:(GCLayout)self :(Size)index :: UInt32 |
+        self __uint32At__: (index *4sz) + 16sz
+    } makeOverride makeFinal makeAlwaysInline;
     withSelector: #at:put: addMethod: {:(GCLayout)self :(Size)index :(UInt32)value :: Void |
-        self uint32At: (index *4sz) + 16sz put: value 
+        self __uint32At__: (index *4sz) + 16sz put: value 
+    } makeOverride makeFinal makeAlwaysInline;
+    withSelector: #size addMethod: {:(GCLayout)self :: Size |
+        self __byteSize__ / 4sz - 4sz
     } makeOverride makeFinal makeAlwaysInline.
 
 GCLayoutBuilder
@@ -3216,7 +3216,7 @@ Type
     withSelector: #computeGCLayout replaceMethod: {:(Type)self :: Void |
         if: self validSlots isEmpty then: {
             if: self supertype ~~ nil then: {
-                self gcLayout: self supertype gcLayout.
+                self gcLayout: (self supertype ensureLayoutIsComputed; gcLayout).
                 self assert: self gcLayout ~~ nil.
                 return: void.
             }

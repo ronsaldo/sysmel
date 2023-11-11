@@ -26,9 +26,6 @@ public final class Form definition: {
     public inline method extent => UInt32x2
         := UInt32x2 x: width y: height.
 
-    public method dummy => Void
-        := void.
-
     public method getPixelsPointer => UInt32 pointer
         := bits __rawContentsPointer__ reinterpretCastTo: UInt32 pointer.
 
@@ -46,5 +43,5 @@ public final class Form definition: {
     }.
 }.
 
-##printLine((UInt32 pointer >> #"[]:") __type__).
-printLine(((Form >> #fillWithColor:) definition ensureAnalysis; bytecode) fullPrintString).
+## FIXME: Debug the GC issue that is triggered by removing this line.
+((Form >> #fillWithColor:) definition ensureAnalysis; bytecode) fullPrintString
