@@ -1,4 +1,4 @@
-public class ColorTestCase superclass: TestCase; definition: {
+public class FormTestCase superclass: TestCase; definition: {
     public method testConstructWithExtent => Void := {
         let form := Form extent: 32u32 @ 16u32.
         self assert: form width equals: 32u32.
