@@ -59,7 +59,6 @@
 #include "stackFrame.c"
 #include "string.c"
 #include "stringStream.c"
-#include "sysmelParser.c"
 #include "system.c"
 #include "time.c"
 #include "token.c"

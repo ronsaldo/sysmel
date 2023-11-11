@@ -19,7 +19,6 @@
 #include "sysbvm/string.h"
 #include "sysbvm/sourceCode.h"
 #include "sysbvm/stackFrame.h"
-#include "sysbvm/sysmelParser.h"
 #include "sysbvm/type.h"
 #include "internal/context.h"
 #include <stdio.h>
@@ -136,7 +135,7 @@ SYSBVM_API sysbvm_tuple_t sysbvm_interpreter_analyzeAndEvaluateSourceCodeWithEnv
 
     SYSBVM_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
     if(sysbvm_string_equalsCString(sysbvm_sourceCode_getLanguage(gcFrame.sourceCode), "sysmel"))
-        gcFrame.ast = sysbvm_sysmelParser_parseSourceCode(context, gcFrame.sourceCode);
+        gcFrame.ast = sysbvm_parser_parseSourceCode(context, gcFrame.sourceCode);
     else
         gcFrame.ast = sysbvm_parser_parseSourceCode(context, gcFrame.sourceCode);
     gcFrame.result = sysbvm_interpreter_analyzeAndEvaluateASTWithEnvironment(context, gcFrame.ast, gcFrame.environment);
@@ -158,7 +157,7 @@ SYSBVM_API sysbvm_tuple_t sysbvm_interpreter_validateThenAnalyzeAndEvaluateSourc
 
     SYSBVM_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
     if(sysbvm_string_equalsCString(sysbvm_sourceCode_getLanguage(gcFrame.sourceCode), "sysmel"))
-        gcFrame.ast = sysbvm_sysmelParser_parseSourceCode(context, gcFrame.sourceCode);
+        gcFrame.ast = sysbvm_parser_parseSourceCode(context, gcFrame.sourceCode);
     else
         gcFrame.ast = sysbvm_parser_parseSourceCode(context, gcFrame.sourceCode);
     gcFrame.result = sysbvm_interpreter_validateThenAnalyzeAndEvaluateASTWithEnvironment(context, gcFrame.ast, gcFrame.environment);
@@ -178,7 +177,7 @@ SYSBVM_API sysbvm_tuple_t sysbvm_interpreter_analyzeAndEvaluateCStringWithEnviro
 
     SYSBVM_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
     if(!strcmp(sourceCodeLanguage, "sysmel"))
-        gcFrame.astNode = sysbvm_sysmelParser_parseCString(context, sourceCodeText, sourceCodeName);
+        gcFrame.astNode = sysbvm_parser_parseCString(context, sourceCodeText, sourceCodeName);
     else
         gcFrame.astNode = sysbvm_parser_parseCString(context, sourceCodeText, sourceCodeName);
     gcFrame.result = sysbvm_interpreter_analyzeAndEvaluateASTWithEnvironment(context, gcFrame.astNode, gcFrame.environment);
@@ -643,124 +642,6 @@ static sysbvm_tuple_t sysbvm_astSequenceNode_primitiveAnalyzeAndEvaluate(sysbvm_
     SYSBVM_STACKFRAME_POP_SOURCE_POSITION(sourcePositionRecord);
     SYSBVM_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
     return gcFrame.result;
-}
-
-static sysbvm_tuple_t sysbvm_astLambdaNode_parseArgumentsNodes(sysbvm_context_t *context, sysbvm_tuple_t unsafeArgumentsNode, bool *hasVariadicArguments, sysbvm_tuple_t *resultTypeNode)
-{
-    struct {
-        sysbvm_tuple_t argumentsNode;
-        sysbvm_tuple_t argumentList;
-        sysbvm_tuple_t nameNode;
-
-        sysbvm_tuple_t unparsedArgumentNode;
-        sysbvm_tuple_t isForAll;
-        sysbvm_tuple_t nameExpression;
-        sysbvm_tuple_t typeExpression;
-    } gcFrame = {0};
-    SYSBVM_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
-
-    gcFrame.argumentsNode = unsafeArgumentsNode;
-    gcFrame.argumentList = sysbvm_orderedCollection_create(context);
-    size_t argumentNodeCount = sysbvm_array_getSize(gcFrame.argumentsNode);
-    *hasVariadicArguments = false;
-    *resultTypeNode = SYSBVM_NULL_TUPLE;
-    for(size_t i = 0; i < argumentNodeCount; ++i)
-    {
-        gcFrame.unparsedArgumentNode = sysbvm_array_at(gcFrame.argumentsNode, i);
-        if(sysbvm_astNode_isIdentifierReferenceNode(context, gcFrame.unparsedArgumentNode))
-        {
-            if(sysbvm_astIdentifierReferenceNode_isEllipsis(gcFrame.unparsedArgumentNode))
-            {
-                if(i + 1 < argumentNodeCount)
-                    sysbvm_error("Ellipsis can only be present at the end.");
-                else if(i == 0)
-                    sysbvm_error("Ellipsis cannot be the first argument.");
-
-                *hasVariadicArguments = true;
-                continue;
-            }
-            else if(sysbvm_astIdentifierReferenceNode_isArrow(gcFrame.unparsedArgumentNode))
-            {
-                if(i + 2 != argumentNodeCount)
-                    sysbvm_error("Result type expression can only be present at the end");
-
-                *resultTypeNode = sysbvm_array_at(gcFrame.argumentsNode, i + 1);
-                break;
-            }
-
-            gcFrame.isForAll = SYSBVM_FALSE_TUPLE;
-            gcFrame.nameExpression = sysbvm_astLiteralNode_create(context, sysbvm_astNode_getSourcePosition(gcFrame.unparsedArgumentNode), sysbvm_astIdentifierReferenceNode_getValue(gcFrame.unparsedArgumentNode));
-            gcFrame.typeExpression = SYSBVM_NULL_TUPLE;
-
-        }
-        else if(sysbvm_astNode_isUnexpandedSExpressionNode(context, gcFrame.unparsedArgumentNode))
-        {
-            sysbvm_astUnexpandedSExpressionNode_t *argumentNode = (sysbvm_astUnexpandedSExpressionNode_t*)gcFrame.unparsedArgumentNode;
-            size_t elementCount = sysbvm_array_getSize(argumentNode->elements);
-            gcFrame.isForAll = SYSBVM_FALSE_TUPLE;
-            gcFrame.nameExpression = sysbvm_astLiteralNode_create(context, sysbvm_astNode_getSourcePosition(gcFrame.unparsedArgumentNode), sysbvm_astIdentifierReferenceNode_getValue(gcFrame.unparsedArgumentNode));
-            gcFrame.typeExpression = SYSBVM_NULL_TUPLE;
-
-            if(elementCount >= 1)
-            {
-                gcFrame.nameNode = sysbvm_array_at(argumentNode->elements, 0);
-                if(!sysbvm_astNode_isIdentifierReferenceNode(context, gcFrame.nameNode))
-                    sysbvm_error("Argument name must be an identifier.");
-                gcFrame.nameExpression = sysbvm_astLiteralNode_create(context, sysbvm_astNode_getSourcePosition(gcFrame.nameNode), sysbvm_astIdentifierReferenceNode_getValue(gcFrame.nameNode));
-            }
-
-            if(elementCount >= 2)
-                gcFrame.typeExpression = sysbvm_array_at(argumentNode->elements, 1);
-        }
-        else
-        {
-            sysbvm_error("Invalid argument definition node.");
-        }
-
-        sysbvm_orderedCollection_add(context, gcFrame.argumentList, sysbvm_astArgumentNode_create(context, sysbvm_astNode_getSourcePosition(gcFrame.unparsedArgumentNode), gcFrame.isForAll, gcFrame.nameExpression, gcFrame.typeExpression));
-    }
-
-    sysbvm_tuple_t result = sysbvm_orderedCollection_asArray(context, gcFrame.argumentList);
-    SYSBVM_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-    return result;
-}
-
-static sysbvm_tuple_t sysbvm_astLambdaNode_primitiveMacro(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
-{
-    (void)context;
-    (void)closure;
-    if(argumentCount != 3) sysbvm_error_argumentCountMismatch(3, argumentCount);
-
-    sysbvm_tuple_t *macroContext = &arguments[0];
-    sysbvm_tuple_t *argumentsSExpressionNode = &arguments[1];
-    sysbvm_tuple_t *bodyNodes = &arguments[2];
-
-    struct {
-        sysbvm_tuple_t argumentsNode;
-        sysbvm_tuple_t sourcePosition;
-        sysbvm_tuple_t argumentsArraySlice;
-        sysbvm_tuple_t resultTypeNode;
-        sysbvm_tuple_t pragmas;
-        sysbvm_tuple_t bodyNodes;
-        sysbvm_tuple_t bodySequence;
-    } gcFrame = {0};
-    SYSBVM_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
-
-    if(!sysbvm_astNode_isUnexpandedSExpressionNode(context, *argumentsSExpressionNode))
-        sysbvm_error("Expected a S-Expression with the arguments node.");
-
-    bool hasVariadicArguments = false;
-    gcFrame.argumentsNode = sysbvm_astUnexpandedSExpressionNode_getElements(*argumentsSExpressionNode);
-    gcFrame.sourcePosition = sysbvm_macroContext_getSourcePosition(*macroContext);
-    gcFrame.argumentsArraySlice = sysbvm_astLambdaNode_parseArgumentsNodes(context, gcFrame.argumentsNode, &hasVariadicArguments, &gcFrame.resultTypeNode);
-    gcFrame.pragmas = sysbvm_array_create(context, 0);
-    gcFrame.bodyNodes = *bodyNodes;
-    gcFrame.bodySequence = sysbvm_astSequenceNode_create(context, gcFrame.sourcePosition, gcFrame.pragmas, gcFrame.bodyNodes);
-    sysbvm_tuple_t result = sysbvm_astLambdaNode_create(context, gcFrame.sourcePosition,
-        sysbvm_tuple_bitflags_encode(hasVariadicArguments ? SYSBVM_FUNCTION_FLAGS_VARIADIC : SYSBVM_FUNCTION_FLAGS_NONE),
-        gcFrame.argumentsArraySlice, gcFrame.resultTypeNode, gcFrame.bodySequence);
-    SYSBVM_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-    return result;
 }
 
 static sysbvm_tuple_t sysbvm_astArgumentNode_primitiveAnalyze(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
@@ -1713,132 +1594,6 @@ static sysbvm_tuple_t sysbvm_astVariableDefinitionNode_macroLetWithPrimitiveMacr
 
     sysbvm_tuple_t sourcePosition = sysbvm_macroContext_getSourcePosition(*macroContext);
     return sysbvm_astVariableDefinitionNode_createMacro(context, sourcePosition, *name, SYSBVM_NULL_TUPLE, *value);
-}
-
-static sysbvm_tuple_t sysbvm_astVariableDefinitionNode_primitiveMacro(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
-{
-    (void)context;
-    (void)closure;
-    if(argumentCount != 3) sysbvm_error_argumentCountMismatch(3, argumentCount);
-
-    sysbvm_tuple_t *macroContext = &arguments[0];
-    sysbvm_tuple_t *nameOrLambdaSignature = &arguments[1];
-    sysbvm_tuple_t *valueOrBodyNodes = &arguments[2];
-
-    struct {
-        sysbvm_tuple_t nameNode;
-        sysbvm_tuple_t valueNode;
-        sysbvm_tuple_t sourcePosition;
-        sysbvm_tuple_t lambdaSignatureElements;
-        sysbvm_tuple_t argumentsNode;
-        sysbvm_tuple_t resultTypeNode;
-        sysbvm_tuple_t arguments;
-        sysbvm_tuple_t pragmas;
-        sysbvm_tuple_t bodyNodes;
-        sysbvm_tuple_t bodySequence;
-        sysbvm_tuple_t nameExpression;
-        sysbvm_tuple_t result;
-    } gcFrame = {0};
-    SYSBVM_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
-
-    gcFrame.sourcePosition = sysbvm_macroContext_getSourcePosition(*macroContext);
-
-    if(sysbvm_astNode_isIdentifierReferenceNode(context, *nameOrLambdaSignature))
-    {
-        if(sysbvm_array_getSize(*valueOrBodyNodes) != 1)
-            sysbvm_error("Expected a single value for a local define.");
-
-        gcFrame.nameNode = *nameOrLambdaSignature;
-        gcFrame.valueNode = sysbvm_array_at(*valueOrBodyNodes, 0);
-    }
-    else if(sysbvm_astNode_isUnexpandedSExpressionNode(context, *nameOrLambdaSignature))
-    {
-        gcFrame.lambdaSignatureElements = sysbvm_astUnexpandedSExpressionNode_getElements(*nameOrLambdaSignature);
-        if(sysbvm_array_getSize(gcFrame.lambdaSignatureElements) < 1)
-            sysbvm_error("Expected function definition requires a name.");
-
-        gcFrame.nameNode = sysbvm_array_at(gcFrame.lambdaSignatureElements, 0);
-        if(!sysbvm_astNode_isIdentifierReferenceNode(context, gcFrame.nameNode))
-            sysbvm_error("Expected an identifier reference node for the name.");
-
-        bool hasVariadicArguments = false;
-        gcFrame.argumentsNode = sysbvm_array_fromOffset(context, gcFrame.lambdaSignatureElements, 1);
-        gcFrame.arguments = sysbvm_astLambdaNode_parseArgumentsNodes(context, gcFrame.argumentsNode, &hasVariadicArguments, &gcFrame.resultTypeNode);
-        gcFrame.pragmas = sysbvm_array_create(context, 0);
-        gcFrame.bodyNodes = *valueOrBodyNodes;
-        gcFrame.bodySequence = sysbvm_astSequenceNode_create(context, gcFrame.sourcePosition, gcFrame.pragmas, gcFrame.bodyNodes);
-        gcFrame.valueNode = sysbvm_astLambdaNode_create(context, gcFrame.sourcePosition,
-            sysbvm_tuple_bitflags_encode(hasVariadicArguments ? SYSBVM_FUNCTION_FLAGS_VARIADIC : SYSBVM_FUNCTION_FLAGS_NONE),
-            gcFrame.arguments, gcFrame.resultTypeNode, gcFrame.bodySequence);
-    }
-    else
-    {
-        sysbvm_error("Invalid usage of (define)");
-    }
-
-    gcFrame.nameExpression = sysbvm_astLiteralNode_create(context, sysbvm_astNode_getSourcePosition(gcFrame.nameNode), sysbvm_astIdentifierReferenceNode_getValue(gcFrame.nameNode));
-    gcFrame.result = sysbvm_astVariableDefinitionNode_create(context, gcFrame.sourcePosition, gcFrame.nameExpression, SYSBVM_NULL_TUPLE, gcFrame.valueNode, false);
-    SYSBVM_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-    return gcFrame.result;
-}
-
-static sysbvm_tuple_t sysbvm_astVariableDefinitionNode_primitiveDefineMacro(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
-{
-    (void)context;
-    (void)closure;
-    if(argumentCount != 3) sysbvm_error_argumentCountMismatch(3, argumentCount);
-
-    sysbvm_tuple_t *macroContext = &arguments[0];
-    sysbvm_tuple_t *nameOrLambdaSignature = &arguments[1];
-    sysbvm_tuple_t *valueOrBodyNodes = &arguments[2];
-
-    struct {
-        sysbvm_tuple_t nameNode;
-        sysbvm_tuple_t valueNode;
-        sysbvm_tuple_t sourcePosition;
-        sysbvm_tuple_t lambdaSignatureElements;
-        sysbvm_tuple_t argumentsNode;
-        sysbvm_tuple_t arguments;
-        sysbvm_tuple_t resultTypeNode;
-        sysbvm_tuple_t pragmas;
-        sysbvm_tuple_t bodyNodes;
-        sysbvm_tuple_t bodySequence;
-        sysbvm_tuple_t nameExpression;
-        sysbvm_tuple_t result;
-    } gcFrame = {0};
-    SYSBVM_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
-
-    gcFrame.sourcePosition = sysbvm_macroContext_getSourcePosition(*macroContext);
-
-    if(sysbvm_astNode_isUnexpandedSExpressionNode(context, *nameOrLambdaSignature))
-    {
-        gcFrame.lambdaSignatureElements = sysbvm_astUnexpandedSExpressionNode_getElements(*nameOrLambdaSignature);
-        if(sysbvm_array_getSize(gcFrame.lambdaSignatureElements) < 1)
-            sysbvm_error("Expected function definition requires a name.");
-
-        gcFrame.nameNode = sysbvm_array_at(gcFrame.lambdaSignatureElements, 0);
-        if(!sysbvm_astNode_isIdentifierReferenceNode(context, gcFrame.nameNode))
-            sysbvm_error("Expected an identifier reference node for the name.");
-
-        bool hasVariadicArguments = false;
-        gcFrame.argumentsNode = sysbvm_array_fromOffset(context, gcFrame.lambdaSignatureElements, 1);
-        gcFrame.arguments = sysbvm_astLambdaNode_parseArgumentsNodes(context, gcFrame.argumentsNode, &hasVariadicArguments, &gcFrame.resultTypeNode);
-        gcFrame.pragmas = sysbvm_array_create(context, 0);
-        gcFrame.bodyNodes = *valueOrBodyNodes;
-        gcFrame.bodySequence = sysbvm_astSequenceNode_create(context, gcFrame.sourcePosition, gcFrame.pragmas, gcFrame.bodyNodes);
-        gcFrame.valueNode = sysbvm_astLambdaNode_create(context, gcFrame.sourcePosition,
-            sysbvm_tuple_bitflags_encode((hasVariadicArguments ? SYSBVM_FUNCTION_FLAGS_VARIADIC : SYSBVM_FUNCTION_FLAGS_NONE) | SYSBVM_FUNCTION_FLAGS_MACRO),
-            gcFrame.arguments, gcFrame.resultTypeNode, gcFrame.bodySequence);
-    }
-    else
-    {
-        sysbvm_error("Invalid usage of (define)");
-    }
-
-    gcFrame.nameExpression = sysbvm_astLiteralNode_create(context, sysbvm_astNode_getSourcePosition(gcFrame.nameNode), sysbvm_astIdentifierReferenceNode_getValue(gcFrame.nameNode));
-    gcFrame.result = sysbvm_astVariableDefinitionNode_create(context, gcFrame.sourcePosition, gcFrame.nameExpression, SYSBVM_NULL_TUPLE, gcFrame.valueNode, false);
-    SYSBVM_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-    return gcFrame.result;
 }
 
 static sysbvm_tuple_t sysbvm_astVariableDefinitionNode_primitiveAnalyze(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
@@ -3731,21 +3486,6 @@ static sysbvm_tuple_t sysbvm_astMessageChainNode_primitiveEvaluate(sysbvm_contex
     SYSBVM_STACKFRAME_POP_SOURCE_POSITION(sourcePositionRecord);
     SYSBVM_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
     return gcFrame.result;
-}
-
-static sysbvm_tuple_t sysbvm_astMessageSendNode_primitiveMacro(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
-{
-    (void)context;
-    (void)closure;
-    if(argumentCount != 4) sysbvm_error_argumentCountMismatch(4, argumentCount);
-
-    sysbvm_tuple_t *macroContext = &arguments[0];
-    sysbvm_tuple_t *selectorNode = &arguments[1];
-    sysbvm_tuple_t *receiverNode = &arguments[2];
-    sysbvm_tuple_t *argumentNodes = &arguments[3];
-
-    sysbvm_tuple_t sourcePosition = sysbvm_macroContext_getSourcePosition(*macroContext);
-    return sysbvm_astMessageSendNode_create(context, sourcePosition, *receiverNode, *selectorNode, *argumentNodes);
 }
 
 static sysbvm_tuple_t sysbvm_astMessageSendNode_primitiveAnalyze(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
@@ -5989,18 +5729,14 @@ void sysbvm_astInterpreter_registerPrimitives(void)
     sysbvm_primitiveTable_registerFunction(sysbvm_astMessageChainNode_primitiveEvaluate, "ASTMessageChainNode::evaluateWithEnvironment:");
     sysbvm_primitiveTable_registerFunction(sysbvm_astMessageChainNode_primitiveAnalyzeAndEvaluate, "ASTMessageChainNode::analyzeAndEvaluateWithEnvironment:");
 
-    sysbvm_primitiveTable_registerFunction(sysbvm_astMessageSendNode_primitiveMacro, "ASTMessageSendNode::sendMacro");
     sysbvm_primitiveTable_registerFunction(sysbvm_astMessageSendNode_primitiveAnalyze, "ASTMessageSendNode::analyzeWithEnvironment:");
     sysbvm_primitiveTable_registerFunction(sysbvm_astMessageSendNode_primitiveEvaluate, "ASTMessageSendNode::evaluateWithEnvironment:");
     sysbvm_primitiveTable_registerFunction(sysbvm_astMessageSendNode_primitiveAnalyzeAndEvaluate, "ASTMessageSendNode::analyzeAndEvaluateWithEnvironment:");
 
-    sysbvm_primitiveTable_registerFunction(sysbvm_astLambdaNode_primitiveMacro, "ASTLambdaNode::lambdaMacro");
     sysbvm_primitiveTable_registerFunction(sysbvm_astLambdaNode_primitiveAnalyze, "ASTLambdaNode::analyzeWithEnvironment:");
     sysbvm_primitiveTable_registerFunction(sysbvm_astLambdaNode_primitiveEvaluate, "ASTLambdaNode::evaluateWithEnvironment:");
     sysbvm_primitiveTable_registerFunction(sysbvm_astLambdaNode_primitiveAnalyzeAndEvaluate, "ASTLambdaNode::analyzeWithEnvironment:");
 
-    sysbvm_primitiveTable_registerFunction(sysbvm_astVariableDefinitionNode_primitiveMacro, "ASTVariableDefinitionNode::macro:");
-    sysbvm_primitiveTable_registerFunction(sysbvm_astVariableDefinitionNode_primitiveDefineMacro, "ASTVariableDefinitionNode::defineMacro");
     sysbvm_primitiveTable_registerFunction(sysbvm_astVariableDefinitionNode_letWithPrimitiveMacro, "ASTVariableDefinitionNode::let:with:");
     sysbvm_primitiveTable_registerFunction(sysbvm_astVariableDefinitionNode_letTypeWithPrimitiveMacro, "ASTVariableDefinitionNode::let:type:with:");
     sysbvm_primitiveTable_registerFunction(sysbvm_astVariableDefinitionNode_letMutableWithPrimitiveMacro, "ASTVariableDefinitionNode::let:mutableWith:");
@@ -6194,22 +5930,18 @@ void sysbvm_astInterpreter_setupASTInterpreter(sysbvm_context_t *context)
         sysbvm_astMessageChainNode_primitiveAnalyzeAndEvaluate
     );
 
-    sysbvm_context_setIntrinsicSymbolBindingValueWithPrimitiveFunction(context, "send", 4, SYSBVM_FUNCTION_FLAGS_MACRO | SYSBVM_FUNCTION_FLAGS_VARIADIC, NULL, sysbvm_astMessageSendNode_primitiveMacro);
     sysbvm_astInterpreter_setupNodeInterpretationFunctions(context, context->roots.astMessageSendNodeType,
         sysbvm_astMessageSendNode_primitiveAnalyze,
         sysbvm_astMessageSendNode_primitiveEvaluate,
         sysbvm_astMessageSendNode_primitiveAnalyzeAndEvaluate
     );
 
-    sysbvm_context_setIntrinsicSymbolBindingValueWithPrimitiveFunction(context, "lambda", 3, SYSBVM_FUNCTION_FLAGS_MACRO | SYSBVM_FUNCTION_FLAGS_VARIADIC, NULL, sysbvm_astLambdaNode_primitiveMacro);
     sysbvm_astInterpreter_setupNodeInterpretationFunctions(context, context->roots.astLambdaNodeType,
         sysbvm_astLambdaNode_primitiveAnalyze,
         sysbvm_astLambdaNode_primitiveEvaluate,
         sysbvm_astLambdaNode_primitiveAnalyzeAndEvaluate
     );
 
-    sysbvm_context_setIntrinsicSymbolBindingValueWithPrimitiveFunction(context, "define", 3, SYSBVM_FUNCTION_FLAGS_MACRO | SYSBVM_FUNCTION_FLAGS_VARIADIC, NULL, sysbvm_astVariableDefinitionNode_primitiveMacro);
-    sysbvm_context_setIntrinsicSymbolBindingValueWithPrimitiveFunction(context, "defineMacro", 3, SYSBVM_FUNCTION_FLAGS_MACRO | SYSBVM_FUNCTION_FLAGS_VARIADIC, NULL, sysbvm_astVariableDefinitionNode_primitiveDefineMacro);
     sysbvm_context_setIntrinsicSymbolBindingValueWithPrimitiveFunction(context, "let:with:", 3, SYSBVM_FUNCTION_FLAGS_MACRO, NULL, sysbvm_astVariableDefinitionNode_letWithPrimitiveMacro);
     sysbvm_context_setIntrinsicSymbolBindingValueWithPrimitiveFunction(context, "let:type:with:", 4, SYSBVM_FUNCTION_FLAGS_MACRO, NULL, sysbvm_astVariableDefinitionNode_letTypeWithPrimitiveMacro);
     sysbvm_context_setIntrinsicSymbolBindingValueWithPrimitiveFunction(context, "let:mutableWith:", 3, SYSBVM_FUNCTION_FLAGS_MACRO, NULL, sysbvm_astVariableDefinitionNode_letMutableWithPrimitiveMacro);

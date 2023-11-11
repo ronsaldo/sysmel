@@ -59,29 +59,34 @@ TEST_SUITE(Parser)
         TEST_ASSERT_EQUALS(sysbvm_symbol_internWithCString(sysbvm_test_context, "test"), sysbvm_astLiteralNode_getValue(node));
     }
 
-    TEST_CASE_WITH_FIXTURE(UnexpandedEmptySExpression, TuuvmCore)
+    TEST_CASE_WITH_FIXTURE(LexicalBlock, TuuvmCore)
     {
-        sysbvm_tuple_t sequenceNode = sysbvm_parser_parseCString(sysbvm_test_context, "()", "test");
+        sysbvm_tuple_t sequenceNode = sysbvm_parser_parseCString(sysbvm_test_context, "{}", "test");
         TEST_ASSERT(sysbvm_astNode_isSequenceNode(sysbvm_test_context, sequenceNode));
         TEST_ASSERT_EQUALS(1, sysbvm_astSequenceNode_getExpressionCount(sequenceNode));
 
         sysbvm_tuple_t node = sysbvm_astSequenceNode_getExpressionAt(sequenceNode, 0);
-        TEST_ASSERT(sysbvm_astNode_isUnexpandedSExpressionNode(sysbvm_test_context, node));
-
-        sysbvm_tuple_t elements = sysbvm_astUnexpandedSExpressionNode_getElements(node);
-        TEST_ASSERT_EQUALS(0, sysbvm_array_getSize(elements));
+        TEST_ASSERT(sysbvm_astNode_isLexicalBlockNode(sysbvm_test_context, node));
     }
 
-    TEST_CASE_WITH_FIXTURE(UnexpandedSExpression, TuuvmCore)
+    TEST_CASE_WITH_FIXTURE(MessageWithoutReceiver, TuuvmCore)
     {
-        sysbvm_tuple_t sequenceNode = sysbvm_parser_parseCString(sysbvm_test_context, "(function)", "test");
+        sysbvm_tuple_t sequenceNode = sysbvm_parser_parseCString(sysbvm_test_context, "let: #x with: 42", "test");
         TEST_ASSERT(sysbvm_astNode_isSequenceNode(sysbvm_test_context, sequenceNode));
         TEST_ASSERT_EQUALS(1, sysbvm_astSequenceNode_getExpressionCount(sequenceNode));
 
         sysbvm_tuple_t node = sysbvm_astSequenceNode_getExpressionAt(sequenceNode, 0);
-        TEST_ASSERT(sysbvm_astNode_isUnexpandedSExpressionNode(sysbvm_test_context, node));
-
-        sysbvm_tuple_t elements = sysbvm_astUnexpandedSExpressionNode_getElements(node);
-        TEST_ASSERT_EQUALS(1, sysbvm_array_getSize(elements));
+        TEST_ASSERT(sysbvm_astNode_isUnexpandedApplicationNode(sysbvm_test_context, node));
     }
+
+    TEST_CASE_WITH_FIXTURE(KeywordMessage, TuuvmCore)
+    {
+        sysbvm_tuple_t sequenceNode = sysbvm_parser_parseCString(sysbvm_test_context, "a perform: #yourself", "test");
+        TEST_ASSERT(sysbvm_astNode_isSequenceNode(sysbvm_test_context, sequenceNode));
+        TEST_ASSERT_EQUALS(1, sysbvm_astSequenceNode_getExpressionCount(sequenceNode));
+
+        sysbvm_tuple_t node = sysbvm_astSequenceNode_getExpressionAt(sequenceNode, 0);
+        TEST_ASSERT(sysbvm_astNode_isMessageSendNode(sysbvm_test_context, node));
+    }
+
 }

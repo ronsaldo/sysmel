@@ -46,7 +46,6 @@ set(sysbvm_sources
     stackFrame.c
     string.c
     stringStream.c
-    sysmelParser.c
     system.c
     time.c
     token.c

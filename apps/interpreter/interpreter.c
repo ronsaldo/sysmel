@@ -6,7 +6,7 @@
 #include <sysbvm/filesystem.h>
 #include <sysbvm/sourceCode.h>
 #include <sysbvm/scanner.h>
-#include <sysbvm/sysmelParser.h>
+#include <sysbvm/parser.h>
 #include <sysbvm/interpreter.h>
 #include <sysbvm/stackFrame.h>
 #include <sysbvm/string.h>
@@ -128,7 +128,7 @@ int doMain(int startArgumentIndex, int argc, const char *argv[])
 
                 if(parseOnly)
                 {
-                    gcFrame.parseResult = sysbvm_sysmelParser_parseTokens(context, gcFrame.sourceCode, gcFrame.scanResult);
+                    gcFrame.parseResult = sysbvm_parser_parseTokens(context, gcFrame.sourceCode, gcFrame.scanResult);
                     sysbvm_orderedCollection_add(context, gcFrame.parseScanResults, gcFrame.parseResult);
                 }
             }

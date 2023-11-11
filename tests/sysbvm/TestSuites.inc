@@ -6,5 +6,4 @@ TEST_SUITE_NAME(StringSymbol)
 
 TEST_SUITE_NAME(Scanner)
 TEST_SUITE_NAME(Parser)
-TEST_SUITE_NAME(SysmelParser)
 TEST_SUITE_NAME(Interpreter)

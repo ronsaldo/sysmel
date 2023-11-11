@@ -6,7 +6,6 @@ set(SYSBVM_TESTS_SOURCES
     OrderedCollection.c
     String.c
     Scanner.c
-    SysmelParser.c
     Parser.c
 )
 
