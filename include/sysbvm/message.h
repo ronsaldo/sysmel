@@ -10,12 +10,13 @@ typedef struct sysbvm_message_s
     sysbvm_tuple_header_t header;
     sysbvm_tuple_t selector;
     sysbvm_tuple_t arguments;
+    sysbvm_tuple_t lookupType;
     sysbvm_tuple_t sourcePosition;
 } sysbvm_message_t;
 
 /**
  * Creates a message.
  */
-SYSBVM_API sysbvm_tuple_t sysbvm_message_create(sysbvm_context_t *context, sysbvm_tuple_t selector, sysbvm_tuple_t arguments, sysbvm_tuple_t sourcePosition);
+SYSBVM_API sysbvm_tuple_t sysbvm_message_create(sysbvm_context_t *context, sysbvm_tuple_t selector, sysbvm_tuple_t arguments, sysbvm_tuple_t lookupType, sysbvm_tuple_t sourcePosition);
 
 #endif //SYSBVM_MESSAGE_H

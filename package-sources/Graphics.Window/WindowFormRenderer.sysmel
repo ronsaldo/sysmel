@@ -1,0 +1,72 @@
+public class WindowFormRenderer superclass: WindowRenderer; definition: {
+    private field window => Window.
+    private field handle => SysmelPAL::WindowRendererHandle.
+    private field texture => SysmelPAL::WindowRendererTextureHandle.
+    private field textureWidth => UInt32.
+    private field textureHeight => UInt32.
+
+    public method initializeWithWindow: (initialWindow: Window) handle: (initialHandle: SysmelPAL::WindowRendererHandle) ::=> Void := {
+        window := initialWindow.
+        handle := initialHandle
+    }.
+
+    public override method destroy => Void := {
+        handle ifNil: {return: void}.
+
+        texture ifNotNil: {
+            sysmel_pal_windowRendererTexture_destroy(texture)
+        }.
+
+        sysmel_pal_windowRenderer_destroy(handle).
+        handle := nil.
+    }.
+
+    public method ensureTextureWithWidth: (width: UInt32) height: (height: UInt32) ::=> Boolean := {
+        texture isNotNil && (textureWidth = width) && (textureHeight = height) ifTrue: {
+            return: true
+        }.
+
+        texture ifNotNil: {
+            sysmel_pal_windowRendererTexture_destroy(texture).
+            texture := nil
+        }.
+
+        texture := sysmel_pal_windowRenderer_createStreamingTextureBGRA32(handle, width asInt32, height asInt32).
+        textureWidth := width.
+        textureHeight := height.
+        texture isNotNil
+    }.
+
+    public method presentForm: (form: Form) ::=> Void := {
+        form bits ifNil: {return: void}.
+        (self ensureTextureWithWidth: form width height: form height) ifFalse: {
+            return: void
+        }.
+
+        sysmel_pal_windowRendererTexture_upload(texture, 0i32, 0i32, form width asInt32, form height asInt32, form pitch asInt32, form bits __rawContentsPointer__).
+        
+        sysmel_pal_windowRenderer_beginFrame(handle, 0u8, 0u8, 0u8, 0u8).
+        sysmel_pal_windowRenderer_drawFullTexture(handle, texture).
+        sysmel_pal_windowRenderer_endFrame(handle).
+    }.
+}.
+
+Window definition: {
+    public method newFormRenderer => WindowFormRenderer := {
+        self assert: renderer isNil.
+
+        let rendererHandle := sysmel_pal_windowRenderer_create(handle, 0u32).
+        rendererHandle ifNil: {
+            self error: "Failed to create form renderer."
+        }.
+
+        let formRenderer := WindowFormRenderer new
+            initializeWithWindow: self handle: rendererHandle;
+            yourself.
+
+        renderer := formRenderer.
+
+        formRenderer
+    }
+
+}.

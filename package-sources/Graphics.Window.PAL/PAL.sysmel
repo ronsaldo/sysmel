@@ -6,6 +6,9 @@ public global SysmelPAL::WindowHandle := SysmelPAL::Window pointer.
 public struct SysmelPAL::WindowRenderer.
 public global SysmelPAL::WindowRendererHandle := SysmelPAL::WindowRenderer pointer.
 
+public struct SysmelPAL::WindowRendererTexture.
+public global SysmelPAL::WindowRendererTextureHandle := SysmelPAL::WindowRendererTexture pointer.
+
 public global SysmelPAL::WindowEventType::UNKNOWN := 0u32.
 public global SysmelPAL::WindowEventType::QUIT := 1u32.
 
@@ -52,7 +55,13 @@ public externC function sysmel_pal_window_destroy(window: SysmelPAL::WindowHandl
 public externC function sysmel_pal_windowRenderer_create(window: SysmelPAL::WindowHandle, flags: UInt32) => SysmelPAL::WindowRendererHandle.
 public externC function sysmel_pal_windowRenderer_destroy(renderer: SysmelPAL::WindowRendererHandle) => Void.
 
+public externC function sysmel_pal_windowRenderer_createStreamingTextureBGRA32(renderer: SysmelPAL::WindowRendererHandle, width: Int32, height: Int32) => SysmelPAL::WindowRendererTextureHandle.
+
+public externC function sysmel_pal_windowRendererTexture_upload(texture: SysmelPAL::WindowRendererTextureHandle, x: Int32, y: Int32, width: Int32, height: Int32, pitch: Int32, pixels: Void pointer) => Void.
+public externC function sysmel_pal_windowRendererTexture_destroy(texture: SysmelPAL::WindowRendererTextureHandle) => Void.
+
 public externC function sysmel_pal_windowRenderer_beginFrame(renderer: SysmelPAL::WindowRendererHandle, red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8) => Void.
+public externC function sysmel_pal_windowRenderer_drawFullTexture(renderer: SysmelPAL::WindowRendererHandle, texture: SysmelPAL::WindowRendererTextureHandle) => Void.
 public externC function sysmel_pal_windowRenderer_endFrame(renderer: SysmelPAL::WindowRendererHandle) => Void.
 
 public externC function sysmel_pal_window_pollEvent(event: SysmelPAL::WindowEvent ref) => Boolean.

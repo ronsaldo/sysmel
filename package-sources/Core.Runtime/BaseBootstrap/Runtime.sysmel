@@ -118,7 +118,14 @@ Type
         } else: {
             self basicNew initialize; yourself
         }
-    } withEagerAnalysis.
+    } withEagerAnalysis;
+    withSelector: #safelyPrintValue:on: addMethod: {:(Type)self :(Untyped)value :(Stream)stream :: Void |
+        if: (self lookupSelector: #printOn:) ~~ nil then: {
+            value printOn: stream
+        } else: {
+            stream nextPutAll: "a "; print: self
+        }
+    } makeVirtual.
 
 Exception
     withSelector: #signal addMethod: {:(Exception)self :: Unwinds |
@@ -932,10 +939,6 @@ UndefinedObject class
     withSelector: #isUndefinedType addMethod: {:(Type)self :: Boolean | true } makeOverride makePure withEagerAnalysis.
 
 UndefinedObject
-    withSelector: #doesNotUnderstand: addMethod: {:(UndefinedObject)self :(Message)message |
-        self error: message selector printString -- " was sent to nil."
-    } makeOverride;
-
     withSelector: #printString addMethod: {:(UndefinedObject)self :: String | "nil" } makeOverride;
     withSelector: #printOn: addMethod: {:(UndefinedObject)self :(Stream)stream :: Void | stream nextPutAll: "nil" } makeOverride.
 

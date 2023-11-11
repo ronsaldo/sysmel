@@ -71,6 +71,16 @@ Exception eagerDefinitionBody: {
         := super printString.
 }.
 
+MessageNotUnderstood eagerDefinitionBody: {
+    public override eager method defaultMessageText ::=> String := {
+        message lookupType isNotNil && (message lookupType isSubtypeOf: UndefinedObject) ifTrue: {
+            "receiver of " -- message selector printString -- " is nil"
+        } ifFalse: {
+            (message lookupType printString) -- " >> " -- message selector printString
+        }
+    }.
+}.
+
 (Function::on:do:) adoptDefinitionOf: {:self :exceptionFilter :exceptionBlock :: self __type__ canonicalResultType |
     <targetDefinedPrimitive>
     primitiveFailedError()

@@ -1,4 +1,10 @@
 #(
+    "Graphics.Color"
+    "Graphics.Color.Tests"
+    "Graphics.Form"
+    "Graphics.Form.Tests"
+    "Graphics.FormSceneGraph"
+    "Graphics.FormSceneGraph.Tests"
     "Graphics.Window"
 ) do: {:each |
     loadPackageNamed: each

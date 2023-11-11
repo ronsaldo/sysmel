@@ -3,4 +3,5 @@ loadSourceNamed: "EventHandler.sysmel".
 loadSourceNamed: "Window.sysmel".
 loadSourceNamed: "WindowRenderer.sysmel".
 loadSourceNamed: "WindowBasicRenderer.sysmel".
+loadSourceNamed: "WindowFormRenderer.sysmel".
 loadSourceNamed: "WindowSystem.sysmel".

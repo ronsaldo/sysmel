@@ -146,7 +146,7 @@ static sysbvm_tuple_t sysbvm_bytecodeInterpreter_interpretSend(sysbvm_context_t 
     for(size_t i = 0; i < argumentCount; ++i)
         sysbvm_array_atPut(arguments, i, receiverAndArguments[1 + i]);
 
-    sysbvm_tuple_t message = sysbvm_message_create(context, selector, arguments, SYSBVM_NULL_TUPLE);
+    sysbvm_tuple_t message = sysbvm_message_create(context, selector, arguments, receiverType, SYSBVM_NULL_TUPLE);
     return sysbvm_function_apply2(context, method, receiverAndArguments[0], message);
 }
 
@@ -174,7 +174,7 @@ SYSBVM_API sysbvm_tuple_t sysbvm_bytecodeInterpreter_interpretSendWithReceiverTy
     for(size_t i = 0; i < argumentCount; ++i)
         sysbvm_array_atPut(arguments, i, receiverAndArguments[1 + i]);
 
-    sysbvm_tuple_t message = sysbvm_message_create(context, selector, arguments, SYSBVM_NULL_TUPLE);
+    sysbvm_tuple_t message = sysbvm_message_create(context, selector, arguments, receiverType, SYSBVM_NULL_TUPLE);
     return sysbvm_function_apply2(context, method, receiverAndArguments[0], message);
 }
 

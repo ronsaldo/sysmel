@@ -1,0 +1,18 @@
+public class ColorTestCase superclass: TestCase; definition: {
+    public method testConstructWithExtent => Void := {
+        let form := Form extent: 32u32 @ 16u32.
+        self assert: form width equals: 32u32.
+        self assert: form height equals: 16u32.
+        self assert: form pitch >= (32u32*4u32).
+        self assert: form bits isNotNil.
+    }.
+
+    public method testForRenderingWithExtent => Void := {
+        let form := Form forRenderingWithExtent: 7u32 @ 5u32.
+        self assert: form width equals: 7u32.
+        self assert: form height equals: 5u32.
+        self assert: form pitch >= (7u32*4u32).
+        self assert: form pitch % 16u32 equals: 0u32.
+        self assert: form bits isNotNil.
+    }.
+}.

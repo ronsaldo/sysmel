@@ -192,11 +192,52 @@ SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_destroy(sysmel_pal_windowRend
     SDL_DestroyRenderer((SDL_Renderer*)renderer);
 }
 
+SYSMEL_PAL_EXTERN_C sysmel_pal_windowRendererTexture_t *sysmel_pal_windowRenderer_createStreamingTextureBGRA32(sysmel_pal_windowRenderer_t *renderer, int width, int height)
+{
+    return (sysmel_pal_windowRendererTexture_t*)SDL_CreateTexture((SDL_Renderer*)renderer, SDL_PIXELFORMAT_BGRA32, SDL_TEXTUREACCESS_STREAMING, width, height);
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRendererTexture_upload(sysmel_pal_windowRendererTexture_t *texture, int x, int y, int width, int height, int pitch, void *pixels)
+{
+    SDL_Rect lockRegion = {
+        .x = x, y = y,
+        .w = width, .h = height
+    };
+
+    void *destPixels;
+    int destPitch;
+    if(SDL_LockTexture((SDL_Texture*)texture, &lockRegion, &destPixels, &destPitch))
+        return;
+
+    uint8_t *destRow = (uint8_t*)destPixels;
+    uint8_t *sourceRow = (uint8_t*)pixels;
+    size_t transferRowSize = width * 4;
+
+    for(int cy = 0; cy < height; ++cy)
+    {
+        memcpy(destRow, sourceRow, transferRowSize);
+        destRow += destPitch;
+        sourceRow += pitch;
+    }
+
+    SDL_UnlockTexture((SDL_Texture*)texture);
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRendererTexture_destroy(sysmel_pal_windowRendererTexture_t *texture)
+{
+    SDL_DestroyTexture((SDL_Texture*)texture);
+}
+
 SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_beginFrame(sysmel_pal_windowRenderer_t *renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
     if(!renderer) return;
     SDL_SetRenderDrawColor((SDL_Renderer*)renderer, r, g, b, a);
     SDL_RenderClear((SDL_Renderer*)renderer);
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_drawFullTexture(sysmel_pal_windowRenderer_t *renderer, sysmel_pal_windowRendererTexture_t *texture)
+{
+    SDL_RenderCopy((SDL_Renderer*)renderer, (SDL_Texture*)texture, NULL, NULL);
 }
 
 SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_endFrame(sysmel_pal_windowRenderer_t *renderer)

@@ -1,27 +1,33 @@
 let windowSystem := WindowSystem default.
-let window := windowSystem createWindowWithTitle: "Hello World" width: 640u32 height: 480u32.
+let window := windowSystem createWindowWithTitle: "Hello World" extent: 640u32 @ 480u32.
 window isAnimated: true.
-let renderer := window newBasicRenderer.
 
-function render() => Void := {
-    let blue := Time::Timestamp::microsecondsNow() / 10000i64.
-    renderer
-        beginFrameClearingWithRed: 0u8 green: 0u8 blue: blue asUInt8 alpha: 255u8;
-        endFrame
-}.
+let renderbuffer := Form forRenderingWithExtent: 640u32 @ 480u32.
+
+let renderer := window newFormRenderer.
 
 let frameCount mutable := 0u32,
 let frameTime mutable := 0f64.
 
 public class TestWindowEventHandler superclass: EventHandler; definition: {
+    public method render => Void := {
+        let currentTime := Time::Timestamp::microsecondsNow() asFloat64 * 1.0e-6.
+        let phase := currentTime *0.3.
+        let gray := phase - phase floor.
+        let grayColor := Color gray: gray asFloat32.
+        renderbuffer fillWithColor: grayColor.
+
+        renderer presentForm: renderbuffer.
+    }.
+
     public override method onTickEvent: (event: TickEvent) ::=> Void := {
         let delta := event deltaSeconds.
         printLine("Frame time ", delta * 1000.0f64, " ms ", 1.0f64 / delta).
-        render()
+        self render
     }.
 
     public override method onExposeEvent: (event: ExposeEvent) ::=> Void := {
-        render()
+        self render
     }.
 
     public override method onWindowCloseRequestEvent: (event: WindowCloseRequestEvent) ::=> Void := {

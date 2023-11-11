@@ -1960,6 +1960,7 @@ public inline function ObjectModel::lookupMethodWithReceiverAndVirtualTableIndex
                 ObjectModel::sendWithReceiverType1(inlineCache, receiver, receiverType, #doesNotUnderstand:, Message basicAllocate
                     selector: selector;
                     arguments: (`@argumentIdentifiers,);
+                    lookupType: receiverType;
                     yourself)
             }
         }.

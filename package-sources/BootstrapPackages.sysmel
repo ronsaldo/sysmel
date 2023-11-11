@@ -12,7 +12,9 @@ loadSourceNamed: "BootstrapCore.sysmel".
     "Parsec"
     "Parsec.Tests"
     "Compiler.Bytecode"
+    "Compiler.Bytecode.Tests"
     "Compiler.NativeCode"
+    "Compiler.NativeCode.Tests"
     "Language.Sysmel"
     "Language.Sysmel.Tests"
 

@@ -24,10 +24,10 @@ WindowSystem definition: {
         sysmel_pal_windowSystem_finalize()
     }.
 
-    public method createWindowWithTitle: (title: String) width: (width: UInt32) height: (height: UInt32) ::=> Window := {
+    public method createWindowWithTitle: (title: String) extent: (extent: UInt32x2) ::=> Window := {
         self assert: title isNotNil.
 
-        let handle := sysmel_pal_window_create(title size, title __rawContentsPointer__ reinterpretCastTo: Char8 const pointer, -1i32, -1i32, width asInt32, height asInt32, 0u32).
+        let handle := sysmel_pal_window_create(title size, title __rawContentsPointer__ reinterpretCastTo: Char8 const pointer, -1i32, -1i32, extent x asInt32, extent y asInt32, 0u32).
         handle ifNil: {return: nil}.
 
         let window := Window new

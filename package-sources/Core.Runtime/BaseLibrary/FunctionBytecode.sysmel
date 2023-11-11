@@ -14,21 +14,10 @@ public global FunctionBytecode::OpcodeExtraImplicitOperandCountTable := (ByteArr
     yourself.
 
 public global FunctionBytecode::OpcodeDestinationOperandCountTable := (ByteArray new: 256sz)
-    at: FunctionBytecode::Opcode::Nop put: 0u8;
-    at: FunctionBytecode::Opcode::Breakpoint put: 0u8;
-    at: FunctionBytecode::Opcode::Unreachable put: 0u8;
-
-    at: FunctionBytecode::Opcode::Return put: 0u8;
-    at: FunctionBytecode::Opcode::Jump put: 0u8;
-
     at: FunctionBytecode::Opcode::Alloca put: 1u8;
     at: FunctionBytecode::Opcode::Move put: 1u8;
     at: FunctionBytecode::Opcode::Load put: 1u8;
     at: FunctionBytecode::Opcode::LoadSymbolValueBinding put: 1u8;
-    at: FunctionBytecode::Opcode::Store put: 0u8;
-    at: FunctionBytecode::Opcode::JumpIfTrue put: 0u8;
-    at: FunctionBytecode::Opcode::JumpIfFalse put: 0u8;
-    at: FunctionBytecode::Opcode::SetDebugValue put: 0u8;
 
     at: FunctionBytecode::Opcode::AllocaWithValue put: 1u8;
     at: FunctionBytecode::Opcode::CoerceValue put: 1u8;
@@ -37,6 +26,8 @@ public global FunctionBytecode::OpcodeDestinationOperandCountTable := (ByteArray
     at: FunctionBytecode::Opcode::MakeAssociation put: 1u8;
     at: FunctionBytecode::Opcode::SlotAt put: 1u8;
     at: FunctionBytecode::Opcode::SlotReferenceAt put: 1u8;
+    at: FunctionBytecode::Opcode::RefSlotAt put: 1u8;
+    at: FunctionBytecode::Opcode::RefSlotReferenceAt put: 1u8;
 
     at: FunctionBytecode::Opcode::Call put: 1u8;
     at: FunctionBytecode::Opcode::UncheckedCall put: 1u8;
@@ -48,8 +39,6 @@ public global FunctionBytecode::OpcodeDestinationOperandCountTable := (ByteArray
     at: FunctionBytecode::Opcode::MakeClosureWithCaptures put: 1u8;
     at: FunctionBytecode::Opcode::MakeDictionaryWithElements put: 1u8;
     at: FunctionBytecode::Opcode::MakeTupleWithElements put: 1u8;
-    
-    at: FunctionBytecode::Opcode::CaseJump put: 0u8;
     yourself.
 
 public global FunctionBytecode::OffsetOperandCountTable := (ByteArray new: 256sz)
@@ -345,6 +334,7 @@ FunctionBytecode definition: {
                         doesNotUnderstand(receiver, Message new
                             selector: selector;
                             arguments: (registerFile copyFrom: 3sz count: variantCount);
+                            lookupType: receiverType;
                             yourself
                         )
                     }.
@@ -368,6 +358,7 @@ FunctionBytecode definition: {
                         doesNotUnderstand(receiver, Message new
                             selector: selector;
                             arguments: (registerFile copyFrom: 4sz count: variantCount);
+                            lookupType: receiverType;
                             yourself
                         )
                     }.

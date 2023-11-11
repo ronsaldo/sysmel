@@ -59,6 +59,30 @@ SYSMEL_PAL_EXTERN_C sysmel_pal_windowRenderer_t *sysmel_pal_windowRenderer_creat
     return NULL;
 }
 
+SYSMEL_PAL_EXTERN_C sysmel_pal_windowRendererTexture_t *sysmel_pal_windowRenderer_createStreamingTextureBGRA32(sysmel_pal_windowRenderer_t *renderer, int width, int height)
+{
+    (void)renderer;
+    (void)width;
+    (void)height;
+    return NULL;
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRendererTexture_upload(sysmel_pal_windowRendererTexture_t *texture, int x, int y, int width, int height, int pitch, void *pixels)
+{
+    (void)texture;
+    (void)x;
+    (void)y;
+    (void)width;
+    (void)height;
+    (void)pitch;
+    (void)pixels;
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRendererTexture_destroy(sysmel_pal_windowRendererTexture_t *texture)
+{
+    (void)texture;
+}
+
 SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_destroy(sysmel_pal_windowRenderer_t *renderer)
 {
     (void)renderer;
@@ -71,6 +95,12 @@ SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_beginFrame(sysmel_pal_windowR
     (void)g;
     (void)b;
     (void)a;
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_drawFullTexture(sysmel_pal_windowRenderer_t *renderer, sysmel_pal_windowRendererTexture_t *texture)
+{
+    (void)renderer;
+    (void)texture;
 }
 
 SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_endFrame(sysmel_pal_windowRenderer_t *renderer)

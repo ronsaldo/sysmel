@@ -12,6 +12,10 @@ public class CLISysmelInterpreter definition: {
         while: (i < arguments size) do: {
             let argument => String := arguments at: i.
             (argument beginsWith: "-") ifTrue: {
+                argument ="-nojit" ifTrue: {
+                    FunctionNativeCodeCompiler::Current := nil.
+                    continue()
+                }.
                 argument = "-version" ifTrue: {
                     self printVersion.
                     continue()

@@ -726,7 +726,87 @@ Integer definition: {
         := Float64x4 withAll: self f64.
 }.
 
+Int32 definition: {
+    public pure inline method @ (next: Int32) ::=> Int32x2
+        := Int32x2 x: self y: next.
+
+    public pure method unpackInt8x4 => Int32x4 := {
+        <primitive: #Int32::unpackInt8x4>
+        <targetDefinedPrimitive>
+        let x := self asUInt32 & 16rff u32.
+        let y := (self asUInt32 >> 8u32) & 16rff u32.
+        let z := (self asUInt32 >> 16u32) & 16rff u32.
+        let w := (self asUInt32 >> 24u32) & 16rff u32.
+        Int32x4 x: x asInt8 asInt32 y: y asInt8 asInt32 z: z asInt8 asInt32 w: w asInt8 asInt32
+    }.
+
+    public pure inline method unpackSnorm4x8 => Float32x4 := {
+        <primitive: #Int32::unpackSnorm4x8>
+        self unpackInt8x4 asFloat32x4 / 127f32x4 clampMin: -1f32x4 max: 1f32x4
+    }.
+
+    public pure method unpackUInt8x4 => UInt32x4 := {
+        <primitive: #Int32::unpackUInt8x4>
+        <targetDefinedPrimitive>
+
+        let x := self asUInt32 & 16rff u32.
+        let y := (self asUInt32 >> 8u32) & 16rff u32.
+        let z := (self asUInt32 >> 16u32) & 16rff u32.
+        let w := (self asUInt32 >> 24u32) & 16rff u32.
+        UInt32x4 x: x asUInt32 y: y asUInt32 z: z asUInt32 w: w asUInt32
+    }.
+
+    public pure inline method unpackUnorm4x8 => Float32x4 := {
+        <primitive: #Int32::unpackUnorm4x8>
+        self unpackUInt8x4 asFloat32x4 / 255f32x4
+    }.
+}.
+
+UInt32 definition: {
+    public pure inline method @ (next: UInt32) ::=> UInt32x2
+        := UInt32x2 x: self y: next.
+
+    public pure method unpackInt8x4 => Int32x4 := {
+        <primitive: #UInt32::unpackInt8x4>
+        <targetDefinedPrimitive>
+        let x := self & 16rff u32.
+        let y := (self >> 8u32) & 16rff u32.
+        let z := (self >> 16u32) & 16rff u32.
+        let w := (self >> 24u32) & 16rff u32.
+        Int32x4 x: x asInt8 asInt32 y: y asInt8 asInt32 z: z asInt8 asInt32 w: w asInt8 asInt32
+    }.
+
+    public pure inline method unpackSnorm4x8 => Float32x4 := {
+        <primitive: #UInt32::unpackSnorm4x8>
+        self unpackInt8x4 asFloat32x4 / 127f32x4 clampMin: -1f32x4 max: 1f32x4
+    }.
+
+    public pure method unpackUInt8x4 => UInt32x4 := {
+        <primitive: #UInt32::unpackUInt8x4>
+        <targetDefinedPrimitive>
+
+        let x := self & 16rff u32.
+        let y := (self >> 8u32) & 16rff u32.
+        let z := (self >> 16u32) & 16rff u32.
+        let w := (self >> 24u32) & 16rff u32.
+        UInt32x4 x: x asUInt32 y: y asUInt32 z: z asUInt32 w: w asUInt32
+    }.
+
+    public pure inline method unpackUnorm4x8 => Float32x4 := {
+        <primitive: #UInt32::unpackUnorm4x8>
+        self unpackUInt8x4 asFloat32x4 / 255f32x4
+    }.
+}.
+
+Float32 definition: {
+    public pure inline method @ (next: Float32) ::=> Float32x2
+        := Float32x2 x: self y: next.
+}.
+
 Float64 definition: {
+    public pure inline method @ (next: Float64) ::=> Float64x2
+        := Float64x2 x: self y: next.
+
     public pure inline method f32x2 => Float32x2 := {
         <primitive: #PrimitiveVector::withAll:>
         <targetDefinedPrimitive>
@@ -1010,68 +1090,3 @@ Float32x4 definition: {
     }.
 }.
 
-Int32 definition: {
-    public pure method unpackInt8x4 => Int32x4 := {
-        <primitive: #Int32::unpackInt8x4>
-        <targetDefinedPrimitive>
-        let x := self asUInt32 & 16rff u32.
-        let y := (self asUInt32 >> 8u32) & 16rff u32.
-        let z := (self asUInt32 >> 16u32) & 16rff u32.
-        let w := (self asUInt32 >> 24u32) & 16rff u32.
-        Int32x4 x: x asInt8 asInt32 y: y asInt8 asInt32 z: z asInt8 asInt32 w: w asInt8 asInt32
-    }.
-
-    public pure inline method unpackSnorm4x8 => Float32x4 := {
-        <primitive: #Int32::unpackSnorm4x8>
-        self unpackInt8x4 asFloat32x4 / 127f32x4 clampMin: -1f32x4 max: 1f32x4
-    }.
-
-    public pure method unpackUInt8x4 => UInt32x4 := {
-        <primitive: #Int32::unpackUInt8x4>
-        <targetDefinedPrimitive>
-
-        let x := self asUInt32 & 16rff u32.
-        let y := (self asUInt32 >> 8u32) & 16rff u32.
-        let z := (self asUInt32 >> 16u32) & 16rff u32.
-        let w := (self asUInt32 >> 24u32) & 16rff u32.
-        UInt32x4 x: x asUInt32 y: y asUInt32 z: z asUInt32 w: w asUInt32
-    }.
-
-    public pure inline method unpackUnorm4x8 => Float32x4 := {
-        <primitive: #Int32::unpackUnorm4x8>
-        self unpackUInt8x4 asFloat32x4 / 255f32x4
-    }.
-}.
-
-UInt32 definition: {
-    public pure method unpackInt8x4 => Int32x4 := {
-        <primitive: #UInt32::unpackInt8x4>
-        <targetDefinedPrimitive>
-        let x := self & 16rff u32.
-        let y := (self >> 8u32) & 16rff u32.
-        let z := (self >> 16u32) & 16rff u32.
-        let w := (self >> 24u32) & 16rff u32.
-        Int32x4 x: x asInt8 asInt32 y: y asInt8 asInt32 z: z asInt8 asInt32 w: w asInt8 asInt32
-    }.
-
-    public pure inline method unpackSnorm4x8 => Float32x4 := {
-        <primitive: #UInt32::unpackSnorm4x8>
-        self unpackInt8x4 asFloat32x4 / 127f32x4 clampMin: -1f32x4 max: 1f32x4
-    }.
-
-    public pure method unpackUInt8x4 => UInt32x4 := {
-        <primitive: #UInt32::unpackUInt8x4>
-        <targetDefinedPrimitive>
-
-        let x := self & 16rff u32.
-        let y := (self >> 8u32) & 16rff u32.
-        let z := (self >> 16u32) & 16rff u32.
-        let w := (self >> 24u32) & 16rff u32.
-        UInt32x4 x: x asUInt32 y: y asUInt32 z: z asUInt32 w: w asUInt32
-    }.
-
-    public pure inline method unpackUnorm4x8 => Float32x4 := {
-        <primitive: #UInt32::unpackUnorm4x8>
-        self unpackUInt8x4 asFloat32x4 / 255f32x4
-    }.
-}.
