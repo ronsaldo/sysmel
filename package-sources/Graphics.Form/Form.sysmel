@@ -26,15 +26,12 @@ public final class Form definition: {
     public inline method extent => UInt32x2
         := UInt32x2 x: width y: height.
 
-    public method getPixelsPointer => UInt32 pointer
-        := bits __rawContentsPointer__ reinterpretCastTo: UInt32 pointer.
-
     public method fillWithColor: (color: Color) ::=> Void := {
         self assert: bits isNotNil.
 
         let pixelCount := bits size / 4sz.
         let encodedColor := color bgra.
-        let destination := self getPixelsPointer.
+        let destination := bits __rawContentsPointer__ reinterpretCastTo: UInt32 pointer.
 
         let i mutable := 0sz.
         while: i < pixelCount do: {
@@ -42,6 +39,3 @@ public final class Form definition: {
         } continueWith: (i := i + 1sz).
     }.
 }.
-
-## FIXME: Debug the GC issue that is triggered by removing this line.
-((Form >> #fillWithColor:) definition ensureAnalysis; bytecode) fullPrintString
