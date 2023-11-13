@@ -2,6 +2,31 @@ ProgramEntity
     withSelector: #addPendingDefinitionBody:withEnvironment: addMethod: {:(ProgramEntity)self :(ASTNode)body :(Environment)definitionEnvironment :: Void |
         self evaluateDefinition: body withEnvironment: definitionEnvironment
     } makeVirtual;
+    withSelector: #addPendingDefinitionBody:withEnvironment:parameterNames:values: addMethod: {:(ProgramEntity)self :(ASTNode)body :(Environment)definitionEnvironment :(Array)parameterNames :(Array)parameterValues :: Void |
+        let: #importedEnvironmentNodes with: OrderedCollection new.
+        parameterNames doWithIndex: {:(Symbol)parameterName :(Size)parameterIndex :: Void |
+            parameterName ifNotNil: {
+                importedEnvironmentNodes add: (ASTVariableDefinitionNode new
+                    sourcePosition: body sourcePosition;
+                    nameExpression: (ASTLiteralNode new
+                        sourcePosition: body sourcePosition;
+                        value: parameterName;
+                        yourself);
+                    valueExpression: (ASTLiteralNode new
+                        sourcePosition: body sourcePosition;
+                        value: (parameterValues at: parameterIndex);
+                        yourself);
+                    yourself)
+            }
+        }.
+
+        let bodyWithParameters := ASTSequenceNode new
+            sourcePosition: body sourcePosition;
+            expressions: importedEnvironmentNodes asArray -- (Array with: body);
+            yourself.
+
+        self evaluateDefinition: bodyWithParameters withEnvironment: definitionEnvironment
+    } makeVirtual;
     withSelector: #addEagerDefinitionBody:withEnvironment: addMethod: {:(ProgramEntity)self :(ASTNode)body :(Environment)definitionEnvironment :: Void |
         self evaluateDefinition: body withEnvironment: definitionEnvironment
     } makeVirtual;
@@ -26,6 +51,16 @@ ProgramEntity
                 value: bodyBlock;
                 yourself)
             with: (macroContext literal: macroContext environment)
+    } makeMacro;
+    withSelector: #pendingDefinitionBody:withParameterNames:values: addMacroMethod: {:(MacroContext)macroContext :(ASTNode)self :(ASTNode)bodyBlock :(ASTNode)parameterNames :(ASTNode)parameterValues :: ASTNode |
+        macroContext send: (macroContext literal: #addPendingDefinitionBody:withEnvironment:parameterNames:values:)
+            to: self
+            with: (ASTLiteralNode new
+                sourcePosition: bodyBlock sourcePosition;
+                value: bodyBlock;
+                yourself)
+            with: (macroContext literal: macroContext environment)
+            with: parameterNames with: parameterValues
     } makeMacro;
     withSelector: #pendingExtensionBody: addMacroMethod: {:(MacroContext)macroContext :(ASTNode)self :(ASTNode)bodyBlock :: ASTNode |
         macroContext send: (macroContext literal: #addPendingExtension:withEnvironment:)

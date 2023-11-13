@@ -20,22 +20,49 @@ TemplateMetaBuilder definition: {
     }.
 
     public override method expansionBody => ASTNode := {
-        typeMetaBuilderClass ifNotNil: {
-            let typeContructionNode := typeMetaBuilderClass new
-                environment: environment;
-                sourcePosition: sourcePosition;
-                supertypeExpression: self supertypeExpression;
-                finishExpansion.
+        typeMetaBuilderClass ifNil: {return: super expansionBody}.
 
-            return: (body ifNotNil: ``{
+        let typeContructionNode := typeMetaBuilderClass new
+            environment: environment;
+            sourcePosition: sourcePosition;
+            supertypeExpression: self supertypeExpression;
+            finishExpansion.
+
+        body ifNotNil: {
+            let argumentNames := ASTMakeArrayNode new
+                sourcePosition: sourcePosition;
+                elements: (self arguments collect: {:(ASTArgumentNode)each :: ASTNode |
+                    each name ifNil: (ASTLiteralNode new
+                        sourcePosition: sourcePosition;
+                        yourself)
+                });
+                yourself.
+
+            let argumentValues := ASTMakeArrayNode new
+                sourcePosition: sourcePosition;
+                elements: (self arguments collect: {:(ASTArgumentNode)each :: ASTNode |
+                    each name isNotNil && each name isLiteralNode ifTrue: {
+                        (each name downCastTo: ASTLiteralNode) asIdentifierReferenceNode
+                    } ifFalse: {
+                        ASTLiteralNode new
+                            sourcePosition: sourcePosition;
+                            yourself
+                    }
+                });
+                yourself.
+
+            ``{
                 let resultType := `,typeContructionNode.
                 __templateResult__ value: resultType.
                 
-                resultType definition: `,body; yourself.
-            } ifNil: (typeContructionNode))
-        }.
-
-        super expansionBody
+                resultType
+                    pendingDefinitionBody: `,body
+                        withParameterNames: `,argumentNames values: `,argumentValues;
+                    yourself
+            }
+        } ifNil: {
+            typeContructionNode
+        }
     }.
 
     public override method finishFunctionExpansion => ASTNode := {

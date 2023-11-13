@@ -73,6 +73,22 @@ MacroContext
             selector: selector;
             arguments: (Array with: firstArgument with: secondArgument);
             yourself
+    };
+    withSelector: #send:to:with:with:with: addMethod: {:(MacroContext)self :(ASTNode)selector :(ASTNode)receiver :(ASTNode)firstArgument :(ASTNode)secondArgument :(ASTNode)thirdArgument :: ASTMessageSendNode |
+        ASTMessageSendNode new
+            sourcePosition: self sourcePosition;
+            receiver: receiver;
+            selector: selector;
+            arguments: (Array with: firstArgument with: secondArgument with: thirdArgument);
+            yourself
+    };
+    withSelector: #send:to:with:with:with:with: addMethod: {:(MacroContext)self :(ASTNode)selector :(ASTNode)receiver :(ASTNode)firstArgument :(ASTNode)secondArgument :(ASTNode)thirdArgument :(ASTNode)fourthArgument :: ASTMessageSendNode |
+        ASTMessageSendNode new
+            sourcePosition: self sourcePosition;
+            receiver: receiver;
+            selector: selector;
+            arguments: (Array with: firstArgument with: secondArgument with: thirdArgument with: fourthArgument);
+            yourself
     }.
 
 (begin) adoptDefinitionOf: {:(MacroContext)macroContext :(Array)expressions... :: ASTSequenceNode |
