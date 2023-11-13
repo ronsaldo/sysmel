@@ -490,7 +490,7 @@ public final class HIRFunctionBytecodeCompilationContext superclass: Object; def
         let primitiveGenerator => PrimitiveGeneratorFunction := PrimitiveGenerators atOrNil: primitiveName.
 
         let result := (primitiveGenerator ifNotNil: {
-            primitiveGenerator(self, arguments, resultType)
+            primitiveGenerator(self, arguments, actualResultType)
         }) ifNil: {
             (builder call: calledFunction arguments: arguments resultType: actualResultType)
                 isUnchecked: isUnchecked;

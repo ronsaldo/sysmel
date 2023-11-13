@@ -2,7 +2,7 @@ public class FormSGFormRenderer superclass: FormSGVisitor; definition: {
     public field canvas => FormCanvas.
 
     public method renderSceneGraph: (sceneGraph: FormSGNode) onForm: (targetForm: Form) ::=> Void := {
-        self renderSceneGraph: sceneGraph onCanvas: (FormCanvas new form: targetForm; yourself)
+        self renderSceneGraph: sceneGraph onCanvas: (FormCanvas for: targetForm)
     }.
 
     public method renderSceneGraph: (sceneGraph: FormSGNode) onCanvas: (targetCanvas: FormCanvas) ::=> Void := {
@@ -12,8 +12,22 @@ public class FormSGFormRenderer superclass: FormSGVisitor; definition: {
 
     public override method visitNullNode: (node: FormSGNullNode) := void.
 
+    public override method visitBorderNode: (node: FormSGBorderNode) := {
+        canvas borderRectangle: node rectangle withColor: node color
+            leftWidth: node leftWidth rightWidth: node rightWidth
+            bottomWidth: node bottomWidth topWidth: node topWidth.
+        void
+    }.
+
     public override method visitColorNode: (node: FormSGColorRectangleNode) := {
-        ##printLine("visitColorNode: ", node).
+        canvas rectangle: node rectangle fillWithColor: node color.
+        void
+    }.
+
+    public override method visitContainerNode: (node: FormSGContainerNode) := {
+        node children do: {:(FormSGNode)eachChild :: Void |
+            self visitNode: eachChild
+        }.
         void
     }.
 }.

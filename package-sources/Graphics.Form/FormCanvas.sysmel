@@ -1,3 +1,82 @@
 public class FormCanvas definition: {
     public field form => Form.
+    public field clippingBounds => RectangleF32.
+    public field formBounds => RectangleI32.
+
+    __Meta__ definition: {
+        public method for: (form: Form) ::=> self
+            := self new
+                initializeWithForm: form;
+                yourself.
+    }.
+
+    public method initializeWithForm: (theForm: Form) ::=> Void := {
+        form := theForm.
+        clippingBounds := 0f32x2 extent: theForm extent asFloat32x2.
+        formBounds := 0i32x2 extent: theForm extent asInt32x2.
+    }.
+
+    let BlitRectanglePixelFunction := (Float32x2, UInt32) => UInt32.
+
+    public inline method blitPixelsInRectangle: (rectangle: RectangleF32) with: (aBlock: BlitRectanglePixelFunction) ::=> Void := {
+        let clippedRectangle := clippingBounds intersectionWith: rectangle.
+        clippedRectangle isExclusiveEmpty ifTrue: {return: void}.
+
+        let drawBounds := (RectangleI32 min: clippedRectangle min floor asInt32x2 max: clippedRectangle max ceiling asInt32x2) intersectionWith: formBounds.
+        drawBounds isExclusiveEmpty ifTrue: {return: void}.
+
+        let destinationPitch := form pitch asIntPointer.
+        let destinationRow mutable := form bits __rawContentsBytePointer__ + (drawBounds min y asIntPointer * destinationPitch) + drawBounds min x asIntPointer.
+
+        let extent := rectangle extent.
+        let origin := rectangle min.
+        let du := Float32x2 x: 1f32 / extent x.
+        let dv := Float32x2 y: 1f32 / extent y.
+
+        let y mutable := drawBounds min y.
+        while: (y < drawBounds max y) do: {
+            let x mutable := drawBounds min x.
+            let destinationPixel mutable := destinationRow reinterpretCastTo: UInt32 pointer.
+            while: (x < drawBounds max x) do: {
+                let pixelPosition := Int32x2 x: x y: y.
+                
+                let localPosition := pixelPosition asFloat32x2 - origin + 0.5f32x2.
+                let uv := Float32x2 x: (du dot: localPosition) y: (dv dot: localPosition).
+
+                (0f32 <= uv x) && (uv x <= 1f32) &&
+                (0f32 <= uv y) && (uv y <= 1f32) ifTrue: {
+                    let oldPixel := destinationPixel load.
+                    destinationPixel store: aBlock(uv, oldPixel).
+                }.
+
+                destinationPixel := destinationPixel + 1iptr.
+            } continueWith: (x := x + 1i32).
+
+            destinationRow := destinationRow + destinationPitch
+        } continueWith: (y := y + 1i32).
+    }.
+
+    public method rectangle: (rectangle: RectangleF32) fillWithColor: (color: Color) ::=> Void := {
+        let encodedColor := color bgra.
+        self blitPixelsInRectangle: rectangle with: {:(Float32x2)uv :(UInt32)oldColor :: UInt32 |
+            encodedColor
+        }.
+    }.
+
+    public method borderRectangle: (rectangle: RectangleF32) withColor: (color: Color)
+        leftWidth: (leftWidth: Float32) rightWidth: (rightWidth: Float32)
+        bottomWidth: (bottomWidth: Float32) topWidth: (topWidth: Float32) ::=> Void := {
+        let encodedColor := color bgra.
+        let extent := rectangle extent.
+        let interiorRectangle := RectangleF32 min: (leftWidth @ topWidth) max: extent - (rightWidth @ bottomWidth).
+
+        self blitPixelsInRectangle: rectangle with: {:(Float32x2)uv :(UInt32)oldColor :: UInt32 |
+            let position := uv * extent.
+            (interiorRectangle includesPoint: position) ifTrue: {
+                oldColor
+            } ifFalse: {
+                encodedColor
+            }
+        }.
+    }.
 }.

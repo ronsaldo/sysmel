@@ -216,7 +216,7 @@ MIR::Operation::Float32UnorderedLessThan
         codegen textSection
             x86::xor: (instruction resultRegister x86::int32For: codegen) with: (instruction resultRegister x86::int32For: codegen);
             x86::ucomiss: (instruction firstOperandRegister x86::float32For: codegen) src: (instruction secondOperandRegister x86::float32For: codegen);
-            x86::setl: (instruction resultRegister x86::int8For: codegen)
+            x86::setb: (instruction resultRegister x86::int8For: codegen)
     }.
 
 MIR::Operation::Float32UnorderedLessOrEquals
@@ -225,7 +225,7 @@ MIR::Operation::Float32UnorderedLessOrEquals
         codegen textSection
             x86::xor: (instruction resultRegister x86::int32For: codegen) with: (instruction resultRegister x86::int32For: codegen);
             x86::ucomiss: (instruction firstOperandRegister x86::float32For: codegen) src: (instruction secondOperandRegister x86::float32For: codegen);
-            x86::setle: (instruction resultRegister x86::int8For: codegen)
+            x86::setbe: (instruction resultRegister x86::int8For: codegen)
     }.
 
 MIR::Operation::Float32UnorderedGreaterThan
@@ -234,7 +234,7 @@ MIR::Operation::Float32UnorderedGreaterThan
         codegen textSection
             x86::xor: (instruction resultRegister x86::int32For: codegen) with: (instruction resultRegister x86::int32For: codegen);
             x86::ucomiss: (instruction firstOperandRegister x86::float32For: codegen) src: (instruction secondOperandRegister x86::float32For: codegen);
-            x86::setg: (instruction resultRegister x86::int8For: codegen)
+            x86::seta: (instruction resultRegister x86::int8For: codegen)
     }.
 
 MIR::Operation::Float32UnorderedGreaterOrEquals
@@ -243,7 +243,7 @@ MIR::Operation::Float32UnorderedGreaterOrEquals
         codegen textSection
             x86::xor: (instruction resultRegister x86::int32For: codegen) with: (instruction resultRegister x86::int32For: codegen);
             x86::ucomiss: (instruction firstOperandRegister x86::float32For: codegen) src: (instruction secondOperandRegister x86::float32For: codegen);
-            x86::setge: (instruction resultRegister x86::int8For: codegen)
+            x86::setae: (instruction resultRegister x86::int8For: codegen)
     }.
 
 MIR::Operation::Float32UnorderedEqualsBranch
@@ -269,7 +269,7 @@ MIR::Operation::Float32UnorderedLessThanBranch
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::ucomiss: (instruction firstOperandRegister x86::float32For: codegen) src: (instruction secondOperandRegister x86::float32For: codegen);
-            x86::jge: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
+            x86::jae: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
             x86::jmp: (instruction thirdOperandRegister x86::relCall32OrInt32For: codegen)
     }.
 MIR::Operation::Float32UnorderedLessOrEqualsBranch
@@ -277,7 +277,7 @@ MIR::Operation::Float32UnorderedLessOrEqualsBranch
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::ucomiss: (instruction firstOperandRegister x86::float32For: codegen) src: (instruction secondOperandRegister x86::float32For: codegen);
-            x86::jg: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
+            x86::ja: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
             x86::jmp: (instruction thirdOperandRegister x86::relCall32OrInt32For: codegen)
     }.
 
@@ -286,7 +286,7 @@ MIR::Operation::Float32UnorderedGreaterThanBranch
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::ucomiss: (instruction firstOperandRegister x86::float32For: codegen) src: (instruction secondOperandRegister x86::float32For: codegen);
-            x86::jle: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
+            x86::jbe: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
             x86::jmp: (instruction thirdOperandRegister x86::relCall32OrInt32For: codegen)
     }.
 MIR::Operation::Float32UnorderedGreaterOrEqualsBranch
@@ -294,7 +294,7 @@ MIR::Operation::Float32UnorderedGreaterOrEqualsBranch
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::ucomiss: (instruction firstOperandRegister x86::float32For: codegen) src: (instruction secondOperandRegister x86::float32For: codegen);
-            x86::jl: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
+            x86::jb: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
             x86::jmp: (instruction thirdOperandRegister x86::relCall32OrInt32For: codegen)
     }.
 
@@ -418,7 +418,7 @@ MIR::Operation::Float64UnorderedLessThan
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::ucomisd: (instruction firstOperandRegister x86::float64For: codegen) src: (instruction secondOperandRegister x86::float64For: codegen);
-            x86::setl: (instruction resultRegister x86::int8For: codegen)
+            x86::setb: (instruction resultRegister x86::int8For: codegen)
     }.
 
 MIR::Operation::Float64UnorderedLessOrEquals
@@ -426,7 +426,7 @@ MIR::Operation::Float64UnorderedLessOrEquals
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::ucomisd: (instruction firstOperandRegister x86::float64For: codegen) src: (instruction secondOperandRegister x86::float64For: codegen);
-            x86::setle: (instruction resultRegister x86::int8For: codegen)
+            x86::setbe: (instruction resultRegister x86::int8For: codegen)
     }.
 
 MIR::Operation::Float64UnorderedGreaterThan
@@ -434,7 +434,7 @@ MIR::Operation::Float64UnorderedGreaterThan
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::ucomisd: (instruction firstOperandRegister x86::float64For: codegen) src: (instruction secondOperandRegister x86::float64For: codegen);
-            x86::setg: (instruction resultRegister x86::int8For: codegen)
+            x86::seta: (instruction resultRegister x86::int8For: codegen)
     }.
 
 MIR::Operation::Float64UnorderedGreaterOrEquals
@@ -442,7 +442,7 @@ MIR::Operation::Float64UnorderedGreaterOrEquals
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::ucomisd: (instruction firstOperandRegister x86::float64For: codegen) src: (instruction secondOperandRegister x86::float64For: codegen);
-            x86::setge: (instruction resultRegister x86::int8For: codegen)
+            x86::setae: (instruction resultRegister x86::int8For: codegen)
     }.
 
 MIR::Operation::Float64UnorderedEqualsBranch
@@ -468,7 +468,7 @@ MIR::Operation::Float64UnorderedLessThanBranch
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::ucomisd: (instruction firstOperandRegister x86::float64For: codegen) src: (instruction secondOperandRegister x86::float64For: codegen);
-            x86::jge: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
+            x86::jae: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
             x86::jmp: (instruction thirdOperandRegister x86::relCall32OrInt32For: codegen)
     }.
 MIR::Operation::Float64UnorderedLessOrEqualsBranch
@@ -476,7 +476,7 @@ MIR::Operation::Float64UnorderedLessOrEqualsBranch
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::ucomisd: (instruction firstOperandRegister x86::float64For: codegen) src: (instruction secondOperandRegister x86::float64For: codegen);
-            x86::jg: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
+            x86::ja: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
             x86::jmp: (instruction thirdOperandRegister x86::relCall32OrInt32For: codegen)
     }.
 
@@ -485,7 +485,7 @@ MIR::Operation::Float64UnorderedGreaterThanBranch
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::ucomisd: (instruction firstOperandRegister x86::float64For: codegen) src: (instruction secondOperandRegister x86::float64For: codegen);
-            x86::jle: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
+            x86::jbe: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
             x86::jmp: (instruction thirdOperandRegister x86::relCall32OrInt32For: codegen)
     }.
 MIR::Operation::Float64UnorderedGreaterOrEqualsBranch
@@ -493,7 +493,7 @@ MIR::Operation::Float64UnorderedGreaterOrEqualsBranch
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::ucomisd: (instruction firstOperandRegister x86::float64For: codegen) src: (instruction secondOperandRegister x86::float64For: codegen);
-            x86::jl: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
+            x86::jb: (instruction fourthOperandRegister x86::relCall32OrInt32For: codegen);
             x86::jmp: (instruction thirdOperandRegister x86::relCall32OrInt32For: codegen)
     }.
 

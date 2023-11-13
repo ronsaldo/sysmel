@@ -451,7 +451,122 @@ Type definition: {
 
         "Type is missing gc layout.\n" writeOntoStderr.
         sysmel_pal_abort()
+    }.
+
+    public nogc method validGCInstanceSize => Size := {
+        instanceAlignment = 0sz ifFalse: {return: instanceSize}.
+
+        let position mutable := self.
+        while: position isNotNil do: {
+            instanceAlignment := position instanceAlignment.
+            instanceSize := position instanceSize.
+            instanceAlignment = 0sz ifFalse: {return: instanceSize}.
+
+            let positionSlots := position slots.
+            positionSlots ifNil: {
+                "Type is missing slots during GC.\n" writeOntoStderr.
+                sysmel_pal_abort()
+            }.
+
+            let positionPendingSlots := position pendingSlots.
+            positionPendingSlots ifNotNil: {
+                "Type with pending slots is used during GC.\n" writeOntoStderr.
+                sysmel_pal_abort()
+            }.
+
+            positionSlots isNotEmpty ifTrue: {
+                "Type with non-empty slots is missing layout during GC.\n" writeOntoStderr.
+                sysmel_pal_abort()
+            }.
+        } continueWith: (position := position supertype).
+
+        "Type is missing gc layout.\n" writeOntoStderr.
+        sysmel_pal_abort()
     }
+}.
+
+AnyValue definition: {
+    public virtual nogc method nogcPrintOntoStderr => Void := {
+        "a " writeOntoStderr.
+        self __type__ nogcPrintOntoStderr
+    }.
+}.
+
+Type definition: {
+    public override nogc method nogcPrintOntoStderr => Void := {
+        let name := self name.
+        name ifNotNil: {
+            name nogcPrintOntoStderr
+        } ifNil: {
+            self __type__ == self ifTrue: {
+                "unknown type" writeOntoStderr
+            } ifFalse: {
+                " a " writeOntoStderr.
+                self __type__ nogcPrintOntoStderr.
+            }.
+        }
+    }.
+}.
+
+PointerType definition: {
+    public override nogc method nogcPrintOntoStderr => Void := {
+        baseType nogcPrintOntoStderr.
+        " pointer".
+    }.
+}.
+
+ReferenceType definition: {
+    public override nogc method nogcPrintOntoStderr => Void := {
+        baseType nogcPrintOntoStderr.
+        " ref".
+    }.
+}.
+
+TemporaryReferenceType definition: {
+    public override nogc method nogcPrintOntoStderr => Void := {
+        baseType nogcPrintOntoStderr.
+        " tempRef" writeOntoStderr.
+    }.
+}.
+
+SimpleFunctionType definition: {
+    public override nogc method nogcPrintOntoStderr => Void := {
+        "a SimpleFunctionType" writeOntoStderr.
+    }.
+}.
+
+DependentFunctionType definition: {
+    public override nogc method nogcPrintOntoStderr => Void := {
+        "a DependentFunctionType" writeOntoStderr.
+    }.
+}.
+
+SequenceTupleType definition: {
+    public override nogc method nogcPrintOntoStderr => Void := {
+        " a SequenceTupleType" writeOntoStderr.
+    }.
+}.
+
+Metatype definition: {
+    public override nogc method nogcPrintOntoStderr => Void := {
+        thisType ifNotNil: {
+            thisType nogcPrintOntoStderr
+        } ifNil: {
+            super nogcPrintOntoStderr
+        }
+    }.
+}.
+
+String definition: {
+    public override nogc method nogcPrintOntoStderr => Void := {
+        self writeOntoStderr
+    }.
+}.
+
+StringSymbol definition: {
+    public override nogc method nogcPrintOntoStderr => Void := {
+        self writeOntoStderr
+    }.
 }.
 
 public nogc function GarbageCollector::markContentOfObject(objectPointer: UIntPointer) => Void := {
@@ -516,12 +631,25 @@ public nogc function GarbageCollector::markContentOfObject(objectPointer: UIntPo
 
     let fixedInstanceSize := type
         ifNil: (0sz)
-        ifNotNil: (type instanceSize).
+        ifNotNil: (type validGCInstanceSize).
 
     {
         let variableDataSize := header _ objectSize asSize - fixedInstanceSize.
         let variableSlotCount := variableDataSize / ObjectModel::PointerSize.
         let variableSlotsPointer := objectPointer + ObjectModel::TupleHeaderSize + fixedInstanceSize reinterpretCastTo: UIntPointer pointer.
+
+        #*
+        variableSlotCount > 0sz ifTrue: {
+            type ifNotNil: {
+                "Expand variable pointers of " writeOntoStderr.
+                type nogcPrintOntoStderr.
+                "\n" writeOntoStderr
+            } ifNil: {
+                "Expand variable pointers of value without type.\n" writeOntoStderr
+            }.
+        }.
+        *#
+
         let i mutable := 0sz.
         while: (i < variableSlotCount) do: {
             GarbageCollector::markPointerValue(variableSlotsPointer[i asIntPointer])

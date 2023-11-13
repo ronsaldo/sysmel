@@ -5,6 +5,27 @@ public final class FormSGContainerNode superclass: FormSGNode; definition: {
         := visitor visitContainerNode: self.
 }.
 
+FormSGNode definition: {
+    public virtual method -- (other: FormSGNode) ::=> FormSGNode := {
+        other isNullNode ifTrue: {return: self}.
+        self isNullNode ifTrue: {return: other}.
+
+        FormSGContainerNode new
+            children: (Array with: self with: other);
+            yourself
+    }.
+}.
+
+FormSGContainerNode definition: {
+    public override method -- (other: FormSGNode) ::=> FormSGNode := {
+        other isNullNode ifTrue: {return: self}.
+
+        FormSGContainerNode new
+            children: children -- (Array with: other);
+            yourself
+    }.
+}.
+
 FormSGBuilder definition: {
     public method containerWith: (nodes: SequenceableCollection) ::=> FormSGContainerNode
         := FormSGContainerNode new

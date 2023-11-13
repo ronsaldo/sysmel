@@ -98,4 +98,12 @@ StringSymbol extend: {
             stream nextPut: (self at: i)
         } continueWith: (i := i + 1sz).
     }.
+
+    public final method writeOntoStdout => Void := {
+        sysmel_pal_writeToFile(sysmel_pal_getStdoutFileHandle(), self size, self __rawContentsPointer__).
+    }.
+
+    public final method writeOntoStderr => Void := {
+        sysmel_pal_writeToFile(sysmel_pal_getStderrFileHandle(), self size, self __rawContentsPointer__).
+    }.
 }.

@@ -46,6 +46,15 @@ public final class Color definition: {
 
         public pure inline method blue => Color
             := Color r: 0f32 g: 0f32 b: 1f32.
+
+        public pure inline method yellow => Color
+            := Color r: 1f32 g: 1f32 b: 0f32.
+
+        public pure inline method magenta => Color
+            := Color r: 1f32 g: 0f32 b: 1f32.
+
+        public pure inline method cyan => Color
+            := Color r: 0f32 g: 1f32 b: 1f32.
     }.
 
     public method asLinearFloat32x4 => Float32x4
