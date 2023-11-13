@@ -79,4 +79,23 @@ public class FormCanvas definition: {
             }
         }.
     }.
+
+    public method rectangle: (rectangle: RectangleF32) linearGradientStart: (startPoint: Float32x2) color: (startColor: Color)
+        end: (endPoint: Float32x2) color: (endColor: Color) ::=> Void := {
+
+        let extent := rectangle extent.
+        let delta := endPoint - startPoint.
+        let dlambda := delta / (Float32x2 withAll: delta length2).
+
+        let startLinearColor := startColor asLinearFloat32x4.
+        let endLinearColor := endColor asLinearFloat32x4.
+
+        self blitPixelsInRectangle: rectangle with: {:(Float32x2)uv :(UInt32)oldColor :: UInt32 |
+            let position := uv * extent.
+            let lambda := position - startPoint dot: dlambda.
+            let alpha := lambda clampMin: 0f32 max: 1f32.
+            let interpolatedColor := ((Float32x4 withAll: 1f32 - alpha)*startLinearColor) + ((Float32x4 withAll: alpha)*endLinearColor).
+            interpolatedColor packUnorm4x8
+        }.
+    }.
 }.

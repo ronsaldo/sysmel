@@ -19,7 +19,10 @@ public class TestWindowEventHandler superclass: EventHandler; definition: {
         renderbuffer fillWithColor: grayColor.
 
         let sceneGraph :=
-            (sgBuilder rectangle: (20f32@30f32 extent: 64f32@32f32) color: Color blue)
+            (sgBuilder rectangle: (0f32@0f32 extent: 200f32@100f32)
+                linearGradientStart: 0f32@0f32 color: Color cyan
+                end: 200f32@0f32 color: Color magenta)
+            -- (sgBuilder rectangle: (20f32@30f32 extent: 64f32@32f32) color: Color blue)
             -- (sgBuilder borderRectangle: (20f32@30f32 extent: 64f32@32f32) color: Color red width: 4f32).
         FormSGFormRenderer new renderSceneGraph: sceneGraph onForm: renderbuffer.
 

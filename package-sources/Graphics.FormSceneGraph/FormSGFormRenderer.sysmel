@@ -30,4 +30,10 @@ public class FormSGFormRenderer superclass: FormSGVisitor; definition: {
         }.
         void
     }.
+
+    public override method visitLinearGradientNode: (node: FormSGLinearGradientNode) := {
+        canvas rectangle: node rectangle linearGradientStart: node startPoint color: node startColor
+            end: node endPoint color: node endColor.
+        void
+    }.
 }.
