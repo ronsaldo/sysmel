@@ -292,14 +292,20 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                 public override method hash => Size
                     := self x hash hashConcatenate: self y hash.
 
-                public override method = (other: SelfType) ::=> Boolean := {
+                public override method = other ::=> Boolean := {
                     <primitive: (VectorTypeName -- "::=") asSymbol>
-                    (self x = other x) && (self y = other y)
+                    VectorType == other __type__ ifFalse: {return: false}.
+
+                    let otherVector => VectorType := other.
+                    (self x = otherVector x) && (self y = otherVector y)
                 }.
 
-                public override method ~= (other: SelfType) ::=> Boolean := {
+                public override method ~= other ::=> Boolean := {
                     <primitive: (VectorTypeName -- "::~=") asSymbol>
-                    (self x ~= other x) || (self y ~= other y)
+                    VectorType ~~ other __type__ ifTrue: {return: true}.
+
+                    let otherVector => VectorType := other.
+                    (self x ~= otherVector x) || (self y ~= otherVector y)
                 }.
             }.
             3sz : {
@@ -346,14 +352,20 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                 public override method hash => Size
                     := (self x hash hashConcatenate: self y hash) hashConcatenate: self z hash.
 
-                public override method = (other: SelfType) ::=> Boolean := {
+                public override method = other ::=> Boolean := {
                     <primitive: (VectorTypeName -- "::=") asSymbol>
-                    (self x = other x) && (self y = other y) && (self z = other z)
+                    VectorType == other __type__ ifFalse: {return: false}.
+
+                    let otherVector => VectorType := other.
+                    (self x = otherVector x) && (self y = otherVector y) && (self z = otherVector z)
                 }.
 
-                public override method ~= (other: SelfType) ::=> Boolean := {
+                public override method ~= other ::=> Boolean := {
                     <primitive: (VectorTypeName -- "::~=") asSymbol>
-                    (self x ~= other x) || (self y ~= other y) || (self z ~= other z)
+                    VectorType ~~ other __type__ ifTrue: {return: true}.
+
+                    let otherVector => VectorType := other.
+                    (self x ~= otherVector x) || (self y ~= otherVector y) || (self z ~= otherVector z)
                 }.
             }.
             4sz : {
@@ -402,14 +414,20 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
                 public override method hash => Size
                     := ((self x hash hashConcatenate: self y hash) hashConcatenate: self z hash) hashConcatenate: self w hash.
 
-                public override method = (other: SelfType) ::=> Boolean := {
+                public override method = other ::=> Boolean := {
                     <primitive: (VectorTypeName -- "::=") asSymbol>
-                    (self x = other x) && (self y = other y) && (self z = other z) && (self w = other w)
+                    VectorType == other __type__ ifFalse: {return: false}.
+
+                    let otherVector => VectorType := other.
+                    (self x = otherVector x) && (self y = otherVector y) && (self z = otherVector z) && (self w = otherVector w)
                 }.
 
-                public override method ~= (other: SelfType) ::=> Boolean := {
+                public override method ~= other ::=> Boolean := {
                     <primitive: (VectorTypeName -- "::~=") asSymbol>
-                    (self x ~= other x) || (self y ~= other y) || (self z ~= other z) || (self w ~= other w)
+                    VectorType ~~ other __type__ ifTrue: {return: true}.
+
+                    let otherVector => VectorType := other.
+                    (self x ~= otherVector x) || (self y ~= otherVector y) || (self z ~= otherVector z) || (self w ~= otherVector w)
                 }.
             }.
             _: error("Unsupported primitive vector with " -- Elements asString -- " elements.")
@@ -584,16 +602,29 @@ public pure template PrimitiveVectorTypeTemplate(elementType: PrimitiveValueType
             }.
 
             ElementType isPrimitiveFloatType ifTrue: {
+                let HalfPi := SelfType withAll: ElementType halfPi.
                 let Pi := SelfType withAll: ElementType pi.
+                let TwoPi := SelfType withAll: ElementType twoPi.
                 let E := SelfType withAll: ElementType e.
                 let Infinity := SelfType withAll: ElementType infinity.
                 let NegativeInfinity := SelfType withAll: ElementType negativeInfinity.
 
                 __Meta__ definition: {
+                    public pure inline method halfPi => VectorType := HalfPi.
                     public pure inline method pi => VectorType := Pi.
+                    public pure inline method twoPi => VectorType := TwoPi.
                     public pure inline method e => VectorType := E.
                     public pure inline method infinity => VectorType := Infinity.
                     public pure inline method negativeInfinity => VectorType := NegativeInfinity.
+
+                    public pure inline method withInteger: (integer: Integer) ::=> VectorType
+                        := VectorType withAll: (ElementType withInteger: integer).
+
+                    public pure inline method withNumerator: (numerator: Integer) denominator: (denominator: Integer) ::=> VectorType
+                        := VectorType withAll: (ElementType withNumerator: numerator denominator: denominator).
+
+                    public pure inline method withDenominator: (denominator: Integer) ::=> VectorType
+                        := VectorType withAll: (ElementType withDenominator: denominator).
                 }.
 
                 public pure method length => ElementType := {

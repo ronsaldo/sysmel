@@ -1,0 +1,7 @@
+#*
+public template PrimitiveMatrix(elementType: Type, rows: Size, columns: Size)
+struct definition: {
+
+}.
+
+*#

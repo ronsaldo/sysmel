@@ -1,0 +1,53 @@
+(
+    Float32, Float32x2, Float32x3, Float32x4,
+    Float64, Float64x2, Float64x3, Float64x4
+) macroDo: {:VectorType :: Void |
+    VectorType definition: {
+        public pure inline method floorModule: (divisor: VectorType) ::=> VectorType
+            := self - ((self / divisor) floor * divisor).
+
+        public pure method sin => VectorType := {
+            let x := self floorModule: VectorType twoPi.
+            let x9 := x * (VectorType withDenominator: 9).
+            let x9_2 := x9*x9.
+
+            let y9 := x9*(
+                (VectorType withInteger: 1) + (x9_2*(
+                (VectorType withDenominator: 3 factorial) negated + (x9_2*(
+                (VectorType withDenominator: 5 factorial) + (x9_2*(
+                (VectorType withDenominator: 7 factorial) negated + (x9_2*(
+                (VectorType withDenominator: 9 factorial) + (x9_2*(
+                (VectorType withDenominator: 11 factorial) negated + (x9_2*(
+                (VectorType withDenominator: 13 factorial) + (x9_2*(
+                (VectorType withDenominator: 15 factorial) negated + (x9_2*(
+                (VectorType withDenominator: 17 factorial)
+            ))))))))))))))))).
+            
+            let y3 := ((VectorType withInteger: 3)*y9) - ((VectorType withInteger: 4)*y9*y9*y9).
+            ((VectorType withInteger: 3)*y3) - ((VectorType withInteger: 4)*y3*y3*y3).
+        }.
+
+        public pure inline method cos => VectorType
+            := (self + VectorType halfPi) sin.
+    }.
+}.
+
+Float32 definition: {
+    public pure inline method sinCos => Float32x2
+        := (Float32x2 x: self y: self + SelfType halfPi) sin.
+
+    public pure inline method tan => Float32 := {
+        let sinCos := self sinCos.
+        sinCos x / sinCos y
+    }.
+}.
+
+Float64 definition: {
+    public pure inline method sinCos => Float64x2
+        := (Float64x2 x: self y: self + SelfType halfPi) sin.
+
+    public pure inline method tan => Float64 := {
+        let sinCos := self sinCos.
+        sinCos x / sinCos y
+    }.
+}.

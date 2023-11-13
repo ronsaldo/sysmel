@@ -81,3 +81,5 @@ loadSourceNamed: "Type.sysmel".
 loadSourceNamed: "WordArray.sysmel".
 
 loadSourceNamed: "PrimitiveVectorType.sysmel".
+loadSourceNamed: "MathFunctions.sysmel".
+loadSourceNamed: "PrimitiveMatrix.sysmel".

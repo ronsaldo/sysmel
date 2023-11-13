@@ -207,6 +207,42 @@ static sysbvm_tuple_t sysbvm_float32_primitive_divide(sysbvm_context_t *context,
     return sysbvm_tuple_float32_encode(context, left / right);
 }
 
+static sysbvm_tuple_t sysbvm_float32_primitive_floor(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
+
+    return sysbvm_tuple_float32_encode(context, floor(sysbvm_tuple_float32_decode(arguments[0])));
+}
+
+static sysbvm_tuple_t sysbvm_float32_primitive_ceiling(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
+
+    return sysbvm_tuple_float32_encode(context, ceil(sysbvm_tuple_float32_decode(arguments[0])));
+}
+
+static sysbvm_tuple_t sysbvm_float32_primitive_rounded(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
+
+    return sysbvm_tuple_float32_encode(context, round(sysbvm_tuple_float32_decode(arguments[0])));
+}
+
+static sysbvm_tuple_t sysbvm_float32_primitive_truncated(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
+
+    return sysbvm_tuple_float32_encode(context, trunc(sysbvm_tuple_float32_decode(arguments[0])));
+}
+
 static sysbvm_tuple_t sysbvm_float32_primitive_compare(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
 {
     (void)context;
@@ -602,6 +638,42 @@ static sysbvm_tuple_t sysbvm_float64_primitive_divide(sysbvm_context_t *context,
     return sysbvm_tuple_float64_encode(context, left / right);
 }
 
+static sysbvm_tuple_t sysbvm_float64_primitive_floor(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
+
+    return sysbvm_tuple_float32_encode(context, floor(sysbvm_tuple_float32_decode(arguments[0])));
+}
+
+static sysbvm_tuple_t sysbvm_float64_primitive_ceiling(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
+
+    return sysbvm_tuple_float32_encode(context, ceil(sysbvm_tuple_float32_decode(arguments[0])));
+}
+
+static sysbvm_tuple_t sysbvm_float64_primitive_rounded(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
+
+    return sysbvm_tuple_float32_encode(context, round(sysbvm_tuple_float32_decode(arguments[0])));
+}
+
+static sysbvm_tuple_t sysbvm_float64_primitive_truncated(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
+
+    return sysbvm_tuple_float32_encode(context, trunc(sysbvm_tuple_float32_decode(arguments[0])));
+}
+
 static sysbvm_tuple_t sysbvm_float64_primitive_compare(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
 {
     (void)context;
@@ -922,6 +994,11 @@ void sysbvm_float_registerPrimitives(void)
     sysbvm_primitiveTable_registerFunction(sysbvm_float32_primitive_multiply, "Float32::*");
     sysbvm_primitiveTable_registerFunction(sysbvm_float32_primitive_divide, "Float32::/");
 
+    sysbvm_primitiveTable_registerFunction(sysbvm_float32_primitive_ceiling, "Float32::ceiling");
+    sysbvm_primitiveTable_registerFunction(sysbvm_float32_primitive_floor, "Float32::floor");
+    sysbvm_primitiveTable_registerFunction(sysbvm_float32_primitive_rounded, "Float32::rounded");
+    sysbvm_primitiveTable_registerFunction(sysbvm_float32_primitive_truncated, "Float32::truncated");
+
     sysbvm_primitiveTable_registerFunction(sysbvm_float32_primitive_compare, "Float32::<=>");
     sysbvm_primitiveTable_registerFunction(sysbvm_float32_primitive_equals, "Float32::=");
     sysbvm_primitiveTable_registerFunction(sysbvm_float32_primitive_notEquals, "Float32::~=");
@@ -968,6 +1045,11 @@ void sysbvm_float_registerPrimitives(void)
     sysbvm_primitiveTable_registerFunction(sysbvm_float64_primitive_sqrt, "Float64::sqrt");
     sysbvm_primitiveTable_registerFunction(sysbvm_float64_primitive_multiply, "Float64::*");
     sysbvm_primitiveTable_registerFunction(sysbvm_float64_primitive_divide, "Float64::/");
+
+    sysbvm_primitiveTable_registerFunction(sysbvm_float64_primitive_ceiling, "Float64::ceiling");
+    sysbvm_primitiveTable_registerFunction(sysbvm_float64_primitive_floor, "Float64::floor");
+    sysbvm_primitiveTable_registerFunction(sysbvm_float64_primitive_rounded, "Float64::rounded");
+    sysbvm_primitiveTable_registerFunction(sysbvm_float64_primitive_truncated, "Float64::truncated");
 
     sysbvm_primitiveTable_registerFunction(sysbvm_float64_primitive_compare, "Float64::<=>");
     sysbvm_primitiveTable_registerFunction(sysbvm_float64_primitive_equals, "Float64::=");
@@ -1020,6 +1102,11 @@ void sysbvm_float_setupPrimitives(sysbvm_context_t *context)
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float32Type, "*", 2, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float32_primitive_multiply);
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float32Type, "/", 2, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float32_primitive_divide);
 
+    sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float32Type, "floor", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float32_primitive_floor);
+    sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float32Type, "ceiling", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float32_primitive_ceiling);
+    sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float32Type, "rounded", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float32_primitive_rounded);
+    sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float32Type, "truncated", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float32_primitive_truncated);
+
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float32Type, "<=>", 2, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float32_primitive_compare);
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float32Type, "=", 2, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float32_primitive_equals);
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float32Type, "~=", 2, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float32_primitive_notEquals);
@@ -1067,6 +1154,11 @@ void sysbvm_float_setupPrimitives(sysbvm_context_t *context)
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float64Type, "sqrt", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float64_primitive_sqrt);
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float64Type, "*", 2, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float64_primitive_multiply);
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float64Type, "/", 2, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float64_primitive_divide);
+
+    sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float64Type, "floor", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float64_primitive_floor);
+    sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float64Type, "ceiling", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float64_primitive_ceiling);
+    sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float64Type, "rounded", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float64_primitive_rounded);
+    sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float64Type, "truncated", 1, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float64_primitive_truncated);
 
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float64Type, "<=>", 2, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float64_primitive_compare);
     sysbvm_context_setIntrinsicPrimitiveMethod(context, context->roots.float64Type, "=", 2, SYSBVM_FUNCTION_FLAGS_CORE_PRIMITIVE | SYSBVM_FUNCTION_FLAGS_PURE | SYSBVM_FUNCTION_FLAGS_FINAL, NULL, sysbvm_float64_primitive_equals);

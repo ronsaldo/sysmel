@@ -620,6 +620,17 @@ UInt64 definition: {
 }.
 
 Float32 definition: {
+    __Meta__ definition: {
+        public pure inline method withInteger: (integer: Integer) ::=> Float32
+            := integer f32.
+
+        public pure inline method withNumerator: (numerator: Integer) denominator: (denominator: Integer) ::=> Float32
+            := numerator f32 / denominator f32.
+
+        public pure inline method withDenominator: (denominator: Integer) ::=> Float32
+            := 1f32 / denominator f32.
+    }.
+
     public pure final method asIEEEFloat32Encoding => UInt32 := {
         <primitive: #Float32::asIEEEFloat32Encoding>
         <targetDefinedPrimitive>
@@ -628,6 +639,17 @@ Float32 definition: {
 }.
 
 Float64 definition: {
+    __Meta__ definition: {
+        public pure inline method withInteger: (integer: Integer) ::=> Float64
+            := integer f64.
+
+        public pure inline method withNumerator: (numerator: Integer) denominator: (denominator: Integer) ::=> Float64
+            := numerator f64 / denominator f64.
+
+        public pure inline method withDenominator: (denominator: Integer) ::=> Float64
+            := 1f64 / denominator f64.
+    }.
+
     public pure final method asIEEEFloat64Encoding => UInt64 := {
         <primitive: #Float64::asIEEEFloat64Encoding>
         <targetDefinedPrimitive>
