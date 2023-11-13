@@ -98,6 +98,7 @@ Environment eagerDefinitionBody: {
             isExternal: isExternal;
             sourcePosition: sourcePosition;
             yourself.
+
         self setNewBinding: binding.
         binding.
     }.
@@ -105,8 +106,13 @@ Environment eagerDefinitionBody: {
     public eager method setNewSymbol: (name: Symbol) valueBinding: (value: Untyped) at: (sourcePosition: SourcePosition) ::=> SymbolBinding
         := self setNewSymbol: name valueBinding: value isMutable: false isExternal: false isThreadLocal: false at: sourcePosition.
 
-    public override method setNewPublicSymbol: (name: Symbol) valueBinding: (value: Untyped) isMutable: (isMutable: Boolean) isExternal: (isExternal: Boolean) isThreadLocal: (isThreadLocal: Boolean) at: (sourcePosition: SourcePosition) ::=> SymbolBinding
-        := self setNewSymbol: name valueBinding: value isMutable: isMutable isExternal: isExternal isThreadLocal: isThreadLocal at: sourcePosition.
+    public override method setNewPublicSymbol: (name: Symbol) valueBinding: (value: Untyped) isMutable: (isMutable: Boolean) isExternal: (isExternal: Boolean) isThreadLocal: (isThreadLocal: Boolean) at: (sourcePosition: SourcePosition) ::=> SymbolBinding := {
+        let binding := self setNewSymbol: name valueBinding: value isMutable: isMutable isExternal: isExternal isThreadLocal: isThreadLocal at: sourcePosition.
+        ((RawTuple::type(value) ifNil: Untyped) lookupSelector: #recordBindingWithOwner:andName:) ifNotNil: {
+            value recordBindingWithOwner: self andName: name.
+        }.
+        binding
+    }.
 
     public virtual eager method lookLocalSymbolTable: (symbol: Symbol) ::=> SymbolBinding
         := symbolTable ifNotNil: (symbolTable associationAtOrNil: symbol).

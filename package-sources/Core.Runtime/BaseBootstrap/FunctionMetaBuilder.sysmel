@@ -64,7 +64,7 @@ FunctionMetaBuilder
                 then: `'(noFFIAvailableError())
                 else: nil
         }
-    };
+    } makeVirtual;
     withSelector: #finishFunctionExpansion addMethod: {:self :: ASTNode |
         ASTLambdaNode new
             sourcePosition: self sourcePosition;

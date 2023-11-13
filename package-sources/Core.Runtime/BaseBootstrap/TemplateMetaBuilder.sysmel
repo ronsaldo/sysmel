@@ -1,12 +1,44 @@
 FunctionMetaBuilder publicSubclass: #TemplateMetaBuilder slots: (
+    TypeSlot publicNamed: #supertypeExpression type: ASTNode ,
+    TypeSlot publicNamed: #typeMetaBuilderClass type: TypeMetaBuilder class,
 ).
 
-TemplateMetaBuilder
-    withSelector: #initialize addMethod: {:self :: Void |
-        (tuple: self withLookupStartingFrom: TemplateMetaBuilder supertype) initialize.
-        self functionFlags: FunctionFlags::Memoized | FunctionFlags::Template.
-    } makeOverride;
-    withSelector: #finishFunctionExpansion addMethod: {:self :: ASTNode |
+TemplateMetaBuilder definition: {
+    public override method initialize => Void := {
+        super initialize.
+        self functionFlags: FunctionFlags::Memoized | FunctionFlags::Template
+    }.
+
+    public override method expandMessageSendNode: (messageSendNode: ASTMessageSendNode) ::=> ASTNode := {
+        let: #selector with: messageSendNode selector.
+        if: (selector isLiteralNode && (selector downCastTo: ASTLiteralNode) value) == #class then: {
+            self typeMetaBuilderClass: ClassMetaBuilder.
+            return: self continueExpansion
+        }.
+
+        super expandMessageSendNode: messageSendNode
+    }.
+
+    public override method expansionBody => ASTNode := {
+        typeMetaBuilderClass ifNotNil: {
+            let typeContructionNode := typeMetaBuilderClass new
+                environment: environment;
+                sourcePosition: sourcePosition;
+                supertypeExpression: self supertypeExpression;
+                finishExpansion.
+
+            return: (body ifNotNil: ``{
+                let resultType := `,typeContructionNode.
+                __templateResult__ value: resultType.
+                
+                resultType definition: `,body; yourself.
+            } ifNil: (typeContructionNode))
+        }.
+
+        super expansionBody
+    }.
+
+    public override method finishFunctionExpansion => ASTNode := {
         let: #templateResultArgument with: (ASTArgumentNode new
             sourcePosition: self sourcePosition;
             isForAll: false;
@@ -23,10 +55,17 @@ TemplateMetaBuilder
             resultType: self resultType;
             makeEagerIf: self isEager;
             yourself
-    } makeOverride.
+    }.
 
-FlagMetaBuilder
-    withSelector: #template addMethod: {:self :: ASTNode |
+    public method definition: (bodyExpression: ASTNode) ::=> ASTNode := {
+        <metaBuilder>
+        self body: bodyExpression.
+        self finishExpansion
+    }.
+}.
+
+FlagMetaBuilder definition: {
+    public method template => ASTNode := {
         <metaBuilder>
         self delegateToMetaBuilder: (TemplateMetaBuilder new
             addFunctionFlags: self methodFlags;
@@ -34,3 +73,4 @@ FlagMetaBuilder
             isEager: self isEager;
             yourself)
     }.
+}.

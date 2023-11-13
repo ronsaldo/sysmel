@@ -15,11 +15,12 @@ loadSourceNamed: "MacroMetaBuilder.sysmel".
 loadSourceNamed: "FlagMetaBuilder.sysmel".
 loadSourceNamed: "NamedMetaBuilder.sysmel".
 loadSourceNamed: "FunctionMetaBuilder.sysmel".
-loadSourceNamed: "TemplateMetaBuilder.sysmel".
 loadSourceNamed: "MethodMetaBuilder.sysmel".
-
 loadSourceNamed: "TypeMetaBuilder.sysmel".
 loadSourceNamed: "ClassMetaBuilder.sysmel".
+
+loadSourceNamed: "TemplateMetaBuilder.sysmel".
+
 loadSourceNamed: "VariableMetaBuilder.sysmel".
 loadSourceNamed: "LetMetaBuilder.sysmel".
 loadSourceNamed: "GlobalMetaBuilder.sysmel".

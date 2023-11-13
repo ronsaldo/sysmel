@@ -1,7 +1,17 @@
-#*
-public template PrimitiveMatrix(elementType: Type, rows: Size, columns: Size)
+public template PrimitiveMatrixTemplate(elementType: Type, rows: Size, columns: Size)
 struct definition: {
+    #*
+    let ElementType := elementType.
+    let Rows := rows.
+    let Columns := columns.
+    let ColumnType := PrimitiveVectorTypeTemplate(elementType, rows).
 
+    __Meta__ definition: {
+
+    }.
+    *#
 }.
 
-*#
+public global Float32x2x2 := PrimitiveMatrixTemplate(Float32, 2sz, 2sz).
+public global Float32x3x3 := PrimitiveMatrixTemplate(Float32, 3sz, 3sz).
+public global Float32x4x4 := PrimitiveMatrixTemplate(Float32, 4sz, 4sz).

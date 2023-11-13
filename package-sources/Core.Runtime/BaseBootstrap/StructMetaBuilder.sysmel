@@ -55,3 +55,11 @@ FlagMetaBuilder extend: {
             yourself)
     }
 }.
+
+TemplateMetaBuilder extend: {
+    public method struct => ASTNode := {
+        <metaBuilder>
+        self typeMetaBuilderClass: StructMetaBuilder.
+        self continueExpansion
+    }.
+}.
