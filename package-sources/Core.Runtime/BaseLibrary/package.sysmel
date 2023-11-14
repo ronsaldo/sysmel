@@ -55,6 +55,7 @@ loadSourceNamed: "FunctionNativeCodeDefinition.sysmel".
 loadSourceNamed: "Elf.sysmel".
 loadSourceNamed: "IO.sysmel".
 loadSourceNamed: "FileSystem.sysmel".
+loadSourceNamed: "FileReference.sysmel".
 loadSourceNamed: "MathPrimitives.sysmel".
 loadSourceNamed: "Integer.sysmel".
 loadSourceNamed: "OrderedInsertionIdentitySet.sysmel".

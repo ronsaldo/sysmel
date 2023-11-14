@@ -1,4 +1,3 @@
 loadSourceNamed: "PixelFormat.sysmel".
 loadSourceNamed: "Form.sysmel".
-loadSourceNamed: "FormBMPReadWriter.sysmel".
 loadSourceNamed: "FormCanvas.sysmel".

@@ -1,0 +1,104 @@
+public struct BitmapFileHeader packed definition: {
+    public field signature => Char8[2sz].
+    public field size => UInt32.
+    public field reserved1 => UInt16.
+    public field reserved2 => UInt16.
+    public field bitmapOffset => UInt32.
+
+    public method hasValidSignature => Boolean
+        := (signature[0sz] = 'B'c8) && (signature[1sz] = 'M'c8)
+}.
+
+public global BitmapFileHeader::Size := BitmapFileHeader valueSize.
+
+public struct BitmapInfoHeader definition: {
+    public field size => UInt32.
+    public field width => Int32.
+    public field height => Int32.
+
+    public field planes => UInt16.
+    public field bitCount => UInt16.
+    public field compression => UInt32.
+    public field sizeOfImage => UInt32.
+    public field xPixelsPerMeter => Int32.
+    public field yPixelsPerMeter => Int32.
+
+    public field usedColorCount => UInt32.
+    public field importantColorCount => UInt32.
+}.
+
+public global BitmapInfoHeader::Size := BitmapInfoHeader valueSize.
+
+public final class BMPReadWriter superclass: ImageReadWriter; definition: {
+    public override method nextImage => Form := {
+        let header mutable := BitmapFileHeader basicNew.
+        (stream readBytes: BitmapFileHeader::Size intoPointer: header address) = BitmapFileHeader::Size asIntPointer ifFalse: {
+            self error: "Failed to read bitmap header."
+        }.
+
+        header hasValidSignature ifFalse: {
+            self error: "Bitmap has invalid BM signature."
+        }.
+
+        ## Read and check the infor header.
+        let infoHeader mutable := BitmapInfoHeader basicNew.
+        (stream readBytes: BitmapInfoHeader::Size intoPointer: infoHeader address) = BitmapInfoHeader::Size asIntPointer ifFalse: {
+            self error: "Failed to read bitmap info header."
+        }.
+
+        (infoHeader size asSize < BitmapInfoHeader::Size) ifTrue: {
+            self error: "Unsupported or incomplete bitmap info header."
+        }.
+
+        ## Skip the extra header data.
+        let extraHeaderSize := infoHeader size asSize - BitmapInfoHeader::Size.
+        stream skip: extraHeaderSize asUInt64.
+
+        ## Read the color map.
+        let colorMapData := (infoHeader bitCount = 8u16) && (infoHeader usedColorCount > 0u32)
+            ifTrue: (WordArray basicNew: infoHeader usedColorCount asSize)
+            ifFalse: nil.
+
+        infoHeader usedColorCount > 0u32 ifTrue: {
+            let colorMapDataByteSize := infoHeader usedColorCount asSize * 4sz.
+            (stream readBytes: colorMapDataByteSize intoPointer: colorMapData __rawContentsBytePointer__) = colorMapDataByteSize asIntPointer ifFalse: {
+                self error: "Failed to read bitmap color map data."
+            }.
+        }.
+
+        let pixelFormat := switch: infoHeader bitCount withCases: #{
+            8u16 : PixelFormat::R8_UNorm .
+            24u16 : PixelFormat::B8G8R8X8_UNorm.
+            32u16 : PixelFormat::B8G8R8A8_UNorm.
+            _: {self error: "Unsupported bitmap bitcount of " -- infoHeader bitCount printString }.
+        }.
+
+        ## Decode the bitmap layout parameters.
+        let width := infoHeader width abs asUInt32.
+        let height := infoHeader height abs asUInt32.
+        let pixelSize := (infoHeader bitCount / 8u16) asUInt32.
+        let stride := width * pixelSize alignedTo: 4u32.
+        let bitmapDataSize := stride * height.
+        let bitmapData := ByteArray new: bitmapDataSize asSize.
+
+        ## Read the bitmap data.
+        (stream readBytes: bitmapDataSize asSize intoPointer: bitmapData __rawContentsBytePointer__) = bitmapDataSize asIntPointer ifFalse: {
+            self error: "Failed to read bitmap data."
+        }.
+
+        colorMapData isNotNil && (colorMapData size = 256sz) ifTrue: {
+            let isGrayScale mutable := true.
+            colorMapData doWithIndex: {:(UInt32)value :(Size)index :: Void |
+                let grayIntensity := index asUInt32.
+                let expectedGrayColor := grayIntensity | (grayIntensity << 8u32) | (grayIntensity << 16u32).
+                isGrayScale := isGrayScale && ((value & 16r00FF_FF_FF u32) = expectedGrayColor)
+            }.
+            
+            isGrayScale ifFalse: {
+                self error: "TODO: Decode indexed bitmap."
+            }.
+        }.
+
+        Form extent: width@height pitch: stride pixelFormat: pixelFormat bits: bitmapData
+    }.
+}.

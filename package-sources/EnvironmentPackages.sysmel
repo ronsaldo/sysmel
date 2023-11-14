@@ -5,6 +5,8 @@
     "Graphics.Color.Tests"
     "Graphics.Form"
     "Graphics.Form.Tests"
+    "Graphics.ImageReadWriter"
+    "Graphics.ImageReadWriter.Tests"
     "Graphics.FormSceneGraph"
     "Graphics.FormSceneGraph.Tests"
     "Graphics.Window"

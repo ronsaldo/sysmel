@@ -1,0 +1,110 @@
+public class FileReference definition: {
+    public field path => String.
+
+    public method binaryReadStream => Stream := {
+        let handle := sysmel_pal_openFile(path size, path __rawContentsPointer__ reinterpretCastTo: Char8 const pointer, SysmelPAL::FileOpenFlags::ReadOnly, 0u32).
+        handle ifNil: {
+            self error: "Failed to open file for reading " -- self printString.
+        }.
+
+        BinaryFileStream withHandle: handle owned: true canRead: true canWrite: false
+    }.
+
+    public inline method binaryReadStreamDo: (aBlock: (Stream) => AnyValue) ::=> AnyValue := {
+        let stream := self binaryReadStream.
+        {| 
+            aBlock(stream)
+        } ensure: {:: Void |
+            stream close
+        }.
+    }.
+
+    public method binaryWriteStream => Stream := {
+        let handle := sysmel_pal_openFile(path size, path __rawContentsPointer__ reinterpretCastTo: Char8 const pointer,
+            SysmelPAL::FileOpenFlags::WriteOnly | SysmelPAL::FileOpenFlags::Create | SysmelPAL::FileOpenFlags::Truncate,
+            SysmelPAL::FileCreationPermissions::RegularFileDefaults).
+        handle ifNil: {
+            self error: "Failed to open file for reading " -- self printString.
+        }.
+
+        BinaryFileStream withHandle: handle owned: true canRead: false canWrite: true
+    }.
+
+    public inline method binaryWriteStreamDo: (aBlock: (Stream) => AnyValue) ::=> AnyValue := {
+        let stream := self binaryWriteStream.
+        {| 
+            aBlock(stream)
+        } ensure: {:: Void |
+            stream close
+        }.
+    }.
+
+    public method binaryAppendStream => Stream := {
+        let handle := sysmel_pal_openFile(path size, path __rawContentsPointer__ reinterpretCastTo: Char8 const pointer,
+            SysmelPAL::FileOpenFlags::WriteOnly | SysmelPAL::FileOpenFlags::Create | SysmelPAL::FileOpenFlags::Append,
+            SysmelPAL::FileCreationPermissions::RegularFileDefaults).
+        handle ifNil: {
+            self error: "Failed to open file for reading " -- self printString.
+        }.
+
+        BinaryFileStream withHandle: handle owned: true canRead: false canWrite: true
+    }.
+
+    public inline method binaryAppendStreamDo: (aBlock: (Stream) => AnyValue) ::=> AnyValue := {
+        let stream := self binaryAppendStream.
+        {| 
+            aBlock(stream)
+        } ensure: {:: Void |
+            stream close
+        }.
+    }.
+
+    public method binaryReadWriteStream => Stream := {
+        let handle := sysmel_pal_openFile(path size, path __rawContentsPointer__ reinterpretCastTo: Char8 const pointer,
+            SysmelPAL::FileOpenFlags::ReadWrite | SysmelPAL::FileOpenFlags::Create,
+            SysmelPAL::FileCreationPermissions::RegularFileDefaults).
+        handle ifNil: {
+            self error: "Failed to open file for reading " -- self printString.
+        }.
+
+        BinaryFileStream withHandle: handle owned: true canRead: true canWrite: true
+    }.
+
+    public inline method binaryReadWriteStreamDo: (aBlock: (Stream) => AnyValue) ::=> AnyValue := {
+        let stream := self binaryReadWriteStream.
+        {| 
+            aBlock(stream)
+        } ensure: {:: Void |
+            stream close
+        }.
+    }.
+
+    public method binaryReadWriteTruncateStream => Stream := {
+        let handle := sysmel_pal_openFile(path size, path __rawContentsPointer__ reinterpretCastTo: Char8 const pointer,
+            SysmelPAL::FileOpenFlags::ReadWrite | SysmelPAL::FileOpenFlags::Create | SysmelPAL::FileOpenFlags::Truncate,
+            SysmelPAL::FileCreationPermissions::RegularFileDefaults).
+        handle ifNil: {
+            self error: "Failed to open file for reading " -- self printString.
+        }.
+
+        BinaryFileStream withHandle: handle owned: true canRead: true canWrite: true
+    }.
+
+    public inline method binaryReadWriteTruncateStream: (aBlock: (Stream) => AnyValue) ::=> AnyValue := {
+        let stream := self binaryReadWriteTruncateStream.
+        {| 
+            aBlock(stream)
+        } ensure: {:: Void |
+            stream close
+        }.
+    }.
+
+    public override method printOn: (aStream: Stream) := {
+        path printOn: aStream. aStream string: " asFileReference"
+    }.
+}.
+
+String definition: {
+    public method asFileReference => FileReference
+        := FileReference new path: self; yourself
+}.

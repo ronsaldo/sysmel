@@ -32,6 +32,9 @@ public class BinaryFileStream superclass: Stream; definition: {
         self writeBytes: byteCount fromPointer: anObject __rawContentsPointer__
     }.
 
+    public override method skip: (skipCount: UInt64) ::=> Void
+        := sysmel_pal_seek(handle, skipCount asInt64, SysmelPAL::SeekMode::Current).
+
     public override method readBytes: (byteCount: Size) intoPointer: (destinationPointer: Void pointer) ::=> IntPointer
         := sysmel_pal_readFromFile(handle, byteCount, destinationPointer).
 

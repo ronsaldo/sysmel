@@ -820,6 +820,12 @@ Stream
         } continueWith: (i := i + 1sz).
         result
     } makeVirtual;
+    withSelector: #skip: addMethod: {:(Stream)self :(UInt64)skipCount :: Void | 
+        let: #i mutableWith: 0u64.
+        while: i < skipCount do: {
+            self next
+        } continueWith: (i := i + 1sz).
+    } makeVirtual;
     withSelector: #nextPut: addMethod: {:(Stream)self :element :: Void | 
         self subclassResponsibility
     } makeVirtual;

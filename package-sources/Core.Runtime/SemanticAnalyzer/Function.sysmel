@@ -27,6 +27,9 @@ Function eagerDefinitionBody: {
         argumentCount := newDefinition argumentCount.
         captureEnvironment := newCaptureEnvironment.
         definition := newDefinition.
+        definition ifNotNil: {
+            primitiveName := definition primitiveName
+        }.
     }.
 
     public eager method setupWithFunctionDefinition: (newDefinition: FunctionDefinition) captureVector: (newCaptureVector: AnySequenceTuple) ::=> Void := {
@@ -34,6 +37,9 @@ Function eagerDefinitionBody: {
         argumentCount := newDefinition argumentCount.
         captureVector := newCaptureVector.
         definition := newDefinition.
+        definition ifNotNil: {
+            primitiveName := definition primitiveName
+        }.
     }.
 
     public method isTargetDefinedPrimitive => Boolean
