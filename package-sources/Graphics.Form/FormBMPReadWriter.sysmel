@@ -1,0 +1,11 @@
+public struct BitmapFileHeader packed definition: {
+    public field magic => Char8[2sz].
+    public field size => UInt32.
+    public field reserved1 => UInt16.
+    public field reserved2 => UInt16.
+    public field bitmapOffset => UInt32.
+}.
+
+public struct BitmapInfoHeader packed definition: {
+}.
+

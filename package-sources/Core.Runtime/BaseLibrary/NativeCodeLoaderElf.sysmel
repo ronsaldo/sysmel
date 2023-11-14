@@ -132,11 +132,11 @@ public class NativeCodeLoaderElf64Builder superclass: Object; definition: {
 
     public method addLocalSymbol: (symbol: Elf64::Symbol ref) ::=> Void := {
         localSymbolCount := localSymbolCount + 1sz.
-        localSymbolTableBuilder nextPutFromPointer: (symbol address reinterpretCastTo: Void pointer) size: Elf64::Symbol valueSize
+        localSymbolTableBuilder writeBytes: Elf64::Symbol valueSize fromPointer: symbol address
     }.
 
     public method addNonLocalSymbol: (symbol: Elf64::Symbol ref) ::=> Void := {
-        nonLocalSymbolTableBuilder nextPutFromPointer: (symbol address reinterpretCastTo: Void pointer) size: Elf64::Symbol valueSize
+        nonLocalSymbolTableBuilder writeBytes: Elf64::Symbol valueSize fromPointer: symbol address
     }.
 
     public method addNativeCodeSection: (nativeCodeSection: NativeCodeSection) ::=> Void := {

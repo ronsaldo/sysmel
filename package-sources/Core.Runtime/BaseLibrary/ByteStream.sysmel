@@ -55,13 +55,12 @@ ByteStream eagerDefinitionBody: {
         }
     }.
 
-    public method nextPutFromPointer: (pointer: Void const pointer) size: (byteCount: Size) ::=> Void := {
+    public override method writeBytes: (byteCount: Size) fromPointer: (sourcePointer: Void const pointer) ::=> IntPointer := {
         self ensureCapacityFor: byteCount.
 
         memcpy((self __slotNamedAt__: #storage) __rawContentsBytePointer__ + size asIntPointer reinterpretCastTo: Void pointer,
-            pointer,
-            byteCount).
-        size := size + byteCount
+            sourcePointer, byteCount).
+        (size := size + byteCount) asIntPointer
     }.
 
     public method nextPutString: (string: String) ::=> Void := {

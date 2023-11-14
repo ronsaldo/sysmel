@@ -36,6 +36,8 @@ loadSourceNamed: "ProgramEntitySymbol.sysmel".
 loadSourceNamed: "FunctionEntryPointSymbol.sysmel".
 loadSourceNamed: "FunctionTrampolineSymbol.sysmel".
 
+loadSourceNamed: "BinaryStream.sysmel".
+loadSourceNamed: "BinaryFileStream.sysmel".
 loadSourceNamed: "ByteStream.sysmel".
 loadSourceNamed: "Exception.sysmel".
 loadSourceNamed: "NativeCodeRelocation.sysmel".

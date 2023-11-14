@@ -1,0 +1,31 @@
+Stream definition: {
+    public virtual method readBytes: (byteCount: Size) intoPointer: (destinationPointer: Void pointer) ::=> IntPointer := {
+        let i mutable := 0sz.
+        let destinationBytePointer := destinationPointer reinterpretCastTo: UInt8 pointer.
+        while: (i < byteCount) do: {
+            let nextByte := self next.
+            nextByte ifNil: break().
+
+            let byte => UInt8 := nextByte.
+            destinationBytePointer[i asIntPointer] := byte.
+        } continueWith: (i := i + 1sz).
+
+        i asIntPointer
+    }.
+
+    public virtual method readBytes: (byteCount: Size) intoPointer: (destinationPointer: Void pointer) atOffset: (offset: UInt64) ::=> IntPointer
+        := self subclassResponsibility.
+
+    public virtual method writeBytes: (byteCount: Size) fromPointer: (sourcePointer: Void const pointer) ::=> IntPointer := {
+        let i mutable := 0sz.
+        let sourceBytePointer := sourcePointer reinterpretCastTo: UInt8 pointer.
+        while: (i < byteCount) do: {
+            self nextPut: sourceBytePointer[i asIntPointer]
+        } continueWith: (i := i + 1sz).
+        
+        i asIntPointer
+    }.
+
+    public virtual method writeBytes: (byteCount: Size) fromPointer: (sourcePointer: Void const pointer) atOffset: (offset: UInt64) ::=> IntPointer
+        := self subclassResponsibility.
+}.

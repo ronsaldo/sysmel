@@ -1,0 +1,55 @@
+public class BinaryFileStream superclass: Stream; definition: {
+    public field handle => SysmelPAL::FileHandle.
+    public field ownsHandle => Boolean.
+    public field canRead => Boolean.
+    public field canWrite => Boolean.
+
+    __Meta__ definition: {
+        public method withHandle: (handle: SysmelPAL::FileHandle) owned: (ownsHandle: Boolean) canRead: (canRead: Boolean) canWrite: (canWrite: Boolean) ::=> self
+            := self new
+                handle: handle;
+                ownsHandle: ownsHandle;
+                canRead: canRead;
+                canWrite: canWrite;
+                yourself
+    }.
+
+    public override method nextPut: byte ::=> Void := {
+        let byteValue mutable => UInt8 := byte.
+        self writeBytes: 1sz fromPointer: byteValue address
+    }.
+
+    public override method nextPutAll: aCollection ::=> Void := {
+        RawTuple::isBytes(aCollection) ifTrue: {
+            self nextPutAllBytesOf: aCollection
+        } ifFalse: {
+            super nextPutAll: aCollection
+        }
+    }.
+
+    public override method nextPutAllBytesOf: anObject ::=> Void := {
+        let byteCount := RawTuple::byteSize(anObject).
+        self writeBytes: byteCount fromPointer: anObject __rawContentsPointer__
+    }.
+
+    public override method readBytes: (byteCount: Size) intoPointer: (destinationPointer: Void pointer) ::=> IntPointer
+        := sysmel_pal_readFromFile(handle, byteCount, destinationPointer).
+
+    public override method readBytes: (byteCount: Size) intoPointer: (destinationPointer: Void pointer) atOffset: (offset: UInt64) ::=> IntPointer
+        := sysmel_pal_readFromFileAtOffset(handle, offset, byteCount, destinationPointer).
+
+    public override method writeBytes: (byteCount: Size) fromPointer: (sourcePointer: Void const pointer) ::=> IntPointer
+        := sysmel_pal_writeToFile(handle, byteCount, sourcePointer).
+
+    public override method writeBytes: (byteCount: Size) fromPointer: (sourcePointer: Void const pointer) atOffset: (offset: UInt64) ::=> IntPointer
+        := sysmel_pal_writeToFileAtOffset(handle, offset, byteCount, sourcePointer).
+
+    public override method close => Void := {
+        handle ifNil: {return: void}.
+
+        ownsHandle ifTrue: {
+            sysmel_pal_closeFile(handle).
+        }.
+        handle := nil.
+    }.
+}.

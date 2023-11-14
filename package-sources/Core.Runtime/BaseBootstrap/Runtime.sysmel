@@ -515,7 +515,7 @@ Type
 
 Type
     withSelector: #isPointedReinterpretableInto: addMethod: {:(Type)self :(Type)targetType :: Boolean |
-        self isDirectSubtypeOf: targetType
+        (self isDirectSubtypeOf: targetType) || targetType isVoidType
     }.
 
 PointerType
@@ -801,6 +801,25 @@ ASTNode
     } makeOverride.
 
 Stream
+    withSelector: #next addMethod: {:(Stream)self  | 
+        self subclassResponsibility
+    } makeVirtual;
+    withSelector: #next: addMethod: {:(Stream)self :(Size)elementCount :: SequenceableCollection | 
+        let: #result with: (Array basicNew: elementCount).
+        let: #i mutableWith: 0sz.
+        while: i < elementCount do: {
+            result at: i put: self next
+        } continueWith: (i := i + 1sz).
+        result
+    } makeVirtual;
+    withSelector: #nextBytes: addMethod: {:(Stream)self :(Size)elementCount :: ByteArray | 
+        let: #result with: (ByteArray basicNew: elementCount).
+        let: #i mutableWith: 0sz.
+        while: i < elementCount do: {
+            result __uint8At__: i put: self next
+        } continueWith: (i := i + 1sz).
+        result
+    } makeVirtual;
     withSelector: #nextPut: addMethod: {:(Stream)self :element :: Void | 
         self subclassResponsibility
     } makeVirtual;
@@ -1983,10 +2002,12 @@ StringSymbol
         self __byteSize__
     }.
 
-ByteStream
+Stream
+    withSelector: #close addMethod: {:(Stream)self :: Void |
+    } makeVirtual;
     withSelector: #nextPutUInt8: addMethod: {:(ByteStream)self :(UInt8)value :: Void |
         self nextPut: value
-    };
+    } makeVirtual;
     withSelector: #nextPutInt8: addMethod: {:(ByteStream)self :(Int8)value :: Void |
         self nextPutUInt8: value asUInt8
     };
