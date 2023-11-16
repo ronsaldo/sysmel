@@ -2,6 +2,8 @@
     Float32, Float32x2, Float32x3, Float32x4,
     Float64, Float64x2, Float64x3, Float64x4
 ) macroDo: {:VectorType :: Void |
+    let ScalarType := VectorType elementType.
+
     VectorType definition: {
         public pure inline method floorModule: (divisor: VectorType) ::=> VectorType
             := self - ((self / divisor) floor * divisor).
@@ -29,6 +31,9 @@
 
         public pure inline method cos => VectorType
             := (self + VectorType halfPi) sin.
+
+        public pure inline method interpolateTo: (destination: VectorType) at: (alpha: ScalarType) ::=> VectorType
+            := ((VectorType withAll: ScalarType one - alpha) * self) + ((VectorType withAll: alpha) * destination).
     }.
 }.
 

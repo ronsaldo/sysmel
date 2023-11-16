@@ -10,5 +10,7 @@ loadSourceNamed: "FormSGBorderNode.sysmel".
 loadSourceNamed: "FormSGColorRectangleNode.sysmel".
 loadSourceNamed: "FormSGGradientNode.sysmel".
 loadSourceNamed: "FormSGLinearGradientNode.sysmel".
+loadSourceNamed: "FormSGTextNode.sysmel".
+loadSourceNamed: "FormSGTextureNode.sysmel".
 
 loadSourceNamed: "FormSGFormRenderer.sysmel".

@@ -1,0 +1,53 @@
+public final class FormSGTextureNode superclass: FormSGRectangleNode; definition: {
+    public field form => Form.
+    public field color => Color.
+    public field isFullyOpaque => Boolean.
+    public field isRepeated => Boolean.
+    public field sourceRectangle => RectangleF32.
+
+    public override method initialize => Void := {
+        super initialize.
+        color := Color white.
+    }.
+
+    public override method accept: (visitor: FormSGVisitor)
+        := visitor visitTextureNode: self.
+}.
+
+FormSGBuilder definition: {
+    public method texturedRectangle: (rectangle: RectangleF32) form: (form: Form) sourceRectangle: (sourceRectangle: RectangleF32) color: (color: Color) opaque: (isFullyOpaque: Boolean) repeated: (isRepeated: Boolean) ::=> FormSGTextureNode
+        := FormSGTextureNode new
+            rectangle: rectangle;
+            form: form;
+            color: color;
+            sourceRectangle: sourceRectangle;
+            isFullyOpaque: isFullyOpaque;
+            isRepeated: isRepeated;
+            yourself.
+
+    public method texturedRectangle: (rectangle: RectangleF32) form: (form: Form) color: (color: Color) opaque: (isFullyOpaque: Boolean) repeated: (isRepeated: Boolean) ::=> FormSGTextureNode
+        := self texturedRectangle: rectangle form: form sourceRectangle: (0.0f32x2 extent: form extent asFloat32x2) color: color opaque: isFullyOpaque repeated: isRepeated.
+
+    public method texturedRectangle: (rectangle: RectangleF32) form: (form: Form) opaque: (isFullyOpaque: Boolean) repeated: (isRepeated: Boolean) ::=> FormSGTextureNode
+        := self texturedRectangle: rectangle form: form color: Color white opaque: isFullyOpaque repeated: isRepeated.
+
+    public method texturedRectangle: (rectangle: RectangleF32) form: (form: Form) opaque: (isFullyOpaque: Boolean) ::=> FormSGTextureNode
+        := self texturedRectangle: rectangle form: form opaque: isFullyOpaque repeated: false.
+
+    public method texturedRectangle: (rectangle: RectangleF32) form: (form: Form) color: (color: Color) ::=> FormSGTextureNode
+        := self texturedRectangle: rectangle form: form color: color opaque: false repeated: false.
+
+    public method texturedRectangle: (rectangle: RectangleF32) form: (form: Form) ::=> FormSGTextureNode
+        := self texturedRectangle: rectangle form: form opaque: false repeated: false.
+
+    public method textureForm: (form: Form) at: (position: Float32x2) ::=> FormSGTextureNode
+        := self texturedRectangle: (position extent: form extent asFloat32x2) form: form.
+
+    public method textureForm: (form: Form) at: (position: Float32x2) opaque: (isFullyOpaque: Boolean) ::=> FormSGTextureNode
+        := self texturedRectangle: (position extent: form extent asFloat32x2) form: form opaque: isFullyOpaque.
+}.
+
+FormSGVisitor definition: {
+    public virtual method visitTextureNode: (node: FormSGTextureNode)
+        := self visitRectangleNode: node.
+}.

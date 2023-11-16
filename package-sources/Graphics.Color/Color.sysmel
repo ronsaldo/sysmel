@@ -57,12 +57,26 @@ public final class Color definition: {
             := Color r: 0f32 g: 1f32 b: 1f32.
     }.
 
-    public method asLinearFloat32x4 => Float32x4
-        := bgra unpackUnorm4x8.
+    public inline method asLinearFloat32x4 => Float32x4 := {
+        ## TODO: Perform sRGB decoding.
+        self asLinearFloat32x4Fast
+    }.
 
     public method asLinearFloat32x4Fast => Float32x4 := {
         let unpacked := bgra unpackUnorm4x8.
         unpacked
+    }.
+
+    public inline method asPremultipliedLinearFloat32x4 => Float32x4 := {
+        ## TODO: Perform sRGB decoding
+        self asPremultipliedLinearFloat32x4Fast
+    }.
+
+    public method asPremultipliedLinearFloat32x4Fast => Float32x4 := {
+        let linear := self asLinearFloat32x4Fast.
+        let alpha := linear w.
+        ## FIXME: Add support for swizzle.
+        Float32x4 x: linear x * alpha y: linear y * alpha z: linear z * alpha w: alpha
     }.
 
     public inline method blueChannel8 => UInt8

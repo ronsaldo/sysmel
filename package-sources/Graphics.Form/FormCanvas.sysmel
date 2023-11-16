@@ -26,7 +26,7 @@ public class FormCanvas definition: {
         drawBounds isExclusiveEmpty ifTrue: {return: void}.
 
         let destinationPitch := form pitch asIntPointer.
-        let destinationRow mutable := form bits __rawContentsBytePointer__ + (drawBounds min y asIntPointer * destinationPitch) + drawBounds min x asIntPointer.
+        let destinationRow mutable := form bits __rawContentsBytePointer__ + (drawBounds min y asIntPointer * destinationPitch) + (drawBounds min x asIntPointer *4 iptr).
 
         let extent := rectangle extent.
         let origin := rectangle min.
@@ -97,5 +97,59 @@ public class FormCanvas definition: {
             let interpolatedColor := ((Float32x4 withAll: 1f32 - alpha)*startLinearColor) + ((Float32x4 withAll: alpha)*endLinearColor).
             interpolatedColor packUnorm4x8
         }.
+    }.
+
+    public method texturedRectangle: (rectangle: RectangleF32) form: (form: Form) sourceRectangle: (sourceRectangle: RectangleF32) color: (color: Color) opaque: (isFullyOpaque: Boolean) repeated: (isRepeated: Boolean) ::=> Void := {
+        form ifNil: {return: void}.
+        form bits ifNil: {return: void}.
+
+        let colorFactor := color asLinearFloat32x4.
+
+        let sourceExtent := form extent asFloat32x2.
+        let sourcePixelFormat := form pixelFormat.
+        let sourcePitch := form pitch asIntPointer.
+        let sourcePixels mutable := form bits __rawContentsBytePointer__.
+
+        let normalizePixelCoordinate := {:(Float32x2)pixelCoordinate :: Float32x2 |
+            isRepeated ifTrue: {
+                pixelCoordinate - ((pixelCoordinate / sourceExtent) floor * sourceExtent)
+            } ifFalse: {
+                pixelCoordinate clampMin: 0f32x2 max: sourceExtent - 1f32x2
+            }
+        }.
+
+        let fetchPixelCoordinate := {:(Float32x2)pixelCoordinate :: Float32x4 |
+            let pixelIntegerCoordinate := pixelCoordinate asInt32x2.
+
+            switch: sourcePixelFormat withCases: #{
+                PixelFormat::R8_UNorm : {
+                    let pixelPointer := sourcePixels + (sourcePitch * pixelIntegerCoordinate y asIntPointer) + pixelIntegerCoordinate x asIntPointer.
+                    Float32x4 withAll: pixelPointer load asFloat32 * (1f32/ 255f32)
+                }.
+                _: Float32x4 zeros
+            }.
+        }.
+
+        let textureMappingFunction := {:(Float32x2)uv :(UInt32)oldColor :: UInt32 |
+            let pixelCoordinate := (Float32x2 x: uv x y: 1f32 - uv y) * sourceExtent - 0.5f32x2.
+            let minPixelCoordinate := pixelCoordinate floor.
+            let maxPixelCoordinate := pixelCoordinate ceiling.
+            let coordinateFraction := pixelCoordinate - minPixelCoordinate.
+            let normalizedMinPixelCoordinate := normalizePixelCoordinate(minPixelCoordinate).
+            let normalizedMaxPixelCoordinate := normalizePixelCoordinate(maxPixelCoordinate).
+
+            let topLeft := fetchPixelCoordinate(normalizedMinPixelCoordinate).
+            let topRight := fetchPixelCoordinate(Float32x2 x: normalizedMaxPixelCoordinate x y: normalizedMinPixelCoordinate y).
+            let bottomLeft := fetchPixelCoordinate(Float32x2 x: normalizedMinPixelCoordinate x y: normalizedMaxPixelCoordinate y).
+            let bottomRight := fetchPixelCoordinate(normalizedMaxPixelCoordinate).
+
+            let top := topLeft interpolateTo: topRight at: coordinateFraction x.
+            let bottom := bottomLeft interpolateTo: bottomRight at: coordinateFraction x.
+            let interpolated := top interpolateTo: bottom at: coordinateFraction y.
+
+            (interpolated * colorFactor) packUnorm4x8
+        }.
+
+        self blitPixelsInRectangle: rectangle with: textureMappingFunction
     }.
 }.

@@ -11,6 +11,13 @@
     let isFloatingPoint := NumberType isPrimitiveFloatType.
 
     NumberType eagerDefinitionBody: {
+        __Meta__ definition: {
+            public pure inline method withAll: (value: NumberType) ::=> NumberType
+                := value.
+
+            public pure inline method elementType => Type := self
+        }.
+
         public pure final eager method negated ::=> SelfType := {
             <primitive: (primitivePrefix -- "negated") asSymbol>
             <targetDefinedPrimitive>

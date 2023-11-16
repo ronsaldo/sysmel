@@ -36,4 +36,9 @@ public class FormSGFormRenderer superclass: FormSGVisitor; definition: {
             end: node endPoint color: node endColor.
         void
     }.
+
+    public override method visitTextureNode: (node: FormSGTextureNode) := {
+        canvas texturedRectangle: node rectangle form: node form sourceRectangle: node sourceRectangle color: node color opaque: node isFullyOpaque repeated: node isRepeated.
+        void
+    }.
 }.
