@@ -16,9 +16,9 @@ public class FormCanvas definition: {
         formBounds := 0i32x2 extent: theForm extent asInt32x2.
     }.
 
-    let BlitRectanglePixelFunction := (Float32x2, UInt32) => UInt32.
+    let ShadeRectanglePixelFunction := (Float32x2) => Float32x4.
 
-    public inline method blitPixelsInRectangle: (rectangle: RectangleF32) with: (aBlock: BlitRectanglePixelFunction) ::=> Void := {
+    public inline method blitPixelsInRectangle: (rectangle: RectangleF32) with: (aBlock: ShadeRectanglePixelFunction) ::=> Void := {
         let clippedRectangle := clippingBounds intersectionWith: rectangle.
         clippedRectangle isExclusiveEmpty ifTrue: {return: void}.
 
@@ -45,8 +45,57 @@ public class FormCanvas definition: {
 
                 (0f32 <= uv x) && (uv x <= 1f32) &&
                 (0f32 <= uv y) && (uv y <= 1f32) ifTrue: {
-                    let oldPixel := destinationPixel load.
-                    destinationPixel store: aBlock(uv, oldPixel).
+                    let newPixel := aBlock(uv).
+                    let newPixelSqrt := (newPixel clampMin: 0f32x4 max: 1f32x4) sqrt.
+                    let newPixelBgra := Float32x4 x: newPixelSqrt z y: newPixelSqrt y z: newPixelSqrt x w: newPixel w.
+                    destinationPixel store: newPixelBgra packUnorm4x8.
+                }.
+
+                destinationPixel := destinationPixel + 1iptr.
+            } continueWith: (x := x + 1i32).
+
+            destinationRow := destinationRow + destinationPitch
+        } continueWith: (y := y + 1i32).
+    }.
+
+    public inline method blendPixelsInRectangle: (rectangle: RectangleF32) with: (aBlock: ShadeRectanglePixelFunction) ::=> Void := {
+        let clippedRectangle := clippingBounds intersectionWith: rectangle.
+        clippedRectangle isExclusiveEmpty ifTrue: {return: void}.
+
+        let drawBounds := (RectangleI32 min: clippedRectangle min floor asInt32x2 max: clippedRectangle max ceiling asInt32x2) intersectionWith: formBounds.
+        drawBounds isExclusiveEmpty ifTrue: {return: void}.
+
+        let destinationPitch := form pitch asIntPointer.
+        let destinationRow mutable := form bits __rawContentsBytePointer__ + (drawBounds min y asIntPointer * destinationPitch) + (drawBounds min x asIntPointer *4 iptr).
+
+        let extent := rectangle extent.
+        let origin := rectangle min.
+        let du := Float32x2 x: 1f32 / extent x.
+        let dv := Float32x2 y: 1f32 / extent y.
+
+        let y mutable := drawBounds min y.
+        while: (y < drawBounds max y) do: {
+            let x mutable := drawBounds min x.
+            let destinationPixel mutable := destinationRow reinterpretCastTo: UInt32 pointer.
+            while: (x < drawBounds max x) do: {
+                let pixelPosition := Int32x2 x: x y: y.
+                
+                let localPosition := pixelPosition asFloat32x2 - origin + 0.5f32x2.
+                let uv := Float32x2 x: (du dot: localPosition) y: (dv dot: localPosition).
+
+                (0f32 <= uv x) && (uv x <= 1f32) &&
+                (0f32 <= uv y) && (uv y <= 1f32) ifTrue: {
+                    let sourcePixelBgra := destinationPixel load unpackUnorm4x8.
+                    let sourcePixelBgraSquare := sourcePixelBgra*sourcePixelBgra.
+                    ## FIXME: Use a swizzle here.
+                    let sourcePixel := Float32x4 x: sourcePixelBgraSquare z y: sourcePixelBgraSquare y z: sourcePixelBgraSquare x w: sourcePixelBgra w.
+
+                    let shadedPixel := aBlock(uv).
+                    let sourcePixelMinusAlpha := (Float32x4 withAll: 1f32 - shadedPixel w) * sourcePixel.
+
+                    let blendedPixelSqrt := (sourcePixelMinusAlpha + shadedPixel clampMin: 0f32x4 max: 1f32x4) sqrt.
+                    let blendedPixelGamma := Float32x4 x: blendedPixelSqrt z y: blendedPixelSqrt y z: blendedPixelSqrt x w: sourcePixel w + shadedPixel w.
+                    destinationPixel store: blendedPixelGamma packUnorm4x8.
                 }.
 
                 destinationPixel := destinationPixel + 1iptr.
@@ -57,25 +106,25 @@ public class FormCanvas definition: {
     }.
 
     public method rectangle: (rectangle: RectangleF32) fillWithColor: (color: Color) ::=> Void := {
-        let encodedColor := color bgra.
-        self blitPixelsInRectangle: rectangle with: {:(Float32x2)uv :(UInt32)oldColor :: UInt32 |
-            encodedColor
+        let linearPremultipliedColor := color asPremultipliedLinearFloat32x4Fast.
+        self blendPixelsInRectangle: rectangle with: {:(Float32x2)uv :: Float32x4 |
+            linearPremultipliedColor
         }.
     }.
 
     public method borderRectangle: (rectangle: RectangleF32) withColor: (color: Color)
         leftWidth: (leftWidth: Float32) rightWidth: (rightWidth: Float32)
         bottomWidth: (bottomWidth: Float32) topWidth: (topWidth: Float32) ::=> Void := {
-        let encodedColor := color bgra.
+        let linearPremultipliedColor := color asPremultipliedLinearFloat32x4Fast.
         let extent := rectangle extent.
         let interiorRectangle := RectangleF32 min: (leftWidth @ topWidth) max: extent - (rightWidth @ bottomWidth).
 
-        self blitPixelsInRectangle: rectangle with: {:(Float32x2)uv :(UInt32)oldColor :: UInt32 |
+        self blendPixelsInRectangle: rectangle with: {:(Float32x2)uv :: Float32x4 |
             let position := uv * extent.
             (interiorRectangle includesPoint: position) ifTrue: {
-                oldColor
+                Float32x4 zeros
             } ifFalse: {
-                encodedColor
+                linearPremultipliedColor
             }
         }.
     }.
@@ -87,15 +136,14 @@ public class FormCanvas definition: {
         let delta := endPoint - startPoint.
         let dlambda := delta / (Float32x2 withAll: delta length2).
 
-        let startLinearColor := startColor asLinearFloat32x4.
-        let endLinearColor := endColor asLinearFloat32x4.
+        let startLinearColor := startColor asPremultipliedLinearFloat32x4Fast.
+        let endLinearColor := endColor asPremultipliedLinearFloat32x4Fast.
 
-        self blitPixelsInRectangle: rectangle with: {:(Float32x2)uv :(UInt32)oldColor :: UInt32 |
+        self blendPixelsInRectangle: rectangle with: {:(Float32x2)uv :: Float32x4 |
             let position := uv * extent.
             let lambda := position - startPoint dot: dlambda.
             let alpha := lambda clampMin: 0f32 max: 1f32.
-            let interpolatedColor := ((Float32x4 withAll: 1f32 - alpha)*startLinearColor) + ((Float32x4 withAll: alpha)*endLinearColor).
-            interpolatedColor packUnorm4x8
+            startLinearColor interpolateTo: endLinearColor at: alpha
         }.
     }.
 
@@ -103,7 +151,7 @@ public class FormCanvas definition: {
         form ifNil: {return: void}.
         form bits ifNil: {return: void}.
 
-        let colorFactor := color asLinearFloat32x4.
+        let colorFactor := color asPremultipliedLinearFloat32x4Fast.
 
         let sourceExtent := form extent asFloat32x2.
         let sourcePixelFormat := form pixelFormat.
@@ -130,7 +178,7 @@ public class FormCanvas definition: {
             }.
         }.
 
-        let textureMappingFunction := {:(Float32x2)uv :(UInt32)oldColor :: UInt32 |
+        let textureMappingFunction := {:(Float32x2)uv :: Float32x4 |
             let pixelCoordinate := (Float32x2 x: uv x y: 1f32 - uv y) * sourceExtent - 0.5f32x2.
             let minPixelCoordinate := pixelCoordinate floor.
             let maxPixelCoordinate := pixelCoordinate ceiling.
@@ -147,9 +195,13 @@ public class FormCanvas definition: {
             let bottom := bottomLeft interpolateTo: bottomRight at: coordinateFraction x.
             let interpolated := top interpolateTo: bottom at: coordinateFraction y.
 
-            (interpolated * colorFactor) packUnorm4x8
+            interpolated * colorFactor
         }.
 
-        self blitPixelsInRectangle: rectangle with: textureMappingFunction
+        isFullyOpaque ifTrue: {
+            self blitPixelsInRectangle: rectangle with: textureMappingFunction
+        } ifFalse: {
+            self blendPixelsInRectangle: rectangle with: textureMappingFunction
+        }.
     }.
 }.

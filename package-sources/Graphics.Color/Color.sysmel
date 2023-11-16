@@ -64,7 +64,8 @@ public final class Color definition: {
 
     public method asLinearFloat32x4Fast => Float32x4 := {
         let unpacked := bgra unpackUnorm4x8.
-        unpacked
+        let unpackedSquare := unpacked * unpacked.
+        Float32x4 x: unpackedSquare z y: unpackedSquare y z: unpackedSquare x w: unpacked w
     }.
 
     public inline method asPremultipliedLinearFloat32x4 => Float32x4 := {
