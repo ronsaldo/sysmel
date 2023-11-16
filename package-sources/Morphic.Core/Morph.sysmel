@@ -17,17 +17,29 @@ public class Morph definition: {
     public virtual method defaultBounds => RectangleF32
         := 0f32x2 extent: 50f32 @ 40f32.
 
-    public virtual method localBounds => RectangleF32
+    public inline method localBounds => RectangleF32
         := 0f32x2 extent: bounds extent.
+
+    public inline method extent => Float32x2
+        := bounds extent.
+
+    public virtual method extent: (newExtent: Float32x2) ::=> Void := {
+        bounds := bounds min extent: newExtent
+    }.
 
     public virtual method buildFullSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode := {
         let localSceneGraph := self buildSceneGraphWith: builder.
+        let childrenSceneGraph := self buildChildrenSceneGraphWith: builder.
 
-        let nodeSceneGraphList := Array new: 1sz + submorphs size.
-        nodeSceneGraphList at: 0sz put: localSceneGraph.
+        localSceneGraph -- childrenSceneGraph
+    }.
 
+    public virtual method buildChildrenSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode := {
+        submorphs isEmpty ifTrue: {return: builder null}.
+
+        let nodeSceneGraphList := Array new: submorphs size.
         submorphs doWithIndex: {:(Morph)childMorph :(Size)childMorphIndex :: Void |
-            nodeSceneGraphList at: childMorphIndex + 1sz put: (childMorph buildFullSceneGraphWith: builder)
+            nodeSceneGraphList at: childMorphIndex put: (childMorph buildFullSceneGraphWith: builder)
         }.
 
         builder containerWith: nodeSceneGraphList
@@ -35,4 +47,44 @@ public class Morph definition: {
 
     public virtual method buildSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode
         := builder rectangle: self localBounds color: color.
+
+    public virtual method addMorph: (morph: Morph) ::=> Void
+        := self addMorphFront: morph.
+
+    public method addMorphFront: (morph: Morph) ::=> Void
+        := self privateAddMorph: morph atIndex: submorphs size.
+
+    public method addMorphBack: (morph: Morph) ::=> Void
+        := self privateAddMorph: morph atIndex: 0sz.
+
+    public method privateAddMorph: (morph: Morph) atIndex: (morphIndex: Size) ::=> Void := {
+        self assert: morph owner isNil.
+        self assert: morphIndex <= submorphs size.
+
+        let oldSubmorphCount := submorphs size.
+        let newSubmorphs := Array new: oldSubmorphCount + 1sz.
+
+        ## Lower half
+        {
+            let lowerHalfSize := oldSubmorphCount min: morphIndex.
+            let i mutable := 0sz.
+            while: (i < lowerHalfSize) do: {
+                newSubmorphs at: i put: (submorphs at: i)
+            } continueWith: (i := i + 1sz).
+        }.
+
+        ## The new morph
+        newSubmorphs at: morphIndex put: morph.
+
+        ## Upper half.
+        {
+            let i mutable := morphIndex.
+            while: (i < oldSubmorphCount) do: {
+                newSubmorphs at: i + 1sz put: (submorphs at: i)
+            } continueWith: (i := i + 1sz).
+        }.
+
+        morph owner: self.
+        submorphs := newSubmorphs
+    }.
 }.

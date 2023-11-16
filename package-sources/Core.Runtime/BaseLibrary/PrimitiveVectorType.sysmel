@@ -1024,7 +1024,7 @@ UInt32x4 definition: {
 }.
 
 Float32x2 definition: {
-    public pure method asUInt32x4 => UInt32x2 := {
+    public pure method asUInt32x2 => UInt32x2 := {
         <primitive: #Float32x2::asUInt32x2>
         <targetDefinedPrimitive>
         UInt32x2 x: self x asUInt32 y: self y asUInt32
@@ -1036,13 +1036,13 @@ Float32x2 definition: {
         Int32x2 x: self x asInt32 y: self y asInt32
     }.
 
-    public pure method asRoundedInt32x2 => UInt32x2 := {
+    public pure method asRoundedUInt32x2 => UInt32x2 := {
         <primitive: #Float32x2::asRoundedInt32x2>
         <targetDefinedPrimitive>
         UInt32x2 x: self x asRoundedUInt32 y: self y asRoundedUInt32
     }.
 
-    public pure method asRoundedInt32x4 => Int32x2 := {
+    public pure method asRoundedInt32x2 => Int32x2 := {
         <primitive: #Float32x2::asRoundedInt32x2>
         <targetDefinedPrimitive>
         Int32x2 x: self x asRoundedInt32 y: self y asRoundedInt32

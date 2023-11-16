@@ -1,0 +1,7 @@
+let windowSystem := WindowSystem default.
+
+let morph := BorderedMorph new.
+morph extent: 300f32x2.
+morph openInWindowSystem: windowSystem.
+
+windowSystem run

@@ -3,15 +3,15 @@ FormSGNode definition: {
 }.
 
 public final class FormSGNullNode superclass: FormSGNode; definition: {
-    __Meta__ definition: {
-        let UniqueInstance := FormSGNullNode basicNew.
-        public inline method uniqueInstance => FormSGNullNode := UniqueInstance.
-    }.
-
     public override method isNullNode => Boolean := true.
 
     public override method accept: (visitor: FormSGVisitor)
         := visitor visitNullNode: self.
+
+    __Meta__ definition: {
+        let UniqueInstance := FormSGNullNode basicNew.
+        public inline method uniqueInstance => FormSGNullNode := UniqueInstance.
+    }.
 }.
 
 FormSGBuilder definition: {
