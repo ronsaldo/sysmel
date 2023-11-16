@@ -1,0 +1,8 @@
+public class FormSGChildAttributeNode superclass: FormSGNode; definition: {
+    public field child => FormSGNode
+}.
+
+FormSGVisitor definition: {
+    public abstract method visitChildAttributeNode: (node: FormSGChildAttributeNode)
+        := self subclassResponsibility.
+}.

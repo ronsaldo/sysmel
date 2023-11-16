@@ -1,5 +1,6 @@
 public class FormCanvas definition: {
     public field form => Form.
+    public field translation => Float32x2.
     public field clippingBounds => RectangleF32.
     public field formBounds => RectangleI32.
 
@@ -16,10 +17,20 @@ public class FormCanvas definition: {
         formBounds := 0i32x2 extent: theForm extent asInt32x2.
     }.
 
+    public inline method translateBy: (extraTranslation: Float32x2) during: (aBlock: () => Void) ::=> Void := {
+        let oldTranslation := translation.
+        translation := oldTranslation + extraTranslation.
+        
+        aBlock ensure: {:: Void |
+            translation := oldTranslation
+        }
+    }.
+
     let ShadeRectanglePixelFunction := (Float32x2) => Float32x4.
 
     public inline method blitPixelsInRectangle: (rectangle: RectangleF32) with: (aBlock: ShadeRectanglePixelFunction) ::=> Void := {
-        let clippedRectangle := clippingBounds intersectionWith: rectangle.
+        let translatedRectangle := rectangle translatedBy: translation.
+        let clippedRectangle := clippingBounds intersectionWith: translatedRectangle.
         clippedRectangle isExclusiveEmpty ifTrue: {return: void}.
 
         let drawBounds := (RectangleI32 min: clippedRectangle min floor asInt32x2 max: clippedRectangle max ceiling asInt32x2) intersectionWith: formBounds.
@@ -28,8 +39,8 @@ public class FormCanvas definition: {
         let destinationPitch := form pitch asIntPointer.
         let destinationRow mutable := form bits __rawContentsBytePointer__ + (drawBounds min y asIntPointer * destinationPitch) + (drawBounds min x asIntPointer *4 iptr).
 
-        let extent := rectangle extent.
-        let origin := rectangle min.
+        let extent := translatedRectangle extent.
+        let origin := translatedRectangle min.
         let du := Float32x2 x: 1f32 / extent x.
         let dv := Float32x2 y: 1f32 / extent y.
 
@@ -59,7 +70,8 @@ public class FormCanvas definition: {
     }.
 
     public inline method blendPixelsInRectangle: (rectangle: RectangleF32) with: (aBlock: ShadeRectanglePixelFunction) ::=> Void := {
-        let clippedRectangle := clippingBounds intersectionWith: rectangle.
+        let translatedRectangle := rectangle translatedBy: translation.
+        let clippedRectangle := clippingBounds intersectionWith: translatedRectangle.
         clippedRectangle isExclusiveEmpty ifTrue: {return: void}.
 
         let drawBounds := (RectangleI32 min: clippedRectangle min floor asInt32x2 max: clippedRectangle max ceiling asInt32x2) intersectionWith: formBounds.
@@ -68,8 +80,8 @@ public class FormCanvas definition: {
         let destinationPitch := form pitch asIntPointer.
         let destinationRow mutable := form bits __rawContentsBytePointer__ + (drawBounds min y asIntPointer * destinationPitch) + (drawBounds min x asIntPointer *4 iptr).
 
-        let extent := rectangle extent.
-        let origin := rectangle min.
+        let extent := translatedRectangle extent.
+        let origin := translatedRectangle min.
         let du := Float32x2 x: 1f32 / extent x.
         let dv := Float32x2 y: 1f32 / extent y.
 

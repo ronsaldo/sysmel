@@ -18,8 +18,9 @@ public class TestWindowEventHandler superclass: EventHandler; definition: {
         let gray := phase - phase floor.
         let grayColor := Color gray: gray asFloat32.
         renderbuffer fillWithColor: grayColor.
+        let rotationPhase := currentTime * 1.0.
 
-        let sceneGraph :=
+        let sceneGraph := sgBuilder translate: (
             (sgBuilder rectangle: (0f32@0f32 extent: 200f32@100f32)
                 linearGradientStart: 0f32@0f32 color: Color cyan
                 end: 200f32@0f32 color: Color magenta)
@@ -27,7 +28,8 @@ public class TestWindowEventHandler superclass: EventHandler; definition: {
             -- (sgBuilder borderRectangle: (20f32@30f32 extent: 64f32@32f32) color: Color red width: 4f32)
             -- (sgBuilder textureForm: bmpFontForm at: 70f32@120f32)
             -- (sgBuilder texturedRectangle: (300f32@150f32 extent: 256f32x2) form: bmpFontForm color: Color magenta)
-            -- (sgBuilder string: "Hello World" at: 20f32@50f32 fontFace: FontFace defaultPixelFont color: Color green).
+            -- (sgBuilder string: "Hello World" at: 20f32@50f32 fontFace: FontFace defaultPixelFont color: Color green)
+        ) with: (Float32x2 x: rotationPhase cos asFloat32 *30f32 y: rotationPhase sin asFloat32 *20f32).
 
         FormSGFormRenderer new renderSceneGraph: sceneGraph onForm: renderbuffer.
 

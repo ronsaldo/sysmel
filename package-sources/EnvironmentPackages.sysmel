@@ -12,6 +12,8 @@
     "Graphics.FormSceneGraph"
     "Graphics.FormSceneGraph.Tests"
     "Graphics.Window"
+    "Morphic.Core"
+    "Morphic.Core.Tests"
 ) do: {:each |
     loadPackageNamed: each
 }.

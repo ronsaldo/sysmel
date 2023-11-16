@@ -52,4 +52,11 @@ public class FormSGFormRenderer superclass: FormSGVisitor; definition: {
         canvas texturedRectangle: node rectangle form: node form sourceRectangle: node sourceRectangle color: node color opaque: node isFullyOpaque repeated: node isRepeated.
         void
     }.
+
+    public override method visitTranslationNode: (node: FormSGTranslationNode) := {
+        canvas translateBy: node translation during: {:: Void | 
+            self visitNode: node child
+        }.
+        void
+    }.
 }.

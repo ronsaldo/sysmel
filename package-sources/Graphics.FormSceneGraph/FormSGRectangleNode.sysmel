@@ -1,4 +1,4 @@
-public final class FormSGRectangleNode superclass: FormSGNode; definition: {
+public class FormSGRectangleNode superclass: FormSGNode; definition: {
     public field rectangle => RectangleF32.
 }.
 

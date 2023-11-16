@@ -1,0 +1,38 @@
+public class Morph definition: {
+    public field bounds => RectangleF32.
+    public field owner => Morph.
+    public field submorphs => Array.
+    public field color => Color.
+
+    public override method initialize => Void := {
+        super initialize.
+        submorphs := #().
+        bounds := self defaultBounds.
+        color := self defaultColor
+    }.
+
+    public virtual method defaultColor => Color
+        := Color blue.
+
+    public virtual method defaultBounds => RectangleF32
+        := 0f32x2 extent: 50f32 @ 40f32.
+
+    public virtual method localBounds => RectangleF32
+        := 0f32x2 extent: bounds extent.
+
+    public virtual method buildFullSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode := {
+        let localSceneGraph := self buildSceneGraphWith: builder.
+
+        let nodeSceneGraphList := Array new: 1sz + submorphs size.
+        nodeSceneGraphList at: 0sz put: localSceneGraph.
+
+        submorphs doWithIndex: {:(Morph)childMorph :(Size)childMorphIndex :: Void |
+            nodeSceneGraphList at: childMorphIndex + 1sz put: (childMorph buildFullSceneGraphWith: builder)
+        }.
+
+        builder containerWith: nodeSceneGraphList
+    }.
+
+    public virtual method buildSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode
+        := builder rectangle: self localBounds color: color.
+}.
