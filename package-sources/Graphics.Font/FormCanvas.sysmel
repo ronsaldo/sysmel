@@ -1,0 +1,54 @@
+FontFace definition: {
+    public abstract method drawGlyphFor: (codePoint: Char32) onFormCanvas: (formCanvas: FormCanvas) at: (position: Float32x2) color: (color: Color) scaleFactor: (scaleFactor: Float32) ::=> Float32x2
+        := {self subclassResponsibility. 0f32x2}.
+
+    public method drawGlyphFor: (codePoint: Char32) onFormCanvas: (formCanvas: FormCanvas) at: (position: Float32x2) color: (color: Color) ::=> Float32x2
+        := self drawGlyphFor: codePoint onFormCanvas: formCanvas at: position color: color scaleFactor: 1f32.
+}.
+
+BitmapGridFontFace definition: {
+    public override method drawGlyphFor: (codePoint: Char32) onFormCanvas: (formCanvas: FormCanvas) at: (position: Float32x2) color: (color: Color) scaleFactor: (scaleFactor: Float32) ::=> Float32x2 := {
+        let validCodePoint := (characterRangeFirst <= codePoint) && (codePoint < characterRangeEnd)
+            ifTrue: codePoint
+            ifFalse: characterRangeFirst.
+
+        let glyphIndex := (validCodePoint - characterRangeFirst) asUInt32.
+        let glyphColumn := glyphIndex % columns.
+        let glyphRow := glyphIndex / columns.
+
+        let glyphSourceRectangle := (glyphColumn asFloat32 * width) @ (glyphRow asFloat32 * height) extent: width @ height.
+        let destinationRectangle := position - (Float32x2 y: ascent*scaleFactor) extent: (width*scaleFactor) @ (height*scaleFactor).
+
+        formCanvas texturedRectangle: destinationRectangle form: form sourceRectangle: glyphSourceRectangle color: color opaque: false repeated: false.
+        
+        Float32x2 x: width*scaleFactor
+    }.
+}.
+
+FormCanvas definition: {
+    public method string: (string: SequenceableCollection) from: (startIndex: Size) until: (endIndex: Size)
+        in: (rectangle: RectangleF32) fontFace: (fontFace: FontFace) color: (color: Color)
+        kern: (kern: Float32x2)
+        underline: (underline: Boolean) underlineColor: (underlineColor: Color)
+        strikethrough: (strikethrough: Boolean) strikethroughColor: (strikethroughColor: Color) ::=> Void := {
+        string ifNil: {return: void}.
+        fontFace ifNil: {return: void}.
+
+        let cursorPosition mutable := rectangle min + (Float32x2 y: fontFace ascent) + kern.
+        let carriageReturnPosition := cursorPosition x.
+        string from: startIndex until: endIndex codePointsDo: {:(Char32)codePoint :: Void |
+            switch: codePoint withCases: #{
+                '\n' : {
+                    cursorPosition := cursorPosition + (Float32x2 y: fontFace height).
+                }.
+                '\r' : {
+                    cursorPosition := Float32x2 x: carriageReturnPosition y: cursorPosition y.
+                }.
+                _: {
+                    let advance := fontFace drawGlyphFor: codePoint onFormCanvas: self at: cursorPosition color: color.
+                    cursorPosition := cursorPosition + advance 
+                }
+            }.
+        }.
+    }.
+}.

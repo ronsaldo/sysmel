@@ -9,7 +9,7 @@ let sgBuilder := FormSGBuilder new.
 
 let frameCount mutable := 0u32,
 let frameTime mutable := 0f64.
-let bmpFontForm := BMPReadWriter formFromFileNamed: "assets/font/pixel-font-latin1.bmp".
+let bmpFontForm := FontFace defaultPixelFont form.
 
 public class TestWindowEventHandler superclass: EventHandler; definition: {
     public method render => Void := {
@@ -26,7 +26,8 @@ public class TestWindowEventHandler superclass: EventHandler; definition: {
             -- (sgBuilder rectangle: (20f32@30f32 extent: 64f32@32f32) color: Color blue)
             -- (sgBuilder borderRectangle: (20f32@30f32 extent: 64f32@32f32) color: Color red width: 4f32)
             -- (sgBuilder textureForm: bmpFontForm at: 70f32@120f32)
-            -- (sgBuilder texturedRectangle: (300f32@150f32 extent: 256f32x2) form: bmpFontForm color: Color magenta).
+            -- (sgBuilder texturedRectangle: (300f32@150f32 extent: 256f32x2) form: bmpFontForm color: Color magenta)
+            -- (sgBuilder string: "Hello World" at: 20f32@50f32 fontFace: FontFace defaultPixelFont color: Color green).
 
         FormSGFormRenderer new renderSceneGraph: sceneGraph onForm: renderbuffer.
 

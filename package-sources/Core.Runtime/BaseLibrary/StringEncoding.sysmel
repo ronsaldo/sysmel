@@ -1,0 +1,17 @@
+SequenceableCollection definition: {
+    public virtual method from: (startIndex: Size) until: (endIndex: Size) codePointsDo: (aBlock: (Char32) => Void) ::=> Void := {
+        let i mutable := startIndex.
+        while: (i < endIndex) do: {
+            aBlock((self at: i) asChar32)
+        } continueWith: (i := i + 1sz).
+    }.
+}.
+
+String definition: {
+    public override method from: (startIndex: Size) until: (endIndex: Size) codePointsDo: (aBlock: (Char32) => Void) ::=> Void := {
+        let i mutable := startIndex.
+        while: (i < endIndex) do: {
+            aBlock((self __char8At__: i) asChar32)
+        } continueWith: (i := i + 1sz).
+    }.
+}.

@@ -1,0 +1,62 @@
+public final class FormSGTextNode superclass: FormSGRectangleNode; definition: {
+    public field string => SequenceableCollection.
+    public field fontFace => FontFace.
+    public field startIndex => Size.
+    public field endIndex => Size.
+    public field color => Color.
+    public field kern => Float32x2.
+    public field underline => Boolean.
+    public field underlineColor => Color.
+    public field strikethrough => Boolean.
+    public field strikethroughColor => Color.
+
+    public override method initialize => Void := {
+        super initialize.
+        color := Color white.
+        underlineColor := Color white.
+        strikethroughColor := Color white.
+    }.
+
+    public override method accept: (visitor: FormSGVisitor)
+        := visitor visitTextNode: self.
+}.
+
+FormSGBuilder definition: {
+    public method string: (string: SequenceableCollection) from: (startIndex: Size) until: (endIndex: Size)
+        in: (rectangle: RectangleF32) fontFace: (fontFace: FontFace) color: (color: Color)
+        kern: (kern: Float32x2)
+        underline: (underline: Boolean) underlineColor: (underlineColor: Color)
+        strikethrough: (strikethrough: Boolean) strikethroughColor: (strikethroughColor: Color) ::=> FormSGTextNode
+        := FormSGTextNode new
+            rectangle: rectangle;
+            string: string;
+            fontFace: fontFace;
+            startIndex: startIndex;
+            endIndex: endIndex;
+            color: color;
+            kern: kern;
+            underline: underline;
+            underlineColor: underlineColor;
+            strikethrough: strikethrough;
+            strikethroughColor: strikethroughColor;
+            yourself.
+
+    public method string: (string: SequenceableCollection) from: (startIndex: Size) until: (endIndex: Size) at: (position: Float32x2) fontFace: (fontFace: FontFace) color: (color: Color) := {
+        let textLocalBounds := fontFace measureBoundsForString: string from: startIndex until: endIndex.
+        let bounds := textLocalBounds translatedBy: position.
+
+        self string: string from: startIndex until: endIndex
+            in: bounds fontFace: fontFace color: color
+            kern: 0f32x2
+            underline: false underlineColor: color
+            strikethrough: false strikethroughColor: color.
+    }.
+
+    public method string: (string: SequenceableCollection) at: (position: Float32x2) fontFace: (fontFace: FontFace) color: (color: Color)
+        := self string: string from: 0sz until: string size at: position fontFace: fontFace color: color.
+}.
+
+FormSGVisitor definition: {
+    public virtual method visitTextNode: (node: FormSGTextNode)
+        := self visitRectangleNode: node.
+}.

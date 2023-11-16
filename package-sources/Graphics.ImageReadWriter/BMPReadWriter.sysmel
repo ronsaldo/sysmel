@@ -68,8 +68,8 @@ public final class BMPReadWriter superclass: ImageReadWriter; definition: {
 
         let pixelFormat := switch: infoHeader bitCount withCases: #{
             8u16 : PixelFormat::R8_UNorm .
-            24u16 : PixelFormat::B8G8R8X8_UNorm.
-            32u16 : PixelFormat::B8G8R8A8_UNorm.
+            24u16 : PixelFormat::B8G8R8X8_UNorm_sRGB.
+            32u16 : PixelFormat::B8G8R8A8_UNorm_sRGB.
             _: {self error: "Unsupported bitmap bitcount of " -- infoHeader bitCount printString }.
         }.
 
@@ -79,11 +79,33 @@ public final class BMPReadWriter superclass: ImageReadWriter; definition: {
         let pixelSize := (infoHeader bitCount / 8u16) asUInt32.
         let stride := width * pixelSize alignedTo: 4u32.
         let bitmapDataSize := stride * height.
-        let bitmapData := ByteArray new: bitmapDataSize asSize.
+        let readedBitmapData := ByteArray new: bitmapDataSize asSize.
 
         ## Read the bitmap data.
-        (stream readBytes: bitmapDataSize asSize intoPointer: bitmapData __rawContentsBytePointer__) = bitmapDataSize asIntPointer ifFalse: {
+        (stream readBytes: bitmapDataSize asSize intoPointer: readedBitmapData __rawContentsBytePointer__) = bitmapDataSize asIntPointer ifFalse: {
             self error: "Failed to read bitmap data."
+        }.
+
+        let topDownBitmapData := infoHeader height > 0i32 ifTrue: {
+            let flippedBitmapData := ByteArray new: bitmapDataSize asSize.
+
+            let sourceRow mutable := readedBitmapData __rawContentsBytePointer__ + (stride * (height - 1u32)) asIntPointer.
+            let sourceStride := stride asIntPointer negated.
+
+            let destRow mutable := flippedBitmapData __rawContentsBytePointer__.
+            let destStride := stride asIntPointer.
+
+            let rowSize := stride asSize.
+            let y mutable := 0u32.
+            while: y < height do: {
+                memcpy(destRow, sourceRow, rowSize).
+                sourceRow := sourceRow + sourceStride.
+                destRow := destRow + destStride.
+            } continueWith: (y := y + 1u32).
+
+            flippedBitmapData
+        } ifFalse: {
+            readedBitmapData
         }.
 
         colorMapData isNotNil && (colorMapData size = 256sz) ifTrue: {
@@ -99,6 +121,6 @@ public final class BMPReadWriter superclass: ImageReadWriter; definition: {
             }.
         }.
 
-        Form extent: width@height pitch: stride pixelFormat: pixelFormat bits: bitmapData
+        Form extent: width@height pitch: stride pixelFormat: pixelFormat bits: topDownBitmapData
     }.
 }.

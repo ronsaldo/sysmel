@@ -16,7 +16,7 @@ public final class Form definition: {
                 yourself.
 
         public method extent: (extent: UInt32x2) pitch: (pitch: UInt32) ::=> self
-            := self extent: extent pitch: pitch pixelFormat: PixelFormat::B8G8R8A8_UNorm bits: (ByteArray new: (extent y * pitch) asSize).
+            := self extent: extent pitch: pitch pixelFormat: PixelFormat::B8G8R8A8_UNorm_sRGB bits: (ByteArray new: (extent y * pitch) asSize).
 
         public method extent: (extent: UInt32x2) ::=> self
             := self extent: extent pitch: extent x * 4u32.

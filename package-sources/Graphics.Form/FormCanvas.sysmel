@@ -178,8 +178,11 @@ public class FormCanvas definition: {
             }.
         }.
 
+        let sourceRectangleMin := sourceRectangle min.
+        let sourceRectangleExtent := sourceRectangle extent.
         let textureMappingFunction := {:(Float32x2)uv :: Float32x4 |
-            let pixelCoordinate := (Float32x2 x: uv x y: 1f32 - uv y) * sourceExtent - 0.5f32x2.
+            let pixelCoordinate := sourceRectangleMin + (uv * sourceRectangleExtent) - 0.5f32x2.
+
             let minPixelCoordinate := pixelCoordinate floor.
             let maxPixelCoordinate := pixelCoordinate ceiling.
             let coordinateFraction := pixelCoordinate - minPixelCoordinate.
@@ -195,7 +198,7 @@ public class FormCanvas definition: {
             let bottom := bottomLeft interpolateTo: bottomRight at: coordinateFraction x.
             let interpolated := top interpolateTo: bottom at: coordinateFraction y.
 
-            interpolated * colorFactor
+            interpolated * colorFactor.
         }.
 
         isFullyOpaque ifTrue: {

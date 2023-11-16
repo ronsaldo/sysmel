@@ -77,6 +77,7 @@ loadSourceNamed: "SourceCode.sysmel".
 loadSourceNamed: "SmallStringBuffer.sysmel".
 loadSourceNamed: "StringSymbol.sysmel".
 loadSourceNamed: "String.sysmel".
+loadSourceNamed: "StringEncoding.sysmel".
 loadSourceNamed: "StringStream.sysmel".
 loadSourceNamed: "System.sysmel".
 loadSourceNamed: "Time.sysmel".

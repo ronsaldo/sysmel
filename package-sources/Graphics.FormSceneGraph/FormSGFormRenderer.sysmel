@@ -37,6 +37,17 @@ public class FormSGFormRenderer superclass: FormSGVisitor; definition: {
         void
     }.
 
+    public override method visitTextNode: (node: FormSGTextNode) := {
+        node fontFace ifNil: {return: void}.
+
+        canvas string: node string from: node startIndex until: node endIndex
+            in: node rectangle fontFace: node fontFace color: node color
+            kern: node kern
+            underline: node underline underlineColor: node underlineColor
+            strikethrough: node strikethrough strikethroughColor: node strikethroughColor.
+        void
+    }.
+
     public override method visitTextureNode: (node: FormSGTextureNode) := {
         canvas texturedRectangle: node rectangle form: node form sourceRectangle: node sourceRectangle color: node color opaque: node isFullyOpaque repeated: node isRepeated.
         void

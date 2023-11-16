@@ -1,0 +1,7 @@
+public class Font definition: {
+    public field name => String.
+    public field regularFace => FontFace.
+    public field italicFace => FontFace.
+    public field boldFace => FontFace.
+    public field italicBoldFace => FontFace.
+}.

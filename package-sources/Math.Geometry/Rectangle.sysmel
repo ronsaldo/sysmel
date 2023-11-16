@@ -39,6 +39,12 @@ public final class RectangleF32 definition: {
     public pure inline method isEmpty => Boolean
         := (min x > max x) || (min y > max y).
 
+    public pure inline method translatedBy: (translation: Float32x2) ::=> SelfType
+        := SelfType basicNew
+            min: min + translation;
+            max: max + translation;
+            yourself.
+
     public override method printOn: (stream: Stream) ::=> Void := {
         stream print: SelfType; string: " min: "; print: min; string: " max: "; print: max
     }.

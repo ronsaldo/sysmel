@@ -7,6 +7,8 @@
     "Graphics.Form.Tests"
     "Graphics.ImageReadWriter"
     "Graphics.ImageReadWriter.Tests"
+    "Graphics.Font"
+    "Graphics.Font.Tests"
     "Graphics.FormSceneGraph"
     "Graphics.FormSceneGraph.Tests"
     "Graphics.Window"
