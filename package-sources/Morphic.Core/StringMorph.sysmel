@@ -1,0 +1,58 @@
+public class StringMorph superclass: Morph; definition: {
+    protected field contents => String.
+    public field fontFace => FontFace.
+    public field backgroundColor => Color.
+
+    __Meta__ definition: {
+        public method contents: (contents: String) ::=> self
+            := self new contents: contents; yourself
+    }.
+
+    public override method initialize => Void := {
+        super initialize.
+        backgroundColor := Color transparent.
+    }.
+
+    public override method defaultColor => Color
+        := Color black.
+
+    public method contents => String := contents.
+
+    public virtual method contents: (newContents: String) ::=> Void := {
+        contents := newContents.
+        self fitContents.
+    }.
+
+    public method measureContents => Float32x2
+        := contents
+            ifNotNil: (self fontFaceToUse measureExtentForString: contents from: 0sz until: contents size)
+            ifNil: 0f32x2.
+
+    public method fitContents => Void := {
+        self extent: self measureContents
+    }.
+
+    public method fontFaceToUse => FontFace
+        := fontFace ifNil: FontFace default.
+
+    public override method buildSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode
+        := (builder rectangle: self localBounds color: backgroundColor)
+        -- (builder string: (contents ifNil: "") in: self localBounds fontFace: self fontFaceToUse color: color).
+}.
+
+AnyValue extend: {
+    public virtual method asStringMorph => StringMorph
+        := StringMorph contents: self asString.
+
+    public virtual method asMorph => Morph
+        := self asStringMorph
+}.
+
+String extend: {
+    public override method asStringMorph => StringMorph
+        := StringMorph contents: self.
+}.
+
+Morph definition: {
+    public override method asMorph => Morph := self
+}.

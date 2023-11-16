@@ -20,6 +20,13 @@ public class Morph definition: {
     public inline method localBounds => RectangleF32
         := 0f32x2 extent: bounds extent.
 
+    public inline method position => Float32x2
+        := bounds min.
+
+    public inline method position: (newPosition: Float32x2) ::=> Void := {
+        bounds := newPosition extent: bounds extent
+    }.
+
     public inline method extent => Float32x2
         := bounds extent.
 
@@ -31,7 +38,7 @@ public class Morph definition: {
         let localSceneGraph := self buildSceneGraphWith: builder.
         let childrenSceneGraph := self buildChildrenSceneGraphWith: builder.
 
-        localSceneGraph -- childrenSceneGraph
+        builder translate: localSceneGraph -- childrenSceneGraph with: self position
     }.
 
     public virtual method buildChildrenSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode := {

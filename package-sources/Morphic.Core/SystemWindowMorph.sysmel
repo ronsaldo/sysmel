@@ -49,6 +49,9 @@ Morph definition: {
         windowMorph addMorph: self.
         windowMorph openInWindowSystem: windowSystem
     }.
+
+    public virtual method openInWindowSystem ::=> SystemWindowMorph
+        := self openInWindowSystem: WindowSystem default.
 }.
 
 SystemWindowMorph definition: {

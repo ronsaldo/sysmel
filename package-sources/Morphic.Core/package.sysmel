@@ -1,3 +1,4 @@
 loadSourceNamed: "Morph.sysmel".
 loadSourceNamed: "BorderedMorph.sysmel".
+loadSourceNamed: "StringMorph.sysmel".
 loadSourceNamed: "SystemWindowMorph.sysmel".

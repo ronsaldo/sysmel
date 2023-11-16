@@ -41,9 +41,21 @@ FormSGBuilder definition: {
             strikethroughColor: strikethroughColor;
             yourself.
 
-    public method string: (string: SequenceableCollection) from: (startIndex: Size) until: (endIndex: Size) at: (position: Float32x2) fontFace: (fontFace: FontFace) color: (color: Color) := {
+    public method string: (string: SequenceableCollection) from: (startIndex: Size) until: (endIndex: Size)
+        in: (rectangle: RectangleF32) fontFace: (fontFace: FontFace) color: (color: Color) ::=> FormSGTextNode
+        := self string: string from: startIndex until: endIndex
+            in: rectangle fontFace: fontFace color: color
+            kern: 0f32x2
+            underline: false underlineColor: color
+            strikethrough: false strikethroughColor: color.
+
+    public method string: (string: SequenceableCollection) in: (rectangle: RectangleF32) fontFace: (fontFace: FontFace) color: (color: Color) ::=> FormSGTextNode
+        := self string: string from: 0sz until: string size
+            in: rectangle fontFace: fontFace color: color.
+
+    public method string: (string: SequenceableCollection) from: (startIndex: Size) until: (endIndex: Size) at: (position: Float32x2) fontFace: (fontFace: FontFace) color: (color: Color) ::=> FormSGTextNode := {
         let textLocalBounds := fontFace measureBoundsForString: string from: startIndex until: endIndex.
-        let bounds := textLocalBounds translatedBy: position.
+        let bounds := textLocalBounds translatedBy: position + (Float32x2 y: fontFace ascent negated).
 
         self string: string from: startIndex until: endIndex
             in: bounds fontFace: fontFace color: color
@@ -52,7 +64,7 @@ FormSGBuilder definition: {
             strikethrough: false strikethroughColor: color.
     }.
 
-    public method string: (string: SequenceableCollection) at: (position: Float32x2) fontFace: (fontFace: FontFace) color: (color: Color)
+    public method string: (string: SequenceableCollection) at: (position: Float32x2) fontFace: (fontFace: FontFace) color: (color: Color) ::=> FormSGTextNode
         := self string: string from: 0sz until: string size at: position fontFace: fontFace color: color.
 }.
 

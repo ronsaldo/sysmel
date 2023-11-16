@@ -1,7 +1,7 @@
-let windowSystem := WindowSystem default.
+BorderedMorph new
+    extent: 300f32x2;
+    color: Color white;
+    addMorph: ("Hello World " asMorph position: 30f32@40f32; yourself);
+    openInWindowSystem.
 
-let morph := BorderedMorph new.
-morph extent: 300f32x2.
-morph openInWindowSystem: windowSystem.
-
-windowSystem run
+WindowSystem default run.

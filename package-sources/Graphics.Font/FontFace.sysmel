@@ -15,6 +15,9 @@ public abstract class FontFace definition: {
     public virtual method measureWidthForString: (string: SequenceableCollection) from: (startIndex: Size) until: (endIndex: Size) ::=> Float32
         := startIndex < endIndex ifTrue: (endIndex - startIndex) asFloat32 * self width ifFalse: 0f32.
 
+    public virtual method measureExtentForString: (string: SequenceableCollection) from: (startIndex: Size) until: (endIndex: Size) ::=> Float32x2
+        := (self measureWidthForString: string from: startIndex until: endIndex) @ self height.
+
     public virtual method measureBoundsForString: (string: SequenceableCollection) from: (startIndex: Size) until: (endIndex: Size) ::=> RectangleF32
-        := 0f32 @ self descent negated extent: (self measureWidthForString: string from: startIndex until: endIndex) @ self ascent.
+        := 0f32x2 extent: (self measureExtentForString: string from: startIndex until: endIndex).
 }.
