@@ -55,6 +55,52 @@ SYSMEL_PAL_EXTERN_C void sysmel_pal_window_destroy(sysmel_pal_window_t *window)
     SDL_DestroyWindow((SDL_Window*)window);
 }
 
+static void sysmel_pal_sdl2Window_convertMouseButtonEvent(SDL_MouseButtonEvent *sdlEvent, sysmel_pal_mouseButtonEvent_t *palEvent)
+{
+    palEvent->mouse = sdlEvent->which;
+    palEvent->button = sdlEvent->button;
+    palEvent->state = sdlEvent->state;
+    palEvent->clicks = sdlEvent->clicks;
+    palEvent->x = sdlEvent->x;
+    palEvent->y = sdlEvent->y;
+}
+
+static void sysmel_pal_sdl2Window_convertMouseMotionEvent(SDL_MouseMotionEvent *sdlEvent, sysmel_pal_mouseMotionEvent_t *palEvent)
+{
+    palEvent->mouse = sdlEvent->which;
+    palEvent->state = sdlEvent->state;
+    palEvent->x = sdlEvent->x;
+    palEvent->y = sdlEvent->y;
+    palEvent->deltaX = sdlEvent->xrel;
+    palEvent->deltaY = sdlEvent->yrel;
+}
+
+static void sysmel_pal_sdl2Window_convertMouseWheelEvent(SDL_MouseWheelEvent *sdlEvent, sysmel_pal_mouseWheelEvent_t *palEvent)
+{
+    palEvent->mouse = sdlEvent->which;
+    palEvent->x = sdlEvent->x;
+    palEvent->y = sdlEvent->direction == SDL_MOUSEWHEEL_FLIPPED ? -sdlEvent->y : sdlEvent->y;
+}
+
+static void sysmel_pal_sdl2Window_convertKeyboardEvent(SDL_KeyboardEvent *sdlEvent, sysmel_pal_keyboardEvent_t *palEvent)
+{
+    palEvent->scancode = sdlEvent->keysym.scancode;
+    palEvent->symbol = sdlEvent->keysym.sym;
+    palEvent->modifiers = sdlEvent->keysym.mod;
+}
+
+static void sysmel_pal_sdl2Window_convertTextInputEvent(SDL_TextInputEvent *sdlEvent, sysmel_pal_textInputEvent_t *palEvent)
+{
+    memcpy(palEvent->text, sdlEvent->text, SYSMEL_PAL_WINDOW_TEXT_INPUT_EVENT_SIZE);
+}
+
+static void sysmel_pal_sdl2Window_convertTextEditingEvent(SDL_TextEditingEvent *sdlEvent, sysmel_pal_textEditingEvent_t *palEvent)
+{
+    memcpy(palEvent->text, sdlEvent->text, SYSMEL_PAL_WINDOW_TEXT_INPUT_EVENT_SIZE);
+    palEvent->start = sdlEvent->start;
+    palEvent->length = sdlEvent->length;
+}
+
 static void sysmel_pal_sdl2Window_convertEvent(SDL_Event *sdlEvent, sysmel_pal_window_event_t *palEvent)
 {
     memset(palEvent, 0, sizeof(*palEvent));
@@ -68,35 +114,43 @@ static void sysmel_pal_sdl2Window_convertEvent(SDL_Event *sdlEvent, sysmel_pal_w
     case SDL_MOUSEBUTTONDOWN:
         palEvent->type = SYSMEL_PAL_WINDOW_EVENT_TYPE_MOUSE_BUTTON_DOWN;
         palEvent->window = (sysmel_pal_window_t*)SDL_GetWindowFromID(sdlEvent->key.windowID);
+        sysmel_pal_sdl2Window_convertMouseButtonEvent(&sdlEvent->button, &palEvent->data.mouseButton);
         break;
     case SDL_MOUSEBUTTONUP:
         palEvent->type = SYSMEL_PAL_WINDOW_EVENT_TYPE_MOUSE_BUTTON_UP;
         palEvent->window = (sysmel_pal_window_t*)SDL_GetWindowFromID(sdlEvent->key.windowID);
+        sysmel_pal_sdl2Window_convertMouseButtonEvent(&sdlEvent->button, &palEvent->data.mouseButton);
         break;
     case SDL_MOUSEMOTION:
         palEvent->type = SYSMEL_PAL_WINDOW_EVENT_TYPE_MOUSE_MOTION;
         palEvent->window = (sysmel_pal_window_t*)SDL_GetWindowFromID(sdlEvent->key.windowID);
+        sysmel_pal_sdl2Window_convertMouseMotionEvent(&sdlEvent->motion, &palEvent->data.mouseMotion);
         break;
     case SDL_MOUSEWHEEL:
         palEvent->type = SYSMEL_PAL_WINDOW_EVENT_TYPE_MOUSE_WHEEL;
         palEvent->window = (sysmel_pal_window_t*)SDL_GetWindowFromID(sdlEvent->key.windowID);
+        sysmel_pal_sdl2Window_convertMouseWheelEvent(&sdlEvent->wheel, &palEvent->data.mouseWheel);
         break;
 
     case SDL_KEYDOWN:
         palEvent->type = SYSMEL_PAL_WINDOW_EVENT_TYPE_KEY_DOWN;
         palEvent->window = (sysmel_pal_window_t*)SDL_GetWindowFromID(sdlEvent->key.windowID);
+        sysmel_pal_sdl2Window_convertKeyboardEvent(&sdlEvent->key, &palEvent->data.keyboard);
         break;
     case SDL_KEYUP:
         palEvent->type = SYSMEL_PAL_WINDOW_EVENT_TYPE_KEY_UP;
         palEvent->window = (sysmel_pal_window_t*)SDL_GetWindowFromID(sdlEvent->key.windowID);
+        sysmel_pal_sdl2Window_convertKeyboardEvent(&sdlEvent->key, &palEvent->data.keyboard);
         break;
     case SDL_TEXTEDITING:
         palEvent->type = SYSMEL_PAL_WINDOW_EVENT_TYPE_TEXT_EDITING;
         palEvent->window = (sysmel_pal_window_t*)SDL_GetWindowFromID(sdlEvent->key.windowID);
+        sysmel_pal_sdl2Window_convertTextEditingEvent(&sdlEvent->edit, &palEvent->data.textEditing);
         break;
     case SDL_TEXTINPUT:
         palEvent->type = SYSMEL_PAL_WINDOW_EVENT_TYPE_TEXT_INPUT;
         palEvent->window = (sysmel_pal_window_t*)SDL_GetWindowFromID(sdlEvent->key.windowID);
+        sysmel_pal_sdl2Window_convertTextInputEvent(&sdlEvent->text, &palEvent->data.textInput);
         break;
     case SDL_KEYMAPCHANGED:
         palEvent->type = SYSMEL_PAL_WINDOW_EVENT_TYPE_KEY_MAP_CHANGED;

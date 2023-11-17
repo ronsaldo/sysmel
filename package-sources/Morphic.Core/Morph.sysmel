@@ -11,6 +11,8 @@ public class Morph definition: {
         color := self defaultColor
     }.
 
+    public virtual method colorToUse => Color := color.
+
     public virtual method defaultColor => Color
         := Color blue.
 
@@ -56,7 +58,7 @@ public class Morph definition: {
     }.
 
     public virtual method buildSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode
-        := builder rectangle: self localBounds color: color.
+        := builder rectangle: self localBounds color: self colorToUse.
 
     public virtual method addMorph: (morph: Morph) ::=> Void
         := self addMorphFront: morph.

@@ -38,9 +38,62 @@ public global SysmelPAL::WindowEventType::FocusGained := 16r30B u32.
 public global SysmelPAL::WindowEventType::FocusLost := 16r30C u32.
 public global SysmelPAL::WindowEventType::Close := 16r30D u32.
 
+public struct SysmelPAL::MouseButtonEvent definition: {
+    public field mouse => UInt32.
+    public field button => UInt8.
+    public field state => UInt8.
+    public field clicks => UInt8.
+    public field padding => UInt8.
+    public field x => Int32.
+    public field y => Int32.
+}.
+
+public struct SysmelPAL::MouseMotionEvent definition: {
+    public field mouse => UInt32.
+    public field state => UInt32.
+    public field x => Int32.
+    public field y => Int32.
+    public field deltaX => Int32.
+    public field deltaY => Int32.
+}.
+
+public struct SysmelPAL::MouseWheelEvent definition: {
+    public field mouse => UInt32.
+    public field x => Int32.
+    public field y => Int32.
+}.
+
+public struct SysmelPAL::KeyboardEvent definition: {
+    public field scancode => UInt32.
+    public field symbol => UInt32.
+    public field modifiers => UInt32.
+}.
+
+public global SysmelPAL::TextInputEventSize := 32sz.
+public struct SysmelPAL::TextInputEvent definition: {
+    public field text => Char8[SysmelPAL::TextInputEventSize].
+}.
+
+public struct SysmelPAL::TextEditingEvent definition: {
+    public field text => Char8[SysmelPAL::TextInputEventSize].
+    public field start => Int32.
+    public field length => Int32.
+}.
+
+public union SysmelPAL::SpecificEventData definition: {
+    public field mouseButton => SysmelPAL::MouseButtonEvent.
+    public field mouseMotion => SysmelPAL::MouseMotionEvent.
+    public field mouseWheel => SysmelPAL::MouseWheelEvent.
+    public field keyboard => SysmelPAL::KeyboardEvent.
+    public field textInput => SysmelPAL::TextInputEvent.
+    public field textEditing => SysmelPAL::TextEditingEvent.
+}.
+
+
 public struct SysmelPAL::WindowEvent definition: {
     public field type => SysmelPAL::WindowEventType.
     public field window => SysmelPAL::WindowHandle.
+    public field data => SysmelPAL::SpecificEventData.
 }.
 
 public externC function sysmel_pal_windowSystem_initialize() => Void.

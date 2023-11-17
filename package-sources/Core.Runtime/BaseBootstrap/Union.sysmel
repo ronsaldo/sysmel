@@ -1,9 +1,7 @@
 public global TypeFlags::UnionDefaultFlags := TypeFlags::Value.
 
 public class UnionType superclass: ValueType; definition: {
-    public field isPacked => Boolean.
-
-    public method subunionWithTypeSlots: (typeSlots: Array) packed: (isPacked: Boolean) ::=> UnionType := {
+    public method subunionWithTypeSlots: (typeSlots: Array) ::=> UnionType := {
         let: #metatype with: UnionMetatype basicNew.
         let: #metatypeSuper with: self __type__.
         metatype
@@ -19,7 +17,6 @@ public class UnionType superclass: ValueType; definition: {
         union
             flags: TypeFlags::UnionDefaultFlags;
             supertype: self;
-            isPacked: isPacked;
             slots: ();
             totalSlotCount: nil;
             registerInSupertype.

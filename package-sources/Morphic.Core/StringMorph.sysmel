@@ -13,6 +13,8 @@ public class StringMorph superclass: Morph; definition: {
         backgroundColor := Color transparent.
     }.
 
+    public virtual method backgroundColorToUse => Color := backgroundColor.
+
     public override method defaultColor => Color
         := Color black.
 
@@ -36,8 +38,8 @@ public class StringMorph superclass: Morph; definition: {
         := fontFace ifNil: FontFace default.
 
     public override method buildSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode
-        := (builder rectangle: self localBounds color: backgroundColor)
-        -- (builder string: (contents ifNil: "") in: self localBounds fontFace: self fontFaceToUse color: color).
+        := (builder rectangle: self localBounds color: self backgroundColorToUse)
+        -- (builder string: (contents ifNil: "") in: self localBounds fontFace: self fontFaceToUse color: self colorToUse).
 }.
 
 AnyValue extend: {

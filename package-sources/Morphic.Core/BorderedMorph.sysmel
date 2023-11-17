@@ -9,6 +9,8 @@ public class BorderedMorph superclass: Morph; definition: {
         borderWidth := self defaultBorderWidth.
     }.
 
+    public virtual method borderColorToUse => Color := borderColor.
+
     public virtual method defaultBorderColor => Color
         := Color black.
 
@@ -17,5 +19,5 @@ public class BorderedMorph superclass: Morph; definition: {
 
     public override method buildSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode
         := (super buildSceneGraphWith: builder)
-        -- (builder borderRectangle: self localBounds color: borderColor width: borderWidth).
+        -- (builder borderRectangle: self localBounds color: self borderColorToUse width: borderWidth).
 }.
