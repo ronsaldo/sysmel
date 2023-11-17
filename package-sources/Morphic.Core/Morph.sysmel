@@ -30,6 +30,9 @@ public class Morph definition: {
     public inline method extent => Float32x2
         := bounds extent.
 
+    public inline method center => Float32x2
+        := bounds center.
+
     public virtual method extent: (newExtent: Float32x2) ::=> Void := {
         bounds := bounds min extent: newExtent
     }.
@@ -93,5 +96,22 @@ public class Morph definition: {
 
         morph owner: self.
         submorphs := newSubmorphs
+    }.
+
+    public method removeAllMorphs => Void := {
+        submorphs do: {:(Morph)each :: Void |
+            each owner: nil
+        }.
+
+        submorphs := #().
+    }.
+
+    public method removeMorph: (morph: Morph) ::=> Void := {
+        self assert: morph owner == self.
+        submorphs := submorphs copyWithout: morph
+    }.
+
+    public virtual method delete => Void := {
+        owner ifNotNil: (owner removeMorph: self).
     }.
 }.

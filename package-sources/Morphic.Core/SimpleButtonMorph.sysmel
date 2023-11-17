@@ -1,0 +1,28 @@
+public class SimpleButtonMorph superclass: BorderedMorph; definition: {
+    protected field label => StringMorph.
+
+    public override method initialize => Void := {
+        super initialize.
+    	self color: (Color r: 0.4f32 g: 0.8f32 b: 0.6f32).
+        self setDefaultLabel.
+    }.
+
+    public method label ::=> String
+        := label contents.
+
+    public method label: (aString: String) ::=> Void := {
+        label ifNotNil: (label delete).
+
+        label := StringMorph contents: aString.
+        self extent: label extent + 12f32x2.
+        label position: (self extent - label extent) / 2f32x2.
+        self addMorph: label.
+    }.
+
+    public method setDefaultLabel => Void := {
+        self label: self defaultLabel
+    }.
+
+    public virtual method defaultLabel => String
+        := "Flash".
+}.

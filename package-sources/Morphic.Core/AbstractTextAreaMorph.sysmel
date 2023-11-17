@@ -1,0 +1,8 @@
+public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
+    public override method initialize => Void := {
+        super initialize.
+    }.
+
+    public override method defaultColor => Color
+        := Color white.
+}.

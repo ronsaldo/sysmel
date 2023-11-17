@@ -43,6 +43,13 @@ Array eagerDefinitionBody: {
         result 
     }.
 
+    public final method copyWithout: element ::=> self class := {
+        let elementIndex := self indexOf: element.
+        elementIndex < 0iptr
+            ifTrue: self
+            ifFalse: (self copyWithoutElementAt: elementIndex asSize)
+    }.
+
     public method swap: (firstIndex: Size) with: (secondIndex: Size) ::=> Void := {
         let temp := self untypedAt: secondIndex.
         self untypedAt: secondIndex put: (self untypedAt: firstIndex).

@@ -2,6 +2,13 @@ BorderedMorph new
     extent: 300f32x2;
     color: Color white;
     addMorph: ("Hello World " asMorph position: 30f32@40f32; yourself);
+    addMorph: (SimpleButtonMorph new
+        position: 30f32@80f32;
+        label: "Test Button";
+        yourself);
+    addMorph: (TextAreaMorph new
+        bounds: (30f32@120f32 extent: 200f32@100f32);
+        yourself);
     openInWindowSystem.
 
 WindowSystem default run.

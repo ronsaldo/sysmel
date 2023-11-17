@@ -19,6 +19,7 @@ public final class RectangleF32 definition: {
     }.
 
     public pure inline method origin => Float32x2 := min.
+    public pure inline method center => Float32x2 := min + ((max - min) / 2f32x2).
     public pure inline method corner => Float32x2 := max.
     public pure inline method extent => Float32x2 := max - min.
 
