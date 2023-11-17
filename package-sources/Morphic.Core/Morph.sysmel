@@ -116,4 +116,62 @@ public class Morph definition: {
     public virtual method delete => Void := {
         owner ifNotNil: (owner removeMorph: self).
     }.
+
+    public virtual method processMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Void := {
+        event withLocalTranslation: self position do: {:: Void |
+            submorphs reverseDo: {:(Morph)each :: Void |
+                (each bounds includesPoint: event position) ifTrue: {
+                    each processMouseButtonPressedEvent: event
+                }
+            }.
+
+            (self handlesMouseButtonPressedEvent: event) ifTrue: {
+                self onMouseButtonPressedEvent: event
+            }
+        }.
+    }.
+
+    public virtual method handlesMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Boolean := false.
+    public virtual method onMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Void := {
+    }.
+
+    public virtual method processMouseButtonReleasedEvent: (event: MouseButtonReleasedEvent) ::=> Void := {
+        event withLocalTranslation: self position do: {:: Void |
+            submorphs reverseDo: {:(Morph)each :: Void |
+                (each bounds includesPoint: event position) ifTrue: {
+                    each processMouseButtonReleasedEvent: event
+                }
+            }.
+
+            (self handlesMouseButtonReleasedEvent: event) ifTrue: {
+                self onMouseButtonReleasedEvent: event
+            }
+        }.
+    }.
+
+    public virtual method handlesMouseButtonReleasedEvent: (event: MouseButtonReleasedEvent) ::=> Boolean := false.
+    public virtual method onMouseButtonReleasedEvent: (event: MouseButtonReleasedEvent) ::=> Void := {
+    }.
+
+    public virtual method processMouseMoveEvent: (event: MouseMoveEvent) ::=> Void := {
+        event withLocalTranslation: self position do: {:: Void |
+            submorphs reverseDo: {:(Morph)each :: Void |
+                (each bounds includesPoint: event position) ifTrue: {
+                    each processMouseMoveEvent: event
+                }
+            }.
+
+            (self handlesMouseMoveEvent: event) ifTrue: {
+                self onMouseMoveEvent: event
+            }
+        }.
+    }.
+
+    public virtual method handlesMouseMoveEvent: (event: MouseMoveEvent) ::=> Boolean := false.
+    public virtual method onMouseMoveEvent: (event: MouseMoveEvent) ::=> Void := {
+    }.
+
+    public virtual method changed => Void := {
+        owner ifNotNil: owner changed
+    }.
 }.

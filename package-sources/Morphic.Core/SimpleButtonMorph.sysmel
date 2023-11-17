@@ -1,11 +1,15 @@
 public class SimpleButtonMorph superclass: BorderedMorph; definition: {
     protected field label => StringMorph.
+    protected field state => Boolean.
 
     public override method initialize => Void := {
         super initialize.
     	self color: (Color r: 0.4f32 g: 0.8f32 b: 0.6f32).
         self setDefaultLabel.
     }.
+
+    public override method colorToUse => Color
+        := state ifTrue: Color white ifFalse: color.
 
     public method label ::=> String
         := label contents.
@@ -25,4 +29,26 @@ public class SimpleButtonMorph superclass: BorderedMorph; definition: {
 
     public virtual method defaultLabel => String
         := "Flash".
+
+    public override method handlesMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Boolean
+        := event wasHandled not.
+
+    public override method onMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Void := {
+        event wasHandled: true.
+        state := true.
+        self changed.
+        printLine("Button pressed")
+
+    }.
+
+    public override method handlesMouseButtonReleasedEvent: (event: MouseButtonPressedEvent) ::=> Boolean
+        := event wasHandled not.
+
+    public override method onMouseButtonReleasedEvent: (event: MouseButtonPressedEvent) ::=> Void := {
+        event wasHandled: true.
+        state := false.
+        self changed.
+        printLine("Button released")
+    }.
+
 }.

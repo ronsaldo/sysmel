@@ -19,6 +19,7 @@ EventHandler definition: {
     public virtual method onMouseWheelEvent: (event: MouseWheelEvent) ::=> Void := {}.
 
     public virtual method onExposeEvent: (event: ExposeEvent) ::=> Void := {}.
+    public virtual method onValidateRenderingEvent: (event: ValidateRenderingEvent) ::=> Void := {}.
 
     public virtual method onWindowCloseRequestEvent: (event: WindowCloseRequestEvent) ::=> Void := {}.
 }.

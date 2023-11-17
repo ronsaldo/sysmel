@@ -7,6 +7,7 @@ public class Window superclass: Object; definition: {
     public field eventHandler => EventHandler.
     public field renderer => WindowRenderer.
     public field isAnimated => Boolean.
+    private field hasDirtyRendering => Boolean.
 
     public method initializeWithWindowSystem: (initialWindowSystem: WindowSystem) handle: (initialHandle: SysmelPAL::WindowHandle) ::=> Void := {
         windowSystem := initialWindowSystem.
@@ -136,5 +137,18 @@ public class Window superclass: Object; definition: {
         eventHandler ifNotNil: {
             eventHandler processEvent: event
         }
+    }.
+
+    public method hasDirtyRendering => Boolean
+        := hasDirtyRendering.
+
+    public method markDirtyRendering => Void := {
+        hasDirtyRendering := true.
+    }.
+
+    public method validateRendering => Void := {
+        hasDirtyRendering ifFalse: {return: void}.
+        self dispatchEvent: ValidateRenderingEvent new.
+        hasDirtyRendering := false.
     }.
 }.

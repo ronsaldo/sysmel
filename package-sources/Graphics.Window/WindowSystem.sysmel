@@ -55,7 +55,9 @@ WindowSystem definition: {
             self convertAndDispatchEvent: event
         }.
 
-        self dispatchTickEvent ifTrue: {
+        let hasAnimation := self dispatchTickEvent.
+        self dispatchValidateRendering.
+        hasAnimation ifTrue: {
             ##printLine("TODO: Animation delay.")
         } ifFalse: {
             sysmel_pal_window_waitEvent(event) ifTrue: {
@@ -81,6 +83,12 @@ WindowSystem definition: {
         }.
 
         hasAnimatedWindow
+    }.
+
+    public method dispatchValidateRendering => Void := {
+        openWindowList do: {:(Window)each :: Void |
+            each validateRendering
+        }
     }.
 
     public method convertAndDispatchEvent: (event: SysmelPAL::WindowEvent ref) ::=> Void := {

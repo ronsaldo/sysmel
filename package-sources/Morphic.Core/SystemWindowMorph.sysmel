@@ -3,6 +3,7 @@ public class SystemWindowMorph superclass: Morph; definition: {
     public field window => Window.
     protected field windowRenderer => WindowFormRenderer.
     protected field renderbuffer => Form.
+    protected field hasDirtyRendering => Boolean.
 
     public method renderOnWindow => Void := {
         let renderbufferExtent := self extent ceiling asUInt32x2.
@@ -17,6 +18,7 @@ public class SystemWindowMorph superclass: Morph; definition: {
         FormSGFormRenderer new renderSceneGraph: sceneGraph onForm: renderbuffer.
 
         windowRenderer presentForm: renderbuffer.
+        hasDirtyRendering := false.
     }.
 
     public override method defaultBounds => RectangleF32
@@ -28,6 +30,11 @@ public class SystemWindowMorph superclass: Morph; definition: {
     public method onWindowCloseRequest => Void := {
         window close
     }.
+
+    public override method changed => Void := {
+        hasDirtyRendering := true.
+        window ifNotNil: {window markDirtyRendering}.
+    }.
 }.
 
 public class SystemWindowMorphEventHandler superclass: EventHandler; definition: {
@@ -37,20 +44,24 @@ public class SystemWindowMorphEventHandler superclass: EventHandler; definition:
         morph renderOnWindow
     }.
 
+    public override method onValidateRenderingEvent: (event: ValidateRenderingEvent) ::=> Void := {
+        morph renderOnWindow
+    }.
+
     public override method onWindowCloseRequestEvent: (event: WindowCloseRequestEvent) ::=> Void := {
         morph onWindowCloseRequest
     }.
 
     public override method onMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Void := {
-        printLine("onMouseButtonPressedEvent ", event button, " ", event position)
+        morph processMouseButtonPressedEvent: event
     }.
 
     public override method onMouseButtonReleasedEvent: (event: MouseButtonReleasedEvent) ::=> Void := {
-        printLine("onMouseButtonReleased ", event button, " ", event position)
+        morph processMouseButtonReleasedEvent: event
     }.
 
     public override method onMouseMoveEvent: (event: MouseMoveEvent) ::=> Void := {
-        printLine("onMouseMoveEvent ", event position, " ", event delta)
+        morph processMouseMoveEvent: event
     }.
 
     public override method onMouseWheelEvent: (event: MouseWheelEvent) ::=> Void := {

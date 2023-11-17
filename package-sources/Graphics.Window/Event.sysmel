@@ -4,6 +4,9 @@ public class EventHandler superclass: Object.
  * I am a basic event for a window.
  *#
 public abstract class Event superclass: Object; definition: {
+    public field wasHandled => Boolean.
+    public field shouldSuppressDefaultAction => Boolean.
+
     public abstract method acceptEventHandler: (handler: EventHandler) ::=> Void
         := self subclassResponsibility
 }.
@@ -78,6 +81,14 @@ public class TextEditingEvent superclass: Event; definition: {
  *#
 public class MouseEvent superclass: Event; definition: {
     public field position => Float32x2.
+
+    public inline method withLocalTranslation: (translation: Float32x2) do: (aBlock: () => Void) ::=> Void := {
+        let oldPosition := position.
+        position := position - translation.
+        aBlock ensure: {:: Void |
+            position := oldPosition
+        }
+    }.
 }.
 
 #**
@@ -146,6 +157,14 @@ public class MouseWheelEvent superclass: MouseEvent; definition: {
 public class ExposeEvent superclass: Event; definition: {
     public override method acceptEventHandler: (handler: EventHandler) ::=> Void
         := handler onExposeEvent: self
+}.
+
+#**
+ * I am a validate rendering event.
+ *#
+public class ValidateRenderingEvent superclass: Event; definition: {
+    public override method acceptEventHandler: (handler: EventHandler) ::=> Void
+        := handler onValidateRenderingEvent: self
 }.
 
 #**
