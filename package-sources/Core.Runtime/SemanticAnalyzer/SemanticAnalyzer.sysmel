@@ -1754,7 +1754,7 @@ ASTTupleSlotNamedReferenceAtNode eagerDefinitionBody: {
             self boundSlot
         } ifNil: {
             let slotName := self nameExpression analyzeAndEvaluateWithEnvironment: environment.
-            (RawTuple::type(tuple) asDecayedType lookupSlot: slotName) ifNil: {
+            (RawTuple::type(tuple) asDecayedBaseType lookupSlot: slotName) ifNil: {
                 self semanticError: "Failed to find slot named " -- slotName printString -- ".".
 
             }
@@ -1776,7 +1776,7 @@ ASTTupleSlotNamedReferenceAtNode eagerDefinitionBody: {
             }.
 
             let slotName => Symbol := (self nameExpression downCastTo: ASTLiteralNode) value.
-            let slot := tupleExpression analyzedType asDecayedType lookupSlot: slotName.
+            let slot := tupleExpression analyzedType asDecayedBaseType lookupSlot: slotName.
             slot ifNil: {
                 self semanticError: "Failed to find slot named " -- slotName printString -- ".".
             }.

@@ -35,6 +35,9 @@ Type
     withSelector: #asDecayedType addMethod: {:(Type)self :: Type |
         self
     } makePure makeVirtual withEagerAnalysis;
+    withSelector: #asDecayedBaseType addMethod: {:(Type)self :: Type |
+        self
+    } makePure makeVirtual withEagerAnalysis;
     withSelector: #asReceiverType addMethod: {:(Type)self :: Type |
         self
     } makePure makeVirtual withEagerAnalysis;

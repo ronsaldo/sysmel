@@ -89,7 +89,6 @@ public union SysmelPAL::SpecificEventData definition: {
     public field textEditing => SysmelPAL::TextEditingEvent.
 }.
 
-
 public struct SysmelPAL::WindowEvent definition: {
     public field type => SysmelPAL::WindowEventType.
     public field window => SysmelPAL::WindowHandle.

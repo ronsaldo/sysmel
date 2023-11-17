@@ -186,7 +186,7 @@ public nogc function GarbageCollector::loadMaybeRelocatedValidGCLayout(type: Typ
     let currentType mutable := type.
 
     while: currentType isNotNil do: {
-        let gcLayout := GarbageCollector::loadMaybeRelocatedPointer((currentType __slotNamedReferenceAt__: #gcLayout) address reinterpretCastTo: UIntPointer pointer)
+        let gcLayout := GarbageCollector::loadMaybeRelocatedPointer((currentType*->gcLayout) address reinterpretCastTo: UIntPointer pointer)
             reinterpretCastTo: GCLayout.
         gcLayout ifNotNil: {
             return: gcLayout
@@ -196,7 +196,7 @@ public nogc function GarbageCollector::loadMaybeRelocatedValidGCLayout(type: Typ
             return: gcLayout
         }.
 
-        let slots := GarbageCollector::loadMaybeRelocatedPointer((currentType __slotNamedReferenceAt__: #slots) address reinterpretCastTo: UIntPointer pointer)
+        let slots := GarbageCollector::loadMaybeRelocatedPointer((currentType*->slots) address reinterpretCastTo: UIntPointer pointer)
             reinterpretCastTo: Array.
         slots ifNil: {
             "Type is missing slots during load time relocation.\n" writeOntoStderr.

@@ -63,7 +63,7 @@ Exception withSelector: #signal replaceMethod: {:(Exception)self :: Unwinds |
         
         ExceptionStackRecord::LastActive := handlerRecord _ previous.
         GCStackFrameRecord::LastActive := handlerRecord _ gcStackFrameRecord.
-        (handlerRecord _ __slotNamedReferenceAt__: #setjmpBuffer) longjmp
+        (handlerRecord *-> setjmpBuffer) longjmp
     }.
 }.
 
@@ -106,7 +106,7 @@ Exception withSelector: #signal replaceMethod: {:(Exception)self :: Unwinds |
 
     ## Perform setjmp
     ## FIXME: Avoid this explicit __slotNamedReferenceAt__:
-    (stackRecord __slotNamedReferenceAt__: #setjmpBuffer) setjmp ifFalse: {
+    (stackRecord*->setjmpBuffer) setjmp ifFalse: {
         let result := self().
         ExceptionStackRecord::LastActive := stackRecord previous.
         result

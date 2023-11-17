@@ -556,6 +556,11 @@ PointerType
         }.
     } makeOverride withEagerAnalysis.
 
+PointerLikeType
+    withSelector: #asDecayedBaseType addMethod: {:(ReferenceLikeType)self :: Type |
+        self baseType asDecayedType
+    } makePure makeOverride withEagerAnalysis.
+
 ReferenceLikeType
     withSelector: #isReferenceLikeType addMethod: {:(ReferenceType)self :: Boolean | true } makeOverride makePure;
     withSelector: #asDecayedType addMethod: {:(ReferenceLikeType)self :: Type |

@@ -248,6 +248,20 @@ MacroContext
         yourself.
 } makeMacro withEagerAnalysis.
 
+AnyValue
+    withSelector: #"*->" addMacroMethod: {:(MacroContext)macroContext :(ASTNode)tupleExpression :(ASTNode)name :: ASTTupleSlotNamedReferenceAtNode |
+    ASTTupleSlotNamedReferenceAtNode new
+        sourcePosition: macroContext sourcePosition;
+        tupleExpression: tupleExpression;
+        nameExpression: (name isIdentifierReferenceNode
+            ifTrue: (ASTLiteralNode new
+                sourcePosition: name sourcePosition;
+                value: (name downCastTo: ASTIdentifierReferenceNode) value;
+                yourself)
+            ifFalse: name);
+        yourself.
+} makeMacro withEagerAnalysis.
+
 (tuple:withLookupStartingFrom:) adoptDefinitionOf: {:(MacroContext)macroContext :(ASTNode)tupleExpression :(ASTNode)typeExpression :: ASTTupleWithLookupStartingFromNode |
     ASTTupleWithLookupStartingFromNode new
         sourcePosition: macroContext sourcePosition;

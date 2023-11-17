@@ -47,8 +47,89 @@ public class Window superclass: Object; definition: {
         SysmelPAL::WindowEventType::Close : {
             self dispatchEvent: WindowCloseRequestEvent new
         }.
+        SysmelPAL::WindowEventType::MouseButtonDown : {
+            self dispatchEvent: (self convertMouseButtonEventInto: event*->data*->mouseButton into: MouseButtonPressedEvent new)
+        }.
+        SysmelPAL::WindowEventType::MouseButtonUp : {
+            self dispatchEvent: (self convertMouseButtonEventInto: event*->data*->mouseButton into: MouseButtonReleasedEvent new)
+        }.
+        SysmelPAL::WindowEventType::MouseMotion : {
+            self dispatchEvent: (self convertMouseMotionEventInto: event*->data*->mouseMotion into: MouseMoveEvent new)
+        }.
+        SysmelPAL::WindowEventType::MouseWheel : {
+            self dispatchEvent: (self convertMouseWheelEventInto: event*->data*->mouseWheel into: MouseWheelEvent new)
+        }.
+        SysmelPAL::WindowEventType::Enter : {
+            self dispatchEvent: MouseEnterEvent new.
+        }.
+        SysmelPAL::WindowEventType::Leave : {
+            self dispatchEvent: MouseLeaveEvent new.
+        }.
+
+        SysmelPAL::WindowEventType::KeyDown : {
+            self dispatchEvent: (self convertKeyboardEventInto: event*->data*->keyboard into: KeyPressedEvent new)
+        }.
+        SysmelPAL::WindowEventType::KeyUp : {
+            self dispatchEvent: (self convertKeyboardEventInto: event*->data*->keyboard into: KeyReleasedEvent new)
+        }.
+
+        SysmelPAL::WindowEventType::TextInput : {
+            self dispatchEvent: (self convertTextInputEventInto: event*->data*->textInput into: TextInputEvent new)
+        }.
+        SysmelPAL::WindowEventType::TextEditing : {
+            self dispatchEvent: (self convertTextEditingEventInto: event*->data*->textEditing into: TextEditingEvent new)
+        }.
+
         _:{}
         }
+    }.
+
+    private method convertMouseButtonEventInto: (palEvent: SysmelPAL::MouseButtonEvent ref) into: (event: MouseButtonEvent) ::=> MouseButtonEvent
+        := event
+            button: palEvent button;
+            clicks: palEvent clicks;
+            position: (Float32x2 x: palEvent x asFloat32 y: palEvent y asFloat32);
+            yourself.
+
+    private method convertMouseMotionEventInto: (palEvent: SysmelPAL::MouseMotionEvent ref) into: (event: MouseMoveEvent) ::=> MouseMoveEvent
+        := event
+            position: (Float32x2 x: palEvent x asFloat32 y: palEvent y asFloat32);
+            delta: (Float32x2 x: palEvent deltaX asFloat32 y: palEvent deltaY asFloat32);
+            yourself.
+
+    private method convertMouseWheelEventInto: (palEvent: SysmelPAL::MouseWheelEvent ref) into: (event: MouseWheelEvent) ::=> MouseWheelEvent
+        := event
+            scrollingDelta: (Float32x2 x: palEvent x asFloat32 y: palEvent y asFloat32);
+            yourself.
+
+    private method convertKeyboardEventInto: (palEvent: SysmelPAL::KeyboardEvent ref) into: (event: KeyboardEvent) ::=> KeyboardEvent
+        := event
+            scancode: palEvent scancode;
+            symbol: palEvent symbol;
+            modifiers: palEvent modifiers;
+            yourself.
+
+    private method convertTextInputEventInto: (palEvent: SysmelPAL::TextInputEvent ref) into: (event: TextInputEvent) ::=> TextInputEvent := {
+        let textData := (palEvent *-> text) [0sz] address.
+        let textDataSize := cstrlen(textData).
+        let text := String basicAllocate: textDataSize.
+        memcpy(text __rawContentsPointer__, textData, textDataSize).
+
+        event
+            text: text;
+            yourself
+    }.
+
+    private method convertTextEditingEventInto: (palEvent: SysmelPAL::TextEditingEvent ref) into: (event: TextEditingEvent) ::=> TextEditingEvent := {
+        let textData := (palEvent *-> text) [0sz] address.
+        let textDataSize := cstrlen(textData).
+        let text := String basicAllocate: textDataSize.
+        memcpy(text __rawContentsPointer__, textData, textDataSize).
+        event
+            text: text;
+            start: palEvent start;
+            length: palEvent length;
+            yourself
     }.
 
     public method dispatchEvent: (event: Event) ::=> Void := {

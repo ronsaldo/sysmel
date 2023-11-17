@@ -40,6 +40,38 @@ public class SystemWindowMorphEventHandler superclass: EventHandler; definition:
     public override method onWindowCloseRequestEvent: (event: WindowCloseRequestEvent) ::=> Void := {
         morph onWindowCloseRequest
     }.
+
+    public override method onMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Void := {
+        printLine("onMouseButtonPressedEvent ", event button, " ", event position)
+    }.
+
+    public override method onMouseButtonReleasedEvent: (event: MouseButtonReleasedEvent) ::=> Void := {
+        printLine("onMouseButtonReleased ", event button, " ", event position)
+    }.
+
+    public override method onMouseMoveEvent: (event: MouseMoveEvent) ::=> Void := {
+        printLine("onMouseMoveEvent ", event position, " ", event delta)
+    }.
+
+    public override method onMouseWheelEvent: (event: MouseWheelEvent) ::=> Void := {
+        printLine("onMouseWheelEvent ", event scrollingDelta)
+    }.
+
+    public override method onKeyPressedEvent: (event: KeyPressedEvent) ::=> Void := {
+        printLine("onKeyPressedEvent ", event symbol)
+    }.
+
+    public override method onKeyReleasedEvent: (event: KeyReleasedEvent) ::=> Void := {
+        printLine("onKeyReleasedEvent ", event symbol)
+    }.
+
+    public override method onTextInputEvent: (event: TextInputEvent) ::=> Void := {
+        printLine("onTextInputEvent ", event text)
+    }.
+
+    public override method onTextEditingEvent: (event: TextEditingEvent) ::=> Void := {
+        printLine("onTextEditingEvent ", event text)
+    }.
 }.
 
 Morph definition: {

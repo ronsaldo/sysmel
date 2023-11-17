@@ -30,6 +30,9 @@ public class TickEvent superclass: Event; definition: {
  * I am keyboard event
  *#
 public abstract class KeyboardEvent superclass: Event; definition: {
+    public field scancode => UInt32.
+    public field symbol => UInt32.
+    public field modifiers => UInt32.
 }.
 
 #**
@@ -63,6 +66,8 @@ public class TextInputEvent superclass: Event; definition: {
  *#
 public class TextEditingEvent superclass: Event; definition: {
     public field text => String.
+    public field start => Int32.
+    public field length => Int32.
 
     public override method acceptEventHandler: (handler: EventHandler) ::=> Void
         := handler onTextEditingEvent: self
@@ -72,6 +77,7 @@ public class TextEditingEvent superclass: Event; definition: {
  * I am a mouse event
  *#
 public class MouseEvent superclass: Event; definition: {
+    public field position => Float32x2.
 }.
 
 #**
@@ -94,6 +100,8 @@ public class MouseLeaveEvent superclass: MouseEvent; definition: {
  * I am a mouse move event
  *#
 public class MouseMoveEvent superclass: MouseEvent; definition: {
+    public field delta => Float32x2.
+
     public override method acceptEventHandler: (handler: EventHandler) ::=> Void
         := handler onMouseMoveEvent: self
 }.
@@ -102,12 +110,14 @@ public class MouseMoveEvent superclass: MouseEvent; definition: {
  * I am a mouse button event
  *#
 public class MouseButtonEvent superclass: MouseEvent; definition: {
+    public field button => UInt8.
+    public field clicks => UInt8.
 }.
 
 #**
  * I am a mouse button pressed event
  *#
-public class MouseButtonPressedEvent superclass: MouseEvent; definition: {
+public class MouseButtonPressedEvent superclass: MouseButtonEvent; definition: {
     public override method acceptEventHandler: (handler: EventHandler) ::=> Void
         := handler onMouseButtonPressedEvent: self
 }.
@@ -115,7 +125,7 @@ public class MouseButtonPressedEvent superclass: MouseEvent; definition: {
 #**
  * I am a mouse button pressed event
  *#
-public class MouseButtonReleasedEvent superclass: MouseEvent; definition: {
+public class MouseButtonReleasedEvent superclass: MouseButtonEvent; definition: {
     public override method acceptEventHandler: (handler: EventHandler) ::=> Void
         := handler onMouseButtonReleasedEvent: self
 }.
@@ -124,6 +134,8 @@ public class MouseButtonReleasedEvent superclass: MouseEvent; definition: {
  * I am a mouse wheel event
  *#
 public class MouseWheelEvent superclass: MouseEvent; definition: {
+    public field scrollingDelta => Float32x2.
+
     public override method acceptEventHandler: (handler: EventHandler) ::=> Void
         := handler onMouseWheelEvent: self
 }.
