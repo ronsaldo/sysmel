@@ -5,4 +5,5 @@ loadSourceNamed: "SimpleButtonMorph.sysmel".
 loadSourceNamed: "AbstractTextAreaMorph.sysmel".
 loadSourceNamed: "TextAreaMorph.sysmel".
 loadSourceNamed: "TextFieldMorph.sysmel".
+loadSourceNamed: "WorldMorph.sysmel".
 loadSourceNamed: "SystemWindowMorph.sysmel".

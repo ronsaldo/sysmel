@@ -1,4 +1,4 @@
-public class SystemWindowMorph superclass: Morph; definition: {
+public class SystemWindowMorph superclass: WorldMorph; definition: {
     private field title => String.
     public field window => Window.
     protected field windowRenderer => WindowFormRenderer.
@@ -69,19 +69,19 @@ public class SystemWindowMorphEventHandler superclass: EventHandler; definition:
     }.
 
     public override method onKeyPressedEvent: (event: KeyPressedEvent) ::=> Void := {
-        printLine("onKeyPressedEvent ", event symbol)
+        morph processKeyPressedEvent: event
     }.
 
     public override method onKeyReleasedEvent: (event: KeyReleasedEvent) ::=> Void := {
-        printLine("onKeyReleasedEvent ", event symbol)
+        morph processKeyReleasedEvent: event
     }.
 
     public override method onTextInputEvent: (event: TextInputEvent) ::=> Void := {
-        printLine("onTextInputEvent ", event text)
+        morph processTextInputEvent: event
     }.
 
     public override method onTextEditingEvent: (event: TextEditingEvent) ::=> Void := {
-        printLine("onTextEditingEvent ", event text)
+        morph processTextEditingEvent: event
     }.
 }.
 

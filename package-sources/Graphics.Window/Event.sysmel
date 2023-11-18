@@ -30,6 +30,24 @@ public class TickEvent superclass: Event; definition: {
 }.
 
 #**
+ * I am a focus event
+ *#
+public abstract class FocusEvent superclass: Event; definition: {
+}.
+
+#**
+ * I am a got focus event
+ *#
+public final class GotFocusEvent superclass: FocusEvent; definition: {
+}.
+
+#**
+ * I am a lost focus event
+ *#
+public final class LostFocusEvent superclass: FocusEvent; definition: {
+}.
+
+#**
  * I am keyboard event
  *#
 public abstract class KeyboardEvent superclass: Event; definition: {

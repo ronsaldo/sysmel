@@ -21,5 +21,8 @@ EventHandler definition: {
     public virtual method onExposeEvent: (event: ExposeEvent) ::=> Void := {}.
     public virtual method onValidateRenderingEvent: (event: ValidateRenderingEvent) ::=> Void := {}.
 
+    public virtual method onGotFocusEvent: (event: GotFocusEvent) ::=> Void := {}.
+    public virtual method onLostFocusEvent: (event: LostFocusEvent) ::=> Void := {}.
+
     public virtual method onWindowCloseRequestEvent: (event: WindowCloseRequestEvent) ::=> Void := {}.
 }.

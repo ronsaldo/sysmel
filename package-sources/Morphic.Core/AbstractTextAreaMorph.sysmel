@@ -5,4 +5,50 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
 
     public override method defaultColor => Color
         := Color white.
+
+    public override method takesKeyboardFocus => Boolean := true.
+
+    public override method handlesMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Boolean
+        := event wasHandled not.
+
+    public override method onMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Void := {
+        event wasHandled: true.
+        self takeKeyboardFocus.
+    }.
+
+    public override method handlesMouseButtonReleasedEvent: (event: MouseButtonPressedEvent) ::=> Boolean
+        := event wasHandled not.
+
+    public override method onMouseButtonReleasedEvent: (event: MouseButtonPressedEvent) ::=> Void := {
+        event wasHandled: true.
+    }.
+
+    public override method handlesKeyPressedEvent: (event: KeyPressedEvent) ::=> Boolean
+        := event wasHandled not.
+
+    public override method onKeyPressedEvent: (event: KeyPressedEvent) ::=> Void := {
+        printLine("AbstractTextAreaMorph onKeyPressed ", event symbol).
+    }.
+
+
+    public override method handlesKeyReleasedEvent: (event: KeyReleasedEvent) ::=> Boolean
+        := event wasHandled not.
+
+    public override method onKeyReleasedEvent: (event: KeyReleasedEvent) ::=> Void := {
+        printLine("AbstractTextAreaMorph onKeyReleased ", event symbol).
+    }.
+
+    public override method handlesTextInputEvent: (event: TextInputEvent) ::=> Boolean
+        := event wasHandled not.
+
+    public override method onTextInputEvent: (event: TextInputEvent) ::=> Void := {
+        printLine("AbstractTextAreaMorph onTextInput ", event text).
+    }.
+
+    public override method handlesTextEditingEvent: (event: TextEditingEvent) ::=> Boolean
+        := event wasHandled not.
+
+    public override method onTextEditingEvent: (event: TextEditingEvent) ::=> Void := {
+        printLine("AbstractTextAreaMorph onTextEditing ", event text, " ", event start, " ", event length).
+    }.
 }.

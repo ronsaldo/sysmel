@@ -3,6 +3,7 @@ public class Morph definition: {
     public field owner => Morph.
     public field submorphs => Array.
     public field color => Color.
+    protected field visible => Boolean.
 
     public override method initialize => Void := {
         super initialize.
@@ -171,7 +172,83 @@ public class Morph definition: {
     public virtual method onMouseMoveEvent: (event: MouseMoveEvent) ::=> Void := {
     }.
 
+    public virtual method processKeyPressedEvent: (event: KeyPressedEvent) ::=> Void := {
+        (self handlesKeyPressedEvent: event) ifTrue: {
+            self onKeyPressedEvent: event
+        }
+    }.
+
+    public virtual method handlesKeyPressedEvent: (event: KeyPressedEvent) ::=> Boolean := false.
+    public virtual method onKeyPressedEvent: (event: KeyPressedEvent) ::=> Void := {
+    }.
+
+    public virtual method processKeyReleasedEvent: (event: KeyReleasedEvent) ::=> Void := {
+        (self handlesKeyReleasedEvent: event) ifTrue: {
+            self onKeyReleasedEvent: event
+        }
+    }.
+
+    public virtual method handlesKeyReleasedEvent: (event: KeyReleasedEvent) ::=> Boolean := false.
+    public virtual method onKeyReleasedEvent: (event: KeyReleasedEvent) ::=> Void := {
+    }.
+
+    public virtual method processTextInputEvent: (event: TextInputEvent) ::=> Void := {
+        (self handlesTextInputEvent: event) ifTrue: {
+            self onTextInputEvent: event
+        }
+    }.
+
+    public virtual method handlesTextInputEvent: (event: TextInputEvent) ::=> Boolean := false.
+    public virtual method onTextInputEvent: (event: TextInputEvent) ::=> Void := {
+    }.
+
+    public virtual method processTextEditingEvent: (event: TextEditingEvent) ::=> Void := {
+        (self handlesTextEditingEvent: event) ifTrue: {
+            self onTextEditingEvent: event
+        }
+    }.
+
+    public virtual method handlesTextEditingEvent: (event: TextEditingEvent) ::=> Boolean := false.
+    public virtual method onTextEditingEvent: (event: TextEditingEvent) ::=> Void := {
+    }.
+
+    public virtual method processGotFocusEvent: (event: GotFocusEvent) ::=> Void := {
+        self onGotFocusEvent: event
+    }.
+
+    public virtual method onGotFocusEvent: (event: GotFocusEvent) ::=> Void := {
+    }.
+
+    public virtual method processLostFocusEvent: (event: LostFocusEvent) ::=> Void := {
+        self onLostFocusEvent: event
+    }.
+    public virtual method onLostFocusEvent: (event: LostFocusEvent) ::=> Void := {
+    }.
+
+    public virtual method enabled => Boolean := true.
+    public virtual method enabled: (aBoolean: Boolean) ::=> Void := {
+        ## By default do nothing.
+    }.
+
+    public virtual method visible => Boolean := visible.
+    public virtual method visible: (aBoolean: Boolean) ::=> Void := {
+        visible := aBoolean.
+        self changed.
+    }.
+
     public virtual method changed => Void := {
         owner ifNotNil: owner changed
     }.
+
+    public virtual method takeKeyboardFocus => Void := {
+        self worldMorph ifNotNil: {:(WorldMorph)worldMorph :: Void |
+            worldMorph newKeyboardFocus: self
+        }.
+    }.
+
+    public virtual method takesKeyboardFocus => Boolean
+        := false.
+
+    public virtual method wantsKeyboardFocus => Boolean
+        := self takesKeyboardFocus && self visible && self enabled.
 }.
