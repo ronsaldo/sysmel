@@ -1,0 +1,36 @@
+public class SimpleTextBuffer superclass: AbstractTextBuffer; definition: {
+    public field contents => String.
+
+    public override method initialize => Void := {
+        super initialize.
+        contents := "".
+    }.
+
+    public override method size => Size
+        := contents size.
+
+    public override method replaceFrom: (startIndex: Size) until: (endIndex: Size) withString: (replacement: String) ::=> Size := {
+        let contentsSize := contents size .
+        let lowerSize := startIndex min: contentsSize.
+        let replacementSize := replacement size.
+        let upperSize := endIndex <= contentsSize ifTrue: contentsSize - endIndex ifFalse: 0sz.
+
+        let newContentSize := lowerSize + replacementSize + upperSize.
+        newContentSize > 0sz ifTrue: {
+            let newContents := String basicAllocate: newContentSize.
+            memcpy(newContents __rawContentsBytePointer__, contents __rawContentsBytePointer__, lowerSize).
+            memcpy(newContents __rawContentsBytePointer__ + lowerSize asIntPointer, replacement __rawContentsBytePointer__, replacementSize).
+            memcpy(newContents __rawContentsBytePointer__ + (lowerSize + replacementSize) asIntPointer, contents __rawContentsBytePointer__ + endIndex asIntPointer, upperSize).
+            contents := newContents
+        } ifFalse: {
+            contents := ""
+        }.
+
+        lowerSize + replacementSize
+    }.
+
+    let StringSpanIterationFunction := (String, Size, Size) => Void.
+    public override method stringSpansDo: (aBlock: StringSpanIterationFunction) ::=> Void := {
+        aBlock(contents, 0sz, contents size)
+    }.
+}.

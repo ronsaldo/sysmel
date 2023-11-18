@@ -1,0 +1,39 @@
+public class TextEditorModel definition: {
+    public field textBuffer => AbstractTextBuffer.
+    public field cursors => Array.
+
+    public override method initialize => Void := {
+        super initialize.
+        textBuffer := SimpleTextBuffer new.
+        cursors := Array with: TextEditorCursor new.
+    }.
+
+    public method contents => String
+        := textBuffer contents.
+
+    public method contents: (newContents: String) ::=> Void := {
+        textBuffer contents: newContents
+    }.
+    
+    public method insertString: (string: String) ::=> Void := {
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor position: (textBuffer replaceFrom: eachCursor minIndex until: eachCursor maxIndex withString: string)
+        }
+    }.
+
+    public method moveCursorLeft ::=> Void := {
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor position > 0sz ifTrue: {
+                eachCursor position: eachCursor position - 1sz
+            } ifFalse: {
+                eachCursor position: 0sz
+            }.
+        }
+    }.
+
+    public method moveCursorRight ::=> Void := {
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor position: (eachCursor position + 1sz min: textBuffer size)
+        }
+    }.
+}.

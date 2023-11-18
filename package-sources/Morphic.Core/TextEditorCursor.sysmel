@@ -1,0 +1,17 @@
+public final class TextEditorCursor definition: {
+    public field startIndex => Size.
+    public field endIndex => Size.
+
+    public inline method minIndex => Size
+        := startIndex min: endIndex.
+
+    public inline method maxIndex => Size
+        := startIndex max: endIndex.
+
+    public inline method position => Size
+        := startIndex.
+
+    public inline method position: (newPosition: Size) ::=> Void := {
+        startIndex := endIndex := newPosition
+    }.
+}.

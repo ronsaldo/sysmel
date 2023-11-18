@@ -1,0 +1,18 @@
+public abstract class AbstractTextBuffer definition: {
+    public abstract method contents => String
+        := self subclassResponsibility.
+
+    public abstract method contents: (newContents: String) ::=> Void
+        := self subclassResponsibility.
+
+    public abstract method size => Size
+        := self subclassResponsibility.
+
+    public abstract method replaceFrom: (startIndex: Size) until: (endIndex: Size) withString: (replacement: String) ::=> Size
+        := self subclassResponsibility.
+
+    let StringSpanIterationFunction := (String, Size, Size) => Void.
+    public abstract method stringSpansDo: (aBlock: StringSpanIterationFunction) ::=> Void
+        := self subclassResponsibility.
+
+}.

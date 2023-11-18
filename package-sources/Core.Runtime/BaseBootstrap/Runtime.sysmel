@@ -2438,16 +2438,16 @@ Type
     };
     withSelector: #allInstancesDo: addMethod: {:(Type)self :aBlock :: Void |
         let: #instance mutableWith: RawTuple::firstInstanceWithType(self).
-        while: instance ~~ nil do: (
-            aBlock(instance)
-        ) continueWith: (instance := RawTuple::nextInstanceWithSameType(instance))
+        while: (Untyped::~~)(instance __refLoad__, nil) do: (
+            aBlock(instance __refLoad__)
+        ) continueWith: (instance := RawTuple::nextInstanceWithSameType(instance __refLoad__))
     };
     withSelector: #allInstances addMethod: {:(Type)self :: Array |
         let: #instance mutableWith: RawTuple::firstInstanceWithType(self).
         let: #result with: OrderedCollection new.
-        while: instance ~~ nil do: (
-            result add: instance
-        ) continueWith: (instance := RawTuple::nextInstanceWithSameType(instance)).
+        while: (Untyped::~~)(instance __refLoad__, nil) do: (
+            result add: instance __refLoad__
+        ) continueWith: (instance := RawTuple::nextInstanceWithSameType(instance __refLoad__)).
 
         result asArray
     };

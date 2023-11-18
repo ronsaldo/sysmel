@@ -1,9 +1,16 @@
 loadSourceNamed: "Morph.sysmel".
+loadSourceNamed: "WorldMorph.sysmel".
+loadSourceNamed: "SystemWindowMorph.sysmel".
+
 loadSourceNamed: "BorderedMorph.sysmel".
 loadSourceNamed: "StringMorph.sysmel".
 loadSourceNamed: "SimpleButtonMorph.sysmel".
+
+loadSourceNamed: "AbstractTextBuffer.sysmel".
+loadSourceNamed: "SimpleTextBuffer.sysmel".
+loadSourceNamed: "TextEditorCursor.sysmel".
+loadSourceNamed: "TextEditorModel.sysmel".
+
 loadSourceNamed: "AbstractTextAreaMorph.sysmel".
 loadSourceNamed: "TextAreaMorph.sysmel".
 loadSourceNamed: "TextFieldMorph.sysmel".
-loadSourceNamed: "WorldMorph.sysmel".
-loadSourceNamed: "SystemWindowMorph.sysmel".

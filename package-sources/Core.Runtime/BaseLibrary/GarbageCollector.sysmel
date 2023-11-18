@@ -105,6 +105,7 @@ public global GarbageCollector::LastAllocatedObject mutable => GarbageCollector:
 
 public global GarbageCollector::MarkingStack mutable := GarbageCollector::PointerList basicNew.
 public global GarbageCollector::RememberedSet mutable := GarbageCollector::PointerList basicNew.
+public global GarbageCollector::VerboseCollection mutable => Boolean := false.
 
 public global GarbageCollector::WhiteColor := 0u8.
 public global GarbageCollector::GrayColor := 1u8.
@@ -216,7 +217,7 @@ public nogc function GarbageCollector::loadMaybeRelocatedValidGCLayout(type: Typ
 public nogc function GarbageCollector::relocateStaticObject(objectHeader: ObjectModel::TupleHeader pointer) => Void := {
     let objectPointer := objectHeader reinterpretCastTo: UIntPointer.
     let relocatedTypePointerValue := GarbageCollector::relocatePointerValue(objectHeader _ typePointer).
-    let type => Type := relocatedTypePointerValue reinterpretCastTo: Type.
+    let type => Type := (objectHeader _ isDummyValue ifTrue: 0uptr ifFalse: relocatedTypePointerValue) reinterpretCastTo: Type.
     let layout => GCLayout := type ifNotNil: (GarbageCollector::loadMaybeRelocatedValidGCLayout(type)).
 
     ## Type pointer.
@@ -296,9 +297,7 @@ public nogc function GarbageCollector::relocateStaticObjectSegment() => Void := 
     let segmentEndAddress := GarbageCollector::StaticObjectSegmentEnd address reinterpretCastTo: UIntPointer.
     GarbageCollector::RelocatedStaticObjectSegmentDifference := segmentStartAddress - GarbageCollector::StaticObjectSegmentLoadAddress.
 
-    let ObjectAlignment := 16uptr.
-
-    let position mutable := segmentStartAddress alignedTo: ObjectAlignment.
+    let position mutable := segmentStartAddress alignedTo: ObjectModel::ObjectAlignment.
     while: (position < segmentEndAddress) do: {
         GarbageCollector::RelocatedStaticObjectSegmentEnd := position.
 
@@ -307,7 +306,7 @@ public nogc function GarbageCollector::relocateStaticObjectSegment() => Void := 
 
         GarbageCollector::relocateStaticObject(objectHeader).
 
-        position := position + objectSize alignedTo: ObjectAlignment
+        position := position + objectSize alignedTo: ObjectModel::ObjectAlignment
     }.
 }.
 
@@ -550,7 +549,8 @@ SequenceTupleType definition: {
 Metatype definition: {
     public override nogc method nogcPrintOntoStderr => Void := {
         thisType ifNotNil: {
-            thisType nogcPrintOntoStderr
+            thisType nogcPrintOntoStderr.
+            " __type__" writeOntoStderr.
         } ifNil: {
             super nogcPrintOntoStderr
         }
@@ -588,7 +588,7 @@ public nogc function GarbageCollector::markContentOfObject(objectPointer: UIntPo
         return: void
     }.
 
-    let type := header _ type.
+    let type := header _ gcType.
     type ifNotNil: {
         let layoutHeader := type validGCLayoutForMarking __rawContentsPointer__ reinterpretCastTo: GarbageCollector::LayoutHeader pointer.
         let layoutOffsets := layoutHeader + 1iptr reinterpretCastTo: UInt32 pointer.
@@ -638,17 +638,25 @@ public nogc function GarbageCollector::markContentOfObject(objectPointer: UIntPo
         let variableSlotCount := variableDataSize / ObjectModel::PointerSize.
         let variableSlotsPointer := objectPointer + ObjectModel::TupleHeaderSize + fixedInstanceSize reinterpretCastTo: UIntPointer pointer.
 
-        #*
-        variableSlotCount > 0sz ifTrue: {
-            type ifNotNil: {
-                "Expand variable pointers of " writeOntoStderr.
-                type nogcPrintOntoStderr.
-                "\n" writeOntoStderr
-            } ifNil: {
-                "Expand variable pointers of value without type.\n" writeOntoStderr
+        GarbageCollector::VerboseCollection ifTrue: {
+            variableSlotCount > 0sz ifTrue: {
+                switch: objectType withCases: #{
+                    ObjectModel::ObjectType::Pointers : "Pointers " writeOntoStderr.
+                    ObjectModel::ObjectType::WeakPointers : "WeakPointers " writeOntoStderr.
+                    ObjectModel::ObjectType::Bytes : "Bytes" writeOntoStderr.
+                    ObjectModel::ObjectType::Complex : "Complex " writeOntoStderr.
+                    _: .
+                }.
+
+                type ifNotNil: {
+                    "expand variable pointers of " writeOntoStderr.
+                    type nogcPrintOntoStderr.
+                    "\n" writeOntoStderr
+                } ifNil: {
+                    "expand variable pointers of value without type.\n" writeOntoStderr
+                }.
             }.
         }.
-        *#
 
         let i mutable := 0sz.
         while: (i < variableSlotCount) do: {
@@ -713,7 +721,7 @@ public nogc function GarbageCollector::clearDeadWeakReferencesOf(objectPointer: 
         return: void
     }.
 
-    let type := header _ type.
+    let type := header _ gcType.
     let fixedInstanceSize := type instanceSize.
     type ifNotNil: {
         let layoutHeader := type validGCLayoutForMarking __rawContentsPointer__ reinterpretCastTo: GarbageCollector::LayoutHeader pointer.
@@ -769,9 +777,8 @@ public nogc function GarbageCollector::clearDeadWeakReferences() => Void := {
         {
             let segmentStartAddress := GarbageCollector::StaticObjectSegmentStart address reinterpretCastTo: UIntPointer.
             let segmentEndAddress := GarbageCollector::StaticObjectSegmentEnd address reinterpretCastTo: UIntPointer.
-            let ObjectAlignment := 16uptr.
 
-            let position mutable := segmentStartAddress alignedTo: ObjectAlignment.
+            let position mutable := segmentStartAddress alignedTo: ObjectModel::ObjectAlignment.
             while: (position < segmentEndAddress) do: {
                 let objectHeader := position reinterpretCastTo: ObjectModel::TupleHeader pointer.
                 let objectSize := ObjectModel::TupleHeaderSize + objectHeader _ objectSize asUIntPointer.
@@ -779,7 +786,7 @@ public nogc function GarbageCollector::clearDeadWeakReferences() => Void := {
                     GarbageCollector::clearDeadWeakReferencesOf(objectHeader reinterpretCastTo: UIntPointer)
                 }.
 
-                position := position + objectSize alignedTo: ObjectAlignment
+                position := position + objectSize alignedTo: ObjectModel::ObjectAlignment
             }.
         }.
 
@@ -886,15 +893,14 @@ public nogc function GarbageCollector::sweepAllocatedObjects() => Void := {
 public nogc function GarbageCollector::sweepStaticObjectSegment() => Void := {
     let segmentStartAddress := GarbageCollector::StaticObjectSegmentStart address reinterpretCastTo: UIntPointer.
     let segmentEndAddress := GarbageCollector::StaticObjectSegmentEnd address reinterpretCastTo: UIntPointer.
-    let ObjectAlignment := 16uptr.
 
-    let position mutable := segmentStartAddress alignedTo: ObjectAlignment.
+    let position mutable := segmentStartAddress alignedTo: ObjectModel::ObjectAlignment.
     while: (position < segmentEndAddress) do: {
         let objectHeader := position reinterpretCastTo: ObjectModel::TupleHeader pointer.
         let objectSize := ObjectModel::TupleHeaderSize + objectHeader _ objectSize asUIntPointer.
         objectHeader _ gcColor: GarbageCollector::WhiteColor.
 
-        position := position + objectSize alignedTo: ObjectAlignment
+        position := position + objectSize alignedTo: ObjectModel::ObjectAlignment
     }.
 }.
 
@@ -968,4 +974,97 @@ public nogc function GarbageCollector::safepoint() => Void := {
     }.
 
     GarbageCollector::collect().
+}.
+
+RawTuple::firstInstance adoptDefinitionOf: {:: Untyped |
+    let segmentStartAddress := GarbageCollector::StaticObjectSegmentStart address reinterpretCastTo: UIntPointer.
+    let segmentEndAddress := GarbageCollector::StaticObjectSegmentEnd address reinterpretCastTo: UIntPointer.
+    segmentStartAddress < segmentEndAddress ifTrue: {
+        return: (segmentStartAddress reinterpretCastTo: Untyped)
+    }.
+
+    GarbageCollector::FirstAllocatedObject ifNotNil: {
+        return: (GarbageCollector::FirstAllocatedObject + 1iptr reinterpretCastTo: Untyped)
+    }.
+
+    GarbageCollector::FirstYoungAllocatedObject ifNotNil: {
+        return: (GarbageCollector::FirstYoungAllocatedObject + 1iptr reinterpretCastTo: Untyped)
+    }.
+
+    nil
+}.
+
+RawTuple::nextInstance adoptDefinitionOf: {:(Untyped)iterator :: Untyped |
+    let pointerValue := ObjectModel::getTuplePointerUIntValue(iterator).
+    let tag := pointerValue & ObjectModel::Tag::Mask asUIntPointer.
+    (tag ~= 0uptr) || (pointerValue = 0uptr) ifTrue: {
+        return: nil
+    }.
+
+    ## Is this a static object segment?
+    let segmentStartAddress := GarbageCollector::StaticObjectSegmentStart address reinterpretCastTo: UIntPointer.
+    let segmentEndAddress := GarbageCollector::StaticObjectSegmentEnd address reinterpretCastTo: UIntPointer.
+    (segmentStartAddress <= pointerValue) && (pointerValue <= segmentEndAddress) ifTrue: {
+        let objectHeader := pointerValue reinterpretCastTo: ObjectModel::TupleHeader pointer.
+        let objectSize := ObjectModel::TupleHeaderSize + objectHeader _ objectSize asUIntPointer.
+
+        let nextObjectPointer := pointerValue + objectSize alignedTo: ObjectModel::ObjectAlignment.
+        nextObjectPointer < segmentEndAddress ifTrue: {
+            return: (nextObjectPointer reinterpretCastTo: Untyped)
+        }.
+
+        GarbageCollector::FirstAllocatedObject ifNotNil: {
+            return: (GarbageCollector::FirstAllocatedObject + 1iptr reinterpretCastTo: Untyped)
+        }.
+
+        GarbageCollector::FirstYoungAllocatedObject ifNotNil: {
+            return: (GarbageCollector::FirstYoungAllocatedObject + 1iptr reinterpretCastTo: Untyped)
+        }.
+
+        return: nil
+    }.
+
+    ## This must be a linked list entry.
+    let gcObjectHeader := (pointerValue reinterpretCastTo: GarbageCollector::ObjectHeader pointer) + -1iptr.
+
+    let nextGCObjectHeader := gcObjectHeader _ next.
+    nextGCObjectHeader ifNotNil: {
+        return: (nextGCObjectHeader + 1iptr reinterpretCastTo: Untyped)
+    }.
+
+    ## Is this an old object?
+    let objectHeader := pointerValue reinterpretCastTo: ObjectModel::TupleHeader pointer.
+    objectHeader _ isYoung ifFalse: {
+        return: (GarbageCollector::FirstYoungAllocatedObject reinterpretCastTo: Untyped)
+    }.
+
+    nil
+}.
+
+RawTuple::firstInstanceWithType adoptDefinitionOf: {:(Type)type :: Untyped |
+    let position mutable := RawTuple::firstInstance().
+    while: (Untyped::~~)(position __refLoad__, nil) do: {
+        let positionValue := position __refLoad__.
+        let positionType := RawTuple::type(positionValue).
+        positionType == type ifTrue: {
+            return: positionValue
+        }.
+    } continueWith: (position := RawTuple::nextInstance(position __refLoad__)).
+
+    nil
+}.
+
+RawTuple::nextInstanceWithSameType adoptDefinitionOf: {:(Untyped)iterator :: Untyped |
+    let expectedType := RawTuple::type(iterator).
+    let position mutable := RawTuple::nextInstance(iterator).
+
+    while: (Untyped::~~)(position __refLoad__, nil) do: {
+        let positionValue := position __refLoad__.
+        let positionType := RawTuple::type(positionValue).
+        positionType == expectedType ifTrue: {
+            return: positionValue
+        }.
+    } continueWith: (position := RawTuple::nextInstance(position __refLoad__)).
+
+    nil
 }.

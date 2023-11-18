@@ -16,6 +16,10 @@ public class CLISysmelInterpreter definition: {
                     FunctionNativeCodeCompiler::Current := nil.
                     continue()
                 }.
+                argument ="-verbose-gc" ifTrue: {
+                    GarbageCollector::VerboseCollection := true.
+                    continue()
+                }.
                 argument = "-version" ifTrue: {
                     self printVersion.
                     continue()

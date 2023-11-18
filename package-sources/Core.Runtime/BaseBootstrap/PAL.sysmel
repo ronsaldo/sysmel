@@ -99,7 +99,7 @@ public externC function sysmel_pal_getStderrFileHandle() => SysmelPAL::FileHandl
 
 public externC function sysmel_pal_openFile(nameSize: Size, name: Char8 const pointer, openFlags: UInt32, creationPermissions: UInt32) => SysmelPAL::FileHandle.
 public externC function sysmel_pal_closeFile(handle: SysmelPAL::FileHandle) => Void.
-public externC function sysmel_pal_isFileHandleValid(handle) => Boolean.
+public externC function sysmel_pal_isFileHandleValid(handle: SysmelPAL::FileHandle) => Boolean.
 
 public externC function sysmel_pal_seek(handle: SysmelPAL::FileHandle, offset: Int64, mode: Int32) => Int64.
 

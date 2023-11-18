@@ -87,6 +87,8 @@ public global ObjectModel::ObjectType::WeakPointers := 1u32.
 public global ObjectModel::ObjectType::Bytes := 2u32.
 public global ObjectModel::ObjectType::Complex := 3u32.
 
+public global ObjectModel::ObjectAlignment := 16sz.
+
 public global ObjectModel::IdentityHash::Shift := 10u32.
 public global ObjectModel::IdentityHash::Bits := 22u32.
 public global ObjectModel::IdentityHash::Mask := ((1u32 << ObjectModel::IdentityHash::Bits) - 1u32) << ObjectModel::IdentityHash::Shift.
@@ -131,6 +133,12 @@ ObjectModel::TupleHeader32 definition: {
     public inline method type: (newType: Type) ::=> Void := {
         typePointer := ObjectModel::getTuplePointerUIntValue(newType) asUInt32
     }.
+
+    public inline method gcTypePointer => UInt32
+        := self isDummyValue ifTrue: 0u32 ifFalse: typePointer.
+
+    public inline method gcType => Type
+        := self gcTypePointer asUIntPointer reinterpretCastTo: Type.
 
     public inline method objectType => UInt32
         := (identityHashAndFlags & ObjectModel::ObjectType::Mask) >> ObjectModel::ObjectType::Shift.
@@ -204,6 +212,12 @@ ObjectModel::TupleHeader64 definition: {
     public inline method type: (newType: Type) ::=> Void := {
         typePointer := ObjectModel::getTuplePointerUIntValue(newType) asUInt64
     }.
+
+    public inline method gcTypePointer => UInt64
+        := self isDummyValue ifTrue: 0u64 ifFalse: typePointer.
+
+    public inline method gcType => Type
+        := self gcTypePointer asUIntPointer reinterpretCastTo: Type.
 
     public inline method objectType => UInt32
         := (identityHashAndFlags & ObjectModel::ObjectType::Mask) >> ObjectModel::ObjectType::Shift.
@@ -1003,11 +1017,6 @@ RawTuple::shallowCopy adoptDefinitionOf: {:(Untyped)sourceObject :: Untyped |
         sourceObject
     }
 } withEagerAnalysis.
-
-RawTuple::firstInstanceWithType adoptDefinitionOf: {:(Type)type :: Untyped | nil}.
-RawTuple::nextInstanceWithSameType adoptDefinitionOf: {:(Untyped)iterator :: Untyped | nil}.
-RawTuple::firstInstance adoptDefinitionOf: {:: Untyped | nil}.
-RawTuple::nextInstance adoptDefinitionOf: {:(Untyped)iterator :: Untyped | nil}.
 
 (RawTuple::typeSlotAt:) adoptDefinitionOf: {:(Untyped)self :(TypeSlot)typeSlot :: Untyped |
     <primitive: #RawTuple::typeSlotAt:>

@@ -1,10 +1,36 @@
 public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
+    protected field model => TextEditorModel.
+    public field fontFace => FontFace.
+    public field backgroundColor => Color.
+
     public override method initialize => Void := {
         super initialize.
+        model := TextEditorModel new.
+        backgroundColor := Color white.
     }.
 
+    public method model => TextEditorModel := model.
+
+    public method model: (newModel: TextEditorModel) ::=> Void := {
+        model := newModel.
+        self changed.
+    }.
+
+    public method contents => String
+        := model contents.
+
+    public method contents: (newContents: String) ::=> Void := {
+        model contents: newContents
+    }.
+
+    public virtual method backgroundColorToUse => Color
+        := backgroundColor.
+
     public override method defaultColor => Color
-        := Color white.
+        := Color black.
+
+    public method fontFaceToUse => FontFace
+        := fontFace ifNil: FontFace default.
 
     public override method takesKeyboardFocus => Boolean := true.
 
@@ -30,7 +56,6 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
         printLine("AbstractTextAreaMorph onKeyPressed ", event symbol).
     }.
 
-
     public override method handlesKeyReleasedEvent: (event: KeyReleasedEvent) ::=> Boolean
         := event wasHandled not.
 
@@ -42,13 +67,42 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
         := event wasHandled not.
 
     public override method onTextInputEvent: (event: TextInputEvent) ::=> Void := {
-        printLine("AbstractTextAreaMorph onTextInput ", event text).
+        model insertString: event text.
+        event wasHandled: true.
+        self changed
     }.
 
     public override method handlesTextEditingEvent: (event: TextEditingEvent) ::=> Boolean
         := event wasHandled not.
 
     public override method onTextEditingEvent: (event: TextEditingEvent) ::=> Void := {
-        printLine("AbstractTextAreaMorph onTextEditing ", event text, " ", event start, " ", event length).
+        ##printLine("AbstractTextAreaMorph onTextEditing ", event text, " ", event start, " ", event length).
+    }.
+
+    public override method buildSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode := {
+        let nodes := OrderedCollection new.
+        nodes add: (builder rectangle: self localBounds color: self backgroundColorToUse).
+
+        let fontFace := self fontFaceToUse.
+        let textColor := self colorToUse.
+
+        model textBuffer stringSpansDo: {:(String)string :(Size)startIndex :(Size)endIndex :: Void |
+            nodes add: (builder string: string from: startIndex until: endIndex
+                in: self localBounds
+                fontFace: fontFace color: textColor
+            )
+        }.
+
+        let cursorExtent := 1f32 @ fontFace height.
+        let cursorColor := Color cyan.
+
+        model cursors do: {:(TextEditorCursor)each :: Void |
+            let cursorPosition := (each position asFloat32*fontFace width)@0f32.
+            nodes add: (builder rectangle: (cursorPosition extent: cursorExtent) color: cursorColor)
+        }.
+
+        nodes add: (builder borderRectangle: self localBounds color: self borderColorToUse width: borderWidth).
+
+        builder containerWith: nodes
     }.
 }.
