@@ -1,3 +1,12 @@
+AddressSpace __type__
+    withSelector: #uniqueInstance addMethod: {:(AddressSpace __type__)self :: self |
+        if: (Untyped::==)(self __slotNamedAt__: #emptyTrivialSingleton, nil) then: {
+            self __slotNamedAt__: #emptyTrivialSingleton put: self basicAllocate
+        }.
+
+        self __slotNamedAt__: #emptyTrivialSingleton
+    }.
+
 Type
     withSelector: #hasAnyFlag: addMethod: {:(Type)self :(Bitflags)flag :: Boolean |
         ((self __slotNamedAt__: #flags) & flag) ~= 0bflgs
@@ -38,14 +47,36 @@ Type
     withSelector: #asDecayedBaseType addMethod: {:(Type)self :: Type |
         self
     } makePure makeVirtual withEagerAnalysis;
+    withSelector: #isPassedByReference addMethod: {:(Type)self :: Boolean | false } makePure makeVirtual withEagerAnalysis;
+    withSelector: #isReturnedViaReference addMethod: {:(Type)self :: Boolean | false } makePure makeVirtual withEagerAnalysis;
+
+    withSelector: #refFor: addMethod: {:(Type)self :(AddressSpace)addressSpace :: ReferenceType |
+        ReferenceTypeTemplate(self, addressSpace)
+    } makeVirtual makePure;
+    withSelector: #ref addMethod: {:(Type)self :: ReferenceType |
+        self refFor: GenericAddressSpace uniqueInstance
+    } makeVirtual makePure;
+    withSelector: #memberRef addMethod: {:(Type)self :: ReferenceType |
+        self refFor: MemberAddressSpace uniqueInstance
+    } makePure;
+    withSelector: #tempRefFor: addMethod: {:(Type)self :(AddressSpace)addressSpace :: ReferenceLikeType |
+        TemporaryReferenceTypeTemplate(self, addressSpace)
+    } makeVirtual makePure;
+    withSelector: #tempRef addMethod: {:(Type)self :: ReferenceLikeType |
+        self tempRefFor: GenericAddressSpace uniqueInstance
+    } makeVirtual makePure;
+    withSelector: #memberTempRef addMethod: {:(Type)self :: ReferenceLikeType |
+        self tempRefFor: MemberAddressSpace uniqueInstance
+    } makeVirtual makePure;
+
     withSelector: #asReceiverType addMethod: {:(Type)self :: Type |
-        self
+        if: self isPassedByReference then: self ref else: self
     } makePure makeVirtual withEagerAnalysis;
     withSelector: #asResultType addMethod: {:(Type)self :: Type |
-        self
+        if: self isReturnedViaReference then: self tempRef else: self
     } makePure makeVirtual withEagerAnalysis;
     withSelector: #decayReferenceLikeForReceiverType: addMethod: {:(Type)self :(ReferenceLikeType)reference :: Type |
-        self
+        if: self isPassedByReference then: reference else: self
     } makePure makeVirtual withEagerAnalysis;
     withSelector: #asDecayedReceiverType addMethod: {:(Type)self :: Type |
         self

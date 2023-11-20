@@ -31,6 +31,12 @@ public class EnumType superclass: ValueType; definition: {
         }.
     }.
 
+    public override method isPassedByReference => Boolean
+        := valueType ifNil: true ifNotNil: valueType isPassedByReference.
+
+    public override method isReturnedViaReference => Boolean
+        := valueType ifNil: true ifNotNil: valueType isReturnedViaReference.
+
     public macro method values: (valueDictionary: ASTMakeDictionaryNode) ::=> ASTNode := {
         let perValueNodes := OrderedCollection new.
         valueDictionary elements do: {:(ASTMakeAssociationNode)associationNode :: Void |

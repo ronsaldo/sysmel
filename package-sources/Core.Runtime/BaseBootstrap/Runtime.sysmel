@@ -2535,34 +2535,9 @@ Metaclass
         else: (stream nextPutAll: "a "; print: self __type__)
     } makeOverride.
 
-AddressSpace
-    withSelector: #uniqueInstance addClassMethod: {:(AddressSpace class)self :: self |
-        if: (Untyped::==)(self __slotNamedAt__: #emptyTrivialSingleton, nil) then: {
-            self __slotNamedAt__: #emptyTrivialSingleton put: self basicAllocate
-        }.
 
-        self __slotNamedAt__: #emptyTrivialSingleton
-    }.
     
 Type
-    withSelector: #refFor: addMethod: {:(Type)self :(AddressSpace)addressSpace :: ReferenceType |
-        ReferenceTypeTemplate(self, addressSpace)
-    } makeVirtual makePure;
-    withSelector: #ref addMethod: {:(Type)self :: ReferenceType |
-        self refFor: GenericAddressSpace uniqueInstance
-    } makeVirtual makePure;
-    withSelector: #memberRef addMethod: {:(Type)self :: ReferenceType |
-        self refFor: MemberAddressSpace uniqueInstance
-    } makePure;
-    withSelector: #tempRefFor: addMethod: {:(Type)self :(AddressSpace)addressSpace :: ReferenceLikeType |
-        TemporaryReferenceTypeTemplate(self, addressSpace)
-    } makeVirtual makePure;
-    withSelector: #tempRef addMethod: {:(Type)self :: ReferenceLikeType |
-        self tempRefFor: GenericAddressSpace uniqueInstance
-    } makeVirtual makePure;
-    withSelector: #memberTempRef addMethod: {:(Type)self :: ReferenceLikeType |
-        self tempRefFor: MemberAddressSpace uniqueInstance
-    } makeVirtual makePure;
     withSelector: #pointerFor: addMethod: {:(Type)self :(AddressSpace)addressSpace :: PointerType |
         PointerTypeTemplate(self, addressSpace)
     } makePure;
@@ -2577,7 +2552,15 @@ Type
     } makePure;
     withSelector: #restrict addMethod: {:(Type)self :: Type |
         self
-    } makePure.
+    } makePure;
+
+    withSelector: #asReceiverType replaceMethod: {:(Type)self :: Type |
+        self isPassedByReference ifTrue: self ref ifFalse: self
+    } makePure makeVirtual withEagerAnalysis;
+    withSelector: #asResultType replaceMethod: {:(Type)self :: Type |
+        self isReturnedViaReference ifTrue: self tempRef ifFalse: self
+    } makePure makeVirtual withEagerAnalysis.
+
 
 AddressSpace
     withSelector: #prettyPointerSuffix addMethod: {:(AddressSpace)self :: String | nil} makeVirtual;
@@ -3385,6 +3368,8 @@ Type
 (Type >> #lookupLocalSelector:) makeInline. ## To speed-up method lookup.
 
 PointerLikeType
+    withSelector: #isPassedByReference addMethod: {:(ValueType)self :: Boolean | false } makeOverride;
+    withSelector: #isReturnedViaReference addMethod: {:(ValueType)self :: Boolean | false } makeOverride;
     withSelector: #computeLayout addMethod: {:(PointerLikeType)self :: Void |
         self instanceSize: UIntPointer valueSize.
         self instanceAlignment: UIntPointer valueAlignment.
@@ -3415,20 +3400,36 @@ PointerLikeType
     }.
 
 ValueType
-    withSelector: #asReceiverType addMethod: {:(Type)self :: Type | self ref } makePure makeOverride;
-    withSelector: #asResultType addMethod: {:(Type)self :: Type | self tempRef } makePure makeOverride;
     withSelector: #valueSize addMethod: {:(ValueType)self :: Size |
         self validInstanceSize
     } makeOverride;
     withSelector: #valueAlignment addMethod: {:(ValueType)self :: Size |
         self validInstanceAlignment
     } makeOverride;
-    withSelector: #decayReferenceLikeForReceiverType: addMethod: {:(Type)self :(ReferenceLikeType)reference :: Type | reference } makeOverride.
+    withSelector: #isPassedByReference addMethod: {:(ValueType)self :: Boolean | true } makeOverride;
+    withSelector: #isReturnedViaReference addMethod: {:(ValueType)self :: Boolean | true } makeOverride.
 
 PrimitiveValueType
-    withSelector: #asReceiverType addMethod: {:(Type)self :: Type | self } makePure makeOverride;
-    withSelector: #asResultType addMethod: {:(Type)self :: Type | self } makePure makeOverride;
-    withSelector: #decayReferenceLikeForReceiverType: addMethod: {:(Type)self :(ReferenceLikeType)reference :: Type | self } makeOverride.
+    withSelector: #isPassedByReference addMethod: {:(ValueType)self :: Boolean | false } makeOverride;
+    withSelector: #isReturnedViaReference addMethod: {:(ValueType)self :: Boolean | false } makeOverride.
+
+Type
+    withSelector: #setPublicSymbolBinding: addMethod: {:(Type)self :(SymbolBinding)binding :: Void |
+        if: self publicSymbolTable == nil then: (self publicSymbolTable: IdentityDictionary new).
+        self publicSymbolTable add: binding
+    };
+    withSelector: #setPublicSymbol:bindingWithValue: addMethod: {:(Type)self :(Symbol)symbol :value :: Void |
+        let: #binding with: (SymbolValueBinding new
+            name: symbol;
+            value: value;
+            yourself).
+        self setPublicSymbolBinding: binding.
+        value recordBindingWithOwner: self andName: symbol.
+        value
+    };
+    withSelector: #setPublicSymbol:value: addMethod: {:(Environment)self :(Symbol)symbol :value :: value __type__ |
+        self setPublicSymbol: symbol value: value
+    },
 
 Environment
     withSelector: #setSymbol:value: addMethod: {:(Environment)self :(Symbol)symbol :value :: value __type__ |

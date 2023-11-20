@@ -27,9 +27,8 @@ public class PrimitiveVectorType superclass: ValueType; definition: {
     public method alignedBitWidth => Size
         := elementType instanceSize * self alignmentMultiplicationFactor * 8sz max: 32sz.
 
-    public override pure method asReceiverType => Type := self.
-    public override pure method asResultType => Type := self.
-    public override method decayReferenceLikeForReceiverType: (reference: ReferenceLikeType) ::=> Type := self.
+    public override method isPassedByReference => Boolean := false.
+    public override method isReturnedViaReference => Boolean := false.
 
     public override method isPrimitiveVectorType => Boolean := true.
     public override method isPrimitiveFloatOrFloatVectorType => Boolean := elementType isPrimitiveFloatType.

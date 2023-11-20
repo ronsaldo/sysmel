@@ -58,6 +58,8 @@ typedef struct sysbvm_type_tuple_s
     sysbvm_tuple_t constructors;
     sysbvm_tuple_t conversions;
 
+    sysbvm_tuple_t publicSymbolTable;
+
     sysbvm_tuple_t virtualMethodSelectorList;
     sysbvm_tuple_t virtualTableSelectorDictionary;
     sysbvm_tuple_t virtualTable;

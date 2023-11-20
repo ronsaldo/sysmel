@@ -233,6 +233,17 @@ public function abs(v: Int32x4) => Int32x4
 ##public function myOnes() => Boolean64x2
 ##    := Boolean64x2 withAll: 1i32.
 
+public enum TestEnum valueType: UInt8; values: #{
+    First: 0u8.
+    Second: 1u8.
+}.
+
+public function enumIdentity(v: TestEnum) => TestEnum
+    := v.
+
+public function enumGetValue(v: TestEnum) => UInt8
+    := v value.
+    
 let asmCompilationTarget := AsmCompilationTarget x86_64 setForLinux.
 
 let hirModule := (HIRModuleCompilationContext forTarget: asmCompilationTarget asMirCompilationTarget asHIRCompilationTarget)

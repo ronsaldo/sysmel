@@ -63,10 +63,3 @@ FlagMetaBuilder extend: {
             yourself)
     }
 }.
-
-#*
-public enum TestEnum valueType: UInt8; values: #{
-    First: 0u8.
-}.
-printLine("TestEnum ", TestEnum).
-*#
