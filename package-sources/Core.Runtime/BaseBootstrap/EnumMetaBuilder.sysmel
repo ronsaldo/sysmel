@@ -1,5 +1,6 @@
 ## Enum MetaBuilder.
 public class EnumMetaBuilder superclass: TypeMetaBuilder; definition: {
+    public field valuesExpression => ASTNode.
     public field valueTypeExpression => ASTNode.
 
     public method validValueTypeExpression => ASTNode
@@ -8,6 +9,12 @@ public class EnumMetaBuilder superclass: TypeMetaBuilder; definition: {
     public method valueType: (newValueTypeExpression: ASTNode) ::=> ASTNode := {
         <metaBuilder>
         valueTypeExpression := newValueTypeExpression.
+        self continueExpansion
+    }.
+
+    public method values: (newValuesExpression: ASTNode) ::=> ASTNode := {
+        <metaBuilder>
+        valuesExpression := newValuesExpression.
         self continueExpansion
     }.
 
@@ -34,10 +41,14 @@ public class EnumMetaBuilder superclass: TypeMetaBuilder; definition: {
                 else: ``(let: `,name with: `,makeEnumExpression) 
             ).
 
+        let enumWithValuesExpression := valuesExpression
+            ifNil: enumValueExpression
+            ifNotNil: ``(`,enumValueExpression values: `,valuesExpression).
+
         let definitionExpression := self definitionExpression.
         definitionExpression
-            ifNil: enumValueExpression
-            ifNotNil: ``(`,enumValueExpression definition: `,definitionExpression)
+            ifNil: enumWithValuesExpression
+            ifNotNil: ``(`,enumWithValuesExpression definition: `,definitionExpression)
     }.
 }.
 
@@ -52,3 +63,10 @@ FlagMetaBuilder extend: {
             yourself)
     }
 }.
+
+#*
+public enum TestEnum valueType: UInt8; values: #{
+    First: 0u8.
+}.
+printLine("TestEnum ", TestEnum).
+*#

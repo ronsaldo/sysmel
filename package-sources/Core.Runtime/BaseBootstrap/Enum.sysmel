@@ -6,7 +6,7 @@ public class EnumType superclass: ValueType; definition: {
     __Meta__ definition: {
         public method makeWithValueType: (valueType: Type) typeSlots: (typeSlots: Array) ::=> EnumType := {
             let: #metatype with: EnumMetatype basicNew.
-            let: #metatypeSuper with: EnumType.
+            let: #metatypeSuper with: AnyEnum __type__.
             metatype
                 flags: TypeFlags::MetatypeRequiredFlags;
                 supertype: metatypeSuper;
@@ -19,9 +19,9 @@ public class EnumType superclass: ValueType; definition: {
             let: #enum with: metatype basicNew.
             enum
                 flags: TypeFlags::EnumDefaultFlags;
-                supertype: AnyValue;
+                supertype: AnyEnum;
                 valueType: valueType;
-                slots: (Array with: (TypeSlot publicNamed: #__value__ type: valueType));
+                slots: (Array with: (TypeSlot publicNamed: #value type: valueType));
                 totalSlotCount: 1;
                 registerSlotsInDictionary;
                 generatePublicAccessors;
@@ -29,6 +29,35 @@ public class EnumType superclass: ValueType; definition: {
             metatype thisType: enum.
             enum
         }.
+    }.
+
+    public macro method values: (valueDictionary: ASTMakeDictionaryNode) ::=> ASTNode := {
+        let perValueNodes := OrderedCollection new.
+        valueDictionary elements do: {:(ASTMakeAssociationNode)associationNode :: Void |
+            let elementName => ASTNode := associationNode key.
+            let elementValue => ASTNode := associationNode value.
+
+            let variableDefinitionNode := ASTVariableDefinitionNode new
+                sourcePosition: __macroContext__ sourcePosition;
+                nameExpression: elementName;
+                valueExpression: elementValue;
+                yourself.
+
+            perValueNodes add: ``(__OwnerProgramEntity__ withName: `,elementName addValue: `,variableDefinitionNode).
+        }.
+
+        ``{
+            let __OwnerProgramEntity__ := `,self,
+            let __ValueType__ := __OwnerProgramEntity__ valueType.
+
+            `@perValueNodes.
+
+            __OwnerProgramEntity__
+        }
+    }.
+
+    public method withName: (name: Symbol) addValue: enumValue ::=> Void := {
+        printLine("EnumType withName: ", name, " addValue: ", enumValue)
     }.
 }.
 
@@ -38,3 +67,17 @@ public class EnumMetatype superclass: ValueMetatype; definition: {
             := EnumType
     }.
 }.
+
+let AnyEnumType := EnumMetatype basicNew
+    flags: TypeFlags::MetatypeRequiredFlags;
+    supertype: EnumType;
+    totalSlotCount: EnumType validTotalSlotCount;
+    yourself.
+public global AnyEnum := AnyEnumType basicNew
+    name: #AnyEnum;
+    flags: TypeFlags::EnumDefaultFlags;
+    supertype: AnyValue;
+    slots: ();
+    totalSlotCount: 0sz;
+    registerInSupertype;
+    yourself.

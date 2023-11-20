@@ -570,9 +570,23 @@ ASTNode
 
         result asArray
     };
+    withSelector: #evaluateQuasiQuotedList:withParameters: addMethod: {:(ASTNode)self :(Array)list :(Array)parameters :: Array |
+        let: #result with: OrderedCollection new.
+        list do: {:(ASTNode)each :: Void |
+            each isSpliceNode ifTrue: {
+                result addAll: (each evaluateSpliceWithParameters: parameters)
+            } ifFalse: {
+                result add: (each evaluateQuasiQuoteWithParameters: parameters)
+            }
+        }.
 
+        result asArray
+    };
     withSelector: #analyzeQuasiQuoteOrSpliceWithEnvironment:parameterList: addMethod: {:(ASTNode)self :(AnalysisAndEvaluationEnvironment)environment :(OrderedCollection)parameterList :: ASTNode |
         self analyzeQuasiQuoteWithEnvironment: environment parameterList: parameterList
+    } makeVirtual;
+    withSelector: #evaluateSpliceWithParameters: addMethod: {:(ASTNode)self :(Array)parameters :: Collection |
+        self error: "Not a splice node."
     } makeVirtual;
 
     withSelector: #analyzeQuasiQuoteWithEnvironment:parameterList: addMethod: {:(ASTNode)self :(AnalysisAndEvaluationEnvironment)environment :(OrderedCollection)parameterList :: ASTNode |
@@ -583,11 +597,28 @@ ASTNode
     } makeVirtual;
     withSelector: #evaluateQuasiQuoteWithParameters: addMethod: {:(ASTNode)self :(Array)parameters :: ASTNode |
         self transformedWith: {:child | child evaluateQuasiQuoteWithParameters: parameters }
-    } makeVirtual;
-    withSelector: #evaluateQuasiQuoteWithEnvironment: addMethod: {:(ASTNode)self :(Environment)environment :: ASTNode |
-        self subclassResponsibility
-    } makeAbstract.
+    } makeVirtual.
 
+ASTSequenceNode
+    withSelector: #analyzeAndEvaluateQuasiQuoteWithEnvironment: addMethod: {:(ASTSequenceNode)self :(AnalysisAndEvaluationEnvironment)environment :(OrderedCollection)parameterList :: ASTNode |
+        self copy
+            pragmas: (self analyzeAndEvaluateQuasiQuotedList: self pragmas withEnvironment: environment);
+            expressions: (self analyzeAndEvaluateQuasiQuotedList: self expressions withEnvironment: environment);
+            yourself
+    } makeOverride;
+    withSelector: #analyzeQuasiQuoteWithEnvironment:parameterList: addMethod: {:(ASTSequenceNode)self :(AnalysisAndEvaluationEnvironment)environment :(OrderedCollection)parameterList :: ASTNode |
+        self copy
+            pragmas: (self analyzeQuasiQuotedList: self pragmas withEnvironment: environment parameterList: parameterList);
+            expressions: (self analyzeQuasiQuotedList: self expressions withEnvironment: environment parameterList: parameterList);
+            yourself
+    } makeOverride;
+    withSelector: #evaluateQuasiQuoteWithParameters: addMethod: {:(ASTSequenceNode)self :(Array)parameters :: ASTNode |
+        self copy
+            pragmas: (self evaluateQuasiQuotedList: self pragmas withParameters: parameters);
+            expressions: (self evaluateQuasiQuotedList: self expressions withParameters: parameters);
+            yourself
+    } makeOverride.
+    
 let: #expandASTTemplateWithParameters with: {:(ASTNode)templateNode :(Array)templateParameters :: ASTNode |
     templateNode evaluateQuasiQuoteWithParameters: templateParameters
 }.
@@ -602,6 +633,28 @@ ASTMakeArrayNode
         self copy
             elements: (self analyzeQuasiQuotedList: self elements withEnvironment: environment parameterList: parameterList);
             yourself
+    } makeOverride;
+    withSelector: #evaluateQuasiQuoteWithParameters: addMethod: {:(ASTMakeArrayNode)self :(Array)parameters :: ASTNode |
+        self copy
+            elements: (self evaluateQuasiQuotedList: self elements withParameters: parameters);
+            yourself
+    } makeOverride.
+
+ASTMakeDictionaryNode
+    withSelector: #analyzeAndEvaluateQuasiQuoteWithEnvironment: addMethod: {:(ASTMakeDictionaryNode)self :(AnalysisAndEvaluationEnvironment)environment :(OrderedCollection)parameterList :: ASTNode |
+        self copy
+            elements: (self analyzeAndEvaluateQuasiQuotedList: self elements withEnvironment: environment);
+            yourself
+    } makeOverride;
+    withSelector: #analyzeQuasiQuoteWithEnvironment:parameterList: addMethod: {:(ASTMakeDictionaryNode)self :(AnalysisAndEvaluationEnvironment)environment :(OrderedCollection)parameterList :: ASTNode |
+        self copy
+            elements: (self analyzeQuasiQuotedList: self elements withEnvironment: environment parameterList: parameterList);
+            yourself
+    } makeOverride;
+    withSelector: #evaluateQuasiQuoteWithParameters: addMethod: {:(ASTMakeDictionaryNode)self :(Array)parameters :: ASTNode |
+        self copy
+            elements: (self evaluateQuasiQuotedList: self elements withParameters: parameters);
+            yourself
     } makeOverride.
 
 ASTUnexpandedSExpressionNode
@@ -613,6 +666,11 @@ ASTUnexpandedSExpressionNode
     withSelector: #analyzeQuasiQuoteWithEnvironment:parameterList: addMethod: {:(ASTUnexpandedSExpressionNode)self :(AnalysisAndEvaluationEnvironment)environment :(OrderedCollection)parameterList :: ASTNode |
         self copy
             elements: (self analyzeQuasiQuotedList: self elements withEnvironment: environment parameterList: parameterList);
+            yourself
+    } makeOverride;
+    withSelector: #evaluateQuasiQuoteWithParameters: addMethod: {:(ASTUnexpandedSExpressionNode)self :(Array)parameters :: ASTNode |
+        self copy
+            elements: (self evaluateQuasiQuotedList: self elements withParameters: parameters);
             yourself
     } makeOverride.
 
@@ -646,7 +704,7 @@ ASTQuasiQuoteNode
         self node analyzeAndEvaluateQuasiQuoteWithEnvironment: environment
     } makeOverride;
     withSelector: #evaluateWithEnvironment: addMethod: {:(ASTQuasiQuoteNode)self :(FunctionActivationEnvironment)environment |
-        self node evaluateQuasiQuoteWithEnvironment: environment
+        self error: "Quasi quote node must be expanded during semantic analysis."
     } makeOverride;
     withSelector: #childrenDo: addMethod: {:(ASTQuasiQuoteNode)self :aBlock :: Void |
         if: (self node isNotNil) then: aBlock(self node)
@@ -721,7 +779,9 @@ ASTSpliceNode
             astTemplateParameterIndex: astTemplateParameterIndex;
             yourself
     } makeOverride;
-
+    withSelector: #evaluateSpliceWithParameters: addMethod: {:(ASTSpliceNode)self :(Array)parameters :: Collection |
+        parameters at: self astTemplateParameterIndex
+    } makeOverride;
     withSelector: #invalidLocationError addMethod: {:(ASTSpliceNode)self |
         self error: "Invalid location for a splice expression."
     }.
