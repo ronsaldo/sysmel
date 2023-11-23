@@ -3,5 +3,6 @@ loadSourceNamed: "CompilationError.sysmel".
 loadSourceNamed: "ProgramEntity.sysmel".
 loadSourceNamed: "Function.sysmel".
 loadSourceNamed: "Environment.sysmel".
+loadSourceNamed: "Type.sysmel".
 loadSourceNamed: "SemanticAnalyzer.sysmel".
 AnalysisQueue current waitPendingAnalysis.

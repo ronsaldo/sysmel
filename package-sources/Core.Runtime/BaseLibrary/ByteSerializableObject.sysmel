@@ -15,7 +15,7 @@ public class ByteSerializableObject superclass: Object; definition: {
             }.
         }.
 
-        public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> self := {
+        public override method decodeValueFromBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> self := {
             let result := self basicAllocate.
             self ensureLayoutIsComputed.
 
@@ -44,7 +44,7 @@ public class ByteSerializablePackedObject superclass: Object; definition: {
             }
         }.
 
-        public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> self := {
+        public override method decodeValueFromBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> self := {
             let result := self basicAllocate.
             let sourceOffset mutable := offset.
 

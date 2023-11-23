@@ -48,7 +48,7 @@ public class PrimitiveVectorType superclass: ValueType; definition: {
 
     public override method canDecodeValueFromBytes => Boolean := true.
 
-    public override method decodeValueFromBytes: (bytes: ByteArray) atOffset: (offset: Size) ::=> self := {
+    public override method decodeValueFromBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> self := {
         let result := self basicAllocate.
         let i mutable := 0sz.
         while: i < instanceSize do: {

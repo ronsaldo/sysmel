@@ -21,10 +21,11 @@ public class EnumType superclass: ValueType; definition: {
                 flags: TypeFlags::EnumDefaultFlags;
                 supertype: AnyEnum;
                 valueType: valueType;
-                slots: (Array with: (TypeSlot publicNamed: #value type: valueType));
-                totalSlotCount: 1;
+                slots: #();
+                totalSlotCount: 0sz;
                 registerSlotsInDictionary;
                 generatePublicAccessors;
+                generateValueAccessor;
                 createBasicInitializeMethod.
             metatype thisType: enum.
             enum
@@ -63,7 +64,29 @@ public class EnumType superclass: ValueType; definition: {
     }.
 
     public method withName: (name: Symbol) addValue: enumValue ::=> Void := {
-        printLine("EnumType withName: ", name, " addValue: ", enumValue)
+        let enumInstance := self value: enumValue.
+        self setPublicSymbol: name bindingWithValue: enumInstance.
+    }.
+
+    public method validValueType => Type
+        := RawTuple::isDummyValue(self) || valueType isNil ifTrue: AnyValue ifFalse: valueType.
+
+    public pure method value: (initialValue: self validValueType) ::=> self := {
+        <primitive: #Enum::value:>
+        self assert: valueType isNotNil.
+        let result := self basicAllocate: valueType alignedValueSize.
+        valueType encodeValue: initialValue inBytes: result atOffset: 0sz.
+        result
+    }.
+
+    public method generateValueAccessor => Void := {
+        let SelfType := self.
+        let ValueType := self validValueType.
+        self withSelector: #value addMethod: {:(SelfType)self :: ValueType |
+            <primitive: #Enum::value>
+            <keepSourceDefinition>
+            ValueType decodeValueFromBytes: self atOffset: 0sz
+        } makeOverride makePure makeFinal recompileAndOptimize
     }.
 }.
 
@@ -87,3 +110,8 @@ public global AnyEnum := AnyEnumType basicNew
     totalSlotCount: 0sz;
     registerInSupertype;
     yourself.
+
+AnyEnum
+    withSelector: #value addMethod: {:(AnyValue)self :: AnyValue |
+        (self __type__ downCastTo: EnumType) validValueType decodeValueFromBytes: self atOffset: 0sz
+    } makePure makeAbstract.

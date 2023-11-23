@@ -1616,37 +1616,37 @@ FixedArrayType definition: {
 
 EnumType extend: {
     public override method emitMirCall: (function: MIRValue) convention: (callingConvention: MIRCallingConvention) withArguments: (arguments: Array) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
-        := valueType emitMirCall: function convention: callingConvention withArguments: arguments withBlockBuilder: builder.
+        := self validValueType emitMirCall: function convention: callingConvention withArguments: arguments withBlockBuilder: builder.
 
     public override method emitMirMove: (value: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
-        := valueType emitMirMove: value withBlockBuilder: builder.
+        := self validValueType emitMirMove: value withBlockBuilder: builder.
 
     public override method emitMirPhiWithBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
-        := valueType emitMirPhiWithBlockBuilder: builder.
+        := self validValueType emitMirPhiWithBlockBuilder: builder.
 
     public override method emitMirReturn: (value: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
-        := valueType emitMirReturn: value withBlockBuilder: builder.
+        := self validValueType emitMirReturn: value withBlockBuilder: builder.
 
     public override method emitMirLoadFromPointer: (pointer: MIRValue) constantOffset: (constantOffset: Int64) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
-        := valueType emitMirLoadFromPointer: pointer constantOffset: constantOffset withBlockBuilder: builder.
+        := self validValueType emitMirLoadFromPointer: pointer constantOffset: constantOffset withBlockBuilder: builder.
 
     public override method emitMirStore: (value: MIRValue) intoPointer: (pointer: MIRValue) constantOffset: (constantOffset: Int64) in: (object: MIRValue) with: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue
-        := valueType emitMirStore: value intoPointer: pointer constantOffset: constantOffset in: object with: codegen.
+        := self validValueType emitMirStore: value intoPointer: pointer constantOffset: constantOffset in: object with: codegen.
 
     public override method emitMirEquals: (left: MIRValue) with: (right: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
-        := valueType emitMirEquals: left with: right withBlockBuilder: builder.
+        := self validValueType emitMirEquals: left with: right withBlockBuilder: builder.
 
     public override method emitMirNotEquals: (left: MIRValue) with: (right: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
-        := valueType emitMirNotEquals: left with: right withBlockBuilder: builder.
+        := self validValueType emitMirNotEquals: left with: right withBlockBuilder: builder.
 
     public override method translateUndefinedConstant: (constant: HIRUndefinedConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
-        := valueType translateUndefinedConstant: constant intoMirWith: codegen.
+        := self validValueType translateUndefinedConstant: constant intoMirWith: codegen.
 
     public override method translateHIRLiteralConstant: (constant: HIRLiteralConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
-        := valueType translateHIRLiteralConstant: constant intoMirWith: codegen.
+        := self validValueType translateHIRLiteralConstant: constant intoMirWith: codegen.
 
     public override method emitMirSwitch: (value: MIRValue) keys: (keys: Array) destinations: (destinations: Array) defaultDestination: (defaultDestination: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
-        := valueType emitMirSwitch: value keys: keys destinations: destinations defaultDestination: defaultDestination withBlockBuilder: builder.
+        := self validValueType emitMirSwitch: value keys: keys destinations: destinations defaultDestination: defaultDestination withBlockBuilder: builder.
 }.
 
 PrimitiveVectorType extend: {

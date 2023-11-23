@@ -30,6 +30,7 @@ loadSourceNamed: "PackageMacro.sysmel".
 
 loadSourceNamed: "ProgramEntity.sysmel".
 loadSourceNamed: "SequenceTuple.sysmel".
+loadSourceNamed: "ByteEncoding.sysmel".
 loadSourceNamed: "FixedArray.sysmel".
 loadSourceNamed: "Enum.sysmel".
 loadSourceNamed: "EnumMetaBuilder.sysmel".

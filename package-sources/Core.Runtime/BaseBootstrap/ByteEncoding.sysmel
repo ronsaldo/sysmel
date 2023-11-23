@@ -1,0 +1,12 @@
+Type definition: {
+    public virtual method encodeValue: (value: Untyped) inBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> Void := {
+        (Untyped::==)(value, nil) ifTrue: {
+            return: void
+        }.
+
+        self shouldBeImplemented
+    }.
+
+    public abstract method decodeValueFromBytes: (bytes: AnyValue) atOffset: (offset: Size) ::=> self
+        := self subclassResponsibility.
+}.
