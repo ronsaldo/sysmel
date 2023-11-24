@@ -139,8 +139,17 @@ public class MouseMoveEvent superclass: MouseEvent; definition: {
  * I am a mouse button event
  *#
 public class MouseButtonEvent superclass: MouseEvent; definition: {
-    public field button => UInt8.
+    public field button => MouseButton.
     public field clicks => UInt8.
+
+    public inline method isLeftButton => Boolean
+        := button isLeft.
+
+    public inline method isMiddleButton => Boolean
+        := button isMiddle.
+
+    public inline method isRightButton => Boolean
+        := button isRight.
 }.
 
 #**

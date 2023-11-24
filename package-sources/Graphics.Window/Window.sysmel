@@ -87,7 +87,7 @@ public class Window superclass: Object; definition: {
 
     private method convertMouseButtonEventInto: (palEvent: SysmelPAL::MouseButtonEvent ref) into: (event: MouseButtonEvent) ::=> MouseButtonEvent
         := event
-            button: palEvent button;
+            button: (MouseButton value: palEvent button);
             clicks: palEvent clicks;
             position: (Float32x2 x: palEvent x asFloat32 y: palEvent y asFloat32);
             yourself.

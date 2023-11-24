@@ -1,0 +1,35 @@
+#**
+ * I represent a particular mouse button.
+ *#
+public enum MouseButton valueType: UInt8; values: #{
+    None: 0u8.
+    Left: 1u8.
+    Middle: 2u8.
+    Right: 3u8.
+    X1: 4u8.
+    X2: 5u8.
+}; definition: {
+    public inline method asMaskBit => UInt32
+        := 1u32<<(self value asUInt32 - 1u32).
+
+    public inline method isLeft => Boolean
+        := self value = MouseButton Left value.
+
+    public inline method isMiddle => Boolean
+        := self value = MouseButton Middle value.
+
+    public inline method isRight => Boolean
+        := self value = MouseButton Right value.
+}.
+
+#**
+* I am a mask of different mouse buttons.
+ *#
+public enum MouseButtonMask bitMask valueType: UInt32; values: #{
+    None: 0u32.
+    Left: MouseButton Left asMaskBit.
+    Middle: MouseButton Middle asMaskBit.
+    Right: MouseButton Right asMaskBit.
+    X1: MouseButton X1 asMaskBit.
+    X2: MouseButton X2 asMaskBit.
+}.
