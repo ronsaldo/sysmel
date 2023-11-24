@@ -128,6 +128,12 @@ Environment eagerDefinitionBody: {
         := (self lookLocalSymbol: symbol)
             ifNil: (parent ifNotNil: (parent lookSymbolRecursively: symbol)).
 
+    public override method lookupPublicSymbolBinding: (symbol: Symbol) ::=> SymbolBinding
+        := self lookLocalSymbol: symbol.
+
+    public override method lookupPublicSymbolBindingRecursively: (symbol: Symbol) ::=> SymbolBinding
+        := self lookSymbolRecursively: symbol.
+
     public virtual method lookReturnTypeExpression => ASTNode
         := parent ifNotNil: parent lookReturnTypeExpression.
 

@@ -1,0 +1,9 @@
+Type eagerDefinitionBody: {
+    public override method lookupPublicSymbolBinding: (symbol: Symbol) ::=> SymbolBinding
+        := publicSymbolTable ifNotNil: (publicSymbolTable associationAtOrNil: symbol).
+
+    public override method lookupPublicSymbolBindingRecursively: (symbol: Symbol) ::=> SymbolBinding := {
+        let found := self lookupPublicSymbolBinding: symbol.
+        found ifNil: (supertype ifNotNil: (supertype lookupPublicSymbolBindingRecursively: symbol))
+    }.
+}.

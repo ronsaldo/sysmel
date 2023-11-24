@@ -1643,7 +1643,7 @@ EnumType extend: {
         := self validValueType translateUndefinedConstant: constant intoMirWith: codegen.
 
     public override method translateHIRLiteralConstant: (constant: HIRLiteralConstant) intoMirWith: (codegen: HIRModuleMIRCodeGenerator) ::=> MIRValue
-        := self validValueType translateHIRLiteralConstant: constant intoMirWith: codegen.
+        := self validValueType translateHIRLiteralConstant: (constant context literal: constant value value) intoMirWith: codegen.
 
     public override method emitMirSwitch: (value: MIRValue) keys: (keys: Array) destinations: (destinations: Array) defaultDestination: (defaultDestination: MIRValue) withBlockBuilder: (builder: MIRBlockBuilder) ::=> MIRValue
         := self validValueType emitMirSwitch: value keys: keys destinations: destinations defaultDestination: defaultDestination withBlockBuilder: builder.

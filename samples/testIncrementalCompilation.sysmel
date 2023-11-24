@@ -238,6 +238,12 @@ public enum TestEnum valueType: UInt8; values: #{
     Second: 1u8.
 }.
 
+public function enumAccessPublic() => TestEnum
+    := TestEnum Second.
+
+printLine("TestEnum First ", TestEnum First).
+printLine("TestEnum Second ", enumAccessPublic()).
+
 public function enumIdentity(v: TestEnum) => TestEnum
     := v.
 
@@ -249,7 +255,7 @@ let asmCompilationTarget := AsmCompilationTarget x86_64 setForLinux.
 let hirModule := (HIRModuleCompilationContext forTarget: asmCompilationTarget asMirCompilationTarget asHIRCompilationTarget)
     exclusiveCompilationMode: true;
     compileFunctionsWithDefinitions: (
-        enumIdentity,);
+        enumAccessPublic, enumIdentity,);
     finish.
 
 hirModule performStandardOptimizations.

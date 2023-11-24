@@ -2,6 +2,12 @@ SymbolBinding eagerDefinitionBody: {
     public abstract method analyzeAndEvaluateWithEnvironment: (environment: Environment) at: (sourcePosition: SourcePosition) ::=> Untyped
         := self subclassResponsibility.
 
+    public abstract eager method analyzeAndEvaluateMessageSendNode: (messageSendNode: ASTMessageSendNode) forReceiver: (receiver: Untyped) selector: (selector: Symbol) withEnvironment: (environment: Environment) at: (sourcePosition: SourcePosition) ::=> Untyped
+        := self subclassResponsibility.
+
+    public abstract eager method analyzeMessageSendNode: (messageSendNode: ASTMessageSendNode) forReceiver: (receiver: Untyped) selector: (selector: Symbol) withEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode
+        := self subclassResponsibility.
+
     public abstract eager method analyzeIdentifierReference: (node: ASTIdentifierReferenceNode) withEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode
         := self subclassResponsibility.
     
@@ -14,6 +20,23 @@ SymbolBinding eagerDefinitionBody: {
 SymbolValueBinding eagerDefinitionBody: {
     public override method analyzeAndEvaluateWithEnvironment: (environment: Environment) at: (sourcePosition: SourcePosition) ::=> Untyped
         := self __slotNamedAt__: #value.
+
+    public override eager method analyzeAndEvaluateMessageSendNode: (messageSendNode: ASTMessageSendNode) forReceiver: (receiver: Untyped) selector: (selector: Symbol) withEnvironment: (environment: Environment) at: (sourcePosition: SourcePosition) ::=> Untyped
+        := self analyzeAndEvaluateWithEnvironment: environment at: sourcePosition.
+
+    public override eager method analyzeMessageSendNode: (node: ASTMessageSendNode) forReceiver: (receiver: Untyped) selector: (selector: Symbol) withEnvironment: (environment: AnalysisAndEvaluationEnvironment)::=> ASTNode := {
+        self isMutable ifTrue: {
+            ASTIdentifierReferenceNode new
+                sourcePosition: node sourcePosition;
+                value: self name;
+                analyzerToken: environment validAnalyzerToken;
+                analyzedType: self type;
+                binding: self;
+                yourself
+        } ifFalse: {
+            environment newLiteral: (self __slotNamedAt__: #value) at: node sourcePosition
+        }
+    }.
 
     public override eager method analyzeIdentifierReference: (node: ASTIdentifierReferenceNode) withEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode := {
         self isMutable ifTrue: {
@@ -967,9 +990,19 @@ Type eagerDefinitionBody: {
     public virtual eager method analyzeAndEvaluateUnboundMessageSendNode: (node: ASTMessageSendNode) forReceiver: (receiver: Untyped) selector: (selector: Symbol) withEnvironment: (environment: Environment) ::=> Untyped
         := node semanticError: "Message " -- selector printString -- " not understood by " -- self printString -- ".".
 
+    public virtual eager method lookupPublicSymbolBindingForMessageSendNode: (node: ASTMessageSendNode) forReceiver: (receiver: Untyped) selector: (selector: Symbol) withEnvironment: (environment: Environment) ::=> SymbolBinding
+        := nil.
+
     public virtual eager method analyzeAndEvaluateOrdinaryMessageSendNode: (node: ASTMessageSendNode) forReceiver: (receiver: Untyped) withEnvironment: (environment: Environment) ::=> Untyped := {
         let selector => Symbol := node selector analyzeAndEvaluateWithEnvironment: environment.
         let staticMethod := self messageSendStaticLookupSelector: selector.
+
+        staticMethod isNil || staticMethod isDoesNotUnderstand ifTrue: {
+            let publicSymbolBinding := self lookupPublicSymbolBindingForMessageSendNode: node forReceiver: receiver selector: selector withEnvironment: environment.
+            publicSymbolBinding ifNotNil: {
+                return: (publicSymbolBinding analyzeAndEvaluateMessageSendNode: node forReceiver: receiver selector: selector withEnvironment: environment at: node sourcePosition)
+            }.
+        }.
 
         staticMethod ifNotNil: {
             ## Is this a macro that we should expand?
@@ -1041,6 +1074,16 @@ Type eagerDefinitionBody: {
             ifTrue: (self messageSendStaticLookupSelector: (node selector downCastTo: ASTLiteralNode) value)
             ifFalse: (nil).
 
+        (staticMethod isNil || staticMethod isDoesNotUnderstand) && node selector isLiteralNode && node receiver isLiteralNode ifTrue: {
+            let selectorValue := (node selector downCastTo: ASTLiteralNode) value.
+            let receiverValue := (node receiver downCastTo: ASTLiteralNode) value.
+
+            let publicSymbolBinding := self lookupPublicSymbolBindingForMessageSendNode: node forReceiver: receiverValue selector: selectorValue withEnvironment: environment.
+            publicSymbolBinding ifNotNil: {
+                return: (publicSymbolBinding analyzeMessageSendNode: node forReceiver: receiverValue selector: selectorValue withEnvironment: environment)
+            }.
+        }.
+
         staticMethod ifNotNil: {
             staticMethod isMacro && staticMethod isDoesNotUnderstand ifTrue: {
                 return: (environment analyzeWithCurrentExpectedType: (node expandWithDoesNotUnderstandMacro: staticMethod foundMethod environment: environment))
@@ -1104,6 +1147,18 @@ Type eagerDefinitionBody: {
 
     public virtual eager method analyzeMessageChainNode: (node: ASTMessageChainNode) withEnvironment: (environment: AnalysisAndEvaluationEnvironment) ::=> ASTNode
         := self analyzeOrdinaryMessageChainNode: node withEnvironment: environment.
+}.
+
+Metatype eagerDefinitionBody: {
+    public override eager method lookupPublicSymbolBindingForMessageSendNode: (node: ASTMessageSendNode) forReceiver: (receiver: Untyped) selector: (selector: Symbol) withEnvironment: (environment: Environment) ::=> SymbolBinding
+        := receiver lookupPublicSymbolBindingRecursively: selector.
+}.
+
+Namespace eagerDefinitionBody: {
+    __Meta__ definition: {
+        public override eager method lookupPublicSymbolBindingForMessageSendNode: (node: ASTMessageSendNode) forReceiver: (receiver: Untyped) selector: (selector: Symbol) withEnvironment: (environment: Environment) ::=> SymbolBinding
+            := receiver lookupPublicSymbolBindingRecursively: selector.
+    }.
 }.
 
 PointerType eagerDefinitionBody: {
