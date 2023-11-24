@@ -23,6 +23,8 @@ public class EnumType superclass: ValueType; definition: {
                 valueType: valueType;
                 slots: #();
                 totalSlotCount: 0sz;
+                instanceSize: valueType validInstanceSize;
+                instanceAlignment: valueType instanceAlignment;
                 registerSlotsInDictionary;
                 generatePublicAccessors;
                 generateValueAccessor;
@@ -79,6 +81,9 @@ public class EnumType superclass: ValueType; definition: {
         result
     }.
 
+    public override method defaultValue ::=> self
+        := self basicAllocate: self validValueType alignedValueSize.
+
     public method generateValueAccessor => Void := {
         let SelfType := self.
         let ValueType := self validValueType.
@@ -114,4 +119,8 @@ public global AnyEnum := AnyEnumType basicNew
 AnyEnum
     withSelector: #value addMethod: {:(AnyValue)self :: AnyValue |
         (self __type__ downCastTo: EnumType) validValueType decodeValueFromBytes: self atOffset: 0sz
+    } makePure makeAbstract;
+    withSelector: #printOn: addMethod: {:(AnyValue)self :(Stream)aStream :: Void |
+        self __type__ printOn: aStream.
+        aStream string: " value: "; print: self value
     } makePure makeAbstract.

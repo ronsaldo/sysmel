@@ -106,8 +106,8 @@ public class Window superclass: Object; definition: {
     private method convertKeyboardEventInto: (palEvent: SysmelPAL::KeyboardEvent ref) into: (event: KeyboardEvent) ::=> KeyboardEvent
         := event
             scancode: palEvent scancode;
-            symbol: palEvent symbol;
-            modifiers: palEvent modifiers;
+            symbol: (KeySymbol value: palEvent symbol);
+            modifiers: (KeyModifiers value: palEvent modifiers);
             yourself.
 
     private method convertTextInputEventInto: (palEvent: SysmelPAL::TextInputEvent ref) into: (event: TextInputEvent) ::=> TextInputEvent := {

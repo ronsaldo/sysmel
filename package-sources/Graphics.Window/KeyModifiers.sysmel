@@ -1,0 +1,23 @@
+#**
+ * I am a bit combination of different key modifiers.
+ * My constant values are the sames as the ones that are provided by SDL2.
+ *#
+public enum KeyModifiers bitMask valueType: UInt32; values: #{
+    None: 0 u32.
+    LShift: 16r0001 u32.
+    RShift: 16r0002 u32.
+    LCtrl: 16r0040 u32.
+    RCtrl: 16r0080 u32.
+    LAlt: 16r0100 u32.
+    RAlt: 16r0200 u32.
+    LGUI: 16r0400 u32.
+    RGUI: 16r0800 u32.
+    Num: 16r1000 u32.
+    Caps: 16r2000 u32.
+    Mode: 16r4000 u32.
+
+    Ctrl: LCtrl | RCtrl.
+    Shift: LShift | RShift.
+    Alt: LAlt | RAlt.
+    GUI: LGUI | RGUI.
+}.

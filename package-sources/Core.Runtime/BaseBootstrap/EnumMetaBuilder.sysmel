@@ -2,6 +2,7 @@
 public class EnumMetaBuilder superclass: TypeMetaBuilder; definition: {
     public field valuesExpression => ASTNode.
     public field valueTypeExpression => ASTNode.
+    public field isBitMask => Boolean.
 
     public method validValueTypeExpression => ASTNode
         := valueTypeExpression ifNil: `'AnyValue.
@@ -15,6 +16,12 @@ public class EnumMetaBuilder superclass: TypeMetaBuilder; definition: {
     public method values: (newValuesExpression: ASTNode) ::=> ASTNode := {
         <metaBuilder>
         valuesExpression := newValuesExpression.
+        self continueExpansion
+    }.
+
+    public method bitMask ::=> ASTNode := {
+        <metaBuilder>
+        isBitMask := true.
         self continueExpansion
     }.
 

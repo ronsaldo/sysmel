@@ -274,7 +274,7 @@ PrimitiveVectorType extend: {
 
 EnumType extend: {
     public override method valueMirPhysicalLocationClass => MIRPhysicalLocation class
-        := valueType valueMirPhysicalLocationClass.
+        := self validValueType valueMirPhysicalLocationClass.
 }.
 
 Int8 class extend: {

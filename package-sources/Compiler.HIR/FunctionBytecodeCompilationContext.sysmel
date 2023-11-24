@@ -482,6 +482,13 @@ public final class HIRFunctionBytecodeCompilationContext superclass: Object; def
         #PrimitiveVector::withAll: : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
             self builder vectorBroadcastElement: arguments last type: resultType
         }.
+
+        #Enum::value : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            self builder bitcast: arguments first into: (self builder literal: resultType) type: resultType
+        }.
+        #Enum::value: : {:(HIRFunctionBytecodeCompilationContext)self :(Array)arguments :(Type)resultType :: HIRValue |
+            self builder bitcast: arguments last into: (self builder literal: resultType) type: resultType
+        }.
     }.
 
     public method compileCall: (calledFunction: HIRValue) isUnchecked: (isUnchecked: Boolean) arguments: (arguments: Array) resultType: (resultType: Type) resultTemporary: (resultTemporary: Int16) ::=> Void := {

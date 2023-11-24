@@ -1,3 +1,6 @@
+loadSourceNamed: "KeyModifiers.sysmel".
+loadSourceNamed: "KeySymbol.sysmel".
+
 loadSourceNamed: "Event.sysmel".
 loadSourceNamed: "EventHandler.sysmel".
 loadSourceNamed: "Window.sysmel".

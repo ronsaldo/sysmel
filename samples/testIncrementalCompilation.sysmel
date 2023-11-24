@@ -249,13 +249,16 @@ public function enumIdentity(v: TestEnum) => TestEnum
 
 public function enumGetValue(v: TestEnum) => UInt8
     := v value.
-    
+
+public function enumMakeWithValue(v: UInt8) => TestEnum
+    := TestEnum value: v.
+
 let asmCompilationTarget := AsmCompilationTarget x86_64 setForLinux.
 
 let hirModule := (HIRModuleCompilationContext forTarget: asmCompilationTarget asMirCompilationTarget asHIRCompilationTarget)
     exclusiveCompilationMode: true;
     compileFunctionsWithDefinitions: (
-        enumAccessPublic, enumIdentity,);
+        enumAccessPublic, enumIdentity, enumGetValue, enumMakeWithValue);
     finish.
 
 hirModule performStandardOptimizations.

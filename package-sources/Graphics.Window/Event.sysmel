@@ -52,8 +52,8 @@ public final class LostFocusEvent superclass: FocusEvent; definition: {
  *#
 public abstract class KeyboardEvent superclass: Event; definition: {
     public field scancode => UInt32.
-    public field symbol => UInt32.
-    public field modifiers => UInt32.
+    public field symbol => KeySymbol.
+    public field modifiers => KeyModifiers.
 }.
 
 #**
