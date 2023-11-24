@@ -253,12 +253,19 @@ public function enumGetValue(v: TestEnum) => UInt8
 public function enumMakeWithValue(v: UInt8) => TestEnum
     := TestEnum value: v.
 
+public function enumSwitch(v: TestEnum) => Int32
+    := switch: v withCases: #{
+        TestEnum First : 1i32.
+        TestEnum Second : 2i32.
+        _: -1i32.
+    }.
+
 let asmCompilationTarget := AsmCompilationTarget x86_64 setForLinux.
 
 let hirModule := (HIRModuleCompilationContext forTarget: asmCompilationTarget asMirCompilationTarget asHIRCompilationTarget)
     exclusiveCompilationMode: true;
     compileFunctionsWithDefinitions: (
-        enumAccessPublic, enumIdentity, enumGetValue, enumMakeWithValue);
+        enumAccessPublic, enumIdentity, enumGetValue, enumMakeWithValue, enumSwitch);
     finish.
 
 hirModule performStandardOptimizations.

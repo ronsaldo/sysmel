@@ -1,0 +1,5 @@
+AnyValue definition: {
+    public method inspect => Void := {
+        self printString asMorph openInWindowSystem
+    }.
+}.

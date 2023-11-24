@@ -2575,7 +2575,7 @@ HIRConditionalBranchInstruction extend: {
 
 HIRSwitchInstruction extend: {
     public override method compileIntoMIRWith: (codegen: HIRFunctionDefinitionMIRCodeGenerator) ::=> MIRValue := {
-        self value type isPrimitiveIntegerType && (self caseKeys allSatisfy: {:(HIRValue)each :: Boolean | each isConstant}) ifTrue: {
+        self value type isPrimitiveIntegerTypeOrEnum && (self caseKeys allSatisfy: {:(HIRValue)each :: Boolean | each isConstant}) ifTrue: {
             let value := codegen translateValue: self value.
             let caseKeys := self caseKeys collect: {:(HIRValue)eachValue :: MIRValue | codegen translateValue: eachValue }.
             let caseDestinations := self caseDestinations collect: {:(HIRBasicBlock)eachValue :: MIRValue | codegen translateValue: eachValue }.

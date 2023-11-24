@@ -36,15 +36,21 @@ FormCanvas definition: {
 
         let cursorPosition mutable := rectangle min + (Float32x2 y: fontFace ascent) + kern.
         let carriageReturnPosition := cursorPosition x.
+        let isLastCarriageReturn mutable := false.
         string from: startIndex until: endIndex codePointsDo: {:(Char32)codePoint :: Void |
             switch: codePoint withCases: #{
                 '\n' : {
-                    cursorPosition := cursorPosition + (Float32x2 y: fontFace height).
+                    isLastCarriageReturn ifFalse: {
+                        cursorPosition := Float32x2 x: carriageReturnPosition y: cursorPosition y + fontFace height.
+                    }.
+                    isLastCarriageReturn := false.
                 }.
                 '\r' : {
-                    cursorPosition := Float32x2 x: carriageReturnPosition y: cursorPosition y.
+                    cursorPosition := Float32x2 x: carriageReturnPosition y: cursorPosition y + fontFace height.
+                    isLastCarriageReturn := true.
                 }.
                 _: {
+                    isLastCarriageReturn := false.
                     let advance := fontFace drawGlyphFor: codePoint onFormCanvas: self at: cursorPosition color: color.
                     cursorPosition := cursorPosition + advance 
                 }

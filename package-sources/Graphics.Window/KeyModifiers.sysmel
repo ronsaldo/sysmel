@@ -20,4 +20,13 @@ public enum KeyModifiers bitMask valueType: UInt32; values: #{
     Shift: LShift | RShift.
     Alt: LAlt | RAlt.
     GUI: LGUI | RGUI.
+}; definition: {
+    public method hasAlt => Boolean
+        := (self value & KeyModifiers Alt value) ~= 0u32.
+
+    public method hasCtrl => Boolean
+        := (self value & KeyModifiers Ctrl value) ~= 0u32.
+
+    public method hasShift => Boolean
+        := (self value & KeyModifiers Shift value) ~= 0u32.
 }.

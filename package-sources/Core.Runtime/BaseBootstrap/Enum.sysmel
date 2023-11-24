@@ -73,8 +73,7 @@ public class EnumType superclass: ValueType; definition: {
     public method validValueType => Type
         := RawTuple::isDummyValue(self) || valueType isNil ifTrue: AnyValue ifFalse: valueType.
 
-    public pure method value: (initialValue: self validValueType) ::=> self := {
-        <primitive: #Enum::value:>
+    public pure virtual method value: (initialValue: self validValueType) ::=> self := {
         self assert: valueType isNotNil.
         let result := self basicAllocate: valueType alignedValueSize.
         valueType encodeValue: initialValue inBytes: result atOffset: 0sz.
@@ -85,14 +84,27 @@ public class EnumType superclass: ValueType; definition: {
         := self basicAllocate: self validValueType alignedValueSize.
 
     public method generateValueAccessor => Void := {
+        valueType ifNil: {return: void}.
+
         let SelfType := self.
-        let ValueType := self validValueType.
+        let SelfMetaType := SelfType __type__.
+        let ValueType := valueType.
         self withSelector: #value addMethod: {:(SelfType)self :: ValueType |
             <primitive: #Enum::value>
             <keepSourceDefinition>
             ValueType decodeValueFromBytes: self atOffset: 0sz
-        } makeOverride makePure makeFinal recompileAndOptimize
+        } makeOverride makePure makeFinal recompileAndOptimize.
+        SelfMetaType withSelector: #value: addMethod: {:(SelfMetaType)self :(ValueType)initialValue :: SelfType |
+            <primitive: #Enum::value:>
+            <keepSourceDefinition>
+            let result := self basicAllocate: ValueType alignedValueSize.
+            ValueType encodeValue: initialValue inBytes: result atOffset: 0sz.
+            result
+        } makeOverride makePure makeFinal recompileAndOptimize.
     }.
+
+    public override method isPrimitiveIntegerTypeOrEnum => Boolean
+        := self validValueType isPrimitiveIntegerTypeOrEnum.
 }.
 
 public class EnumMetatype superclass: ValueMetatype; definition: {

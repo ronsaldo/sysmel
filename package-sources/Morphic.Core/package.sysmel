@@ -14,3 +14,6 @@ loadSourceNamed: "TextEditorModel.sysmel".
 loadSourceNamed: "AbstractTextAreaMorph.sysmel".
 loadSourceNamed: "TextAreaMorph.sysmel".
 loadSourceNamed: "TextFieldMorph.sysmel".
+loadSourceNamed: "SourceCodeEditorMorph.sysmel".
+
+loadSourceNamed: "BasicInspector.sysmel".

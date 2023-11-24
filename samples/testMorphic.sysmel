@@ -6,7 +6,7 @@ BorderedMorph new
         position: 30f32@80f32;
         label: "Test Button";
         yourself);
-    addMorph: (TextAreaMorph new
+    addMorph: (SourceCodeEditorMorph new
         bounds: (30f32@120f32 extent: 200f32@100f32);
         yourself);
     openInWindowSystem.

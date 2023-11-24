@@ -21,7 +21,48 @@ public class TextEditorModel definition: {
         }
     }.
 
-    public method moveCursorLeft ::=> Void := {
+    public method validSelectionSourceCodesDo: (aBlock: (SourceCode) => Void) ::=> Void := {
+        ## TODO: Use the different cursors for this.
+        aBlock(SourceCode text: textBuffer contents name: "<cli>" language: #sysmel).
+    }.
+
+    public method doIt => Void := {
+        self validSelectionSourceCodesDo: {:(SourceCode)sourceCode :: Void |
+            sourceCode analyzeAndEvaluate
+        }.
+    }.
+
+    public method printIt => Void := {
+        self validSelectionSourceCodesDo: {:(SourceCode)sourceCode :: Void |
+            let value := sourceCode analyzeAndEvaluate.
+            self insertString: value printString.
+        }.
+    }.
+
+    public method inspectIt => Void := {
+        self validSelectionSourceCodesDo: {:(SourceCode)sourceCode :: Void |
+            let value := sourceCode analyzeAndEvaluate.
+            value inspect
+        }.
+    }.
+
+    public method deleteNext => Void := {
+        printLine("TODO: deleteNext")
+    }.
+
+    public method deletePrevious => Void := {
+        printLine("TODO: deletePrevious")
+    }.
+
+    public method moveCursorUp => Void := {
+        printLine("TODO: moveCursorUp")
+    }.
+
+    public method moveCursorDown => Void := {
+        printLine("TODO: moveCursorDown")
+    }.
+
+    public method moveCursorLeft => Void := {
         cursors do: {:(TextEditorCursor)eachCursor :: Void |
             eachCursor position > 0sz ifTrue: {
                 eachCursor position: eachCursor position - 1sz

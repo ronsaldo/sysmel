@@ -53,14 +53,56 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
         := event wasHandled not.
 
     public override method onKeyPressedEvent: (event: KeyPressedEvent) ::=> Void := {
-        printLine("AbstractTextAreaMorph onKeyPressed ", event symbol).
-    }.
+        event modifiers hasCtrl ifTrue: {
+            return: void
+        }.
 
-    public override method handlesKeyReleasedEvent: (event: KeyReleasedEvent) ::=> Boolean
-        := event wasHandled not.
+        event modifiers hasAlt ifTrue: {
+            return: void
+        }.
 
-    public override method onKeyReleasedEvent: (event: KeyReleasedEvent) ::=> Void := {
-        printLine("AbstractTextAreaMorph onKeyReleased ", event symbol).
+        event modifiers hasShift ifTrue: {
+            return: void
+        }.
+
+        switch: event symbol withCases: #{
+            KeySymbol Backspace : {
+                model deletePrevious.
+                event wasHandled: true.
+                self changed
+            }.
+            KeySymbol Delete : {
+                model deleteNext.
+                event wasHandled: true.
+                self changed
+            }.
+            KeySymbol Return : {
+                model insertString: "\n".
+                event wasHandled: true.
+                self changed
+            }.
+            KeySymbol Left : {
+                model moveCursorLeft.
+                event wasHandled: true.
+                self changed
+            }.
+            KeySymbol Right : {
+                model moveCursorRight.
+                event wasHandled: true.
+                self changed
+            }.
+            KeySymbol Down : {
+                model moveCursorDown.
+                event wasHandled: true.
+                self changed
+            }.
+            KeySymbol Up : {
+                model moveCursorUp.
+                event wasHandled: true.
+                self changed
+            }.
+            _: {}
+        }
     }.
 
     public override method handlesTextInputEvent: (event: TextInputEvent) ::=> Boolean
