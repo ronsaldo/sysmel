@@ -90,6 +90,7 @@ Morph definition: {
         let windowMorph := SystemWindowMorph new.
         windowMorph extent: self extent.
         windowMorph addMorph: self.
+        windowMorph layout: (MorphFullLayout for: self).
         windowMorph openInWindowSystem: windowSystem
     }.
 
