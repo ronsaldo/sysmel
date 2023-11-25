@@ -1,13 +1,19 @@
+let label := "Hello World " asMorph.
+let button := SimpleButtonMorph new
+    label: "Test Button";
+    yourself.
+let sourceCodeEditor := SourceCodeEditorMorph new.
+
 BorderedMorph new
     extent: 300f32x2;
     color: Color white;
-    addMorph: ("Hello World " asMorph position: 30f32@40f32; yourself);
-    addMorph: (SimpleButtonMorph new
-        position: 30f32@80f32;
-        label: "Test Button";
-        yourself);
-    addMorph: (SourceCodeEditorMorph new
-        bounds: (30f32@120f32 extent: 200f32@100f32);
+    addMorph: label;
+    addMorph: button;
+    addMorph: sourceCodeEditor;
+    layout: (MorphVerticalBoxLayout new
+        add: label proportion: 0u32 borderWidth: 2f32;
+        add: button proportion: 0u32 borderWidth: 2f32;
+        add: sourceCodeEditor proportion: 1u32 borderWidth: 2f32;
         yourself);
     openInWindowSystem.
 

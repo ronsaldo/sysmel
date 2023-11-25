@@ -1,0 +1,22 @@
+public abstract class MorphBoxLayout superclass: MorphLayout; definition: {
+    private field elements => OrderedCollection.
+
+    public override method initialize => Void := {
+        super initialize.
+        elements := OrderedCollection new.
+    }.
+
+    public method add: (target: MorphLayoutElement) proportion: (proportion: UInt32) borderWidth: (borderWidth: Float32) ::=> Void := {
+        elements add: (MorphBoxLayoutElement new
+            target: target;
+            proportion: proportion;
+            borderWidth: borderWidth;
+            yourself)
+    }.
+
+    public method add: (target: MorphLayoutElement) proportion: (proportion: UInt32) ::=> Void
+        := self add: target proportion: proportion borderWidth: 0f32.
+
+    public method add: (element: MorphLayoutElement) ::=> Void
+        := self add: element proportion: 0u32.
+}.

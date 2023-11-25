@@ -17,6 +17,9 @@ public class BorderedMorph superclass: Morph; definition: {
     public virtual method defaultBorderWidth => Float32
         := 1f32.
 
+    public override method innerLayoutBounds => RectangleF32
+        := self localBounds insetBy: self borderWidth@self borderWidth.
+
     public override method buildSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode
         := (super buildSceneGraphWith: builder)
         -- (builder borderRectangle: self localBounds color: self borderColorToUse width: borderWidth).

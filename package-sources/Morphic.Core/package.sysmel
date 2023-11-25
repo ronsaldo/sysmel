@@ -1,3 +1,5 @@
+loadSourceNamed: "MorphLayoutElement.sysmel".
+loadSourceNamed: "MorphLayout.sysmel".
 loadSourceNamed: "Morph.sysmel".
 loadSourceNamed: "WorldMorph.sysmel".
 loadSourceNamed: "SystemWindowMorph.sysmel".
@@ -5,6 +7,12 @@ loadSourceNamed: "SystemWindowMorph.sysmel".
 loadSourceNamed: "BorderedMorph.sysmel".
 loadSourceNamed: "StringMorph.sysmel".
 loadSourceNamed: "SimpleButtonMorph.sysmel".
+
+loadSourceNamed: "MorphFullLayout.sysmel".
+loadSourceNamed: "MorphBoxLayoutElement.sysmel".
+loadSourceNamed: "MorphBoxLayout.sysmel".
+loadSourceNamed: "MorphHorizontalBoxLayout.sysmel".
+loadSourceNamed: "MorphVerticalBoxLayout.sysmel".
 
 loadSourceNamed: "AbstractTextBuffer.sysmel".
 loadSourceNamed: "SimpleTextBuffer.sysmel".

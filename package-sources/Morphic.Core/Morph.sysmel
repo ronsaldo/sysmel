@@ -1,9 +1,10 @@
-public class Morph definition: {
-    public field bounds => RectangleF32.
+public class Morph superclass: MorphLayoutElement; definition: {
+    protected field bounds => RectangleF32.
     public field owner => Morph.
     public field submorphs => Array.
     public field color => Color.
     protected field visible => Boolean.
+    protected field layout => MorphLayout.
 
     public override method initialize => Void := {
         super initialize.
@@ -11,6 +12,8 @@ public class Morph definition: {
         bounds := self defaultBounds.
         color := self defaultColor
     }.
+
+    public method layout => MorphLayout := layout.
 
     public virtual method colorToUse => Color := color.
 
@@ -26,8 +29,8 @@ public class Morph definition: {
     public inline method position => Float32x2
         := bounds min.
 
-    public inline method position: (newPosition: Float32x2) ::=> Void := {
-        bounds := newPosition extent: bounds extent
+    public inline override method position: (newPosition: Float32x2) ::=> Void := {
+        bounds := newPosition extent: bounds extent.
     }.
 
     public inline method extent => Float32x2
@@ -36,8 +39,31 @@ public class Morph definition: {
     public inline method center => Float32x2
         := bounds center.
 
+    public override method bounds ::=> RectangleF32
+        := bounds.
+
+    public override method bounds: (newBounds: RectangleF32) ::=> Void := {
+        bounds := newBounds.
+        self updateLayout
+    }.
+
     public virtual method extent: (newExtent: Float32x2) ::=> Void := {
-        bounds := bounds min extent: newExtent
+        bounds := bounds min extent: newExtent.
+        self updateLayout
+    }.
+
+    public virtual method layout: (newLayout: MorphLayout) ::=> Void := {
+        layout := newLayout.
+        self updateLayout
+    }.
+
+    public virtual method innerLayoutBounds => RectangleF32
+        := self localBounds.
+
+    public virtual method updateLayout => Void := {
+        layout ifNil: {return: void}.
+
+        layout bounds: self innerLayoutBounds.
     }.
 
     public virtual method buildFullSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode := {

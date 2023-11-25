@@ -19,8 +19,17 @@ public class SimpleButtonMorph superclass: BorderedMorph; definition: {
 
         label := StringMorph contents: aString.
         self extent: label extent + 12f32x2.
-        label position: (self extent - label extent) / 2f32x2.
         self addMorph: label.
+
+        self updateLayout
+    }.
+
+    public override method updateLayout => Void := {
+        label ifNotNil: {
+            label position: (self extent - label extent) / 2f32x2.
+        }.
+
+        super updateLayout
     }.
 
     public method setDefaultLabel => Void := {

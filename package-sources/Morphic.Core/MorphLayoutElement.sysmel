@@ -1,0 +1,10 @@
+public abstract class MorphLayoutElement definition: {
+    public abstract method bounds => RectangleF32
+        := self subclassResponsibility.
+
+    public abstract method bounds: (newBounds: RectangleF32) ::=> Void
+        := self subclassResponsibility.
+
+    public abstract method position: (newPosition: Float32x2) ::=> Void
+        := self subclassResponsibility.
+}.

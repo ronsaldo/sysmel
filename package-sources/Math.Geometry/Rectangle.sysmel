@@ -22,6 +22,8 @@ public final class RectangleF32 definition: {
     public pure inline method center => Float32x2 := min + ((max - min) / 2f32x2).
     public pure inline method corner => Float32x2 := max.
     public pure inline method extent => Float32x2 := max - min.
+    public pure inline method width => Float32 := max x - min x.
+    public pure inline method height => Float32 := max y - min y.
 
     public pure inline method includesPoint: (point: Float32x2) ::=> Boolean
         := (min x <= point x) && (point x <= max x) &&
@@ -44,6 +46,18 @@ public final class RectangleF32 definition: {
         := SelfType basicNew
             min: min + translation;
             max: max + translation;
+            yourself.
+
+    public pure inline method expandBy: (margin: Float32x2) ::=> SelfType
+        := SelfType basicNew
+            min: min - margin;
+            max: max + margin;
+            yourself.
+
+    public pure inline method insetBy: (margin: Float32x2) ::=> SelfType
+        := SelfType basicNew
+            min: min + margin;
+            max: max - margin;
             yourself.
 
     public override method printOn: (stream: Stream) ::=> Void := {
@@ -78,6 +92,8 @@ public final class RectangleI32 definition: {
     public pure inline method origin => Int32x2 := min.
     public pure inline method corner => Int32x2 := max.
     public pure inline method extent => Int32x2 := max - min.
+    public pure inline method width => Int32 := max x - min x.
+    public pure inline method height => Int32 := max y - min y.
 
     public pure inline method intersectionWith: (other: RectangleI32) ::=> RectangleI32
         := RectangleI32 min: (min max: other min) max: (max min: other max).

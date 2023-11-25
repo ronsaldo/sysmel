@@ -1,0 +1,16 @@
+public class MorphFullLayout superclass: MorphLayout; definition: {
+    public field target => MorphLayoutElement.
+    public field borderWidth => Float32.
+
+    __Meta__ definition: {
+        public method for: (target: MorphLayoutElement) ::=> self
+            := self new target: target; yourself
+    }.
+
+    public override method bounds => RectangleF32
+        := target bounds expandBy: borderWidth@borderWidth.
+
+    public override method bounds: (newBounds: RectangleF32) ::=> Void := {
+        target bounds: (newBounds insetBy: borderWidth@borderWidth)
+    }.
+}.
