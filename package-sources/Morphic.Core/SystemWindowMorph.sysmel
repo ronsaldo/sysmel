@@ -6,16 +6,21 @@ public class SystemWindowMorph superclass: WorldMorph; definition: {
     protected field hasDirtyRendering => Boolean.
 
     public method renderOnWindow => Void := {
-        let renderbufferExtent := self extent ceiling asUInt32x2.
+        let windowExtent := window extent.
+        self extent: windowExtent asFloat32x2.
+
+        let renderbufferExtent := windowRenderer drawableSurfaceExtent.
         renderbuffer isNil || (renderbuffer extent ~= renderbufferExtent) ifTrue: {
             renderbuffer := Form forRenderingWithExtent: renderbufferExtent
         }.
 
         renderbuffer fillWithColor: self color.
 
+        let windowScaleFactor := renderbufferExtent asFloat32x2 / windowExtent asFloat32x2.
+
         let builder := FormSGBuilder new.
         let sceneGraph := self buildChildrenSceneGraphWith: builder.
-        FormSGFormRenderer new renderSceneGraph: sceneGraph onForm: renderbuffer.
+        FormSGFormRenderer new renderSceneGraph: sceneGraph scaleFactor: windowScaleFactor onForm: renderbuffer.
 
         windowRenderer presentForm: renderbuffer.
         hasDirtyRendering := false.
@@ -50,6 +55,14 @@ public class SystemWindowMorphEventHandler superclass: EventHandler; definition:
 
     public override method onWindowCloseRequestEvent: (event: WindowCloseRequestEvent) ::=> Void := {
         morph onWindowCloseRequest
+    }.
+
+    public override method onWindowResizeEvent: (event: WindowResizeEvent) ::=> Void := {
+        morph renderOnWindow
+    }.
+    
+    public override method onWindowSizeChangedEvent: (event: WindowSizeChangedEvent) ::=> Void := {
+        morph renderOnWindow
     }.
 
     public override method onMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Void := {

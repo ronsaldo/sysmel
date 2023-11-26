@@ -40,44 +40,58 @@ public class Window superclass: Object; definition: {
         handle := nil.
     }.
 
+    public method extent => UInt32x2 := {
+        let width mutable := 0i32.
+        let height mutable := 0i32.
+        sysmel_pal_window_getSize(handle, width, height).
+        width asUInt32 @ height asUInt32
+    }.
+
     public method convertAndDispatchEvent: (event: SysmelPAL::WindowEvent ref) ::=> Void := {
         switch: event type withCases: #{
-        SysmelPAL::WindowEventType::Exposed : {
+        SysmelPAL::WindowEventType Exposed : {
             self dispatchEvent: ExposeEvent new
         }.
-        SysmelPAL::WindowEventType::Close : {
+        SysmelPAL::WindowEventType Close : {
             self dispatchEvent: WindowCloseRequestEvent new
         }.
-        SysmelPAL::WindowEventType::MouseButtonDown : {
+        SysmelPAL::WindowEventType Resize : {
+            self dispatchEvent: WindowResizeEvent new
+        }.
+        SysmelPAL::WindowEventType SizeChanged : {
+            self dispatchEvent: WindowSizeChangedEvent new
+        }.
+
+        SysmelPAL::WindowEventType MouseButtonDown : {
             self dispatchEvent: (self convertMouseButtonEventInto: event*->data*->mouseButton into: MouseButtonPressedEvent new)
         }.
-        SysmelPAL::WindowEventType::MouseButtonUp : {
+        SysmelPAL::WindowEventType MouseButtonUp : {
             self dispatchEvent: (self convertMouseButtonEventInto: event*->data*->mouseButton into: MouseButtonReleasedEvent new)
         }.
-        SysmelPAL::WindowEventType::MouseMotion : {
+        SysmelPAL::WindowEventType MouseMotion : {
             self dispatchEvent: (self convertMouseMotionEventInto: event*->data*->mouseMotion into: MouseMoveEvent new)
         }.
-        SysmelPAL::WindowEventType::MouseWheel : {
+        SysmelPAL::WindowEventType MouseWheel : {
             self dispatchEvent: (self convertMouseWheelEventInto: event*->data*->mouseWheel into: MouseWheelEvent new)
         }.
-        SysmelPAL::WindowEventType::Enter : {
+        SysmelPAL::WindowEventType Enter : {
             self dispatchEvent: MouseEnterEvent new.
         }.
-        SysmelPAL::WindowEventType::Leave : {
+        SysmelPAL::WindowEventType Leave : {
             self dispatchEvent: MouseLeaveEvent new.
         }.
 
-        SysmelPAL::WindowEventType::KeyDown : {
+        SysmelPAL::WindowEventType KeyDown : {
             self dispatchEvent: (self convertKeyboardEventInto: event*->data*->keyboard into: KeyPressedEvent new)
         }.
-        SysmelPAL::WindowEventType::KeyUp : {
+        SysmelPAL::WindowEventType KeyUp : {
             self dispatchEvent: (self convertKeyboardEventInto: event*->data*->keyboard into: KeyReleasedEvent new)
         }.
 
-        SysmelPAL::WindowEventType::TextInput : {
+        SysmelPAL::WindowEventType TextInput : {
             self dispatchEvent: (self convertTextInputEventInto: event*->data*->textInput into: TextInputEvent new)
         }.
-        SysmelPAL::WindowEventType::TextEditing : {
+        SysmelPAL::WindowEventType TextEditing : {
             self dispatchEvent: (self convertTextEditingEventInto: event*->data*->textEditing into: TextEditingEvent new)
         }.
 

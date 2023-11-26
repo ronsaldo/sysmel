@@ -195,6 +195,22 @@ public class ValidateRenderingEvent superclass: Event; definition: {
 }.
 
 #**
+ * I am a window size changed event.
+ *#
+public class WindowSizeChangedEvent superclass: Event; definition: {
+    public override method acceptEventHandler: (handler: EventHandler) ::=> Void
+        := handler onWindowSizeChangedEvent: self
+}.
+
+#**
+ * I am a window resize event.
+ *#
+public class WindowResizeEvent superclass: Event; definition: {
+    public override method acceptEventHandler: (handler: EventHandler) ::=> Void
+        := handler onWindowResizeEvent: self
+}.
+
+#**
  * I am a window close event.
  *#
 public class WindowCloseRequestEvent superclass: Event; definition: {

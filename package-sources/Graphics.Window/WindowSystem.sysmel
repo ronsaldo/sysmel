@@ -27,7 +27,7 @@ WindowSystem definition: {
     public method createWindowWithTitle: (title: String) extent: (extent: UInt32x2) ::=> Window := {
         self assert: title isNotNil.
 
-        let handle := sysmel_pal_window_create(title size, title __rawContentsPointer__ reinterpretCastTo: Char8 const pointer, -1i32, -1i32, extent x asInt32, extent y asInt32, 0u32).
+        let handle := sysmel_pal_window_create(title size, title __rawContentsPointer__ reinterpretCastTo: Char8 const pointer, -1i32, -1i32, extent x asInt32, extent y asInt32, SysmelPAL::WindowCreationFlags Default).
         handle ifNil: {return: nil}.
 
         let window := Window new

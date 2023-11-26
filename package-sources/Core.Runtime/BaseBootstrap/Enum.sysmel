@@ -18,7 +18,7 @@ public class EnumType superclass: ValueType; definition: {
             
             let: #enum with: metatype basicNew.
             enum
-                flags: TypeFlags::EnumDefaultFlags;
+                flags: TypeFlags::EnumDefaultFlags | (valueType isBytes ifTrue: TypeFlags::Bytes ifFalse: 0bflgs);
                 supertype: AnyEnum;
                 valueType: valueType;
                 slots: #();

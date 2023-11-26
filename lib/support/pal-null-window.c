@@ -40,6 +40,15 @@ SYSMEL_PAL_EXTERN_C void sysmel_pal_window_destroy(sysmel_pal_window_t *window)
     (void)window;
 }
 
+SYSMEL_PAL_EXTERN_C void sysmel_pal_window_getSize(sysmel_pal_window_t *window, int *outWidth, int *outHeight)
+{
+    (void)window;
+    if(outWidth)
+        *outWidth = 0;
+    if(outHeight)
+        *outHeight = 0;
+}
+
 SYSMEL_PAL_EXTERN_C bool sysmel_pal_window_pollEvent(sysmel_pal_window_event_t *event)
 {
     (void)event;
@@ -86,6 +95,15 @@ SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRendererTexture_destroy(sysmel_pal_win
 SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_destroy(sysmel_pal_windowRenderer_t *renderer)
 {
     (void)renderer;
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_getOutputSize(sysmel_pal_windowRenderer_t *renderer, int *outWidth, int *outHeight)
+{
+    (void)renderer;
+    if(outWidth)
+        *outWidth = 0;
+    if(outHeight)
+        *outHeight = 0;
 }
 
 SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_beginFrame(sysmel_pal_windowRenderer_t *renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a)

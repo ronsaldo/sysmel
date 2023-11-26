@@ -1,12 +1,13 @@
 public class FormSGFormRenderer superclass: FormSGVisitor; definition: {
     public field canvas => FormCanvas.
 
-    public method renderSceneGraph: (sceneGraph: FormSGNode) onForm: (targetForm: Form) ::=> Void := {
-        self renderSceneGraph: sceneGraph onCanvas: (FormCanvas for: targetForm)
+    public method renderSceneGraph: (sceneGraph: FormSGNode) scaleFactor: (scaleFactor: Float32x2) onForm: (targetForm: Form) ::=> Void := {
+        self renderSceneGraph: sceneGraph scaleFactor: scaleFactor onCanvas: (FormCanvas for: targetForm)
     }.
 
-    public method renderSceneGraph: (sceneGraph: FormSGNode) onCanvas: (targetCanvas: FormCanvas) ::=> Void := {
+    public method renderSceneGraph: (sceneGraph: FormSGNode) scaleFactor: (scaleFactor: Float32x2) onCanvas: (targetCanvas: FormCanvas) ::=> Void := {
         canvas := targetCanvas.
+        ## TODO: Apply the scale factor.
         self visitNode: sceneGraph.
     }.
 

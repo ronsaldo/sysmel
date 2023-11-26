@@ -9,34 +9,52 @@ public global SysmelPAL::WindowRendererHandle := SysmelPAL::WindowRenderer point
 public struct SysmelPAL::WindowRendererTexture.
 public global SysmelPAL::WindowRendererTextureHandle := SysmelPAL::WindowRendererTexture pointer.
 
-public global SysmelPAL::WindowEventType::UNKNOWN := 0u32.
-public global SysmelPAL::WindowEventType::QUIT := 1u32.
+public enum SysmelPAL::WindowCreationFlags bitMask valueType: UInt32; values: #{
+    None: 0u32.
+    AllowHighDPI: 1u32 << 0u32.
+    AlwaysOnTop: 1u32 << 1u32.
+    Borderless: 1u32 << 2u32.
+    Fullscreen: 1u32 << 3u32.
+    FullscreenDesktop: 1u32 << 4u32.
+    Hidden: 1u32 << 5u32.
+    Popup: 1u32 << 6u32.
+    Resizable: 1u32 << 7u32.
+    Tooltip: 1u32 << 8u32.
+    Utility: 1u32 << 90u32.
 
-public global SysmelPAL::WindowEventType::KeyDown := 16r100 u32.
-public global SysmelPAL::WindowEventType::KeyUp := 16r101 u32.
-public global SysmelPAL::WindowEventType::TextEditing := 16r102 u32.
-public global SysmelPAL::WindowEventType::TextInput := 16r103 u32.
-public global SysmelPAL::WindowEventType::KeyMapChanged := 16r104 u32.
+    Default: Resizable | AllowHighDPI.
+}.
 
-public global SysmelPAL::WindowEventType::MouseButtonDown := 16r200 u32.
-public global SysmelPAL::WindowEventType::MouseButtonUp := 16r201 u32.
-public global SysmelPAL::WindowEventType::MouseMotion := 16r202 u32.
-public global SysmelPAL::WindowEventType::MouseWheel := 16r203 u32.
+public enum SysmelPAL::WindowEventType valueType: UInt32; values: #{
+    Unknown: 0u32.
+    Quit: 1u32.
 
-public global SysmelPAL::WindowEventType::Shown := 16r300 u32.
-public global SysmelPAL::WindowEventType::Hidden := 16r301 u32.
-public global SysmelPAL::WindowEventType::Exposed := 16r302 u32.
-public global SysmelPAL::WindowEventType::Moved := 16r303 u32.
-public global SysmelPAL::WindowEventType::Resize := 16r304 u32.
-public global SysmelPAL::WindowEventType::SizeChanged := 16r305 u32.
-public global SysmelPAL::WindowEventType::Minimize := 16r306 u32.
-public global SysmelPAL::WindowEventType::Maximized := 16r307 u32.
-public global SysmelPAL::WindowEventType::Restored := 16r308 u32.
-public global SysmelPAL::WindowEventType::Enter := 16r309 u32.
-public global SysmelPAL::WindowEventType::Leave := 16r30A u32.
-public global SysmelPAL::WindowEventType::FocusGained := 16r30B u32.
-public global SysmelPAL::WindowEventType::FocusLost := 16r30C u32.
-public global SysmelPAL::WindowEventType::Close := 16r30D u32.
+    KeyDown: 16r100 u32.
+    KeyUp: 16r101 u32.
+    TextEditing: 16r102 u32.
+    TextInput: 16r103 u32.
+    KeyMapChanged: 16r104 u32.
+
+    MouseButtonDown: 16r200 u32.
+    MouseButtonUp: 16r201 u32.
+    MouseMotion: 16r202 u32.
+    MouseWheel: 16r203 u32.
+
+    Shown: 16r300 u32.
+    Hidden: 16r301 u32.
+    Exposed: 16r302 u32.
+    Moved: 16r303 u32.
+    Resize: 16r304 u32.
+    SizeChanged: 16r305 u32.
+    Minimize: 16r306 u32.
+    Maximized: 16r307 u32.
+    Restored: 16r308 u32.
+    Enter: 16r309 u32.
+    Leave: 16r30A u32.
+    FocusGained: 16r30B u32.
+    FocusLost: 16r30C u32.
+    Close: 16r30D u32.
+}.
 
 public struct SysmelPAL::MouseButtonEvent definition: {
     public field mouse => UInt32.
@@ -98,13 +116,15 @@ public struct SysmelPAL::WindowEvent definition: {
 public externC function sysmel_pal_windowSystem_initialize() => Void.
 public externC function sysmel_pal_windowSystem_finalize() => Void.
 
-public externC function sysmel_pal_window_create(titleSize: Size, title: Char8 const pointer, x: Int32, y: Int32, width: Int32, height: Int32, flags: UInt32) => SysmelPAL::WindowHandle.
+public externC function sysmel_pal_window_create(titleSize: Size, title: Char8 const pointer, x: Int32, y: Int32, width: Int32, height: Int32, flags: SysmelPAL::WindowCreationFlags) => SysmelPAL::WindowHandle.
 public externC function sysmel_pal_window_show(window: SysmelPAL::WindowHandle) => Void.
 public externC function sysmel_pal_window_hide(window: SysmelPAL::WindowHandle) => Void.
 public externC function sysmel_pal_window_raise(window: SysmelPAL::WindowHandle) => Void.
+public externC function sysmel_pal_window_getSize(window: SysmelPAL::WindowHandle, outWidth: Int32 ref, outHeight: Int32 ref) => Void.
 public externC function sysmel_pal_window_destroy(window: SysmelPAL::WindowHandle) => Void.
 
 public externC function sysmel_pal_windowRenderer_create(window: SysmelPAL::WindowHandle, flags: UInt32) => SysmelPAL::WindowRendererHandle.
+public externC function sysmel_pal_windowRenderer_getOutputSize(renderer: SysmelPAL::WindowRendererHandle, outWidth: Int32 ref, outHeight: Int32 ref) => Void.
 public externC function sysmel_pal_windowRenderer_destroy(renderer: SysmelPAL::WindowRendererHandle) => Void.
 
 public externC function sysmel_pal_windowRenderer_createStreamingTextureBGRA32(renderer: SysmelPAL::WindowRendererHandle, width: Int32, height: Int32) => SysmelPAL::WindowRendererTextureHandle.

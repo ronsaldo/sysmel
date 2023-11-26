@@ -25,4 +25,6 @@ EventHandler definition: {
     public virtual method onLostFocusEvent: (event: LostFocusEvent) ::=> Void := {}.
 
     public virtual method onWindowCloseRequestEvent: (event: WindowCloseRequestEvent) ::=> Void := {}.
+    public virtual method onWindowResizeEvent: (event: WindowResizeEvent) ::=> Void := {}.
+    public virtual method onWindowSizeChangedEvent: (event: WindowSizeChangedEvent) ::=> Void := {}.
 }.

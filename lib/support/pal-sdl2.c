@@ -15,7 +15,37 @@ SYSMEL_PAL_EXTERN_C void sysmel_pal_windowSystem_finalize(void)
 SYSMEL_PAL_EXTERN_C sysmel_pal_window_t *sysmel_pal_window_create(size_t titleSize, const char *title, int x, int y, int width, int height, uint32_t flags)
 {
     (void)flags;
-    Uint32 sdlFlags = SDL_WINDOW_ALLOW_HIGHDPI;
+    Uint32 sdlFlags = 0;
+
+    if(flags & SYSMEL_PAL_WINDOW_CREATION_FLAGS_ALLOW_HIGH_DPI)
+        sdlFlags |= SDL_WINDOW_ALLOW_HIGHDPI;
+
+    if(flags & SYSMEL_PAL_WINDOW_CREATION_FLAGS_ALWAYS_ON_TOP)
+        sdlFlags |= SDL_WINDOW_ALWAYS_ON_TOP;
+
+    if(flags & SYSMEL_PAL_WINDOW_CREATION_FLAGS_BORDERLESS)
+        sdlFlags |= SDL_WINDOW_BORDERLESS;
+
+    if(flags & SYSMEL_PAL_WINDOW_CREATION_FLAGS_FULLSCREEN)
+        sdlFlags |= SDL_WINDOW_FULLSCREEN;
+
+    if(flags & SYSMEL_PAL_WINDOW_CREATION_FLAGS_FULLSCREEN_DESKTOP)
+        sdlFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+
+    if(flags & SYSMEL_PAL_WINDOW_CREATION_FLAGS_HIDDEN)
+        sdlFlags |= SDL_WINDOW_HIDDEN;
+
+    if(flags & SYSMEL_PAL_WINDOW_CREATION_FLAGS_POPUP)
+        sdlFlags |= SDL_WINDOW_POPUP_MENU;
+
+    if(flags & SYSMEL_PAL_WINDOW_CREATION_FLAGS_RESIZABLE)
+        sdlFlags |= SDL_WINDOW_RESIZABLE;
+
+    if(flags & SYSMEL_PAL_WINDOW_CREATION_FLAGS_TOOLTIP)
+        sdlFlags |= SDL_WINDOW_TOOLTIP;
+
+    if(flags & SYSMEL_PAL_WINDOW_CREATION_FLAGS_UTILITY)
+        sdlFlags |= SDL_WINDOW_UTILITY;
 
     char *titleCString = malloc(titleSize + 1);
     memcpy(titleCString, title, titleSize);
@@ -48,6 +78,11 @@ SYSMEL_PAL_EXTERN_C void sysmel_pal_window_hide(sysmel_pal_window_t *window)
 SYSMEL_PAL_EXTERN_C void sysmel_pal_window_raise(sysmel_pal_window_t *window)
 {
     SDL_RaiseWindow((SDL_Window*)window);
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_window_getSize(sysmel_pal_window_t *window, int *outWidth, int *outHeight)
+{
+    SDL_GetWindowSize((SDL_Window*)window, outWidth, outHeight);
 }
 
 SYSMEL_PAL_EXTERN_C void sysmel_pal_window_destroy(sysmel_pal_window_t *window)
@@ -210,7 +245,7 @@ static void sysmel_pal_sdl2Window_convertEvent(SDL_Event *sdlEvent, sysmel_pal_w
         }
         break;
     default:
-        printf("Unknown sdl event 16r%x\n", sdlEvent->type);
+        //printf("Unknown sdl event 16r%x\n", sdlEvent->type);
         break;
     }
 }
@@ -239,6 +274,11 @@ SYSMEL_PAL_EXTERN_C sysmel_pal_windowRenderer_t *sysmel_pal_windowRenderer_creat
 {
     (void)flags;
     return (sysmel_pal_windowRenderer_t*)SDL_CreateRenderer((SDL_Window*)window, -1, 0);
+}
+
+SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_getOutputSize(sysmel_pal_windowRenderer_t *renderer, int *outWidth, int *outHeight)
+{
+    SDL_GetRendererOutputSize((SDL_Renderer*)renderer, outWidth, outHeight);
 }
 
 SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_destroy(sysmel_pal_windowRenderer_t *renderer)

@@ -21,6 +21,14 @@ public class WindowFormRenderer superclass: WindowRenderer; definition: {
         handle := nil.
     }.
 
+    public method drawableSurfaceExtent => UInt32x2 := {
+        let outputWidth mutable := 0i32.
+        let outputHeight mutable := 0i32.
+        sysmel_pal_windowRenderer_getOutputSize(handle, outputWidth, outputHeight).
+
+        outputWidth asUInt32 @ outputHeight asUInt32
+    }.
+
     public method ensureTextureWithWidth: (width: UInt32) height: (height: UInt32) ::=> Boolean := {
         texture isNotNil && (textureWidth = width) && (textureHeight = height) ifTrue: {
             return: true

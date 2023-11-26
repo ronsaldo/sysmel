@@ -7,6 +7,21 @@ typedef struct sysmel_pal_window_s sysmel_pal_window_t;
 typedef struct sysmel_pal_windowRenderer_s sysmel_pal_windowRenderer_t;
 typedef struct sysmel_pal_windowRendererTexture_s sysmel_pal_windowRendererTexture_t;
 
+typedef enum sysmel_pal_windowCreationFlags_e
+{
+    SYSMEL_PAL_WINDOW_CREATION_FLAGS_NONE = 0,
+    SYSMEL_PAL_WINDOW_CREATION_FLAGS_ALLOW_HIGH_DPI = 1<<0,
+    SYSMEL_PAL_WINDOW_CREATION_FLAGS_ALWAYS_ON_TOP = 1<<1,
+    SYSMEL_PAL_WINDOW_CREATION_FLAGS_BORDERLESS = 1<<2,
+    SYSMEL_PAL_WINDOW_CREATION_FLAGS_FULLSCREEN = 1<<3,
+    SYSMEL_PAL_WINDOW_CREATION_FLAGS_FULLSCREEN_DESKTOP = 1<<4,
+    SYSMEL_PAL_WINDOW_CREATION_FLAGS_HIDDEN = 1<<5,
+    SYSMEL_PAL_WINDOW_CREATION_FLAGS_POPUP = 1<<6,
+    SYSMEL_PAL_WINDOW_CREATION_FLAGS_RESIZABLE = 1<<7,
+    SYSMEL_PAL_WINDOW_CREATION_FLAGS_TOOLTIP = 1<<8,
+    SYSMEL_PAL_WINDOW_CREATION_FLAGS_UTILITY = 1<<9,
+} sysmel_pal_windowCreationFlags_t;
+
 typedef enum sysmel_pal_window_event_type_e
 {
     SYSMEL_PAL_WINDOW_EVENT_TYPE_UNKNOWN = 0,
@@ -112,12 +127,14 @@ SYSMEL_PAL_EXTERN_C sysmel_pal_window_t *sysmel_pal_window_create(size_t titleSi
 SYSMEL_PAL_EXTERN_C void sysmel_pal_window_show(sysmel_pal_window_t *window);
 SYSMEL_PAL_EXTERN_C void sysmel_pal_window_hide(sysmel_pal_window_t *window);
 SYSMEL_PAL_EXTERN_C void sysmel_pal_window_raise(sysmel_pal_window_t *window);
+SYSMEL_PAL_EXTERN_C void sysmel_pal_window_getSize(sysmel_pal_window_t *window, int *outWidth, int *outHeight);
 SYSMEL_PAL_EXTERN_C void sysmel_pal_window_destroy(sysmel_pal_window_t *window);
 
 SYSMEL_PAL_EXTERN_C bool sysmel_pal_window_pollEvent(sysmel_pal_window_event_t *event);
 SYSMEL_PAL_EXTERN_C bool sysmel_pal_window_waitEvent(sysmel_pal_window_event_t *event);
 
 SYSMEL_PAL_EXTERN_C sysmel_pal_windowRenderer_t *sysmel_pal_windowRenderer_create(sysmel_pal_window_t *window, uint32_t flags);
+SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_getOutputSize(sysmel_pal_windowRenderer_t *renderer, int *outWidth, int *outHeight);
 SYSMEL_PAL_EXTERN_C void sysmel_pal_windowRenderer_destroy(sysmel_pal_windowRenderer_t *renderer);
 
 SYSMEL_PAL_EXTERN_C sysmel_pal_windowRendererTexture_t *sysmel_pal_windowRenderer_createStreamingTextureBGRA32(sysmel_pal_windowRenderer_t *renderer, int width, int height);
