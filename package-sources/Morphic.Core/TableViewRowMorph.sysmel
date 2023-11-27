@@ -1,0 +1,76 @@
+TableViewRowMorph definition: {
+    public field rowIndex => Size.
+    protected field cells => Array.
+
+    public method tableViewMorph => TableViewMorph
+        := (owner downCastTo: TableViewContentMorph) tableViewMorph.
+
+    public method dataSource => DataSource
+        := self tableViewMorph dataSource.
+
+    public method columns => OrderedCollection
+        := self tableViewMorph columns.
+
+    public override method defaultColor => Color
+        := Color transparent.
+
+    public override method colorToUse => Color := {
+        self isSelected ifTrue: {
+            Color cyan
+        } ifFalse: {
+            super colorToUse
+        }
+    }.
+
+    public method isSelected => Boolean
+        := self tableViewMorph isRowSelected: rowIndex.
+
+    public method createCells => Void := {
+        let dataSource := self dataSource.
+        dataSource ifNil: {return: void}.
+
+        let element := dataSource elementAtRow: rowIndex.
+        cells := self columns collect: {:(TableViewColumn)eachColumn :: Morph |
+            let cellMorph := eachColumn createCellMorphForElement: element.
+            self addMorph: cellMorph.
+            cellMorph
+        } as: Array.
+    }.
+
+    public method updateContent => Void := {
+        let dataSource := self dataSource.
+        dataSource ifNil: {return: void}.
+
+        let columns := self columns.
+        let element := dataSource elementAtRow: rowIndex.
+        cells doWithIndex: {:(Morph)cellMorph :(Size)cellIndex :: Void |
+            let viewColumn => TableViewColumn := columns at: cellIndex.
+            viewColumn updateCellMorph: cellMorph withElement: element
+        }.
+    }.
+
+    public override method updateLayout => Void := {
+        let cellX mutable := 0f32.
+        let cellHeight := self extent y.
+
+        let columns := self columns.
+        cells doWithIndex: {:(Morph)cellMorph :(Size)cellIndex :: Void |
+            let viewColumn => TableViewColumn := columns at: cellIndex.
+            let cellWidth := viewColumn width.
+
+            cellMorph bounds: (cellX@0f32 extent: cellWidth@cellHeight).
+            cellX := cellX + cellWidth.
+        }.
+    }.
+
+    public override method handlesMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Boolean
+        := event wasHandled not.
+
+    public override method onMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Void := {
+        super onMouseButtonPressedEvent: event.
+        event isLeftButton ifTrue: {
+            self tableViewMorph rowClicked: rowIndex.
+            event wasHandled: true
+        }.
+    }.
+}.

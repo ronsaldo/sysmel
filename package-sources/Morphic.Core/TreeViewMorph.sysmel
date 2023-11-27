@@ -1,0 +1,3 @@
+public class TreeViewMorph superclass: TableViewMorph; definition: {
+
+}.

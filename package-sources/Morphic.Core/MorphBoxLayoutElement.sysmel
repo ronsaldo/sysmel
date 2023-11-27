@@ -1,13 +1,13 @@
 public class MorphBoxLayoutElement superclass: MorphLayoutElement; definition: {
     public field target => MorphLayoutElement.
-    public field proportion => UInt32.
+    public field proportion => Float32.
     public field borderWidth => Float32.
 
     public override method bounds => RectangleF32
         := target bounds expandBy: borderWidth@borderWidth.
 
     public override method bounds: (newBounds: RectangleF32) ::=> Void := {
-        proportion = 0u32 ifTrue: {
+        proportion = 0f32 ifTrue: {
             target position: newBounds min + (borderWidth@borderWidth)
         } ifFalse: {
             target bounds: (newBounds insetBy: borderWidth@borderWidth)

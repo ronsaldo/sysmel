@@ -24,4 +24,19 @@ loadSourceNamed: "TextAreaMorph.sysmel".
 loadSourceNamed: "TextFieldMorph.sysmel".
 loadSourceNamed: "SourceCodeEditorMorph.sysmel".
 
+loadSourceNamed: "DataSource.sysmel".
+loadSourceNamed: "SimpleListDataSource.sysmel".
+loadSourceNamed: "TableRowSelection.sysmel".
+
+loadSourceNamed: "TableViewColumn.sysmel".
+loadSourceNamed: "StringTableViewColumn.sysmel".
+
+loadSourceNamed: "TableViewMorph.sysmel".
+loadSourceNamed: "TableViewHeaderMorph.sysmel".
+loadSourceNamed: "TableViewContentMorph.sysmel".
+loadSourceNamed: "TableViewRowMorph.sysmel".
+
+loadSourceNamed: "ListViewMorph.sysmel".
+loadSourceNamed: "TreeViewMorph.sysmel".
+
 loadSourceNamed: "BasicInspector.sysmel".

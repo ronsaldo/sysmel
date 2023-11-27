@@ -1,0 +1,17 @@
+public class StringTableViewColumn superclass: TableViewColumn; definition: {
+    let DisplayBlockType := (AnyValue) => String.
+    
+    public field display => DisplayBlockType.
+
+    public override method initialize => Void := {
+        super initialize.
+        display := {:element :: String | element asString }.
+    }.
+    
+    public override method createCellMorphForElement: element ::=> Morph
+        := display(element) asMorph.
+
+    public override method updateCellMorph: (morph: Morph) withElement: element ::=> Void := {
+        (morph downCastTo: StringMorph) contents: display(element)
+    }.
+}.

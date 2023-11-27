@@ -1,0 +1,26 @@
+public class SimpleListDataSource superclass: DataSource; definition: {
+    public field items => OrderedCollection.
+
+    public override method initialize => Void := {
+        super initialize.
+        items := OrderedCollection new.
+    }.
+
+    public override method numberOfElements => Size
+        := items size.
+
+    public override method elementAtRow: (rowIndex: Size) ::=> AnyValue
+        := rowIndex < items size
+            ifTrue: (items at: rowIndex)
+            ifFalse: nil.
+
+    public method removeAll => Void := {
+        items removeAll
+    }.
+
+    public method addItem: item ::=> Size := {
+        let index := items size.
+        items add: item.
+        index
+    }.
+}.

@@ -1,0 +1,7 @@
+public abstract class DataSource definition: {
+    public abstract method numberOfElements => Size
+        := self subclassResponsibility.
+
+    public abstract method elementAtRow: (rowIndex: Size) ::=> AnyValue
+        := self subclassResponsibility.
+}.

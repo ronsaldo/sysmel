@@ -1,0 +1,14 @@
+public abstract class TableViewColumn definition: {
+    public field name => String.
+    public field width => Float32.
+
+    public virtual method minimalCellExtent ::=> Float32x2
+        := 0f32 @ FontFace default height.
+
+    public virtual method createCellMorphForElement: element ::=> Morph
+        := Morph new.
+
+    public virtual method updateCellMorph: (morph: Morph) withElement: element ::=> Void := {
+        ## By default do nothing.
+    }.
+}.

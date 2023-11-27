@@ -6,7 +6,7 @@ public abstract class MorphBoxLayout superclass: MorphLayout; definition: {
         elements := OrderedCollection new.
     }.
 
-    public method add: (target: MorphLayoutElement) proportion: (proportion: UInt32) borderWidth: (borderWidth: Float32) ::=> Void := {
+    public method add: (target: MorphLayoutElement) proportion: (proportion: Float32) borderWidth: (borderWidth: Float32) ::=> Void := {
         elements add: (MorphBoxLayoutElement new
             target: target;
             proportion: proportion;
@@ -14,9 +14,9 @@ public abstract class MorphBoxLayout superclass: MorphLayout; definition: {
             yourself)
     }.
 
-    public method add: (target: MorphLayoutElement) proportion: (proportion: UInt32) ::=> Void
+    public method add: (target: MorphLayoutElement) proportion: (proportion: Float32) ::=> Void
         := self add: target proportion: proportion borderWidth: 0f32.
 
     public method add: (element: MorphLayoutElement) ::=> Void
-        := self add: element proportion: 0u32.
+        := self add: element proportion: 0f32.
 }.

@@ -2,6 +2,12 @@ let label := "Hello World " asMorph.
 let button := SimpleButtonMorph new
     label: "Test Button";
     yourself.
+let listView := ListViewMorph new
+    addColumn: StringTableViewColumn new;
+    addItem: "First";
+    addItem: "Second";
+    addItem: "Third";
+    yourself.
 let sourceCodeEditor := SourceCodeEditorMorph new.
 
 BorderedMorph new
@@ -9,11 +15,13 @@ BorderedMorph new
     color: Color white;
     addMorph: label;
     addMorph: button;
+    addMorph: listView;
     addMorph: sourceCodeEditor;
     layout: (MorphVerticalBoxLayout new
-        add: label proportion: 0u32 borderWidth: 2f32;
-        add: button proportion: 0u32 borderWidth: 2f32;
-        add: sourceCodeEditor proportion: 1u32 borderWidth: 2f32;
+        add: label proportion: 0f32 borderWidth: 2f32;
+        add: button proportion: 0f32 borderWidth: 2f32;
+        add: listView proportion: 1f32 borderWidth: 2f32;
+        add: sourceCodeEditor proportion: 1f32 borderWidth: 2f32;
         yourself);
     openInWindowSystem.
 

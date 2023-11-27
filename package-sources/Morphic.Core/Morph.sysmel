@@ -73,11 +73,14 @@ public class Morph superclass: MorphLayoutElement; definition: {
         builder translate: localSceneGraph -- childrenSceneGraph with: self position
     }.
 
-    public virtual method buildChildrenSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode := {
-        submorphs isEmpty ifTrue: {return: builder null}.
+    public virtual method validSubmorphs => Array
+        := submorphs.
 
-        let nodeSceneGraphList := Array new: submorphs size.
-        submorphs doWithIndex: {:(Morph)childMorph :(Size)childMorphIndex :: Void |
+    public virtual method buildChildrenSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode := {
+        self validSubmorphs isEmpty ifTrue: {return: builder null}.
+
+        let nodeSceneGraphList := Array new: self validSubmorphs size.
+        self validSubmorphs doWithIndex: {:(Morph)childMorph :(Size)childMorphIndex :: Void |
             nodeSceneGraphList at: childMorphIndex put: (childMorph buildFullSceneGraphWith: builder)
         }.
 
@@ -135,6 +138,18 @@ public class Morph superclass: MorphLayoutElement; definition: {
         submorphs := #().
     }.
 
+    public method replaceAllMorphsWith: (newMorphs: Collection) ::=> Void := {
+        self removeAllMorphs.
+
+        let newSubmorphs := Array new: newMorphs size.
+        newMorphs doWithIndex: {:(Morph)each :(Size)index :: Void |
+            each owner: self.
+            newSubmorphs at: index put: each.
+        }.
+
+        submorphs := newSubmorphs.
+    }.
+
     public method removeMorph: (morph: Morph) ::=> Void := {
         self assert: morph owner == self.
         submorphs := submorphs copyWithout: morph
@@ -146,7 +161,7 @@ public class Morph superclass: MorphLayoutElement; definition: {
 
     public virtual method processMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Void := {
         event withLocalTranslation: self position do: {:: Void |
-            submorphs reverseDo: {:(Morph)each :: Void |
+            self validSubmorphs reverseDo: {:(Morph)each :: Void |
                 (each bounds includesPoint: event position) ifTrue: {
                     each processMouseButtonPressedEvent: event
                 }
@@ -164,7 +179,7 @@ public class Morph superclass: MorphLayoutElement; definition: {
 
     public virtual method processMouseButtonReleasedEvent: (event: MouseButtonReleasedEvent) ::=> Void := {
         event withLocalTranslation: self position do: {:: Void |
-            submorphs reverseDo: {:(Morph)each :: Void |
+            self validSubmorphs reverseDo: {:(Morph)each :: Void |
                 (each bounds includesPoint: event position) ifTrue: {
                     each processMouseButtonReleasedEvent: event
                 }
@@ -182,7 +197,7 @@ public class Morph superclass: MorphLayoutElement; definition: {
 
     public virtual method processMouseMoveEvent: (event: MouseMoveEvent) ::=> Void := {
         event withLocalTranslation: self position do: {:: Void |
-            submorphs reverseDo: {:(Morph)each :: Void |
+            self validSubmorphs reverseDo: {:(Morph)each :: Void |
                 (each bounds includesPoint: event position) ifTrue: {
                     each processMouseMoveEvent: event
                 }
