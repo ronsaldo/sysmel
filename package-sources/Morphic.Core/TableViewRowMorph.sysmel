@@ -66,11 +66,31 @@ TableViewRowMorph definition: {
     public override method handlesMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Boolean
         := event wasHandled not.
 
+    public override method takesKeyboardFocus => Boolean
+        := true.
+
     public override method onMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Void := {
         super onMouseButtonPressedEvent: event.
         event isLeftButton ifTrue: {
             self tableViewMorph rowClicked: rowIndex.
-            event wasHandled: true
+            event wasHandled: true.
+            self takeKeyboardFocus
         }.
     }.
+
+    public override method handlesKeyPressedEvent: (event: KeyPressedEvent) ::=> Boolean
+        := event wasHandled not.
+
+    public override method onKeyPressedEvent: (event: KeyPressedEvent) ::=> Void := {
+        switch: event symbol withCases: #{
+            KeySymbol Return : {
+                self isSelected ifTrue: {
+                    self tableViewMorph rowActivated: rowIndex.
+                    event wasHandled: true.
+                }
+            }.
+            _: {}
+        }
+    }.
+
 }.

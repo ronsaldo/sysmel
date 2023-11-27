@@ -35,6 +35,7 @@ loadSourceNamed: "TableViewColumn.sysmel".
 loadSourceNamed: "StringTableViewColumn.sysmel".
 
 loadSourceNamed: "TableViewAnnouncement.sysmel".
+loadSourceNamed: "TableViewRowActivatedAnnouncement.sysmel".
 loadSourceNamed: "TableViewSelectionChangedAnnouncement.sysmel".
 
 loadSourceNamed: "TableViewMorph.sysmel".

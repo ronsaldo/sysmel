@@ -91,6 +91,12 @@ public class TableViewMorph superclass: BorderedMorph; definition: {
         }
     }.
 
+    public method rowActivated: (rowIndex: Size) ::=> Void := {
+        self announce: ((TableViewRowActivatedAnnouncement for: self)
+            rowIndex: rowIndex;
+            yourself)
+    }.
+
     public method selectionChanged => Void := {
         self changed.
         self announce: ((TableViewSelectionChangedAnnouncement for: self)
