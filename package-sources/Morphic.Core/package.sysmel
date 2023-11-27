@@ -1,6 +1,9 @@
 loadSourceNamed: "MorphLayoutElement.sysmel".
 loadSourceNamed: "MorphLayout.sysmel".
 loadSourceNamed: "Morph.sysmel".
+loadSourceNamed: "MorphAnnouncement.sysmel".
+loadSourceNamed: "MorphActivatedAnnouncement.sysmel".
+
 loadSourceNamed: "WorldMorph.sysmel".
 loadSourceNamed: "SystemWindowMorph.sysmel".
 
@@ -30,6 +33,9 @@ loadSourceNamed: "TableRowSelection.sysmel".
 
 loadSourceNamed: "TableViewColumn.sysmel".
 loadSourceNamed: "StringTableViewColumn.sysmel".
+
+loadSourceNamed: "TableViewAnnouncement.sysmel".
+loadSourceNamed: "TableViewSelectionChangedAnnouncement.sysmel".
 
 loadSourceNamed: "TableViewMorph.sysmel".
 loadSourceNamed: "TableViewHeaderMorph.sysmel".

@@ -1,0 +1,8 @@
+public class MorphAnnouncement superclass: Announcement; definition: {
+    public field morph => Morph.
+
+    __Meta__ definition: {
+        public method for: (aMorph: Morph) ::=> self
+            := self new morph: aMorph; yourself
+    }.
+}.

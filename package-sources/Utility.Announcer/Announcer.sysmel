@@ -1,0 +1,19 @@
+Announcer definition: {
+    protected field registry => SubscriptionRegistry.
+
+    public override method initialize => Void := {
+        super initialize.
+        registry := SubscriptionRegistry new.
+    }.
+
+    public method when: (anAnnouncementClass: Announcement class) do: aValuable ::=> AnnouncementSubscription
+        := registry add: (AnnouncementSubscription new
+            announcer: self;
+            announcementClass: anAnnouncementClass;
+            valuable: aValuable;
+            yourself).
+
+    public method announce: (anAnnouncement: Announcement) ::=> Void := {
+        registry deliver: anAnnouncement
+    }.
+}.

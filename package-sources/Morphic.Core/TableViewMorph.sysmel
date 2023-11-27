@@ -93,5 +93,8 @@ public class TableViewMorph superclass: BorderedMorph; definition: {
 
     public method selectionChanged => Void := {
         self changed.
+        self announce: ((TableViewSelectionChangedAnnouncement for: self)
+            selection: selectedRows;
+            yourself)
     }.
 }.

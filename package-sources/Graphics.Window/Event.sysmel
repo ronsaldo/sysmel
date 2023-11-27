@@ -3,7 +3,7 @@ public class EventHandler superclass: Object.
 #**
  * I am a basic event for a window.
  *#
-public abstract class Event superclass: Object; definition: {
+public abstract class Event superclass: Announcement; definition: {
     public field wasHandled => Boolean.
     public field shouldSuppressDefaultAction => Boolean.
 

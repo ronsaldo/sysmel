@@ -1,0 +1,3 @@
+public class TableViewSelectionChangedAnnouncement superclass: MorphAnnouncement; definition: {
+    public field selection => TableRowSelection.
+}.

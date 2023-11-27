@@ -1,12 +1,14 @@
 let label := "Hello World " asMorph.
 let button := SimpleButtonMorph new
     label: "Test Button";
+    when: MorphActivatedAnnouncement do: {:: Void | printLine("Test button activated")};
     yourself.
 let listView := ListViewMorph new
     addColumn: StringTableViewColumn new;
     addItem: "First";
     addItem: "Second";
     addItem: "Third";
+    when: TableViewSelectionChangedAnnouncement do: {:: Void | printLine("Table selection changed")};
     yourself.
 let sourceCodeEditor := SourceCodeEditorMorph new.
 

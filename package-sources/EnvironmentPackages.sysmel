@@ -11,6 +11,7 @@
     "Graphics.Font.Tests"
     "Graphics.FormSceneGraph"
     "Graphics.FormSceneGraph.Tests"
+    "Utility.Announcer"
     "Graphics.Window"
     "Morphic.Core"
     "Morphic.Core.Tests"

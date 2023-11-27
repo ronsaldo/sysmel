@@ -1,0 +1,2 @@
+public class MorphActivatedAnnouncement superclass: MorphAnnouncement; definition: {
+}.

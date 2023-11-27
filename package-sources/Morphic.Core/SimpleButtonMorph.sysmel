@@ -46,7 +46,6 @@ public class SimpleButtonMorph superclass: BorderedMorph; definition: {
         event wasHandled: true.
         state := true.
         self changed.
-        printLine("Button pressed")
     }.
 
     public override method handlesMouseButtonReleasedEvent: (event: MouseButtonPressedEvent) ::=> Boolean
@@ -56,6 +55,7 @@ public class SimpleButtonMorph superclass: BorderedMorph; definition: {
         event wasHandled: true.
         state := false.
         self changed.
-        printLine("Button released")
+
+        self announce: (MorphActivatedAnnouncement for: self)
     }.
 }.

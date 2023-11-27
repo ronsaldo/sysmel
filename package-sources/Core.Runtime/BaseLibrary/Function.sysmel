@@ -101,6 +101,26 @@ Function eagerDefinitionBody: {
         error("applyWithExpandedArguments with an excessive number of arguments.").
     }.
 
+    public method cull: arg0
+        := argumentCount = 0sz
+            ifTrue: self()
+            ifFalse: self(arg0).
+
+    public method cull: arg0 cull: arg1
+        := argumentCount < 2sz
+            ifTrue: (self cull: arg0)
+            ifFalse: self(arg0, arg1).
+
+    public method cull: arg0 cull: arg1 cull: arg2
+        := argumentCount < 3sz
+            ifTrue: (self cull: arg0 cull: arg1)
+            ifFalse: self(arg0, arg1, arg2).
+
+    public method cull: arg0 cull: arg1 cull: arg2 cull: arg3
+        := argumentCount < 4sz
+            ifTrue: (self cull: arg0 cull: arg1 cull: arg2)
+            ifFalse: self(arg0, arg1, arg2, arg3).
+
     public method interpretWithArguments: (arguments: Array) ::=> Untyped := {
         self doEnsureAnalysis.
         definition interpretClosure: self withArguments: arguments

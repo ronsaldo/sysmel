@@ -1,0 +1,37 @@
+public class SubscriptionRegistry definition: {
+    protected field subscriptions => IdentitySet.
+
+    public override method initialize => Void := {
+        subscriptions := IdentitySet new.
+    }.
+
+    public method add: (subscription: AnnouncementSubscription) ::=> AnnouncementSubscription := {
+        subscriptions add: subscription.
+        subscription
+    }.
+
+    public method remove: (subscription: AnnouncementSubscription) ::=> AnnouncementSubscription := {
+        subscriptions remove: subscription.
+        subscription
+    }.
+
+    public method deliver: (announcement: Announcement) ::=> Void := {
+        subscriptions isEmpty ifTrue: {return: void}.
+
+        let interestedSubscriptions := self subscriptionsHandling: announcement.
+        interestedSubscriptions do: {:(AnnouncementSubscription)eachSubscription :: Void |
+            eachSubscription deliver: announcement
+        }
+    }.
+
+    public method subscriptionsHandling: (announcement: Announcement) ::=> OrderedCollection := {
+        let result := OrderedCollection new.
+        subscriptions do: {:(AnnouncementSubscription)each :: Void |
+            (each handlesAnnouncement: announcement) ifTrue: {
+                result add: each
+            }
+        }.
+
+        result
+    }
+}.

@@ -3,6 +3,7 @@ public class Morph superclass: MorphLayoutElement; definition: {
     public field owner => Morph.
     public field submorphs => Array.
     public field color => Color.
+    public field announcer => Announcer.
     protected field visible => Boolean.
     protected field layout => MorphLayout.
 
@@ -292,4 +293,16 @@ public class Morph superclass: MorphLayoutElement; definition: {
 
     public virtual method wantsKeyboardFocus => Boolean
         := self takesKeyboardFocus && self visible && self enabled.
+
+    public method validAnnouncer => Announcer
+        := announcer ifNil: {announcer := Announcer new}.
+
+    public method when: (anAnnouncementClass: Announcement class) do: aValuable ::=> AnnouncementSubscription
+        := self validAnnouncer when: anAnnouncementClass do: aValuable.
+
+    public method announce: (anAnnouncement: Announcement) ::=> Void := {
+        announcer ifNotNil: {
+            announcer announce: anAnnouncement
+        }
+    }.
 }.
