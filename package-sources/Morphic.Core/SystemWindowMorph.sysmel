@@ -26,8 +26,8 @@ public class SystemWindowMorph superclass: WorldMorph; definition: {
         hasDirtyRendering := false.
     }.
 
-    public override method defaultBounds => RectangleF32
-        := 0f32x2 extent: 640f32 @ 480f32.
+    public override method defaultExtent => Float32x2
+        := 640f32 @ 480f32.
 
     public override method defaultColor => Color
         := Color white.

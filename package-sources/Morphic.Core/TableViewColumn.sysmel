@@ -2,6 +2,11 @@ public abstract class TableViewColumn definition: {
     public field name => String.
     public field width => Float32.
 
+    __Meta__ definition: {
+        public method named: (name: String) ::=> self
+            := self new name: name; yourself
+    }.
+
     public virtual method minimalCellExtent ::=> Float32x2
         := 0f32 @ FontFace default height.
 

@@ -1,5 +1,66 @@
+public class BasicInspector superclass: BorderedMorph; definition: {
+    protected field inspectedValue => Untyped.
+    protected field listView => ListViewMorph.
+    protected field sourceCodeEditor => SourceCodeEditorMorph.
+
+    public override method initialize => Void := {
+        super initialize.
+
+        listView := ListViewMorph new
+            addColumn: ((StringTableViewColumn named: "Variable") display: {:assoc :: String | assoc key}; yourself);
+            addColumn: ((StringTableViewColumn named: "Value") display: {:assoc :: String | assoc value()}; yourself);
+            yourself.
+        sourceCodeEditor := SourceCodeEditorMorph new.
+
+        self
+            addMorph: listView;
+            addMorph: sourceCodeEditor;
+            layout: (MorphVerticalBoxLayout new
+                add: listView proportion: 1f32 borderWidth: 2f32;
+                add: sourceCodeEditor proportion: 1f32 borderWidth: 2f32;
+                yourself
+            )
+    }.
+
+    public override method defaultColor => Color := Color transparent.
+
+    public override method defaultExtent => Float32x2 := 300f32@300f32.
+
+    public method on: (newInspectedValue: Untyped) ::=> Void := {
+        listView removeAll.
+        inspectedValue := newInspectedValue.
+
+        let theInspectedValue := newInspectedValue.
+
+        let inspectedValueType := RawTuple::type(theInspectedValue).
+        let selfString := {:: String | 
+            String streamContents: {:(StringStream)out :: Void |
+                inspectedValueType safelyPrintValue: theInspectedValue on: out
+            }
+        }.
+
+        listView addItem: "self" -> selfString.
+
+        inspectedValueType allSlotsDo: {:(TypeSlot)eachTypeSlot :: Void |
+            let slotName := (eachTypeSlot name ifNil: #"") asString.
+            let slotPrintValue := {:: String |
+                let accessorFunction := RawTuple::typeSlotAt:.
+                let slotValue := accessorFunction(theInspectedValue, eachTypeSlot).
+                let slotType := RawTuple::type(slotValue).
+                String streamContents: {:(StringStream)out :: Void |
+                    slotType safelyPrintValue: slotValue on: out
+                }
+            }.
+
+            listView addItem: slotName -> slotPrintValue.
+        }
+    }.
+}.
+
 AnyValue definition: {
     public method inspect => Void := {
-        self printString asMorph openInWindowSystem
+        BasicInspector new
+            on: self;
+            openInWindowSystem
     }.
 }.

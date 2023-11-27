@@ -21,8 +21,11 @@ public class Morph superclass: MorphLayoutElement; definition: {
     public virtual method defaultColor => Color
         := Color blue.
 
+    public virtual method defaultExtent => Float32x2
+        := 50f32 @ 40f32.
+
     public virtual method defaultBounds => RectangleF32
-        := 0f32x2 extent: 50f32 @ 40f32.
+        := 0f32x2 extent: self defaultExtent.
 
     public inline method localBounds => RectangleF32
         := 0f32x2 extent: bounds extent.
