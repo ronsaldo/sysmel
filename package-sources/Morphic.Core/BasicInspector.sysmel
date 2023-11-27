@@ -1,3 +1,31 @@
+public class BasicInspectorListElement definition: {
+    public field name => String.
+    public field valueFunction => (() => Untyped).
+
+    __Meta__ definition: {
+        public method name: (name: String) value: (value: Untyped) ::=> self
+            := self new name: name; value: value; yourself.
+
+        public method name: (name: String) valueFunction: (valueFunction: () => Untyped) ::=> self
+            := self new name: name; valueFunction: valueFunction; yourself.
+    }.
+
+    public method value => Untyped
+        := valueFunction().
+
+    public method value: (theValue: Untyped) ::=> Void := {
+        valueFunction := {:: Untyped | theValue }
+    }.
+
+    public method valueDisplayString => String := {
+        let value := self value.
+        let valueType := RawTuple::type(value).
+        String streamContents: {:(StringStream)out :: Void |
+            valueType safelyPrintValue: value on: out
+        }
+    }
+}.
+
 public class BasicInspector superclass: BorderedMorph; definition: {
     protected field inspectedValue => Untyped.
     protected field listView => ListViewMorph.
@@ -7,8 +35,8 @@ public class BasicInspector superclass: BorderedMorph; definition: {
         super initialize.
 
         listView := ListViewMorph new
-            addColumn: ((StringTableViewColumn named: "Variable") display: {:assoc :: String | assoc key}; yourself);
-            addColumn: ((StringTableViewColumn named: "Value") display: {:assoc :: String | assoc value()}; yourself);
+            addColumn: ((StringTableViewColumn named: "Variable") display: {:listElement :: String | listElement name}; yourself);
+            addColumn: ((StringTableViewColumn named: "Value") display: {:listElement :: String | listElement valueDisplayString}; yourself);
             yourself.
         sourceCodeEditor := SourceCodeEditorMorph new.
 
@@ -31,30 +59,75 @@ public class BasicInspector superclass: BorderedMorph; definition: {
         inspectedValue := newInspectedValue.
 
         let theInspectedValue := newInspectedValue.
-
         let inspectedValueType := RawTuple::type(theInspectedValue).
-        let selfString := {:: String | 
-            String streamContents: {:(StringStream)out :: Void |
-                inspectedValueType safelyPrintValue: theInspectedValue on: out
-            }
-        }.
 
-        listView addItem: "self" -> selfString.
+        self addInspectorListElementWithName: "self" value: theInspectedValue.
+        inspectedValueType fillBasicInspector: self for: theInspectedValue.
+    }.
 
-        inspectedValueType allSlotsDo: {:(TypeSlot)eachTypeSlot :: Void |
+    public method addInspectorListElementWithName: (name: String) value: (value: Untyped) ::=> Void := {
+        listView addItem: (BasicInspectorListElement name: name value: value).
+    }.
+
+    public method addInspectorListElementWithName: (name: String) valueFunction: (valueFunction: () => Untyped) ::=> Void := {
+        listView addItem: (BasicInspectorListElement name: name valueFunction: valueFunction).
+    }.
+}.
+
+Type definition: {
+    public virtual method fillBasicInspector: (basicInspector: BasicInspector) withSlotsFor: (inspectedValue: Untyped) ::=> Void := {
+        self allSlotsDo: {:(TypeSlot)eachTypeSlot :: Void |
             let slotName := (eachTypeSlot name ifNil: #"") asString.
-            let slotPrintValue := {:: String |
+            let slotValueFunction := {:: Untyped |
                 let accessorFunction := RawTuple::typeSlotAt:.
-                let slotValue := accessorFunction(theInspectedValue, eachTypeSlot).
-                let slotType := RawTuple::type(slotValue).
-                String streamContents: {:(StringStream)out :: Void |
-                    slotType safelyPrintValue: slotValue on: out
-                }
+                accessorFunction(inspectedValue, eachTypeSlot)
             }.
 
-            listView addItem: slotName -> slotPrintValue.
+            basicInspector addInspectorListElementWithName: slotName valueFunction: slotValueFunction.
         }
     }.
+
+    public virtual method fillBasicInspector: (basicInspector: BasicInspector) for: (inspectedValue: Untyped) ::=> Void := {
+        self fillBasicInspector: basicInspector withSlotsFor: inspectedValue
+    }.
+}.
+
+Collection definition: {
+    __Meta__ definition: {
+        public override method fillBasicInspector: (basicInspector: BasicInspector) for: (inspectedValue: Untyped) ::=> Void := {
+            super fillBasicInspector: basicInspector for: inspectedValue.
+            self fillBasicInspector: basicInspector withCollectionMembersOf: inspectedValue
+        }.
+
+        public virtual method fillBasicInspector: (basicInspector: BasicInspector) withCollectionMembersOf: (inspectedValue: Untyped) ::=> Void := {
+            let inspectedCollection => Collection := inspectedValue.
+            inspectedCollection doWithIndex: {:element :(Size)index :: Void |
+                basicInspector addInspectorListElementWithName: index asString value: element.
+            }
+        }.
+    }
+}.
+
+Dictionary definition: {
+    __Meta__ definition: {
+        public override method fillBasicInspector: (basicInspector: BasicInspector) withCollectionMembersOf: (inspectedValue: Untyped) ::=> Void := {
+            let inspectedDictionary => Dictionary := inspectedValue.
+            inspectedDictionary keysAndValuesDo: {:key :value :: Void |
+                basicInspector addInspectorListElementWithName: key printString value: value.
+            }
+        }.
+    }
+}.
+
+MethodDictionary definition: {
+    __Meta__ definition: {
+        public override method fillBasicInspector: (basicInspector: BasicInspector) withCollectionMembersOf: (inspectedValue: Untyped) ::=> Void := {
+            let inspectedDictionary => MethodDictionary := inspectedValue.
+            inspectedDictionary keysAndValuesDo: {:key :value :: Void |
+                basicInspector addInspectorListElementWithName: key printString value: value.
+            }
+        }.
+    }
 }.
 
 AnyValue definition: {
