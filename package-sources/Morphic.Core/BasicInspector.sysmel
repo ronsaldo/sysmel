@@ -21,7 +21,7 @@ public class BasicInspectorListElement definition: {
         let value := self value.
         let valueType := RawTuple::type(value).
         String streamContents: {:(StringStream)out :: Void |
-            valueType safelyPrintValue: value on: out
+            valueType safelyPrintShortValue: value on: out
         }
     }
 }.
@@ -99,6 +99,14 @@ Type definition: {
     public virtual method fillBasicInspector: (basicInspector: BasicInspector) for: (inspectedValue: Untyped) ::=> Void := {
         self fillBasicInspector: basicInspector withSlotsFor: inspectedValue
     }.
+
+    public virtual method safelyPrintShortValue: (value: Untyped) on: (stream: Stream) ::=> Void := {
+        {:: Void |
+            self safelyPrintValue: value on: stream
+        } on: Error do: {:(Error)e :: Void |
+            stream print: e
+        }
+    }.
 }.
 
 Collection definition: {
@@ -114,7 +122,25 @@ Collection definition: {
                 basicInspector addInspectorListElementWithName: index asString value: element.
             }
         }.
-    }
+
+        public virtual method shortPrintSizeThreshold => Size
+            := 10sz.
+
+        public override method safelyPrintShortValue: (value: Untyped) on: (stream: Stream) ::=> Void := {
+            self shortPrintSizeThreshold > value size ifTrue: {
+                super safelyPrintShortValue: value on: stream
+            } ifFalse: {
+                stream string: "a "; print: self
+            }
+        }.
+    }.
+}.
+
+String definition: {
+    __Meta__ definition: {
+        public override method shortPrintSizeThreshold => Size
+            := 128sz.
+    }.
 }.
 
 Dictionary definition: {
