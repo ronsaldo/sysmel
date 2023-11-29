@@ -8,6 +8,12 @@ public class SystemBrowser superclass: PanelMorph; definition: {
             addColumn: ((StringTableViewColumn named: "Name") display: {:element :: String | element shortPrintString}; yourself);
             children: {:element :: Collection | element children };
             roots: (Array with: __Global__);
+            when: TableViewRowActivatedAnnouncement do: {:(TableViewRowActivatedAnnouncement)announcement :: Void |
+                self onActivatedProgramEntityTreeViewElement: announcement rowElement
+            };
+            when: TableViewSelectionChangedAnnouncement do: {:(TableViewSelectionChangedAnnouncement)announcement :: Void |
+                self onProgramEntityTreeViewSelectionChanged: announcement selection
+            };
             yourself.
 
         self
@@ -18,4 +24,11 @@ public class SystemBrowser superclass: PanelMorph; definition: {
     }.
 
     public override method defaultExtent => Float32x2 := 600f32@400f32.
+
+    public method onActivatedProgramEntityTreeViewElement: (programEntity: ProgramEntity) ::=> Void := {
+        programEntity inspect
+    }.
+
+    public method onProgramEntityTreeViewSelectionChanged: (newSelection: TableRowSelection) ::=> Void := {
+    }.
 }.
