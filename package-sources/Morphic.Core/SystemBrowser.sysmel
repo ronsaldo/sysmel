@@ -1,8 +1,20 @@
 public class SystemBrowser superclass: PanelMorph; definition: {
-    protected field sourceCodeEditor => SourceCodeEditorMorph.
+    protected field programEntityTreeView => TreeViewMorph.
 
     public override method initialize => Void := {
         super initialize.
+
+        programEntityTreeView := TreeViewMorph new
+            addColumn: ((StringTableViewColumn named: "Name") display: {:element :: String | element shortPrintString}; yourself);
+            children: {:element :: Collection | element children };
+            roots: (Array with: __Global__);
+            yourself.
+
+        self
+            addMorph: programEntityTreeView;
+            layout: (MorphVerticalBoxLayout new
+                add: programEntityTreeView proportion: 1f32 borderWidth: 2f32;
+                yourself)
     }.
 
     public override method defaultExtent => Float32x2 := 600f32@400f32.

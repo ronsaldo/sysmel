@@ -644,14 +644,6 @@ TemporaryReferenceType
 Array ensureAnalysisOfMethodWithSelector: #doWithIndex:.
 
 __Global__
-    setSymbol: #tuple:downCastTo: bindingWithValue: {:(MacroContext)macroContext :(ASTNode)self :(ASTNode)targetTypeExpression :: ASTDownCastNode |
-        ASTDownCastNode new
-            sourcePosition: macroContext sourcePosition;
-            typeExpression: targetTypeExpression;
-            valueExpression: self;
-            isUnchecked: false;
-            yourself
-    } makeMacro;
     setSymbol: #tuple:uncheckedDownCastTo: bindingWithValue: {:(MacroContext)macroContext :(ASTNode)self :(ASTNode)targetTypeExpression :: ASTDownCastNode |
         ASTDownCastNode new
             sourcePosition: macroContext sourcePosition;
@@ -3414,6 +3406,18 @@ ValueType
 PrimitiveValueType
     withSelector: #isPassedByReference addMethod: {:(ValueType)self :: Boolean | false } makeOverride;
     withSelector: #isReturnedViaReference addMethod: {:(ValueType)self :: Boolean | false } makeOverride.
+
+ProgramEntity
+    withSelector: #recordChild: addMethod: {:(ProgramEntity)self :(ProgramEntity)child :: Void | } makeVirtual.
+
+ProgramEntityWithChildren
+    withSelector: #recordChild: addMethod: {:(ProgramEntityWithChildren)self :(ProgramEntity)child :: Void |
+        if: (self __slotNamedAt__: #children) == nil then: {
+            self __slotNamedAt__: #children put: OrderedCollection new.
+        }.
+
+        (self __slotNamedAt__: #children) add: child.
+    } makeOverride.
 
 Type
     withSelector: #setPublicSymbolBinding: addMethod: {:(Type)self :(SymbolBinding)binding :: Void |

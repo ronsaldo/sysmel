@@ -1,11 +1,11 @@
 #include "sysbvm/programEntity.h"
+#include "sysbvm/orderedCollection.h"
 #include "sysbvm/errors.h"
 #include "sysbvm/function.h"
 #include "internal/context.h"
 
 SYSBVM_API void sysbvm_programEntity_recordBindingWithOwnerAndName(sysbvm_context_t *context, sysbvm_tuple_t programEntity, sysbvm_tuple_t owner, sysbvm_tuple_t name)
 {
-    (void)context;
     if(!sysbvm_tuple_isKindOf(context, programEntity, context->roots.programEntityType)) return;
     if(owner == programEntity) return;
 
@@ -14,7 +14,20 @@ SYSBVM_API void sysbvm_programEntity_recordBindingWithOwnerAndName(sysbvm_contex
     {
         programEntityObject->owner = owner;
         programEntityObject->name = name;
+
+        sysbvm_programEntity_recordChild(context, owner, programEntity);
     }
+}
+
+SYSBVM_API void sysbvm_programEntity_recordChild(sysbvm_context_t *context, sysbvm_tuple_t programEntity, sysbvm_tuple_t child)
+{
+    if(!sysbvm_tuple_isKindOf(context, programEntity, context->roots.programEntityWithChildrenType)) return;
+    if(programEntity == child) return;
+
+    sysbvm_programEntityWithChildren_t *programEntityWithChildrenObject = (sysbvm_programEntityWithChildren_t*)programEntity;
+    if(!programEntityWithChildrenObject->children)
+        programEntityWithChildrenObject->children = sysbvm_orderedCollection_create(context);
+    sysbvm_orderedCollection_add(context, programEntityWithChildrenObject->children, child);
 }
 
 static sysbvm_tuple_t sysbvm_programEntity_primitive_recordBindingWithOwnerAndName(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)

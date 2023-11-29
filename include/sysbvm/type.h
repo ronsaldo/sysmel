@@ -37,7 +37,7 @@ typedef struct sysbvm_type_pendingDefinitionFragments_s
 
 typedef struct sysbvm_type_tuple_s
 {
-    sysbvm_programEntity_t super;
+    sysbvm_programEntityWithChildren_t super;
     sysbvm_tuple_t supertype;
     sysbvm_tuple_t slots;
     sysbvm_tuple_t slotsWithBasicInitialization;
@@ -69,7 +69,6 @@ typedef struct sysbvm_type_tuple_s
     sysbvm_tuple_t pendingSlots;
     sysbvm_tuple_t pendingDefinitionFragments;
     sysbvm_tuple_t subtypes;
-    sysbvm_tuple_t children;
 } sysbvm_type_tuple_t;
 
 typedef enum sysbvm_typeFlags_e
@@ -509,7 +508,7 @@ SYSBVM_INLINE sysbvm_tuple_t sysbvm_type_getName(sysbvm_tuple_t type)
 {
     if(!sysbvm_tuple_isNonNullPointer(type)) return SYSBVM_NULL_TUPLE;
     if(sysbvm_tuple_isDummyValue(type)) return SYSBVM_NULL_TUPLE;
-    return ((sysbvm_type_tuple_t*)type)->super.name;
+    return ((sysbvm_type_tuple_t*)type)->super.super.name;
 }
 
 /**
@@ -519,7 +518,7 @@ SYSBVM_INLINE void sysbvm_type_setName(sysbvm_tuple_t type, sysbvm_tuple_t name)
 {
     if(!sysbvm_tuple_isNonNullPointer(type)) return;
     if(sysbvm_tuple_isDummyValue(type)) return;
-    ((sysbvm_type_tuple_t*)type)->super.name = name;
+    ((sysbvm_type_tuple_t*)type)->super.super.name = name;
 }
 
 /**

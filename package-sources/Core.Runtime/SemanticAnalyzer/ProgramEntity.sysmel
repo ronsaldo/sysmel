@@ -3,6 +3,9 @@ ProgramEntity eagerDefinitionBody: {
         self owner isNil && self name isNil ifTrue: {
             self owner: newOwner.
             self name: newName.
+            newOwner ifNotNil: {
+                newOwner recordChild: self
+            }
         }
     }.
 

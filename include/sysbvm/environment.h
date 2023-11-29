@@ -23,11 +23,10 @@ typedef struct sysbvm_analysisQueue_s
 
 typedef struct sysbvm_environment_s
 {
-    sysbvm_programEntity_t super;
+    sysbvm_programEntityWithChildren_t super;
     sysbvm_tuple_t parent;
     sysbvm_tuple_t analysisQueue;
     sysbvm_tuple_t symbolTable;
-    sysbvm_tuple_t children;
 } sysbvm_environment_t;
 
 typedef sysbvm_environment_t sysbvm_namespace_t;
@@ -344,6 +343,11 @@ SYSBVM_API void sysbvm_environment_setBinding(sysbvm_context_t *context, sysbvm_
  * Sets a new symbol binding with value the environment.
  */ 
 SYSBVM_API void sysbvm_environment_setNewSymbolBindingWithValue(sysbvm_context_t *context, sysbvm_tuple_t environment, sysbvm_tuple_t symbol, sysbvm_tuple_t value);
+
+/**
+ * Sets a new symbol binding with value in the namespace.
+ */ 
+SYSBVM_API void sysbvm_namespace_setNewSymbolBindingWithValue(sysbvm_context_t *context, sysbvm_tuple_t nspace, sysbvm_tuple_t symbol, sysbvm_tuple_t value);
 
 /**
  * Sets a new symbol binding with value in the environment.

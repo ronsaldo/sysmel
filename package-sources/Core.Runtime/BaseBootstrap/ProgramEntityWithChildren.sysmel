@@ -1,0 +1,4 @@
+ProgramEntityWithChildren definition: {
+    public override method children => SequenceableCollection
+        := children ifNil: #().
+}.

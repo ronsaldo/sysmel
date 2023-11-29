@@ -175,6 +175,7 @@ typedef struct sysbvm_context_roots_s
     sysbvm_tuple_t pragmaType;
     sysbvm_tuple_t primitiveValueType;
     sysbvm_tuple_t programEntityType;
+    sysbvm_tuple_t programEntityWithChildrenType;
     sysbvm_tuple_t referenceLikeType;
     sysbvm_tuple_t referenceType;
     sysbvm_tuple_t sequenceableCollectionType;

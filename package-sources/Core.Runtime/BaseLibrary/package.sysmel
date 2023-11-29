@@ -32,6 +32,7 @@ loadSourceNamed: "VirtualTableSetSource.sysmel".
 loadSourceNamed: "ImageBuilderVirtualTableSetSource.sysmel".
 loadSourceNamed: "CurrentImageVirtualTableSetSource.sysmel".
 
+loadSourceNamed: "ProgramEntity.sysmel".
 loadSourceNamed: "ProgramEntitySymbol.sysmel".
 loadSourceNamed: "FunctionEntryPointSymbol.sysmel".
 loadSourceNamed: "FunctionTrampolineSymbol.sysmel".

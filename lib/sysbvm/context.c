@@ -112,8 +112,7 @@ SYSBVM_API sysbvm_tuple_t sysbvm_context_createIntrinsicClass(sysbvm_context_t *
 {
     sysbvm_tuple_t nameSymbol = sysbvm_symbol_internWithCString(context, name);
     sysbvm_tuple_t type = sysbvm_type_createAnonymousClassAndMetaclass(context, supertype);
-    sysbvm_type_setName(type, nameSymbol);
-    sysbvm_environment_setNewSymbolBindingWithValue(context, context->roots.globalNamespace, nameSymbol, type);
+    sysbvm_namespace_setNewSymbolBindingWithValue(context, context->roots.globalNamespace, nameSymbol, type);
     sysbvm_orderedCollection_add(context, context->roots.intrinsicTypes, type);
 
     // First pass: count the arguments.
@@ -158,8 +157,7 @@ SYSBVM_API sysbvm_tuple_t sysbvm_context_createIntrinsicPrimitiveValueType(sysbv
 {
     sysbvm_tuple_t nameSymbol = sysbvm_symbol_internWithCString(context, name);
     sysbvm_tuple_t type = sysbvm_type_createAnonymousPrimitiveValueTypeAndValueMetatype(context, supertype);
-    sysbvm_type_setName(type, nameSymbol);
-    sysbvm_environment_setNewSymbolBindingWithValue(context, context->roots.globalNamespace, nameSymbol, type);
+    sysbvm_namespace_setNewSymbolBindingWithValue(context, context->roots.globalNamespace, nameSymbol, type);
     sysbvm_orderedCollection_add(context, context->roots.intrinsicTypes, type);
 
     sysbvm_type_setSlots(type, sysbvm_array_create(context, 0));
@@ -173,8 +171,7 @@ SYSBVM_API sysbvm_tuple_t sysbvm_context_createIntrinsicAbstractPrimitiveValueTy
 {
     sysbvm_tuple_t nameSymbol = sysbvm_symbol_internWithCString(context, name);
     sysbvm_tuple_t type = sysbvm_type_createAnonymousAbstractPrimitiveValueTypeAndValueMetatype(context, supertype);
-    sysbvm_type_setName(type, nameSymbol);
-    sysbvm_environment_setNewSymbolBindingWithValue(context, context->roots.globalNamespace, nameSymbol, type);
+    sysbvm_namespace_setNewSymbolBindingWithValue(context, context->roots.globalNamespace, nameSymbol, type);
     sysbvm_orderedCollection_add(context, context->roots.intrinsicTypes, type);
 
     sysbvm_type_setSlots(type, sysbvm_array_create(context, 0));
@@ -234,10 +231,9 @@ SYSBVM_API sysbvm_tuple_t sysbvm_context_createIntrinsicType(sysbvm_context_t *c
 static void sysbvm_context_setIntrinsicTypeMetadata(sysbvm_context_t *context, sysbvm_tuple_t type, const char *name, sysbvm_tuple_t supertype, ...)
 {
     sysbvm_tuple_t nameSymbol = sysbvm_symbol_internWithCString(context, name);
-    sysbvm_type_setName(type, nameSymbol);
     if(supertype)
         sysbvm_type_setSupertype(type, supertype);
-    sysbvm_environment_setNewSymbolBindingWithValue(context, context->roots.globalNamespace, nameSymbol, type);
+    sysbvm_namespace_setNewSymbolBindingWithValue(context, context->roots.globalNamespace, nameSymbol, type);
     sysbvm_orderedCollection_add(context, context->roots.intrinsicTypes, type);
 
     // First pass: count the arguments.
@@ -278,12 +274,8 @@ static void sysbvm_context_setIntrinsicTypeMetadata(sysbvm_context_t *context, s
 
 SYSBVM_API void sysbvm_context_setIntrinsicSymbolBindingValue(sysbvm_context_t *context, sysbvm_tuple_t symbol, sysbvm_tuple_t value)
 {
-    sysbvm_environment_setNewSymbolBindingWithValue(context, context->roots.globalNamespace, symbol, value);
+    sysbvm_namespace_setNewSymbolBindingWithValue(context, context->roots.globalNamespace, symbol, value);
 
-    if(sysbvm_tuple_isFunction(context, value))
-        sysbvm_function_recordBindingWithOwnerAndName(context, value, context->roots.globalNamespace, symbol);
-    else
-        sysbvm_programEntity_recordBindingWithOwnerAndName(context, value, context->roots.globalNamespace, symbol);
 }
 
 SYSBVM_API void sysbvm_context_setIntrinsicSymbolBindingNamedWithValue(sysbvm_context_t *context, const char *symbolName, sysbvm_tuple_t binding)
@@ -370,9 +362,11 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
     context->roots.objectType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.anyValueType);
     context->roots.lookupKeyType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.objectType);
     context->roots.programEntityType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.lookupKeyType);
-    sysbvm_type_setSupertype(context->roots.typeType, context->roots.programEntityType);
+    context->roots.programEntityWithChildrenType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.programEntityType);
+    sysbvm_type_setSupertype(context->roots.typeType, context->roots.programEntityWithChildrenType);
     sysbvm_type_setSupertype(sysbvm_tuple_getType(context, context->roots.lookupKeyType), sysbvm_tuple_getType(context, context->roots.objectType));
     sysbvm_type_setSupertype(sysbvm_tuple_getType(context, context->roots.programEntityType), sysbvm_tuple_getType(context, context->roots.lookupKeyType));
+    sysbvm_type_setSupertype(sysbvm_tuple_getType(context, context->roots.programEntityWithChildrenType), sysbvm_tuple_getType(context, context->roots.programEntityType));
 
     context->roots.metatypeType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.typeType);
 
@@ -392,6 +386,8 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
 
     sysbvm_tuple_setType((sysbvm_object_tuple_t*)sysbvm_tuple_getType(context, context->roots.programEntityType), context->roots.metaclassType);
 
+    sysbvm_tuple_setType((sysbvm_object_tuple_t*)sysbvm_tuple_getType(context, context->roots.programEntityWithChildrenType), context->roots.metaclassType);
+
     sysbvm_tuple_setType((sysbvm_object_tuple_t*)sysbvm_tuple_getType(context, context->roots.metatypeType), context->roots.metaclassType);
 
     sysbvm_tuple_setType((sysbvm_object_tuple_t*)sysbvm_tuple_getType(context, context->roots.classType), context->roots.metaclassType);
@@ -399,7 +395,7 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
     sysbvm_tuple_setType((sysbvm_object_tuple_t*)sysbvm_tuple_getType(context, context->roots.metaclassType), context->roots.metaclassType);
 
     // Package type
-    context->roots.packageType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.packageType);
+    context->roots.packageType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.programEntityWithChildrenType);
 
     // Create the type slot class.
     context->roots.typeSlotType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.programEntityType);
@@ -437,7 +433,7 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
     context->roots.symbolMacroValueBindingType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.symbolBindingType);
     context->roots.symbolTupleSlotBindingType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.symbolAnalysisBindingType);
     context->roots.symbolValueBindingType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.symbolBindingType);
-    context->roots.environmentType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.programEntityType);
+    context->roots.environmentType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.programEntityWithChildrenType);
     context->roots.namespaceType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.environmentType);
     context->roots.astNodeType = sysbvm_type_createAnonymousClassAndMetaclass(context, context->roots.objectType);
 
@@ -687,8 +683,10 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
         "owner", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, context->roots.programEntityType,
         "serialToken", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.anyValueType,
         NULL);
-    sysbvm_context_setIntrinsicTypeMetadata(context, context->roots.packageType, "Package", SYSBVM_NULL_TUPLE,
+    sysbvm_context_setIntrinsicTypeMetadata(context, context->roots.programEntityWithChildrenType, "ProgramEntityWithChildren", SYSBVM_NULL_TUPLE,
         "children", SYSBVM_TYPE_SLOT_FLAG_PROTECTED, context->roots.orderedCollectionType,
+        NULL);
+    sysbvm_context_setIntrinsicTypeMetadata(context, context->roots.packageType, "Package", SYSBVM_NULL_TUPLE,
         NULL);
     sysbvm_context_setIntrinsicTypeMetadata(context, context->roots.typeType, "PendingDefinitionFragment", SYSBVM_NULL_TUPLE,
         "node", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.astNodeType,
@@ -732,7 +730,6 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
         "pendingSlots", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, SYSBVM_NULL_TUPLE,
         "pendingDefinitionFragments", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, context->roots.pendingDefinitionFragmentsType,
         "subtypes", SYSBVM_TYPE_SLOT_FLAG_PUBLIC | SYSBVM_TYPE_SLOT_FLAG_MIN_RTTI_EXCLUDED, SYSBVM_NULL_TUPLE,
-        "children", SYSBVM_TYPE_SLOT_FLAG_PROTECTED, context->roots.orderedCollectionType,
         NULL);
     sysbvm_context_setIntrinsicTypeMetadata(context, context->roots.classType, "Class", SYSBVM_NULL_TUPLE, NULL);
     sysbvm_context_setIntrinsicTypeMetadata(context, context->roots.metatypeType, "Metatype", SYSBVM_NULL_TUPLE,
@@ -790,7 +787,6 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
         "parent", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.environmentType,
         "analysisQueue", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.analysisQueueType,
         "symbolTable", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.identityDictionaryType,
-        "children", SYSBVM_TYPE_SLOT_FLAG_PROTECTED, context->roots.orderedCollectionType,
         NULL);
     sysbvm_context_setIntrinsicTypeMetadata(context, context->roots.namespaceType, "Namespace", SYSBVM_NULL_TUPLE,
         NULL);

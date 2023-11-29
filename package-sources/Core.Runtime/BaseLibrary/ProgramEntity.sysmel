@@ -1,0 +1,15 @@
+ProgramEntity definition: {
+    public method shortPrintOn: (stream: Stream) := {
+        let name := self name.
+        name ifNotNil: {
+            stream string: name
+        } ifNil: {
+            self printAnonymousNameOn: stream
+        }
+    }.
+
+    public method shortPrintString => String
+        := String streamContents: {:(StringStream)out :: Void |
+            self shortPrintOn: out
+        }.
+}

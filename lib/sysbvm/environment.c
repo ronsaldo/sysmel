@@ -404,6 +404,20 @@ SYSBVM_API void sysbvm_environment_setNewSymbolBindingWithValue(sysbvm_context_t
    sysbvm_environment_setNewSymbolBindingWithValueAtSourcePosition(context, environment, symbol, value, SYSBVM_NULL_TUPLE);
 }
 
+SYSBVM_API void sysbvm_namespace_setNewSymbolBindingWithValue(sysbvm_context_t *context, sysbvm_tuple_t nspace, sysbvm_tuple_t symbol, sysbvm_tuple_t value)
+{
+    if(!sysbvm_tuple_isNonNullPointer(nspace))
+        sysbvm_error("Expected a namespace.");
+
+    sysbvm_tuple_t binding = sysbvm_symbolValueBinding_create(context, SYSBVM_NULL_TUPLE, symbol, value);
+    sysbvm_environment_setNewBinding(context, nspace, binding);
+
+    if(sysbvm_tuple_isFunction(context, value))
+        sysbvm_function_recordBindingWithOwnerAndName(context, value, nspace, symbol);
+    else
+        sysbvm_programEntity_recordBindingWithOwnerAndName(context, value, nspace, symbol);
+}
+
 SYSBVM_API bool sysbvm_environment_lookSymbolRecursively(sysbvm_context_t *context, sysbvm_tuple_t environment, sysbvm_tuple_t symbol, sysbvm_tuple_t *outBinding)
 {
     *outBinding = SYSBVM_NULL_TUPLE;

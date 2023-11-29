@@ -4,4 +4,6 @@ ProgramEntity definition: {
         self name: nil.
         self owner: nil.
     }.
+
+    public virtual method children => SequenceableCollection := #().
 }.
