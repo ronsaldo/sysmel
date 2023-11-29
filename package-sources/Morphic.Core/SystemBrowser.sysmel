@@ -1,0 +1,9 @@
+public class SystemBrowser superclass: PanelMorph; definition: {
+    protected field sourceCodeEditor => SourceCodeEditorMorph.
+
+    public override method initialize => Void := {
+        super initialize.
+    }.
+
+    public override method defaultExtent => Float32x2 := 600f32@400f32.
+}.

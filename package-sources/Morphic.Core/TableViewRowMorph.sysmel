@@ -30,8 +30,9 @@ TableViewRowMorph definition: {
         dataSource ifNil: {return: void}.
 
         let element := dataSource elementAtRow: rowIndex.
+        let elementModel := dataSource elementModelAtRow: rowIndex.
         cells := self columns collect: {:(TableViewColumn)eachColumn :: Morph |
-            let cellMorph := eachColumn createCellMorphForElement: element.
+            let cellMorph := eachColumn createCellMorphForElement: element model: elementModel.
             self addMorph: cellMorph.
             cellMorph
         } as: Array.
@@ -43,14 +44,18 @@ TableViewRowMorph definition: {
 
         let columns := self columns.
         let element := dataSource elementAtRow: rowIndex.
+        let elementModel := dataSource elementModelAtRow: rowIndex.
         cells doWithIndex: {:(Morph)cellMorph :(Size)cellIndex :: Void |
             let viewColumn => TableViewColumn := columns at: cellIndex.
-            viewColumn updateCellMorph: cellMorph withElement: element
+            viewColumn updateCellMorph: cellMorph withElement: element model: elementModel
         }.
     }.
 
     public override method updateLayout => Void := {
-        let cellX mutable := 0f32.
+        let rowDepth := self dataSource depthOfRow: rowIndex.
+        let spaceWidth := FontFace default measureWidthForString: " ".
+
+        let cellX mutable := rowDepth asFloat32 * spaceWidth.
         let cellHeight := self extent y.
 
         let columns := self columns.

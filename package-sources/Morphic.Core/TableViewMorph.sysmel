@@ -55,18 +55,42 @@ public class TableViewMorph superclass: BorderedMorph; definition: {
 
     public method dataSource: (newDataSource: DataSource) ::=> Void := {
         dataSource := newDataSource.
+        dataSource onUpdate: {:: Void |
+            self onDataUpdate
+        }.
         self changed.
     }.
 
     public method isRowSelected: (rowIndex: Size) ::=> Boolean
         := selectedRows isNotNil && (selectedRows includesRowIndex: rowIndex).
 
+    public method onDataUpdate => Void := {
+        contentMorph updateContent.
+        self changed
+    }.
+
     public method computeNewColumnWidths => Void := {
         columns isEmpty ifTrue: {return: void}.
 
-        let columnFixedWidth := self extent x / columns size asFloat32.
+        let totalProportion mutable := 0f32.
+        let fixedWidth mutable := 0f32.
         columns do: {:(TableViewColumn)eachColumn :: Void |
-            eachColumn width: columnFixedWidth
+            let columnProportion := eachColumn proportion.
+            columnProportion = 0f32 ifTrue: {
+                fixedWidth := fixedWidth + eachColumn minimalCellExtent x
+            } ifFalse: {
+                totalProportion := totalProportion + columnProportion
+            }.
+        }.
+
+        let availableWidth := self extent x - fixedWidth max: 0f32.
+        columns do: {:(TableViewColumn)eachColumn :: Void |
+            let columnProportion := eachColumn proportion.
+            columnProportion = 0f32 ifTrue: {
+                eachColumn width: eachColumn minimalCellExtent x
+            } ifFalse: {
+                eachColumn width: (availableWidth * columnProportion / totalProportion) floor
+            }.
         }
     }.
 

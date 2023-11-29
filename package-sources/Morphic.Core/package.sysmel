@@ -8,6 +8,7 @@ loadSourceNamed: "WorldMorph.sysmel".
 loadSourceNamed: "SystemWindowMorph.sysmel".
 
 loadSourceNamed: "BorderedMorph.sysmel".
+loadSourceNamed: "PanelMorph.sysmel".
 loadSourceNamed: "StringMorph.sysmel".
 loadSourceNamed: "SimpleButtonMorph.sysmel".
 
@@ -29,10 +30,12 @@ loadSourceNamed: "SourceCodeEditorMorph.sysmel".
 
 loadSourceNamed: "DataSource.sysmel".
 loadSourceNamed: "SimpleListDataSource.sysmel".
+loadSourceNamed: "SimpleTreeDataSource.sysmel".
 loadSourceNamed: "TableRowSelection.sysmel".
 
 loadSourceNamed: "TableViewColumn.sysmel".
 loadSourceNamed: "StringTableViewColumn.sysmel".
+loadSourceNamed: "TreeExpansionButtonColumn.sysmel".
 
 loadSourceNamed: "TableViewAnnouncement.sysmel".
 loadSourceNamed: "TableViewRowActivatedAnnouncement.sysmel".
@@ -47,3 +50,6 @@ loadSourceNamed: "ListViewMorph.sysmel".
 loadSourceNamed: "TreeViewMorph.sysmel".
 
 loadSourceNamed: "BasicInspector.sysmel".
+loadSourceNamed: "Workspace.sysmel".
+loadSourceNamed: "SystemBrowser.sysmel".
+loadSourceNamed: "BasicDevelopmentEnvironment.sysmel".

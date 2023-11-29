@@ -254,8 +254,8 @@ ASTLiteralNode
             else: false
     } makeOverride;
     withSelector: #literalFunctionPrimitiveName addMethod: {:(ASTLiteralNode)self :: Symbol |
-        if: (self value __type__ lookupSelector: #primitiveName) ~~ nil
-            then: (self value ensureAnalysis; primitiveName)
+        if: (self value __type__ lookupSelector: #validPrimitiveName) ~~ nil
+            then: (self value validPrimitiveName)
             else: nil
     } makeOverride.
 

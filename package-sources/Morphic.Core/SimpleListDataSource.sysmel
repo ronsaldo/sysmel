@@ -9,6 +9,11 @@ public class SimpleListDataSource superclass: DataSource; definition: {
     public override method numberOfElements => Size
         := items size.
 
+    public override method elementModelAtRow: (rowIndex: Size) ::=> AnyValue
+        := rowIndex < items size
+            ifTrue: (items at: rowIndex)
+            ifFalse: nil.
+
     public override method elementAtRow: (rowIndex: Size) ::=> AnyValue
         := rowIndex < items size
             ifTrue: (items at: rowIndex)

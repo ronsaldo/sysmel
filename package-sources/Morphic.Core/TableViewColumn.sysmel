@@ -1,6 +1,7 @@
 public abstract class TableViewColumn definition: {
     public field name => String.
     public field width => Float32.
+    public field proportion => Float32.
 
     __Meta__ definition: {
         public method named: (name: String) ::=> self
@@ -10,10 +11,10 @@ public abstract class TableViewColumn definition: {
     public virtual method minimalCellExtent ::=> Float32x2
         := 0f32 @ FontFace default height.
 
-    public virtual method createCellMorphForElement: element ::=> Morph
+    public virtual method createCellMorphForElement: element model: elementModel ::=> Morph
         := Morph new.
 
-    public virtual method updateCellMorph: (morph: Morph) withElement: element ::=> Void := {
+    public virtual method updateCellMorph: (morph: Morph) withElement: element model: elementModel ::=> Void := {
         ## By default do nothing.
     }.
 }.

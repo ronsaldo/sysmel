@@ -5,13 +5,14 @@ public class StringTableViewColumn superclass: TableViewColumn; definition: {
 
     public override method initialize => Void := {
         super initialize.
+        proportion := 1f32.
         display := {:element :: String | element asString }.
     }.
     
-    public override method createCellMorphForElement: element ::=> Morph
+    public override method createCellMorphForElement: element model: elementModel ::=> Morph
         := display(element) asMorph.
 
-    public override method updateCellMorph: (morph: Morph) withElement: element ::=> Void := {
+    public override method updateCellMorph: (morph: Morph) withElement: element model: elementModel ::=> Void := {
         (morph downCastTo: StringMorph) contents: display(element)
     }.
 }.

@@ -26,7 +26,7 @@ public class BasicInspectorListElement definition: {
     }
 }.
 
-public class BasicInspector superclass: BorderedMorph; definition: {
+public class BasicInspector superclass: PanelMorph; definition: {
     protected field inspectedValue => Untyped.
     protected field listView => ListViewMorph.
     protected field sourceCodeEditor => SourceCodeEditorMorph.
@@ -52,8 +52,6 @@ public class BasicInspector superclass: BorderedMorph; definition: {
                 yourself
             )
     }.
-
-    public override method defaultColor => Color := Color transparent.
 
     public override method defaultExtent => Float32x2 := 300f32@300f32.
 

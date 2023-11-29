@@ -1,3 +1,22 @@
 public class TreeViewMorph superclass: TableViewMorph; definition: {
+    let ChildrenBlockType := (AnyValue) => Collection.
+    protected field treeDataSource => SimpleTreeDataSource.
 
+    public override method initialize => Void := {
+        super initialize.
+
+        treeDataSource := SimpleTreeDataSource new.
+        self dataSource: treeDataSource.
+        self addColumn: TreeExpansionButtonColumn new.
+    }.
+
+    public method roots: (newRoots: Collection) ::=> Void := {
+        treeDataSource roots: newRoots.
+        self changed
+    }.
+
+    public method children: (childrenBlock: ChildrenBlockType) ::=> Void := {
+        treeDataSource childrenBlock: childrenBlock.
+        self changed
+    }.
 }.

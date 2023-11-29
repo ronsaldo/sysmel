@@ -92,4 +92,13 @@ Function
     withSelector: #makeNoGC addMethod: {:(Function)self :: Function |
         self addFlags: FunctionFlags::NoGC.
         self
+    } withEagerAnalysis;
+    withSelector: #validPrimitiveName addMethod: {:(Function)self :: Symbol |
+        if: (self __slotNamedAt__: #captureEnvironment) == __pendingMemoizationValue__ then: {
+            let: #definition type: AnyValue with: (self __slotNamedAt__: #definition).
+            definition primitiveName
+        } else: {
+            self ensureAnalysis.
+            self __slotNamedAt__: #primitiveName
+        }.
     } withEagerAnalysis.

@@ -1,30 +1,17 @@
-let label := "Hello World " asMorph.
-let button := SimpleButtonMorph new
-    label: "Test Button";
-    when: MorphActivatedAnnouncement do: {:: Void | printLine("Test button activated")};
+let treeView := TreeViewMorph new
+    addColumn: ((StringTableViewColumn named: "Name") display: {:element :: String | element printString}; yourself);
+    children: {:element :: Collection | element subtypes};
+    roots: (Array with: AnyValue);
     yourself.
-let listView := ListViewMorph new
-    addColumn: StringTableViewColumn new;
-    addItem: "First";
-    addItem: "Second";
-    addItem: "Third";
-    when: TableViewSelectionChangedAnnouncement do: {:: Void | printLine("Table selection changed")};
-    yourself.
-let sourceCodeEditor := SourceCodeEditorMorph new.
 
 BorderedMorph new
     extent: 300f32x2;
     color: Color white;
-    addMorph: label;
-    addMorph: button;
-    addMorph: listView;
-    addMorph: sourceCodeEditor;
+    addMorph: treeView;
     layout: (MorphVerticalBoxLayout new
-        add: label proportion: 0f32 borderWidth: 2f32;
-        add: button proportion: 0f32 borderWidth: 2f32;
-        add: listView proportion: 1f32 borderWidth: 2f32;
-        add: sourceCodeEditor proportion: 1f32 borderWidth: 2f32;
+        add: treeView proportion: 1f32 borderWidth: 2f32;
         yourself);
     openInWindowSystem.
 
+BasicDevelopmentEnvironment new openInWindowSystem.
 WindowSystem default run.

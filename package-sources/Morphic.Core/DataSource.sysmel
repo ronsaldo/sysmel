@@ -1,7 +1,21 @@
 public abstract class DataSource definition: {
+    public field onUpdate => (() => Void).
+
     public abstract method numberOfElements => Size
+        := self subclassResponsibility.
+
+    public abstract method elementModelAtRow: (rowIndex: Size) ::=> AnyValue
         := self subclassResponsibility.
 
     public abstract method elementAtRow: (rowIndex: Size) ::=> AnyValue
         := self subclassResponsibility.
+
+    public virtual method depthOfRow: (rowIndex: Size) ::=> UInt32
+        := 0u32.
+
+    public method notifyUpdates => Void := {
+        onUpdate ifNotNil: {
+            onUpdate()
+        }
+    }.
 }.
