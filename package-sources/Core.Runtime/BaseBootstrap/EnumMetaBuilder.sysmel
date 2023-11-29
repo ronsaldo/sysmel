@@ -44,7 +44,7 @@ public class EnumMetaBuilder superclass: TypeMetaBuilder; definition: {
         let enumValueExpression := name
             ifNil: makeEnumExpression
             ifNotNil: (if: self isPublic
-                then: ``(public: `,name with: (`,makeEnumExpression name: `,name; yourself))
+                then: ``(public: `,name with: `,makeEnumExpression)
                 else: ``(let: `,name with: `,makeEnumExpression) 
             ).
 

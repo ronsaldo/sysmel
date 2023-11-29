@@ -34,7 +34,7 @@ public class StructMetaBuilder superclass: TypeMetaBuilder; definition: {
         let structValueExpression := name
             ifNil: makeStructExpression
             ifNotNil: (if: self isPublic
-                then: ``(public: `,name with: (`,makeStructExpression name: `,name; yourself))
+                then: ``(public: `,name with: `,makeStructExpression)
                 else: ``(let: `,name with: `,makeStructExpression) 
             ).
 

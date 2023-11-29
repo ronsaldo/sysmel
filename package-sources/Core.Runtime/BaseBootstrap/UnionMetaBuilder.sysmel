@@ -21,7 +21,7 @@ public class UnionMetaBuilder superclass: TypeMetaBuilder; definition: {
         let unionValueExpression := name
             ifNil: makeUnionExpression
             ifNotNil: (if: self isPublic
-                then: ``(public: `,name with: (`,makeUnionExpression name: `,name; yourself))
+                then: ``(public: `,name with: `,makeUnionExpression)
                 else: ``(let: `,name with: `,makeUnionExpression) 
             ).
 
