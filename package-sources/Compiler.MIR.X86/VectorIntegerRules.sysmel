@@ -4,6 +4,12 @@ let x86::vectorUnaryAluRegisterConstraints := {:(MIRInstruction)instruction :(MI
         allocateRegisterForInstructionResult: instruction trySharingWithOperandAt: 0sz
 }.
 
+let x86::vectorUnaryAluNotShareRegisterConstraints := {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+    allocator
+        allocateRegisterOrMemoryForInstruction: instruction operandAt: 0sz;
+        allocateRegisterForInstructionResult: instruction
+}.
+
 let x86::vectorAluRegisterConstraints := {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
     allocator
         allocateRegisterOrMemoryForInstruction: instruction operandAt: 0sz;
@@ -72,7 +78,7 @@ MIR::Operation::Int32x2Abs
     }.
 
 MIR::Operation::Int32x2Negate
-    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluNotShareRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::pxor: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen);
@@ -239,7 +245,7 @@ MIR::Operation::Int32x3Abs
     }.
 
 MIR::Operation::Int32x3Negate
-    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluNotShareRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::pxor: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen);
@@ -406,7 +412,7 @@ MIR::Operation::Int32x4Abs
     }.
 
 MIR::Operation::Int32x4Negate
-    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluNotShareRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::pxor: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen);

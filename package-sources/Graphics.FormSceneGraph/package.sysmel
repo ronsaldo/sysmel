@@ -9,6 +9,8 @@ loadSourceNamed: "FormSGChildAttributeNode.sysmel".
 loadSourceNamed: "FormSGOpacityNode.sysmel".
 loadSourceNamed: "FormSGTranslationNode.sysmel".
 
+loadSourceNamed: "FormSGClipNode.sysmel".
+
 loadSourceNamed: "FormSGRectangleNode.sysmel".
 loadSourceNamed: "FormSGBorderNode.sysmel".
 loadSourceNamed: "FormSGColorRectangleNode.sysmel".

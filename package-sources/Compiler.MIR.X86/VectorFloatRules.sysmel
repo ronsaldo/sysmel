@@ -11,6 +11,12 @@ let x86::vectorUnaryAluRegisterConstraints := {:(MIRInstruction)instruction :(MI
         allocateRegisterForInstructionResult: instruction trySharingWithOperandAt: 0sz
 }.
 
+let x86::vectorUnaryAluNotShareRegisterConstraints := {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+    allocator
+        allocateRegisterOrMemoryForInstruction: instruction operandAt: 0sz;
+        allocateRegisterForInstructionResult: instruction
+}.
+
 let x86::vectorAluRegisterConstraints := {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
     allocator
         allocateRegisterOrMemoryForInstruction: instruction operandAt: 0sz;
@@ -22,6 +28,12 @@ let x86::vectorPairUnaryAluRegisterConstraints := {:(MIRInstruction)instruction 
     allocator
         allocateRegisterPairForInstruction: instruction operandAt: 0sz;
         allocateRegisterPairForInstructionResult: instruction trySharingWithOperandAt: 0sz
+}.
+
+let x86::vectorPairUnaryAluNotShareRegisterConstraints := {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
+    allocator
+        allocateRegisterPairForInstruction: instruction operandAt: 0sz;
+        allocateRegisterPairForInstructionResult: instruction
 }.
 
 let x86::vectorPairAluRegisterConstraints := {:(MIRInstruction)instruction :(MIRRegisterAllocator)allocator :: Void |
@@ -90,7 +102,7 @@ MIR::Operation::Float32x2Add
     }.
 
 MIR::Operation::Float32x2Negate
-    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluNotShareRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::xorps: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen);
@@ -231,7 +243,7 @@ MIR::Operation::Float32x3Add
     }.
 
 MIR::Operation::Float32x3Negate
-    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluNotShareRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::xorps: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen);
@@ -372,7 +384,7 @@ MIR::Operation::Float32x4Add
     }.
 
 MIR::Operation::Float32x4Negate
-    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluNotShareRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::xorps: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen);
@@ -525,7 +537,7 @@ MIR::Operation::Float64x2Add
     }.
 
 MIR::Operation::Float64x2Negate
-    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorUnaryAluNotShareRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::xorpd: (instruction resultRegister x86::vector128For: codegen) with: (instruction resultRegister x86::vector128For: codegen);
@@ -696,7 +708,7 @@ MIR::Operation::Float64x3Add
     }.
 
 MIR::Operation::Float64x3Negate
-    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPairUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPairUnaryAluNotShareRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::xorpd: (instruction resultRegister firstComponent x86::vector128For: codegen) with: (instruction resultRegister firstComponent x86::vector128For: codegen);
@@ -893,7 +905,7 @@ MIR::Operation::Float64x4Add
     }.
 
 MIR::Operation::Float64x4Negate
-    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPairUnaryAluRegisterConstraints;
+    forTargets: #(x86 x86_64) registerConstraintsWith: x86::vectorPairUnaryAluNotShareRegisterConstraints;
     forTargets: #(x86 x86_64) generateWith: {:(MIRInstruction)instruction :(MIRFunctionAsmCodeGenerator)codegen :: Void |
         codegen textSection
             x86::xorpd: (instruction resultRegister firstComponent x86::vector128For: codegen) with: (instruction resultRegister firstComponent x86::vector128For: codegen);

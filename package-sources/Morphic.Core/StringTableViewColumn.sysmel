@@ -1,3 +1,13 @@
+public class StringCellMorph superclass: Morph; definition: {
+    public field contents => String.
+
+    public override method hasClippedContent => Boolean
+        := true.
+        
+    public override method buildSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode
+        := builder string: (contents ifNil: "") in: self localBounds fontFace: FontFace default color: Color black.
+}.
+
 public class StringTableViewColumn superclass: TableViewColumn; definition: {
     let DisplayBlockType := (AnyValue) => String.
     
@@ -10,9 +20,9 @@ public class StringTableViewColumn superclass: TableViewColumn; definition: {
     }.
     
     public override method createCellMorphForElement: element model: elementModel ::=> Morph
-        := display(element) asMorph.
+        := StringCellMorph new contents: display(element); changed; yourself.
 
     public override method updateCellMorph: (morph: Morph) withElement: element model: elementModel ::=> Void := {
-        (morph downCastTo: StringMorph) contents: display(element)
+        (morph downCastTo: StringCellMorph) contents: display(element); changed
     }.
 }.

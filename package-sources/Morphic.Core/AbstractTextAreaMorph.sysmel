@@ -23,6 +23,9 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
         model contents: newContents
     }.
 
+    public override method hasClippedContent => Boolean
+        := true.
+        
     public virtual method backgroundColorToUse => Color
         := backgroundColor.
 

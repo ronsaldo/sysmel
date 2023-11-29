@@ -1,5 +1,6 @@
 TableViewContentMorph definition: {
     protected field visibleRows => Array.
+    protected field scrollingOffset => Float32x2.
 
     public override method initialize => Void := {
         super initialize.
@@ -26,6 +27,24 @@ TableViewContentMorph definition: {
         super validSubmorphs
     }.
 
+    public method scrollingVelocity => Float32x2
+        := 10f32x2.
+
+    public override method handlesMouseWheelEvent: (event: MouseWheelEvent) ::=> Boolean
+        := event wasHandled not.
+
+    public override method scrollingOffset => Float32x2
+        := scrollingOffset.
+
+    public override method hasClippedContent => Boolean
+        := true.
+
+    public override method onMouseWheelEvent: (event: MouseWheelEvent) ::=> Void := {
+        scrollingOffset := scrollingOffset + ((event scrollingDelta x @ event scrollingDelta y negated) * self scrollingVelocity) max: 0f32x2.
+        self ensureThatVisibleRowsExists.
+        self changed
+    }.
+
     public method updateContent => Void := {
         self ensureThatVisibleRowsExists.
         visibleRows do: {:(TableViewRowMorph)eachRow :: Void |
@@ -44,7 +63,7 @@ TableViewContentMorph definition: {
     }.
 
     public method computeVisibleRowRangeFrom: (firstVisibleRow: Size ref) to: (lastVisibleRow: Size ref) ::=> Void := {
-        let visibleBounds := self localBounds.
+        let visibleBounds := self localBounds translatedBy: scrollingOffset.
         let rowHeight := self rowHeight.
         let dataSource := self dataSource.
         let elementCount := dataSource ifNil: 0sz ifNotNil: dataSource numberOfElements.

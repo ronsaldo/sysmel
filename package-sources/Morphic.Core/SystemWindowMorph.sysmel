@@ -78,7 +78,7 @@ public class SystemWindowMorphEventHandler superclass: EventHandler; definition:
     }.
 
     public override method onMouseWheelEvent: (event: MouseWheelEvent) ::=> Void := {
-        printLine("onMouseWheelEvent ", event scrollingDelta)
+        morph processMouseWheelEvent: event
     }.
 
     public override method onKeyPressedEvent: (event: KeyPressedEvent) ::=> Void := {

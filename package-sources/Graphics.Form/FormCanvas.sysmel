@@ -26,6 +26,15 @@ public class FormCanvas definition: {
         }
     }.
 
+    public inline method clipBy: (extraClippingRectangle: RectangleF32) during: (aBlock: () => Void) ::=> Void := {
+        let oldClippingBounds := clippingBounds.
+        clippingBounds := clippingBounds intersectionWith: (extraClippingRectangle translatedBy: translation).
+        
+        aBlock ensure: {:: Void |
+            clippingBounds := oldClippingBounds
+        }
+    }.
+
     let ShadeRectanglePixelFunction := (Float32x2) => Float32x4.
 
     public inline method blitPixelsInRectangle: (rectangle: RectangleF32) with: (aBlock: ShadeRectanglePixelFunction) ::=> Void := {

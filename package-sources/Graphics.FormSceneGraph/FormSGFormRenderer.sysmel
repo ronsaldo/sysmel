@@ -20,6 +20,13 @@ public class FormSGFormRenderer superclass: FormSGVisitor; definition: {
         void
     }.
 
+    public override method visitClipNode: (node: FormSGClipNode) := {
+        canvas clipBy: node rectangle during: {:: Void |
+            self visitNode: node child
+        }.
+        void
+    }.
+
     public override method visitColorNode: (node: FormSGColorRectangleNode) := {
         canvas rectangle: node rectangle fillWithColor: node color.
         void

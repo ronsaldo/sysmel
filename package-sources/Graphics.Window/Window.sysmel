@@ -8,6 +8,7 @@ public class Window superclass: Object; definition: {
     public field renderer => WindowRenderer.
     public field isAnimated => Boolean.
     private field hasDirtyRendering => Boolean.
+    protected field lastMousePosition => Float32x2.
 
     public method initializeWithWindowSystem: (initialWindowSystem: WindowSystem) handle: (initialHandle: SysmelPAL::WindowHandle) ::=> Void := {
         windowSystem := initialWindowSystem.
@@ -75,10 +76,14 @@ public class Window superclass: Object; definition: {
             self dispatchEvent: (self convertMouseWheelEventInto: event*->data*->mouseWheel into: MouseWheelEvent new)
         }.
         SysmelPAL::WindowEventType Enter : {
-            self dispatchEvent: MouseEnterEvent new.
+            self dispatchEvent: (MouseEnterEvent new
+                position: lastMousePosition;
+                yourself).
         }.
         SysmelPAL::WindowEventType Leave : {
-            self dispatchEvent: MouseLeaveEvent new.
+            self dispatchEvent: (MouseLeaveEvent new
+                position: lastMousePosition;
+                yourself).
         }.
 
         SysmelPAL::WindowEventType KeyDown : {
@@ -103,17 +108,18 @@ public class Window superclass: Object; definition: {
         := event
             button: (MouseButton value: palEvent button);
             clicks: palEvent clicks;
-            position: (Float32x2 x: palEvent x asFloat32 y: palEvent y asFloat32);
+            position: (lastMousePosition := (Float32x2 x: palEvent x asFloat32 y: palEvent y asFloat32));
             yourself.
 
     private method convertMouseMotionEventInto: (palEvent: SysmelPAL::MouseMotionEvent ref) into: (event: MouseMoveEvent) ::=> MouseMoveEvent
         := event
-            position: (Float32x2 x: palEvent x asFloat32 y: palEvent y asFloat32);
+            position: (lastMousePosition := (Float32x2 x: palEvent x asFloat32 y: palEvent y asFloat32));
             delta: (Float32x2 x: palEvent deltaX asFloat32 y: palEvent deltaY asFloat32);
             yourself.
 
     private method convertMouseWheelEventInto: (palEvent: SysmelPAL::MouseWheelEvent ref) into: (event: MouseWheelEvent) ::=> MouseWheelEvent
         := event
+            position: lastMousePosition;
             scrollingDelta: (Float32x2 x: palEvent x asFloat32 y: palEvent y asFloat32);
             yourself.
 

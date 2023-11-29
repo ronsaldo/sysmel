@@ -33,6 +33,12 @@ public class Morph superclass: MorphLayoutElement; definition: {
     public inline method position => Float32x2
         := bounds min.
 
+    public virtual method scrollingOffset => Float32x2
+        := 0f32x2.
+
+    public virtual method hasClippedContent => Boolean
+        := false.
+
     public inline override method position: (newPosition: Float32x2) ::=> Void := {
         bounds := newPosition extent: bounds extent.
     }.
@@ -73,8 +79,13 @@ public class Morph superclass: MorphLayoutElement; definition: {
     public virtual method buildFullSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode := {
         let localSceneGraph := self buildSceneGraphWith: builder.
         let childrenSceneGraph := self buildChildrenSceneGraphWith: builder.
+        let translatedChildrenSceneGraph := builder translate: childrenSceneGraph with: self scrollingOffset negated.
+        let contentSceneGraph := localSceneGraph -- translatedChildrenSceneGraph.
+        let clippedContentSceneGraph := self hasClippedContent
+            ifTrue: (builder clip: contentSceneGraph withRectangle: self localBounds)
+            ifFalse: contentSceneGraph.
 
-        builder translate: localSceneGraph -- childrenSceneGraph with: self position
+        builder translate: clippedContentSceneGraph with: self position
     }.
 
     public virtual method validSubmorphs => Array
@@ -165,10 +176,12 @@ public class Morph superclass: MorphLayoutElement; definition: {
 
     public virtual method processMouseButtonPressedEvent: (event: MouseButtonPressedEvent) ::=> Void := {
         event withLocalTranslation: self position do: {:: Void |
-            self validSubmorphs reverseDo: {:(Morph)each :: Void |
-                (each bounds includesPoint: event position) ifTrue: {
-                    each processMouseButtonPressedEvent: event
-                }
+            event withLocalTranslation: self scrollingOffset negated do: {:: Void |
+                self validSubmorphs reverseDo: {:(Morph)each :: Void |
+                    (each bounds includesPoint: event position) ifTrue: {
+                        each processMouseButtonPressedEvent: event
+                    }
+                }.
             }.
 
             (self handlesMouseButtonPressedEvent: event) ifTrue: {
@@ -183,10 +196,12 @@ public class Morph superclass: MorphLayoutElement; definition: {
 
     public virtual method processMouseButtonReleasedEvent: (event: MouseButtonReleasedEvent) ::=> Void := {
         event withLocalTranslation: self position do: {:: Void |
-            self validSubmorphs reverseDo: {:(Morph)each :: Void |
-                (each bounds includesPoint: event position) ifTrue: {
-                    each processMouseButtonReleasedEvent: event
-                }
+            event withLocalTranslation: self scrollingOffset negated do: {:: Void |
+                self validSubmorphs reverseDo: {:(Morph)each :: Void |
+                    (each bounds includesPoint: event position) ifTrue: {
+                        each processMouseButtonReleasedEvent: event
+                    }
+                }.
             }.
 
             (self handlesMouseButtonReleasedEvent: event) ifTrue: {
@@ -201,10 +216,12 @@ public class Morph superclass: MorphLayoutElement; definition: {
 
     public virtual method processMouseMoveEvent: (event: MouseMoveEvent) ::=> Void := {
         event withLocalTranslation: self position do: {:: Void |
-            self validSubmorphs reverseDo: {:(Morph)each :: Void |
-                (each bounds includesPoint: event position) ifTrue: {
-                    each processMouseMoveEvent: event
-                }
+            event withLocalTranslation: self scrollingOffset negated do: {:: Void |
+                self validSubmorphs reverseDo: {:(Morph)each :: Void |
+                    (each bounds includesPoint: event position) ifTrue: {
+                        each processMouseMoveEvent: event
+                    }
+                }.
             }.
 
             (self handlesMouseMoveEvent: event) ifTrue: {
@@ -215,6 +232,26 @@ public class Morph superclass: MorphLayoutElement; definition: {
 
     public virtual method handlesMouseMoveEvent: (event: MouseMoveEvent) ::=> Boolean := false.
     public virtual method onMouseMoveEvent: (event: MouseMoveEvent) ::=> Void := {
+    }.
+
+    public virtual method processMouseWheelEvent: (event: MouseWheelEvent) ::=> Void := {
+        event withLocalTranslation: self position do: {:: Void |
+            event withLocalTranslation: self scrollingOffset negated do: {:: Void |
+                self validSubmorphs reverseDo: {:(Morph)each :: Void |
+                    (each bounds includesPoint: event position) ifTrue: {
+                        each processMouseWheelEvent: event
+                    }
+                }.
+            }.
+
+            (self handlesMouseWheelEvent: event) ifTrue: {
+                self onMouseWheelEvent: event
+            }
+        }.
+    }.
+
+    public virtual method handlesMouseWheelEvent: (event: MouseWheelEvent) ::=> Boolean := false.
+    public virtual method onMouseWheelEvent: (event: MouseWheelEvent) ::=> Void := {
     }.
 
     public virtual method processKeyPressedEvent: (event: KeyPressedEvent) ::=> Void := {
