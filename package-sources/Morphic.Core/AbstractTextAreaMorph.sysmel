@@ -104,6 +104,16 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
                 event wasHandled: true.
                 self changed
             }.
+            KeySymbol Home : {
+                model moveCursorToStartOfLine.
+                event wasHandled: true.
+                self changed
+            }.
+            KeySymbol End : {
+                model moveCursorToEndOfLine.
+                event wasHandled: true.
+                self changed
+            }.
             _: {}
         }
     }.
@@ -142,7 +152,7 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
         let cursorColor := Color cyan.
 
         model cursors do: {:(TextEditorCursor)each :: Void |
-            let cursorPosition := (each position asFloat32*fontFace width)@0f32.
+            let cursorPosition := (each startColumn asFloat32*fontFace width)@(each startLine asFloat32*fontFace height).
             nodes add: (builder rectangle: (cursorPosition extent: cursorExtent) color: cursorColor)
         }.
 

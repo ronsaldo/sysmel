@@ -29,6 +29,154 @@ public class SimpleTextBuffer superclass: AbstractTextBuffer; definition: {
         lowerSize + replacementSize
     }.
 
+    public method computeIndexForLine: (lineIndex: Size) ::=> Size := {
+        let currentLineIndex mutable := 0sz.
+
+        let i mutable := 0sz.
+        let lastIsCr mutable := false.
+        while: i < contents size do: {
+            let c := contents char8At: i.
+            switch: c withCases: #{
+                '\r'c8 : {
+                    currentLineIndex >= lineIndex ifTrue: (return: i).
+
+                    currentLineIndex := currentLineIndex + 1sz.
+                    lastIsCr := true.
+                }.
+                '\n'c8 : {
+                    lastIsCr ifFalse: {
+                        currentLineIndex >= lineIndex ifTrue: (return: i).
+                        currentLineIndex := currentLineIndex + 1sz
+                    }.
+                    lastIsCr := false.
+                }.
+                _: {
+                    currentLineIndex >= lineIndex ifTrue: (return: i).
+                    lastIsCr := false.
+                }
+            }
+        } continueWith: (i := i + 1sz).
+
+        i
+    }.
+
+    public override method computeIndexForLine: (lineIndex: Size) andColumn: (columnIndex: Size) ::=> Size := {
+        let index mutable := self computeIndexForLine: lineIndex.
+
+        let currentColumnIndex mutable := 0sz.
+        while: index < contents size do: {
+            currentColumnIndex >= columnIndex ifTrue: {
+                return: index
+            }.
+
+            let c := contents char8At: index.
+            switch: c withCases: #{
+                '\r'c8 : {
+                    return: index.
+                }.
+                '\n'c8 : {
+                    return: index.
+                }.
+                '\t'c8 : {
+                    currentColumnIndex := currentColumnIndex + self tabWidth - 1sz alignedTo: self tabWidth.
+                }.
+                _: {
+                    currentColumnIndex := currentColumnIndex + 1sz.
+                }
+            }
+        } continueWith: (index := index + 1sz).
+
+        index
+    }.
+
+    public override method forIndex: (index: Size) computeLine: (outLine: Size ref) andColumn: (outColumn: Size ref) ::=> Void := {
+        outLine := 0sz.
+        outColumn := 0sz.
+
+        let i mutable := 0sz.
+        let lastIsCr mutable := false.
+        let loopEnd := index min: contents size.
+        while: i < loopEnd do: {
+            let c := contents char8At: i.
+            switch: c withCases: #{
+                '\r'c8 : {
+                    outLine := outLine + 1sz.
+                    outColumn := 0sz.
+                    lastIsCr := true.
+                }.
+                '\n'c8 : {
+                    lastIsCr ifFalse: {
+                        outLine := outLine + 1sz.
+                        outColumn := 0sz.
+                    }.
+                    lastIsCr := false.
+                }.
+                '\t'c8 : {
+                    lastIsCr := false.
+                    outColumn := outColumn + self tabWidth - 1sz alignedTo: self tabWidth.
+                }.
+                _: {
+                    lastIsCr := false.
+                    outColumn := outColumn + 1sz.
+                }
+            }
+
+        } continueWith: (i := i + 1sz).
+    }.
+
+    public override method numberOfLines ::=> Size := {
+        let lineCount mutable := 1sz.
+
+        let i mutable := 0sz.
+        let lastIsCr mutable := false.
+        while: i < contents size do: {
+            let c := contents char8At: i.
+            switch: c withCases: #{
+                '\r'c8 : {
+                    lineCount := lineCount + 1sz.
+                    lastIsCr := true.
+                }.
+                '\n'c8 : {
+                    lastIsCr ifFalse: {
+                        lineCount := lineCount + 1sz
+                    }.
+                    lastIsCr := false.
+                }.
+                _: {
+                    lastIsCr := false.
+                }
+            }
+
+        } continueWith: (i := i + 1sz).
+
+        lineCount.
+    }.
+
+    public override method numberOfColumnsInLine: (lineIndex: Size) ::=> Size := {
+        let index mutable := self computeIndexForLine: lineIndex.
+
+        let currentColumnIndex mutable := 0sz.
+        while: index < contents size do: {
+            let c := contents char8At: index.
+            switch: c withCases: #{
+                '\r'c8 : {
+                    return: currentColumnIndex.
+                }.
+                '\n'c8 : {
+                    return: currentColumnIndex.
+                }.
+                '\t'c8 : {
+                    currentColumnIndex := currentColumnIndex + self tabWidth - 1sz alignedTo: self tabWidth.
+                }.
+                _: {
+                    currentColumnIndex := currentColumnIndex + 1sz.
+                }
+            }
+        } continueWith: (index := index + 1sz).
+
+        currentColumnIndex
+    }.
+
     let StringSpanIterationFunction := (String, Size, Size) => Void.
     public override method stringSpansDo: (aBlock: StringSpanIterationFunction) ::=> Void := {
         aBlock(contents, 0sz, contents size)

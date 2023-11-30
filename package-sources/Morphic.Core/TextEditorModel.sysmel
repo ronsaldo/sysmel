@@ -5,7 +5,7 @@ public class TextEditorModel definition: {
     public override method initialize => Void := {
         super initialize.
         textBuffer := SimpleTextBuffer new.
-        cursors := Array with: TextEditorCursor new.
+        cursors := Array with: (TextEditorCursor new textBuffer: textBuffer; yourself).
     }.
 
     public method contents => String
@@ -17,7 +17,7 @@ public class TextEditorModel definition: {
     
     public method insertString: (string: String) ::=> Void := {
         cursors do: {:(TextEditorCursor)eachCursor :: Void |
-            eachCursor position: (textBuffer replaceFrom: eachCursor minIndex until: eachCursor maxIndex withString: string)
+            eachCursor insertString: string
         }
     }.
 
@@ -47,34 +47,50 @@ public class TextEditorModel definition: {
     }.
 
     public method deleteNext => Void := {
-        printLine("TODO: deleteNext")
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor deleteNext
+        }
     }.
 
     public method deletePrevious => Void := {
-        printLine("TODO: deletePrevious")
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor deletePrevious
+        }
     }.
 
     public method moveCursorUp => Void := {
-        printLine("TODO: moveCursorUp")
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor moveUp.
+        }
     }.
 
     public method moveCursorDown => Void := {
-        printLine("TODO: moveCursorDown")
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor moveDown.
+        }
     }.
 
     public method moveCursorLeft => Void := {
         cursors do: {:(TextEditorCursor)eachCursor :: Void |
-            eachCursor position > 0sz ifTrue: {
-                eachCursor position: eachCursor position - 1sz
-            } ifFalse: {
-                eachCursor position: 0sz
-            }.
+            eachCursor moveLeft.
         }
     }.
 
     public method moveCursorRight ::=> Void := {
         cursors do: {:(TextEditorCursor)eachCursor :: Void |
-            eachCursor position: (eachCursor position + 1sz min: textBuffer size)
+            eachCursor moveRight.
+        }
+    }.
+
+    public method moveCursorToStartOfLine ::=> Void := {
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor moveToStartOfLine.
+        }
+    }.
+
+    public method moveCursorToEndOfLine ::=> Void := {
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor moveToEndOfLine.
         }
     }.
 }.
