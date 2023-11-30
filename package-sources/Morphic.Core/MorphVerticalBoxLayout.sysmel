@@ -23,7 +23,7 @@ public class MorphVerticalBoxLayout superclass: MorphBoxLayout; definition: {
             let proportion := element proportion.
             let elementHeight := proportion = 0f32
                 ifTrue: (element bounds height)
-                ifFalse: (availableHeight * proportion / totalProportion).
+                ifFalse: ((availableHeight * proportion / totalProportion) rounded).
 
             let elementBounds := destX@destY extent: availableWidth@elementHeight.
             element bounds: elementBounds.

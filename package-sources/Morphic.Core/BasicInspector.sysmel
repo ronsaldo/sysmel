@@ -163,41 +163,6 @@ MethodDictionary definition: {
     }
 }.
 
-FunctionBytecode definition: {
-    __Meta__ definition: {
-        public override method fillBasicInspector: (basicInspector: BasicInspector) for: (inspectedValue: Untyped) ::=> Void := {
-            super fillBasicInspector: basicInspector for: inspectedValue.
-            self fillBasicInspector: basicInspector withInstructionsOf: inspectedValue
-        }.
-
-        public method fillBasicInspector: (basicInspector: BasicInspector) withInstructionsOf: (inspectedValue: Untyped) ::=> Void := {
-            let functionBytecode => FunctionBytecode := inspectedValue.
-            functionBytecode decodedInstructionsDo: {:(UInt8)opcode :(Array)operands :(Size)pc :(Size)nextPC :: Void |
-                let pcString := pc printString padLeft: 4sz with: '0'c8.
-
-                let formattedInstruction := String streamContents: {:(StringStream)stream :: Void |
-                    functionBytecode printOpcodeMnemonic: opcode on: stream.
-                    let isBranchInstruction := functionBytecode isBranchOpcode: opcode.
-                    operands doWithIndex: {:(Int16)each :(Size)operandIndex :: Void |
-                        stream nextPut: ' 'c8.
-                        if: isBranchInstruction && ((operandIndex + 1sz) = operands size) then: {
-                            stream print: each; nextPut: '|'c8; nextPutAll: ((nextPC asSize + each asSize) printString padLeft: 4sz with: '0'c8)
-                        } else: {
-                            let operandVector := each & FunctionBytecode::OperandVectorName::BitMask.
-                            let operandIndex := each >> FunctionBytecode::OperandVectorName::Bits.
-                            stream nextPutAll: (FunctionBytecode::OperandVectorNameDictionary at: operandVector); nextPut: '@'c8; print: operandIndex.
-                            if: operandVector = FunctionBytecode::OperandVectorName::Literal
-                                then: (stream nextPut: ':'c8; print: (functionBytecode literalVector at: operandIndex asSize)).
-                        }.
-                    }.
-                }.
-
-                basicInspector addInspectorListElementWithName: pcString value: formattedInstruction
-            }.
-        }.
-    }
-}.
-
 AnyValue definition: {
     public method inspect => Void := {
         BasicInspector new

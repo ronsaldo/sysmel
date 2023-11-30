@@ -92,6 +92,22 @@ SimpleTreeDataSource definition: {
         self recomputeExpandedElements.
     }.
 
+    public method expandAll => Void := {
+        roots do: {:(SimpleTreeDataSourceElement)each :: Void |
+            self expandAllFrom: each
+        }.
+
+        self recomputeExpandedElements.
+    }.
+
+    protected method expandAllFrom: (element: SimpleTreeDataSourceElement) ::=> Void := {
+        element isExpanded: true.
+
+        (element validExpandedChildrenWithBlock: childrenBlock) do: {:(SimpleTreeDataSourceElement)eachChild :: Void |
+            self expandAllFrom: eachChild
+        }
+    }.
+
     public method recomputeExpandedElements => Void := {
         expandedItems := OrderedCollection new.
         roots do: {:(SimpleTreeDataSourceElement)each :: Void |

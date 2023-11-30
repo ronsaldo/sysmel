@@ -50,6 +50,7 @@ loadSourceNamed: "ListViewMorph.sysmel".
 loadSourceNamed: "TreeViewMorph.sysmel".
 
 loadSourceNamed: "BasicInspector.sysmel".
+loadSourceNamed: "FunctionIRInspector.sysmel".
 loadSourceNamed: "Workspace.sysmel".
 loadSourceNamed: "SystemBrowser.sysmel".
 loadSourceNamed: "BasicDevelopmentEnvironment.sysmel".

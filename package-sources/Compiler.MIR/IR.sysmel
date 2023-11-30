@@ -464,6 +464,9 @@ MIRValue definition: {
 
     public method userCount => Size
         := users ifNil: 0sz ifNotNil: users size.
+
+    public virtual method treeChildren => Collection := #().
+    public virtual method treeElementPrintString => String := self printString.
 }.
 
 public final class MIRBasicBlock superclass: MIRLocalValue.
@@ -1513,6 +1516,8 @@ MIRInstruction definition: {
         operandRegisters := Array new: operands size.
         scratchRegisters := #().
     }.
+
+    public override method treeElementPrintString => String := self fullPrintString.
 }.
 
 public global MIR::Operation::Branch := MIROperation terminatorNamed: #branch.
@@ -1841,6 +1846,15 @@ MIRBasicBlock definition: {
 
     public method indexAtEnd => UInt32
         := lastInstruction ifNotNil: lastInstruction index + 1u32 ifNil: index.
+
+    public override method treeChildren => Collection := {
+        let children := OrderedCollection new.
+        self instructionsDo: {:(MIRInstruction)each :: Void |
+            children add: each
+        }.
+
+        children
+    }.
 }.
 
 MIRFunction definition: {
@@ -2021,14 +2035,6 @@ MIRFunction definition: {
             aBlock(position).
             position := nextPosition
         }
-    }.
-
-    public method enumerateBlocks => Void := {
-        let index mutable := 0u32.
-        self basicBlocksDo: {:(MIRBasicBlock)each :: Void |
-            each index: index.
-            index := index + 1u32.
-        }.
     }.
 
     public inline method instructionsDo: (aBlock: (MIRInstruction) => Void) ::=> Void := {
@@ -2216,12 +2222,31 @@ MIRFunction definition: {
         stream print: self; nextPutAll: " {".
         self printDebugInfoOn: stream.
         stream nl.
-        self enumerateBlocks; enumerateLocals.
+        self enumerateLocals.
         self basicBlocksDo: {:(MIRBasicBlock)each :: Void |
             stream fullPrint: each
         }.
         stream nextPut: '}'c8; nl.
     }.
+
+    public override method treeChildren => Collection := {
+        let children := OrderedCollection new.
+        self enumerateLocals.
+        children addAll: arguments.
+        captureVectorPointerValue ifNotNil: (children add: captureVectorPointerValue).
+        children addAll: captures.
+        gotPointerValue ifNotNil: (children add: gotPointerValue).
+        threadLocalSegmentPointerValue ifNotNil: (children add: threadLocalSegmentPointerValue).
+
+        children addAll: temporaries.
+
+        self basicBlocksDo: {:(MIRBasicBlock)each :: Void |
+            children add: each
+        }.
+
+        children
+    }.
+
 }.
 
 public final class MIRBlockBuilder superclass: Object; definition: {
@@ -3301,6 +3326,8 @@ public final class MIRModule superclass: MIRProgramEntity; definition: {
             each performStandardOptimizations
         }
     }.
+
+    public override method treeChildren => Collection := programEntities.
 }.
 
 MIRCallingConvention definition: {

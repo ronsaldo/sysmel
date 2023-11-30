@@ -19,4 +19,9 @@ public class TreeViewMorph superclass: TableViewMorph; definition: {
         treeDataSource childrenBlock: childrenBlock.
         self changed
     }.
+
+    public method expandAll => Void := {
+        treeDataSource expandAll.
+        self changed
+    }
 }.

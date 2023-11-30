@@ -177,6 +177,9 @@ HIRValue definition: {
 
     public method hasOnlyDebugUsers => Boolean
         := users isNil || (users allSatisfy: {:(HIRValue)user :: Boolean | user isSetDebugValueForBindingInstruction}).
+
+    public virtual method treeChildren => Collection := #().
+    public virtual method treeElementPrintString => String := self printString.
 }.
 
 HIRConstant definition: {
@@ -1041,6 +1044,18 @@ HIRFunctionDefinition definition: {
     public method postTransformValidation: (transformName: String) ::=> Void := {
         ##self validate
     }.
+
+    public override method treeChildren => Collection := {
+        let treeChildren := OrderedCollection new.
+        self enumerateLocalValueIndices.
+        treeChildren addAll: arguments.
+        treeChildren addAll: captures.
+        self basicBlocksDo: {:(HIRBasicBlock)each :: Void |
+            treeChildren add: each
+        }.
+
+        treeChildren
+    }.
 }.
 
 HIRFunctionLocalValue definition: {
@@ -1080,6 +1095,8 @@ HIRFunctionLocalValue definition: {
             stream nextPutAll: " => "; print: self type.
         }.
     }.
+
+    public override method treeElementPrintString => String := self fullPrintString.
 }.
 
 HIRBasicBlock definition: {
@@ -1735,6 +1752,14 @@ HIRBasicBlock definition: {
             instruction fullPrintOn: stream.
             stream nl.
         }.
+    }.
+
+    public override method treeChildren => Collection := {
+        let treeChildren := OrderedCollection new.
+        self instructionsDo: {:(HIRInstruction)instruction :: Void |
+            treeChildren add: instruction
+        }.
+        treeChildren
     }.
 
     public override method validate => Void := {
@@ -3172,6 +3197,9 @@ public final class HIRModule superclass: Object; definition: {
             stream fullPrint: eachValue; nl
         }
     }.
+
+    public method treeChildren => Collection := globalValues.
+    public method treeElementPrintString => String := "HIRModule".
 }.
 
 HIRInstructionBuilder definition: {
