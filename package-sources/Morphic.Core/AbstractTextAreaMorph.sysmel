@@ -183,9 +183,14 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
         ##printLine("AbstractTextAreaMorph onTextEditing ", event text, " ", event start, " ", event length).
     }.
 
+    public method textAreaLocalBounds => RectangleF32
+        := self localBounds insetBy: 2f32x2.
+
     public override method buildSceneGraphWith: (builder: FormSGBuilder) ::=> FormSGNode := {
         let nodes := OrderedCollection new.
         nodes add: (builder rectangle: self localBounds color: self backgroundColorToUse).
+
+        let textAreaLocalBounds := self textAreaLocalBounds.
 
         let fontFace := self fontFaceToUse.
         let textColor := self colorToUse.
@@ -193,8 +198,8 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
         let fontHeight := fontFace height.
         let textBuffer := model textBuffer.
 
-        let minXPosition := self localBounds min x.
-        let maxXPosition := self localBounds max x.
+        let minXPosition := textAreaLocalBounds min x.
+        let maxXPosition := textAreaLocalBounds max x.
 
         let cursorColor := Color cyan.
         let cursorBackgroundColor := Color cyan.
@@ -217,8 +222,8 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
             textBuffer forIndex: minIndex computeLine: startLine andColumn: startColumn.
             textBuffer forIndex: maxIndex computeLine: endLine andColumn: endColumn.
 
-            let startPosition := (startColumn asFloat32*fontWidth) @ (startLine asFloat32*fontHeight).
-            let endPosition := (endColumn asFloat32*fontWidth) @ ((endLine + 1sz) asFloat32*fontHeight).
+            let startPosition := textAreaLocalBounds min + ((startColumn asFloat32*fontWidth) @ (startLine asFloat32*fontHeight)).
+            let endPosition := textAreaLocalBounds min + ((endColumn asFloat32*fontWidth) @ ((endLine + 1sz) asFloat32*fontHeight)).
 
             startLine = endLine ifTrue: {
                 nodes add: (builder rectangle: (RectangleF32 min: startPosition max: endPosition) color: cursorBackgroundColor)
@@ -231,7 +236,7 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
 
         model textBuffer stringSpansDo: {:(String)string :(Size)startIndex :(Size)endIndex :: Void |
             nodes add: (builder string: string from: startIndex until: endIndex
-                in: self localBounds
+                in: textAreaLocalBounds
                 fontFace: fontFace color: textColor
             )
         }.
@@ -243,7 +248,7 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
             let column mutable := 0sz.
             textBuffer forIndex: each endIndex computeLine: line andColumn: column.
 
-            let cursorPosition := (column asFloat32*fontFace width)@(line asFloat32*fontHeight).
+            let cursorPosition := textAreaLocalBounds min + ((column asFloat32*fontFace width)@(line asFloat32*fontHeight)).
             nodes add: (builder rectangle: (cursorPosition extent: cursorExtent) color: cursorColor)
         }.
 
