@@ -103,4 +103,7 @@ public final class Color definition: {
 
     public inline method alpha => Float32
         := self alphaChannel8 asFloat32 / 255.0f32.
+
+    public inline method isTransparent => Boolean
+        := self alphaChannel8 = 0u8.
 }.

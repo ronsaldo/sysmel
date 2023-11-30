@@ -127,6 +127,8 @@ public class FormCanvas definition: {
     }.
 
     public method rectangle: (rectangle: RectangleF32) fillWithColor: (color: Color) ::=> Void := {
+        color isTransparent ifTrue: {return: void}.
+
         let linearPremultipliedColor := color asPremultipliedLinearFloat32x4Fast.
         self blendPixelsInRectangle: rectangle with: {:(Float32x2)uv :: Float32x4 |
             linearPremultipliedColor
@@ -136,22 +138,18 @@ public class FormCanvas definition: {
     public method borderRectangle: (rectangle: RectangleF32) withColor: (color: Color)
         leftWidth: (leftWidth: Float32) rightWidth: (rightWidth: Float32)
         bottomWidth: (bottomWidth: Float32) topWidth: (topWidth: Float32) ::=> Void := {
-        let linearPremultipliedColor := color asPremultipliedLinearFloat32x4Fast.
-        let extent := rectangle extent.
-        let interiorRectangle := RectangleF32 min: (leftWidth @ topWidth) max: extent - (rightWidth @ bottomWidth).
+        color isTransparent ifTrue: {return: void}.
 
-        self blendPixelsInRectangle: rectangle with: {:(Float32x2)uv :: Float32x4 |
-            let position := uv * extent.
-            (interiorRectangle includesPoint: position) ifTrue: {
-                Float32x4 zeros
-            } ifFalse: {
-                linearPremultipliedColor
-            }
-        }.
+        self rectangle: (RectangleF32 min: rectangle min max: (rectangle min x + leftWidth) @ rectangle max y) fillWithColor: color.
+        self rectangle: (RectangleF32 min: (rectangle max x - rightWidth) @ rectangle min y max: rectangle max) fillWithColor: color.
+        self rectangle: (RectangleF32 min: rectangle min max: rectangle max x @ (rectangle min y + topWidth)) fillWithColor: color.
+        self rectangle: (RectangleF32 min: rectangle min x @ (rectangle max y - bottomWidth) max: rectangle max) fillWithColor: color.
     }.
 
     public method rectangle: (rectangle: RectangleF32) linearGradientStart: (startPoint: Float32x2) color: (startColor: Color)
         end: (endPoint: Float32x2) color: (endColor: Color) ::=> Void := {
+
+        startColor isTransparent && endColor isTransparent ifTrue: {return: void}.
 
         let extent := rectangle extent.
         let delta := endPoint - startPoint.
@@ -171,6 +169,7 @@ public class FormCanvas definition: {
     public method texturedRectangle: (rectangle: RectangleF32) form: (form: Form) sourceRectangle: (sourceRectangle: RectangleF32) color: (color: Color) opaque: (isFullyOpaque: Boolean) repeated: (isRepeated: Boolean) ::=> Void := {
         form ifNil: {return: void}.
         form bits ifNil: {return: void}.
+        color isTransparent ifTrue: {return: void}.
 
         let colorFactor := color asPremultipliedLinearFloat32x4Fast.
 
