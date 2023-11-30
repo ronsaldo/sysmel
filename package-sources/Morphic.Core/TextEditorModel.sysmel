@@ -35,7 +35,7 @@ public class TextEditorModel definition: {
     public method printIt => Void := {
         self validSelectionSourceCodesDo: {:(SourceCode)sourceCode :: Void |
             let value := sourceCode analyzeAndEvaluate.
-            self insertString: value printString.
+            self insertString: " " -- value printString.
         }.
     }.
 
