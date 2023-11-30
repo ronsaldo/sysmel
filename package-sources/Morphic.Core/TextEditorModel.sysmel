@@ -58,6 +58,42 @@ public class TextEditorModel definition: {
         }
     }.
 
+    public method expandCursorUp => Void := {
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor expandUp.
+        }
+    }.
+
+    public method expandCursorDown => Void := {
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor expandDown.
+        }
+    }.
+
+    public method expandCursorLeft => Void := {
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor expandLeft.
+        }
+    }.
+
+    public method expandCursorRight ::=> Void := {
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor expandRight.
+        }
+    }.
+
+    public method expandCursorToStartOfLine ::=> Void := {
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor expandToStartOfLine.
+        }
+    }.
+
+    public method expandCursorToEndOfLine ::=> Void := {
+        cursors do: {:(TextEditorCursor)eachCursor :: Void |
+            eachCursor expandToEndOfLine.
+        }
+    }.
+
     public method moveCursorUp => Void := {
         cursors do: {:(TextEditorCursor)eachCursor :: Void |
             eachCursor moveUp.

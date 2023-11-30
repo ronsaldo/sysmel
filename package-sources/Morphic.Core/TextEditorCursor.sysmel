@@ -12,6 +12,9 @@ public final class TextEditorCursor definition: {
     public method endIndex => Size
         := textBuffer computeIndexForLine: endLine andColumn: endColumn.
 
+    public method isSelectionRange => Boolean
+        := self startIndex ~= self endIndex.
+
     public method insertString: (string: String) ::=> Void := {
         let startIndex := self startIndex.
         let endIndex := self endIndex.

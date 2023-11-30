@@ -65,6 +65,55 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
         }.
 
         event modifiers hasShift ifTrue: {
+            switch: event symbol withCases: #{
+                KeySymbol Backspace : {
+                    model deletePrevious.
+                    event wasHandled: true.
+                    self changed
+                }.
+                KeySymbol Delete : {
+                    model deleteNext.
+                    event wasHandled: true.
+                    self changed
+                }.
+                KeySymbol Return : {
+                    model insertString: "\n".
+                    event wasHandled: true.
+                    self changed
+                }.
+                KeySymbol Left : {
+                    model expandCursorLeft.
+                    event wasHandled: true.
+                    self changed
+                }.
+                KeySymbol Right : {
+                    model expandCursorRight.
+                    event wasHandled: true.
+                    self changed
+                }.
+                KeySymbol Down : {
+                    model expandCursorDown.
+                    event wasHandled: true.
+                    self changed
+                }.
+                KeySymbol Up : {
+                    model expandCursorUp.
+                    event wasHandled: true.
+                    self changed
+                }.
+                KeySymbol Home : {
+                    model expandCursorToStartOfLine.
+                    event wasHandled: true.
+                    self changed
+                }.
+                KeySymbol End : {
+                    model expandCursorToEndOfLine.
+                    event wasHandled: true.
+                    self changed
+                }.
+                _: {}
+            }.
+
             return: void
         }.
 
@@ -140,6 +189,45 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
 
         let fontFace := self fontFaceToUse.
         let textColor := self colorToUse.
+        let fontWidth := fontFace width.
+        let fontHeight := fontFace height.
+        let textBuffer := model textBuffer.
+
+        let minXPosition := self localBounds min x.
+        let maxXPosition := self localBounds max x.
+
+        let cursorColor := Color cyan.
+        let cursorBackgroundColor := Color cyan.
+
+        model cursors do: {:(TextEditorCursor)each :: Void |
+            let startIndex := each startIndex.
+            let endIndex := each endIndex.
+            startIndex = endIndex ifTrue: {
+                return: void.
+            }.
+
+            let minIndex := startIndex min: endIndex.
+            let maxIndex := startIndex max: endIndex.
+
+            let startLine mutable := 0sz.
+            let startColumn mutable := 0sz.
+            let endLine mutable := 0sz.
+            let endColumn mutable := 0sz.
+
+            textBuffer forIndex: minIndex computeLine: startLine andColumn: startColumn.
+            textBuffer forIndex: maxIndex computeLine: endLine andColumn: endColumn.
+
+            let startPosition := (startColumn asFloat32*fontWidth) @ (startLine asFloat32*fontHeight).
+            let endPosition := (endColumn asFloat32*fontWidth) @ ((endLine + 1sz) asFloat32*fontHeight).
+
+            startLine = endLine ifTrue: {
+                nodes add: (builder rectangle: (RectangleF32 min: startPosition max: endPosition) color: cursorBackgroundColor)
+            } ifFalse: {
+                nodes add: (builder rectangle: (RectangleF32 min: startPosition max: maxXPosition@(startPosition y + fontHeight)) color: cursorBackgroundColor).
+                nodes add: (builder rectangle: (RectangleF32 min: minXPosition@(startPosition y + fontHeight) max: maxXPosition @ (endPosition y- fontHeight)) color: cursorBackgroundColor).
+                nodes add: (builder rectangle: (RectangleF32 min: minXPosition@(endPosition y - fontHeight) max: endPosition) color: cursorBackgroundColor)
+            }.
+        }.
 
         model textBuffer stringSpansDo: {:(String)string :(Size)startIndex :(Size)endIndex :: Void |
             nodes add: (builder string: string from: startIndex until: endIndex
@@ -148,11 +236,14 @@ public class AbstractTextAreaMorph superclass: BorderedMorph; definition: {
             )
         }.
 
-        let cursorExtent := 1f32 @ fontFace height.
-        let cursorColor := Color cyan.
+        let cursorExtent := 1f32 @ fontHeight.
 
         model cursors do: {:(TextEditorCursor)each :: Void |
-            let cursorPosition := (each startColumn asFloat32*fontFace width)@(each startLine asFloat32*fontFace height).
+            let line mutable := 0sz.
+            let column mutable := 0sz.
+            textBuffer forIndex: each endIndex computeLine: line andColumn: column.
+
+            let cursorPosition := (column asFloat32*fontFace width)@(line asFloat32*fontHeight).
             nodes add: (builder rectangle: (cursorPosition extent: cursorExtent) color: cursorColor)
         }.
 
