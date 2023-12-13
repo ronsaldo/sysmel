@@ -243,7 +243,7 @@ SYSBVM_API void sysbvm_bytecodeInterpreter_interpretWithActivationRecord(sysbvm_
 
         // Validate the destination operands.
         uint8_t destinationOperandCount = sysbvm_bytecodeInterpreter_destinationOperandCountForOpcode(standardOpcode);
-        uint8_t offsetOperandCount = caseCount + sysbvm_bytecodeInterpreter_offsetOperandCountForOpcode(standardOpcode);
+        size_t offsetOperandCount = caseCount + sysbvm_bytecodeInterpreter_offsetOperandCountForOpcode(standardOpcode);
 
         for(uint8_t i = 0; i < destinationOperandCount; ++i)
         {
@@ -500,7 +500,7 @@ SYSBVM_API void sysbvm_bytecodeInterpreter_interpretWithActivationRecord(sysbvm_
 
 SYSBVM_API sysbvm_tuple_t sysbvm_bytecodeInterpreter_getSourcePositionForPC(sysbvm_context_t *context, sysbvm_functionBytecode_t *functionBytecode, size_t pc)
 {
-    return sysbvm_orderedOffsetTable_findValueWithOffset(context, functionBytecode->debugSourcePositions, pc);
+    return sysbvm_orderedOffsetTable_findValueWithOffset(context, functionBytecode->debugSourcePositions, (uint32_t)pc);
 }
 
 SYSBVM_API sysbvm_tuple_t sysbvm_bytecodeInterpreter_getSourcePositionForActivationRecord(sysbvm_context_t *context, sysbvm_stackFrameBytecodeFunctionActivationRecord_t *activationRecord)

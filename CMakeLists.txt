@@ -1,9 +1,9 @@
 # AbstractGPU cmake build script.
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 project(Tuuvm C)
 
 if(MSVC)
-    set(CMAKE_C_FLAGS "/std:c11 ${CMAKE_C_FLAGS}")
+    set(CMAKE_C_FLAGS "/std:c11 /experimental:c11atomics  ${CMAKE_C_FLAGS}")
     #SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /STACK:0x2000000")
 else()
     set(CMAKE_C_FLAGS "-Wall -Wextra ${CMAKE_C_FLAGS}")

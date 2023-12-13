@@ -56,13 +56,13 @@ SYSBVM_INLINE void sysbvm_chunkedAllocatorIterator_setForChunk(sysbvm_chunkedAll
 
 SYSBVM_INLINE void sysbvm_chunkedAllocatorIterator_begin(sysbvm_chunkedAllocator_t *allocator, sysbvm_chunkedAllocatorIterator_t *iterator)
 {
-    return sysbvm_chunkedAllocatorIterator_setForChunk(iterator, allocator->firstChunk);
+    sysbvm_chunkedAllocatorIterator_setForChunk(iterator, allocator->firstChunk);
 }
 
 SYSBVM_INLINE void sysbvm_chunkedAllocatorIterator_advance(sysbvm_chunkedAllocatorIterator_t *iterator)
 {
     if(iterator->chunk)
-        return sysbvm_chunkedAllocatorIterator_setForChunk(iterator, iterator->chunk->next);
+        sysbvm_chunkedAllocatorIterator_setForChunk(iterator, iterator->chunk->next);
 }
 
 SYSBVM_INLINE bool sysbvm_chunkedAllocatorIterator_isValid(sysbvm_chunkedAllocatorIterator_t *iterator)

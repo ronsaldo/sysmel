@@ -495,7 +495,7 @@ SYSBVM_API void sysbvm_bytecodeJit_jit(sysbvm_context_t *context, sysbvm_functio
 
         // Validate the destination operands.
         uint8_t destinationOperandCount = sysbvm_bytecodeInterpreter_destinationOperandCountForOpcode(standardOpcode);
-        uint8_t offsetOperandCount = caseCount + sysbvm_bytecodeInterpreter_offsetOperandCountForOpcode(standardOpcode);
+        size_t offsetOperandCount = caseCount + sysbvm_bytecodeInterpreter_offsetOperandCountForOpcode(standardOpcode);
 
         for(uint8_t i = 0; i < destinationOperandCount; ++i)
         {

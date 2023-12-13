@@ -213,7 +213,7 @@ static sysbvm_tuple_t sysbvm_float32_primitive_floor(sysbvm_context_t *context, 
     (void)closure;
     if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
 
-    return sysbvm_tuple_float32_encode(context, floor(sysbvm_tuple_float32_decode(arguments[0])));
+    return sysbvm_tuple_float32_encode(context, (float)floor(sysbvm_tuple_float32_decode(arguments[0])));
 }
 
 static sysbvm_tuple_t sysbvm_float32_primitive_ceiling(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
@@ -222,7 +222,7 @@ static sysbvm_tuple_t sysbvm_float32_primitive_ceiling(sysbvm_context_t *context
     (void)closure;
     if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
 
-    return sysbvm_tuple_float32_encode(context, ceil(sysbvm_tuple_float32_decode(arguments[0])));
+    return sysbvm_tuple_float32_encode(context, (float)ceil(sysbvm_tuple_float32_decode(arguments[0])));
 }
 
 static sysbvm_tuple_t sysbvm_float32_primitive_rounded(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
@@ -231,7 +231,7 @@ static sysbvm_tuple_t sysbvm_float32_primitive_rounded(sysbvm_context_t *context
     (void)closure;
     if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
 
-    return sysbvm_tuple_float32_encode(context, round(sysbvm_tuple_float32_decode(arguments[0])));
+    return sysbvm_tuple_float32_encode(context, (float)round(sysbvm_tuple_float32_decode(arguments[0])));
 }
 
 static sysbvm_tuple_t sysbvm_float32_primitive_truncated(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
@@ -240,7 +240,7 @@ static sysbvm_tuple_t sysbvm_float32_primitive_truncated(sysbvm_context_t *conte
     (void)closure;
     if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
 
-    return sysbvm_tuple_float32_encode(context, trunc(sysbvm_tuple_float32_decode(arguments[0])));
+    return sysbvm_tuple_float32_encode(context, (float)trunc(sysbvm_tuple_float32_decode(arguments[0])));
 }
 
 static sysbvm_tuple_t sysbvm_float32_primitive_compare(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
@@ -644,7 +644,7 @@ static sysbvm_tuple_t sysbvm_float64_primitive_floor(sysbvm_context_t *context, 
     (void)closure;
     if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
 
-    return sysbvm_tuple_float32_encode(context, floor(sysbvm_tuple_float32_decode(arguments[0])));
+    return sysbvm_tuple_float64_encode(context, floor(sysbvm_tuple_float32_decode(arguments[0])));
 }
 
 static sysbvm_tuple_t sysbvm_float64_primitive_ceiling(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
@@ -653,7 +653,7 @@ static sysbvm_tuple_t sysbvm_float64_primitive_ceiling(sysbvm_context_t *context
     (void)closure;
     if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
 
-    return sysbvm_tuple_float32_encode(context, ceil(sysbvm_tuple_float32_decode(arguments[0])));
+    return sysbvm_tuple_float64_encode(context, ceil(sysbvm_tuple_float32_decode(arguments[0])));
 }
 
 static sysbvm_tuple_t sysbvm_float64_primitive_rounded(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
@@ -662,7 +662,7 @@ static sysbvm_tuple_t sysbvm_float64_primitive_rounded(sysbvm_context_t *context
     (void)closure;
     if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
 
-    return sysbvm_tuple_float32_encode(context, round(sysbvm_tuple_float32_decode(arguments[0])));
+    return sysbvm_tuple_float64_encode(context, round(sysbvm_tuple_float32_decode(arguments[0])));
 }
 
 static sysbvm_tuple_t sysbvm_float64_primitive_truncated(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
@@ -671,7 +671,7 @@ static sysbvm_tuple_t sysbvm_float64_primitive_truncated(sysbvm_context_t *conte
     (void)closure;
     if(argumentCount != 1) sysbvm_error_argumentCountMismatch(1, argumentCount);
 
-    return sysbvm_tuple_float32_encode(context, trunc(sysbvm_tuple_float32_decode(arguments[0])));
+    return sysbvm_tuple_float64_encode(context, trunc(sysbvm_tuple_float32_decode(arguments[0])));
 }
 
 static sysbvm_tuple_t sysbvm_float64_primitive_compare(sysbvm_context_t *context, sysbvm_tuple_t closure, size_t argumentCount, sysbvm_tuple_t *arguments)
