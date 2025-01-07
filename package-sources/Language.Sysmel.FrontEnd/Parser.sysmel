@@ -1,0 +1,168 @@
+public class SysmelParserState definition: {
+    public field sourceCode => SourceCode.
+    public field tokens => Array.
+    public field tokensSize => Size.
+    public field position => Size.
+
+    public method atEnd ::=> Boolean
+        := position >= tokensSize.
+
+
+    public method peekKindAtOffset: (offset: Size) ::=> Int32 := {
+        let peekPosition := position + offset.
+        if: peekPosition >= tokensSize
+            then: -1i32
+            else: (tokens at: peekPosition) kind
+    }.
+
+    public method advance ::=> Void := {
+        self assert: position < tokensSize.
+        position := position + 1sz
+    }.
+
+    public method peekKind ::=> Int32
+        := self peekKindAtOffset: 1sz.
+
+    public method next ::=> SysmelToken := {
+        self assert: position < tokensSize.
+        let token := tokens at: position.
+        position := position + 1sz.
+        token
+    }.
+
+    public method sourcePositionFrom: (startingPosition: Size) ::=> SourcePosition := {
+        self assert: startingPosition < tokensSize.
+        let startSourcePosition := (self tokens at: startingPosition) sourcePosition.
+        if: position > 0sz then: {
+            let endSourcePosition := self previousSourcePosition.
+            return: (startSourcePosition to: endSourcePosition)
+        } else: {
+            let endSourcePosition := self currentSourcePosition.
+            return: (startSourcePosition until: endSourcePosition)
+        }
+    }.
+
+    public method previousSourcePosition => SourcePosition := {
+        self assert: position > 0sz.
+        (tokens at: position - 1sz) sourcePosition
+    }.
+
+    public method currentSourcePosition => SourcePosition := {
+        if: (position < tokens size) then: {
+            return: (tokens at: position) sourcePosition
+        }.
+
+        self assert: tokens isNotEmpty.
+        return: (tokens at: tokens size - 1sz) sourcePosition
+    }.
+
+    public method makeErrorAtCurrentPosition: (errorMessage: String) ::=> ASTErrorNode := {
+        ASTErrorNode new
+            sourcePosition: self currentSourcePosition;
+            errorMessage: errorMessage;
+            yourself
+    }.
+
+    public method advanceWithExpectedError: (errorMessage: String) ::=> ASTErrorNode := {
+        self advance.
+        self makeErrorAtCurrentPosition: errorMessage
+    }.
+}.
+
+public class SysmelParser superclass: Object; definition: {
+
+    private method parseLiteralToken: (state: SysmelParserState) ::=> ASTLiteralNode := {
+        let token := state next.
+
+        ASTLiteralNode new
+            sourcePosition: token sourcePosition;
+            value: token value;
+            yourself
+    }.
+
+    private method parseLiteral: (state: SysmelParserState) ::=> ASTNode := {
+        switch: state peekKind withCases: #{
+            SysmelTokenKind::Integer   : self parseLiteralToken: state.
+            SysmelTokenKind::Float     : self parseLiteralToken: state.
+            SysmelTokenKind::Character : self parseLiteralToken: state.
+            SysmelTokenKind::String    : self parseLiteralToken: state.
+            SysmelTokenKind::Symbol    : self parseLiteralToken: state.
+            _: state advanceWithExpectedError: "Expected a literal."
+        }
+    }.
+
+    private method parseIdentifier: (state: SysmelParserState) ::=> ASTNode := {
+        let token := state next.
+        self assert: token kind = SysmelTokenKind::Identifier.
+
+        ASTIdentifierReferenceNode new
+            sourcePosition: token sourcePosition;
+            value: token value;
+            yourself
+    }.
+
+    private method parseTerm: (state: SysmelParserState) ::=> ASTNode := {
+        switch: state peekKind withCases: #{
+            SysmelTokenKind::Identifier : self parseIdentifier: state.
+            ##SysmelTokenKind::LeftParent : self parseParenthesis: state.
+            _: (self parseLiteral: state).
+        }
+    }.
+
+    private method parseExpression: (state: SysmelParserState) ::=> ASTNode
+        := self parseTerm: state.
+
+    private method parseExpressionList: (state: SysmelParserState) untilEndOrDelimiter: (delimiter: Int32) ::=> Array := {
+        let elements := OrderedCollection new.
+
+        ## Leading dots.
+        while: state peekKind = SysmelTokenKind::Dot do: {
+            state advance
+        }.
+
+        let expectsExpression mutable := true.
+        while: (state atEnd not && state peekKind ~= delimiter) do: {
+            if: expectsExpression not then: {
+                elements add: (state makeErrorAtCurrentPosition: "Expected dot before expression.")
+            }.
+
+            let expression := self parseExpression: state.
+            elements add: expression.
+
+            ## Trailing dots
+            while: (state peekKind = SysmelTokenKind::Dot) do: {
+                state advance.
+                expectsExpression := true.
+            }
+        }.
+
+        elements asArray
+    }.
+
+    private method parseSequence: (state: SysmelParserState) untilEndOrDelimiter: (delimiter: Int32) ::=> ASTNode := {
+        let initialPosition := state position.
+        let expressions := self parseExpressionList: state untilEndOrDelimiter: delimiter.
+        if: expressions size = 1sz then: {
+            return: expressions first
+        }.
+
+        ASTSequenceNode new
+            sourcePosition: (state sourcePositionFrom: initialPosition);
+            expressions: expressions asArray;
+            yourself
+    }.
+
+    private method parseTopLevelExpression: (state: SysmelParserState) ::=> ASTNode := {
+        self parseSequence: state untilEndOrDelimiter: SysmelTokenKind::EndOfSource 
+    }.
+
+    public method parseTokens: (tokens: Array) withSourceCode: (sourceCode: SourceCode) ::=> ASTNode := {
+        let parseState := SysmelParserState new
+            tokens: tokens;
+            tokensSize: tokens size;
+            sourceCode: sourceCode;
+            position: 0sz;
+            yourself.
+        self parseTopLevelExpression: parseState
+    }.
+}

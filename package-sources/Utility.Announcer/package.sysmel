@@ -1,4 +1,0 @@
-loadSourceNamed: "Announcement.sysmel".
-loadSourceNamed: "AnnouncementSubscription.sysmel".
-loadSourceNamed: "SubscriptionRegistry.sysmel".
-loadSourceNamed: "Announcer.sysmel".

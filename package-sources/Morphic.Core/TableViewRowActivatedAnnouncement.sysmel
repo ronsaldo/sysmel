@@ -1,6 +1,0 @@
-public class TableViewRowActivatedAnnouncement superclass: MorphAnnouncement; definition: {
-    public field rowIndex => Size.
-
-    public method rowElement => AnyValue
-        := (morph downCastTo: TableViewMorph) dataSource elementAtRow: rowIndex.
-}.

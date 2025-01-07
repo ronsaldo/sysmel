@@ -1,5 +1,0 @@
-loadSourceNamed: "FontFace.sysmel".
-loadSourceNamed: "Font.sysmel".
-loadSourceNamed: "BitmapGridFontFace.sysmel".
-
-loadSourceNamed: "FormCanvas.sysmel".

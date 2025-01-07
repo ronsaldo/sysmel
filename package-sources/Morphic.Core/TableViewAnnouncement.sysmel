@@ -1,2 +1,0 @@
-public class TableViewAnnouncement superclass: MorphAnnouncement; definition: {
-}.

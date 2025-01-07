@@ -1,9 +1,0 @@
-public final class FormSGGradientNode superclass: FormSGRectangleNode; definition: {
-    public field startColor => Color.
-    public field endColor => Color.
-}.
-
-FormSGVisitor definition: {
-    public virtual method visitGradientNode: (node: FormSGGradientNode)
-        := self visitRectangleNode: node.
-}.

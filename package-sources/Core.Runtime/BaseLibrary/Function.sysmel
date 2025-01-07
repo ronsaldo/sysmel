@@ -123,6 +123,6 @@ Function eagerDefinitionBody: {
 
     public method interpretWithArguments: (arguments: Array) ::=> Untyped := {
         self doEnsureAnalysis.
-        definition interpretClosure: self withArguments: arguments
+        ##definition interpretClosure: self withArguments: arguments
     }.
 }.

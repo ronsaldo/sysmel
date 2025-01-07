@@ -324,8 +324,6 @@ public nogc function GarbageCollector::initialize() => Void := {
     GarbageCollector::GCPointerRootAllocator initialize.
     GarbageCollector::GCFatPointerRootAllocator initialize.
     GarbageCollector::IsInitialized := true.
-
-    NativeCodeLoaderElf::Mutex initialize. ## FIXME: Move this into a runtime initialization section.
 }.
 
 public nogc function GarbageCollector::shutdown() => Void := {
@@ -338,7 +336,6 @@ public nogc function GarbageCollector::shutdown() => Void := {
     GarbageCollector::RememberedSet finalize.
     GarbageCollector::GCPointerRootAllocator finalize.
     GarbageCollector::GCFatPointerRootAllocator finalize.
-    NativeCodeLoaderElf::Mutex finalize. ## FIXME: Move this into a runtime initialization section.
     GarbageCollector::IsInitialized := false.
 }.
 
@@ -685,12 +682,6 @@ public nogc function GarbageCollector::mark() => Void := {
     }.
 
     ## TODO: Mark the dynamic roots allocated through: GarbageCollector::GCPointerRootAllocator
-
-    ## FIXME: Remove these roots after properly including them in the static root pointer table.
-    {
-        GarbageCollector::markPointerValue(ObjectModel::getTuplePointerUIntValue(NativeCodeLoaderElf::First __refLoad__)).
-        GarbageCollector::markPointerValue(ObjectModel::getTuplePointerUIntValue(NativeCodeLoaderElf::Last __refLoad__)).
-    }.
 
     GarbageCollector::IsCollectingYoungGeneration ifTrue: {
         let i mutable := 0sz.

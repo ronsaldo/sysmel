@@ -1,4 +1,0 @@
-loadSourceNamed: "FunctionBytecode.sysmel".
-loadSourceNamed: "FunctionBytecodeAssembler.sysmel".
-loadSourceNamed: "FunctionBytecodeDirectCompiler.sysmel".
-loadSourceNamed: "FrontEnd.sysmel".

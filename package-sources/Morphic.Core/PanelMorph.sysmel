@@ -1,3 +1,0 @@
-public class PanelMorph superclass: BorderedMorph; definition: {
-    public override method defaultColor => Color := Color transparent.
-}.

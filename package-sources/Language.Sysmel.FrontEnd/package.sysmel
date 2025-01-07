@@ -1,0 +1,4 @@
+loadSourceNamed: "Token.sysmel".
+loadSourceNamed: "Scanner.sysmel".
+loadSourceNamed: "Parser.sysmel".
+loadSourceNamed: "SysmelLanguage.sysmel".

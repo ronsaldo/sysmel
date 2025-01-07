@@ -1,2 +1,0 @@
-public class TextAreaMorph superclass: AbstractTextAreaMorph; definition: {
-}.

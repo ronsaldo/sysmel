@@ -4,37 +4,6 @@ loadSourceNamed: "BootstrapCore.sysmel".
 #(
     "MiniSUnit"
     "Core.Runtime.Tests"
-
-    "Json"
-    "Json.AST"
-    "Json.Tests"
-
-    "Parsec"
-    "Parsec.Tests"
-    "Compiler.Bytecode"
-    "Compiler.Bytecode.Tests"
-    "Compiler.NativeCode"
-    "Compiler.NativeCode.Tests"
-    "Language.Sysmel"
-    "Language.Sysmel.Tests"
-
-    "ImageBuilder"
-
-    "Assembler"
-    "Assembler.X86"
-    "Assembler.Arm"
-    "Assembler.Arm64"
-    "Assembler.RiscV"
-
-    "Compiler.MIR"
-    "Compiler.MIR.Tests"
-    "Compiler.MIR.Assembler"
-    "Compiler.MIR.X86"
-
-    "Compiler.HIR"
-    "Compiler.HIR.Tests"
-
-    "Graphics.Window.PAL"
 ) do: {:each |
     loadPackageNamed: each
 }.

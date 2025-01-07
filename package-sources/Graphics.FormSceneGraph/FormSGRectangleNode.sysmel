@@ -1,8 +1,0 @@
-public class FormSGRectangleNode superclass: FormSGNode; definition: {
-    public field rectangle => RectangleF32.
-}.
-
-FormSGVisitor definition: {
-    public abstract method visitRectangleNode: (node: FormSGRectangleNode)
-        := self subclassResponsibility.
-}.

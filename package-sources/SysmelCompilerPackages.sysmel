@@ -1,0 +1,9 @@
+## Primitive definitions.
+#(
+    "Language.Sysmel.FrontEnd"
+    "Language.Sysmel.FrontEnd.Test"
+) do: {:each |
+    loadPackageNamed: each
+}.
+
+TestCase runWithAllSubclasses

@@ -1,4 +1,0 @@
-WindowRenderer definition: {
-    public virtual method exposed => Void := {}.
-    public virtual method destroy => Void := {}.
-}.

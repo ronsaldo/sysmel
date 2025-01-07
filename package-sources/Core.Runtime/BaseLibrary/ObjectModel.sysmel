@@ -1804,9 +1804,6 @@ public function ObjectModel::fetchUncheckedEntryPointMatchingBoxDescriptorOrBoxi
     }
 }.
 
-public function ObjectModel::interpretFunctionWithArguments(function: Function, arguments: Array) => Untyped
-    := function interpretWithArguments: arguments.
-
 ## Generate the trampolines via macro metaprogramming.
 public global ObjectModel::DirectFunctionApplicationTrampolines := Array new: 17.
 public global ObjectModel::CheckedFunctionApplicationTrampolines := Array new: 17.

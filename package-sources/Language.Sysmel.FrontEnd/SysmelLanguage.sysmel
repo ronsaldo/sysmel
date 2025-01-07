@@ -1,0 +1,16 @@
+public class SysmelLanguage superclass: ProgrammingLanguage; definition: {
+    __Meta__ definition: {
+        public override method languageName => StringSymbol
+            := #sysmel.
+
+        public override method supportsExtension: (extension: String) ::=> Boolean
+            := ".sysmel" = extension.
+    }.
+
+    public override method scanSourceCode: (sourceCode: SourceCode)
+        ::=> Array := SysmelScanner new scanSourceCode: sourceCode.
+
+    public override method parseTokens: (tokens: Array) sourceCode: (sourceCode: SourceCode) ::=> ASTNode := {
+        SysmelParser new parseTokens: tokens withSourceCode: sourceCode.
+    }.
+}.
