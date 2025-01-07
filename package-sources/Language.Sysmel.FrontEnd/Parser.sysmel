@@ -67,6 +67,22 @@ public class SysmelParserState definition: {
         self advance.
         self makeErrorAtCurrentPosition: errorMessage
     }.
+
+    public method expect: (kind: Int32) addingErrorToNode: (node: ASTNode) ::=> ASTNode := {
+        self peekKind = kind ifTrue: {
+            self advance.
+            return: node
+        }.
+
+        let errorNode := ASTErrorNode new
+            sourcePosition: self currentSourcePosition;
+            errorMessage: "Expected a specific token";
+            yourself.
+        ASTSequenceNode new
+            sourcePosition: self currentSourcePosition;
+            expressions: (Array with: node with: errorNode);
+            yourself
+    }
 }.
 
 public class SysmelParser superclass: Object; definition: {
@@ -101,10 +117,44 @@ public class SysmelParser superclass: Object; definition: {
             yourself
     }.
 
+    private method isBinaryOperator: (tokenKind: Int32) ::=> Boolean := {
+        switch: tokenKind withCases: #{
+            SysmelTokenKind::Operator    : true.
+            SysmelTokenKind::Star        : true.
+            SysmelTokenKind::LessThan    : true.
+            SysmelTokenKind::GreaterThan : true.
+            SysmelTokenKind::Bar         : true.
+            _: false
+        }
+    }.
+    
+    private method parseParenthesis: (state: SysmelParserState) ::=> ASTNode := {
+        let startPosition := state position.
+        self assert: state peekKind = SysmelTokenKind::LeftParent.
+        state advance.
+
+        if: (self isBinaryOperator: state peekKind) && ((state peekKindAtOffset: 1sz) = SysmelTokenKind::RightParent) then: {
+            let token := state next.
+            state advance.
+            return: (ASTIdentifierReferenceNode new
+                sourcePosition: token sourcePosition;
+                value: token value;
+                yourself)
+        }.
+
+        if: state peekKind = SysmelTokenKind::RightParent then: {
+            state advance.
+            ## TODO: Implement this case, somehow
+        }.
+
+        let expression := self parseSequence: state untilEndOrDelimiter: SysmelTokenKind::RightParent.
+        state expect: SysmelTokenKind::RightParent addingErrorToNode: expression.
+    }.
+
     private method parseTerm: (state: SysmelParserState) ::=> ASTNode := {
         switch: state peekKind withCases: #{
             SysmelTokenKind::Identifier : self parseIdentifier: state.
-            ##SysmelTokenKind::LeftParent : self parseParenthesis: state.
+            SysmelTokenKind::LeftParent : self parseParenthesis: state.
             _: (self parseLiteral: state).
         }
     }.
