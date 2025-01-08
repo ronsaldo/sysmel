@@ -21,7 +21,7 @@ public class SysmelParserState definition: {
     }.
 
     public method peekKind ::=> Int32
-        := self peekKindAtOffset: 1sz.
+        := self peekKindAtOffset: 0sz.
 
     public method peek ::=> SysmelToken := {
         self assert: position < tokensSize.
@@ -736,9 +736,13 @@ public class SysmelParser superclass: Object; definition: {
         if: (state peekKind = SysmelTokenKind::Assignment) then: {
             let token := state next.
             let assignedValue := self parseAssignmentExpression: state.
+            let selectorNode := ASTLiteralNode new
+                sourcePosition: token sourcePosition;
+                value: token value asSymbol;
+                yourself.
             ASTMessageSendNode new
                 receiver: assignedStore;
-                selector: token value asSymbol;
+                selector: selectorNode;
                 arguments: (Array with: assignedValue);
                 yourself
         }

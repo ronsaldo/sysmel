@@ -6,4 +6,5 @@
     loadPackageNamed: each
 }.
 
-TestCase runWithAllSubclasses
+##TestCase runWithAllSubclasses.
+SysmelParserTestCase run
