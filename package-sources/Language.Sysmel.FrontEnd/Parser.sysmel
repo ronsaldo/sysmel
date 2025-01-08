@@ -159,10 +159,86 @@ public class SysmelParser superclass: Object; definition: {
         state expect: SysmelTokenKind::RightParent addingErrorToNode: expression.
     }.
 
+    private method parsePragma: (state: SysmelParserState) ::=> ASTNode := {
+        let startPosition := state position.
+        self assert: state peekKind = SysmelTokenKind::LessThan.
+        state advance.
+
+        let selector mutable := "".
+        let arguments := OrderedCollection new.
+
+        switch: state peekKind withCases: #{
+            SysmelTokenKind::Identifier : {
+                let identifierToken := state next.
+                selector := identifierToken value
+            }.
+            SysmelTokenKind::Keyword : {
+                while: (state peekKind = SysmelTokenKind::Keyword) do: {
+                    let keywordToken := state next.
+                    selector := selector -- keywordToken value.
+                    
+                    let argument := self parseUnaryPrefix: state.
+                    arguments add: argument
+                }
+            }.
+            _: state advanceWithExpectedError: "Expected a content."
+        }.
+
+        if: state peekKind = SysmelTokenKind::GreaterThan then: {
+            state advance
+        } else: {
+            arguments add: (state advanceWithExpectedError: "Expected > to finish the pragma.")
+        }.
+
+        let selectorLiteral := 
+            ASTLiteralNode new
+            sourcePosition: (state sourcePositionFrom: startPosition);
+            value: selector asSymbol;
+            yourself.
+        ASTPragmaNode new
+            sourcePosition: (state sourcePositionFrom: startPosition);
+            selector: selectorLiteral;
+            arguments: arguments asArray;
+            yourself
+    }.
+
+    private method parseBlock: (state: SysmelParserState) ::=> ASTNode := {
+        let startPosition := state position.
+        self assert: state peekKind = SysmelTokenKind::LeftCurlyBracket.
+        state advance.
+
+        let pragmas := OrderedCollection new.
+        while: (state peekKind = SysmelTokenKind::LessThan) do:
+        {
+            let pragma := self parsePragma: state.
+            pragmas add: pragma
+        }.
+
+        let expressions := self parseExpressionList: state untilEndOrDelimiter: SysmelTokenKind::RightCurlyBracket.
+        if: (state peekKind = SysmelTokenKind::RightCurlyBracket) then: {
+            state advance
+        } else: {
+            expressions add: (state makeErrorAtCurrentPosition: "Expected a right curly bracket" )
+        }.
+
+        let sequenceNode := ASTSequenceNode new
+            sourcePosition: (state sourcePositionFrom: startPosition);
+            pragmas: pragmas asArray;
+            expressions: expressions asArray;
+            yourself.
+        ASTLexicalBlockNode new
+            sourcePosition: (state sourcePositionFrom: startPosition);
+            body: sequenceNode;
+            yourself.
+    }.
     private method parseTerm: (state: SysmelParserState) ::=> ASTNode := {
         switch: state peekKind withCases: #{
             SysmelTokenKind::Identifier : self parseIdentifier: state.
             SysmelTokenKind::LeftParent : self parseParenthesis: state.
+            SysmelTokenKind::LeftCurlyBracket : self parseBlock: state.
+            ##SysmelTokenKind::LeftBracket : self parseArray: state.
+            ##SysmelTokenKind::ByteArrayStart : self parseByteArray: state.
+            ##SysmelTokenKind::DictionaryStart : self parseDictionary: state.
             _: (self parseLiteral: state).
         }
     }.
