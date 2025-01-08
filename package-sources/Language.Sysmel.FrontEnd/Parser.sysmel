@@ -159,8 +159,60 @@ public class SysmelParser superclass: Object; definition: {
         }
     }.
 
+    private method parseKeywordApplication: (state: SysmelParserState) ::=> ASTNode := {
+        nil
+    }.
+
+    private method parseMessageCascade: (state: SysmelParserState) ::=> ASTNode := {
+        self parseTerm: state
+    }.
+
+    private method parseLowPrecedenceExpression: (state: SysmelParserState) ::=> ASTNode := {
+        if: (state peekKind = SysmelTokenKind::Keyword)
+            then: (self parseKeywordApplication: state)
+            else: (self parseMessageCascade: state)
+    }.
+
+    private method parseAssignmentExpression: (state: SysmelParserState) ::=> ASTNode := {
+        let startPosition := state position.
+        let assignedStore := self parseLowPrecedenceExpression: state.
+        if: (state peekKind = SysmelTokenKind::Assignment) then: {
+            let token := state next.
+            let assignedValue := self parseAssignmentExpression: state.
+            ASTMessageSendNode new
+                receiver: assignedStore;
+                selector: token value asSymbol;
+                arguments: (Array with: assignedValue);
+                yourself
+        }
+        else: {
+            assignedStore
+        }
+    }.
+
+    private method parseCommaExpression: (state: SysmelParserState) ::=> ASTNode := {
+        let startingPosition := state position.
+        let element := self parseAssignmentExpression: state.
+
+        if: (state peekKind ~= SysmelTokenKind::Comma) then: {
+            return: element
+        }.
+
+        let elements := OrderedCollection new.
+        while: (state peekKind = SysmelTokenKind::Comma) do: {
+            state advance.
+            let nextElement := self parseAssignmentExpression: state.
+            elements add: nextElement
+        }.
+
+        ASTMakeArrayNode new
+            sourcePosition: (state sourcePositionFrom: startingPosition);
+            elements: elements asArray;
+            yourself            
+    }.
+
     private method parseExpression: (state: SysmelParserState) ::=> ASTNode
-        := self parseTerm: state.
+        := self parseCommaExpression: state.
 
     private method parseExpressionList: (state: SysmelParserState) untilEndOrDelimiter: (delimiter: Int32) ::=> Array := {
         let elements := OrderedCollection new.

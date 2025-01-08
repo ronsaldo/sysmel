@@ -38,29 +38,16 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
 
     public method testIdentifierReference => Void := {
         let ast := self parseString: "identifier".
-        self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
-
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isIdentifierReferenceNode.
-        let identifierNode => ASTIdentifierReferenceNode := sequenceNode expressions first.
+        let identifierNode := ast downCastTo: ASTIdentifierReferenceNode.
         self assert: identifierNode value equals: #identifier.
     }.
 
     public method testLiteralInteger => Void := {
         let ast := self parseString: "1234".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isLiteralNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isLiteralNode.
-        let literalNode => ASTLiteralNode := sequenceNode expressions first.
+        let literalNode := ast downCastTo: ASTLiteralNode.
         self assert: literalNode value equals: 1234.
     }.
 
