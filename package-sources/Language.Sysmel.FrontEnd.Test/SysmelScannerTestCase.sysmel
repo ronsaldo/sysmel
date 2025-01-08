@@ -3,213 +3,219 @@ public class SysmelScannerTestCase superclass: TestCase; definition: {
         := SysmelLanguage scanSourceCode: (SourceCode text: string directory: "" name: "test" language: #tlisp).
 
     public method testEmptyString => Void := {
-        self assert: (self scanString: "") isEmpty.
+        let tokenList := self scanString: "".
+        self assert: tokenList size equals: 1sz.
+        self assert: tokenList first kind equals: SysmelTokenKind::EndOfSource.
     }.
 
     public method testSingleLineComment => Void := {
-        self assert: (self scanString: "## Single line comment") isEmpty.
+        let tokenList := (self scanString: "## Single line comment").
+        self assert: tokenList size equals: 1sz.
+        self assert: tokenList first kind equals: SysmelTokenKind::EndOfSource.
     }.
 
     public method testMultiLineComment => Void := {
-        self assert: (self scanString:"
+        let tokenList := (self scanString:"
         #**
          * Multi line comment
          *#
-        ") isEmpty.
+        ").
+        self assert: tokenList size equals: 1sz.
+        self assert: tokenList first kind equals: SysmelTokenKind::EndOfSource.
     }.
 
     public method testIdentifier => Void := {
         let tokenList := self scanString: "helloWorld1234".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Identifier.
         self assert: tokenList first value equals: #helloWorld1234.
     }.
 
     public method testScopedIdentifier => Void := {
         let tokenList := self scanString: "Scope::helloWorld1234".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Identifier.
         self assert: tokenList first value equals: #Scope::helloWorld1234.
     }.
 
     public method testScopedIdentifier2 => Void := {
         let tokenList := self scanString: "Scope::SubScope::helloWorld1234".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Identifier.
         self assert: tokenList first value equals: #Scope::SubScope::helloWorld1234.
     }.
 
     public method testOperator => Void := {
         let tokenList := self scanString: "+".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Operator.
         self assert: tokenList first value equals: #+.
     }.
 
     public method testOperator2 => Void := {
         let tokenList := self scanString: "||".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Operator.
         self assert: tokenList first value equals: #||.
     }.
 
     public method testScopedOperator => Void := {
         let tokenList := self scanString: "Scope::+".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Operator.
         self assert: tokenList first value equals: #Scope::+.
     }.
 
     public method testScopedOperator2 => Void := {
         let tokenList := self scanString: "Scope::SubScope::+".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Operator.
         self assert: tokenList first value equals: #Scope::SubScope::+.
     }.
 
     public method testKeyword => Void := {
         let tokenList := self scanString: "test:".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Keyword.
         self assert: tokenList first value equals: #test:.
     }.
 
     public method testScopedKeyword => Void := {
         let tokenList := self scanString: "Scope::test:".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Keyword.
         self assert: tokenList first value equals: #Scope::test:.
     }.
 
     public method testMultiKeyword => Void := {
         let tokenList := self scanString: "test:second:".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::MultiKeyword.
         self assert: tokenList first value equals: #test:second:.
     }.
 
     public method testScopedMultiKeyword => Void := {
         let tokenList := self scanString: "Scope::test:second:".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::MultiKeyword.
         self assert: tokenList first value equals: #Scope::test:second:.
     }.
 
     public method testKeywordSymbol => Void := {
         let tokenList := self scanString: "#helloWorld1234:".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Symbol.
         self assert: tokenList first value equals: #helloWorld1234:.
     }.
 
     public method testMultiKeywordSymbol => Void := {
         let tokenList := self scanString: "#helloWorld1234:with:".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Symbol.
         self assert: tokenList first value equals: #helloWorld1234:with:.
     }.
 
     public method testIdentifierSymbol => Void := {
         let tokenList := self scanString: "#helloWorld1234".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Symbol.
         self assert: tokenList first value equals: #helloWorld1234.
     }.
 
     public method testIdentifierSymbol2 => Void := {
         let tokenList := self scanString: "#Scope::helloWorld1234".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Symbol.
         self assert: tokenList first value equals: #Scope::helloWorld1234.
     }.
 
     public method testOperatorSymbol => Void := {
         let tokenList := self scanString: "#+".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Symbol.
         self assert: tokenList first value equals: #+.
     }.
 
     public method testOperatorSymbol2 => Void := {
         let tokenList := self scanString: "#Scope::+".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Symbol.
         self assert: tokenList first value equals: #Scope::+.
     }.
 
     public method testInteger => Void := {
         let tokenList := self scanString: "1234".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Integer.
         self assert: tokenList first value equals: 1234.
     }.
 
     public method testInteger2 => Void := {
         let tokenList := self scanString: "12_345".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Integer.
         self assert: tokenList first value equals: 12_345.
     }.
 
     public method testIntegerWithRadix => Void := {
         let tokenList := self scanString: "16rFF00".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Integer.
         self assert: tokenList first value equals: 16rFF00.
     }.
 
     public method testIntegerWithRadix2 => Void := {
         let tokenList := self scanString: "16rFF_00".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Integer.
         self assert: tokenList first value equals: 16rFF_00.
     }.
 
     public method testFloat => Void := {
         let tokenList := self scanString: "12345.0".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Float.
         self assert: tokenList first value equals: 12345.0.
     }.
 
     public method testCharacter => Void := {
         let tokenList := self scanString: "'T'".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Character.
         self assert: tokenList first value equals: 'T'.
     }.
 
     public method testString2 => Void := {
         let tokenList := self scanString: "\"Hello World\"".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::String.
         self assert: tokenList first value equals: "Hello World".
     }.
 
     public method testString2 => Void := {
         let tokenList := self scanString: "\"Hello \\\"World\\r\\n\"".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::String.
         self assert: tokenList first value equals: "Hello \"World\r\n".
     }.
 
     public method testStringSymbol => Void := {
         let tokenList := self scanString: "#\"Hello World\"".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Symbol.
         self assert: tokenList first value equals: #"Hello World".
     }.
 
     public method testStringSymbol2 => Void := {
         let tokenList := self scanString: "#\"Hello \\\"World\\r\\n\"".
-        self assert: tokenList size equals: 1sz.
+        self assert: tokenList size equals: 2sz.
         self assert: tokenList first kind equals: SysmelTokenKind::Symbol.
         self assert: tokenList first value equals: #"Hello \"World\r\n".
     }.
 
     public method testDelimiters => Void := {
         let tokenList := self scanString: "() [] {} : :: `' `` `, `@ | .. ... ; * < > #[ #( #{ := ,".
-        self assert: tokenList size equals: 25sz.
+        self assert: tokenList size equals: 26sz.
 
         self assert: (tokenList at: 0sz) kind equals: SysmelTokenKind::LeftParent.
         self assert: (tokenList at: 0sz) value equals: #"(".
@@ -285,5 +291,7 @@ public class SysmelScannerTestCase superclass: TestCase; definition: {
 
         self assert: (tokenList at: 24sz) kind equals: SysmelTokenKind::Comma.
         self assert: (tokenList at: 24sz) value equals: #",".
+
+        self assert: (tokenList at: 25sz) kind equals: SysmelTokenKind::EndOfSource.
     }.
 }.

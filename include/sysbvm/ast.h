@@ -27,6 +27,7 @@ typedef struct sysbvm_astArgumentNode_s
 typedef struct sysbvm_astBinaryExpressionSequenceNode_s
 {
     sysbvm_astNode_t super;
+    sysbvm_tuple_t elements;
     sysbvm_tuple_t operands;
     sysbvm_tuple_t operators;
 } sysbvm_astBinaryExpressionSequenceNode_t;

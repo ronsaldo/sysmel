@@ -18,8 +18,13 @@ public class SysmelScanner superclass: Object; definition: {
         let tokens := OrderedCollection new.
         while: self atEnd not do: {
             let token := self scanNextToken.
-            token ifNotNil: {
-                tokens add: token
+            self assert: token isNotNil.
+            tokens add: token
+        }.
+
+        if: self atEnd then: {
+            if: tokens isEmpty || tokens last kind ~= SysmelTokenKind::EndOfSource then: {
+                tokens add: (self makeToken: SysmelTokenKind::EndOfSource from: position)
             }
         }.
 
@@ -232,7 +237,9 @@ public class SysmelScanner superclass: Object; definition: {
 
     public method scanNextToken => SysmelToken := {
         self skipWhite.
-        self atEnd ifTrue: {return: nil}.
+        self atEnd ifTrue: {
+            return: (self makeToken: SysmelTokenKind::EndOfSource from: position)
+        }.
         
         let startPosition := position.
         let firstChar := self peek.

@@ -1240,6 +1240,7 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
         "binding", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, SYSBVM_NULL_TUPLE,
         NULL);
     context->roots.astBinaryExpressionSequenceNodeType = sysbvm_context_createIntrinsicClass(context, "ASTBinaryExpressionSequenceNode", context->roots.astNodeType,
+        "elements", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.arrayType,
         "operands", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.arrayType,
         "operators", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.arrayType,
         NULL);

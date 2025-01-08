@@ -23,6 +23,6 @@ SysmelToken definition: {
     }.
 
     public override method printOn: (stream: Stream) ::=> Void := {
-        stream nextPutAll: "SystemToken kind: "; print: kind; nextPutAll: " value: "; print: value
+        stream nextPutAll: "SysmelToken kind: "; print: kind; nextPutAll: " value: "; print: value
     }.
 }.

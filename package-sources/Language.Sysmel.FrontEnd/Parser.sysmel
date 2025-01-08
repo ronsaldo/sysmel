@@ -11,7 +11,7 @@ public class SysmelParserState definition: {
     public method peekKindAtOffset: (offset: Size) ::=> Int32 := {
         let peekPosition := position + offset.
         if: peekPosition >= tokensSize
-            then: -1i32
+            then: SysmelTokenKind::EndOfSource
             else: (tokens at: peekPosition) kind
     }.
 
@@ -22,6 +22,11 @@ public class SysmelParserState definition: {
 
     public method peekKind ::=> Int32
         := self peekKindAtOffset: 1sz.
+
+    public method peek ::=> SysmelToken := {
+        self assert: position < tokensSize.
+        tokens at: position
+    }.
 
     public method next ::=> SysmelToken := {
         self assert: position < tokensSize.
@@ -144,7 +149,10 @@ public class SysmelParser superclass: Object; definition: {
 
         if: state peekKind = SysmelTokenKind::RightParent then: {
             state advance.
-            ## TODO: Implement this case, somehow
+            return: (ASTMakeArrayNode new
+                sourcePosition: (state sourcePositionFrom: startPosition);
+                elements: #();
+                yourself)
         }.
 
         let expression := self parseSequence: state untilEndOrDelimiter: SysmelTokenKind::RightParent.
@@ -159,12 +167,261 @@ public class SysmelParser superclass: Object; definition: {
         }
     }.
 
+    private method isUnaryPostfixTokenKind: (kind: Int32) ::=> Boolean := {
+        switch: (kind) withCases: #{
+            SysmelTokenKind::Identifier : true.
+            SysmelTokenKind::LeftParent : true.
+            SysmelTokenKind::LeftBracket : true.
+            SysmelTokenKind::LeftCurlyBracket : true.
+            SysmelTokenKind::ByteArrayStart : true.
+            SysmelTokenKind::DictionaryStart : true.
+            _: false
+        }
+    }.
+
+
+    private method parseUnaryPostfix: (state: SysmelParserState) ::=> ASTNode := {
+        let startPosition := state position.
+        let receiver mutable := self parseTerm: state.
+        
+        while: (self isUnaryPostfixTokenKind: state peekKind) do: {
+            let token := state peek.
+            if: token kind = SysmelTokenKind::Identifier then: {
+                state advance.
+
+                let selector := ASTLiteralNode new
+                    sourcePosition: token sourcePosition;
+                    value: token value asSymbol;
+                    yourself.
+
+                let message := ASTMessageSendNode new
+                    receiver: receiver;
+                    selector: selector;
+                    arguments: #();
+                    yourself.
+                
+                receiver := message
+            }.
+            if: token kind = SysmelTokenKind::LeftParent then: {
+                state advance.
+                let arguments := self parseExpressionList: state untilEndOrDelimiter: SysmelTokenKind::RightParent.
+                if: (state peekKind = SysmelTokenKind::RightParent) then: {
+                    state advance
+                } else: {
+                    arguments add: (state makeErrorAtCurrentPosition: "Expected a right parent" )
+                }.
+
+                let application := ASTFunctionApplicationNode new
+                    sourcePosition: (state sourcePositionFrom: startPosition);
+                    functionExpression: receiver;
+                    arguments: arguments asArray;
+                    yourself.
+
+                receiver := application
+            }
+        }.
+        receiver
+    }.
+
+    private method parseQuote: (state: SysmelParserState) ::=> ASTNode := {
+        let startPosition := state position.
+        self assert: state peekKind = SysmelTokenKind::Quote.
+        state advance.
+
+        let term := self parseUnaryPrefix: state.
+        ASTQuoteNode new
+            sourcePosition: (state sourcePositionFrom: startPosition);
+            node: term;
+            yourself
+    }.
+
+    private method parseQuasiQuote: (state: SysmelParserState) ::=> ASTNode := {
+        let startPosition := state position.
+        self assert: state peekKind = SysmelTokenKind::QuasiQuote.
+        state advance.
+
+        let term := self parseUnaryPrefix: state.
+        ASTQuasiQuoteNode new
+            sourcePosition: (state sourcePositionFrom: startPosition);
+            node: term;
+            yourself
+    }.
+
+    private method parseQuasiUnquote: (state: SysmelParserState) ::=> ASTNode := {
+        let startPosition := state position.
+        self assert: state peekKind = SysmelTokenKind::QuasiUnquote.
+        state advance.
+
+        let term := self parseUnaryPrefix: state.
+        ASTQuasiUnquoteNode new
+            sourcePosition: (state sourcePositionFrom: startPosition);
+            expression: term;
+            yourself
+    }.
+
+    private method parseSplice: (state: SysmelParserState) ::=> ASTNode := {
+        let startPosition := state position.
+        self assert: state peekKind = SysmelTokenKind::Splice.
+        state advance.
+
+        let term := self parseUnaryPrefix: state.
+        ASTSpliceNode new
+            sourcePosition: (state sourcePositionFrom: startPosition);
+            expression: term;
+            yourself
+    }.
+
+    private method parseUnaryPrefix: (state: SysmelParserState) ::=> ASTNode := {
+        switch: state peekKind withCases: #{
+            SysmelTokenKind::Quote        : self parseQuote: state.
+            SysmelTokenKind::QuasiQuote   : self parseQuasiQuote: state.
+            SysmelTokenKind::QuasiUnquote : self parseQuasiUnquote: state.
+            SysmelTokenKind::Splice       : self parseSplice: state.
+            _: (self parseUnaryPostfix: state).
+        }
+    }.
+
+    private method parseBinaryExpressionSequence: (state: SysmelParserState) ::=> ASTNode := {
+        let startingPosition := state position.
+        let operand := self parseUnaryPrefix: state.
+
+        (self isBinaryOperator: state peekKind) ifFalse: {
+            return: operand
+        }.
+
+        let elements := OrderedCollection new.
+        elements add: operand.
+
+        while: (self isBinaryOperator: state peekKind) do: {
+            let operatorToken := state next.
+            elements add: (ASTLiteralNode new
+                sourcePosition: operatorToken sourcePosition;
+                value: operatorToken value asSymbol;
+                yourself).
+
+            let nextOperand := self parseUnaryPrefix: state.
+            elements add: nextOperand
+        }.
+
+        ASTBinaryExpressionSequenceNode new
+            sourcePosition: (state sourcePositionFrom: startingPosition);
+            elements: elements asArray;
+            yourself
+    }.
+
+    private method parseAssociationExpression: (state: SysmelParserState) ::=> ASTNode := {
+        let startingPosition := state position.
+        let key := self parseBinaryExpressionSequence: state.
+
+        if: (state peekKind ~= SysmelTokenKind::Colon) then: {
+            return: key
+        }.
+
+        state advance.
+        let value := self parseAssociationExpression: state.
+        
+        ASTMakeAssociationNode new
+            sourcePosition: (state sourcePositionFrom: startingPosition);
+            key: key;
+            value: value;
+            yourself
+    }.
+
     private method parseKeywordApplication: (state: SysmelParserState) ::=> ASTNode := {
-        nil
+        self assert: state peekKind = SysmelTokenKind::Keyword.
+        let startingPosition := state position.
+
+        let symbolValue mutable := "".
+        let arguments := OrderedCollection new.
+        while: (state peekKind = SysmelTokenKind::Keyword) do: {
+            let token := state next.
+            symbolValue := symbolValue -- token value.
+
+            let argument := self parseAssociationExpression: state.
+            arguments add: argument.
+        }.
+
+        let identifier := ASTLiteralNode new
+            sourcePosition: (state sourcePositionFrom: startingPosition);
+            value: symbolValue asSymbol;
+            yourself.
+        ASTMessageSendNode new
+            sourcePosition: (state sourcePositionFrom: startingPosition);
+            selector: identifier;
+            arguments: arguments asArray;
+            yourself
+    }.
+
+    private method parseKeywordMessageSend: (state: SysmelParserState) ::=> ASTNode := {
+        let startingPosition := state position.
+        let receiver := self parseAssociationExpression: state.
+
+        if: state peekKind ~= SysmelTokenKind::Keyword then: {
+            return: receiver
+        }.
+
+        let selectorValue mutable := "".
+        let arguments := OrderedCollection new.
+
+        while: (state peekKind = SysmelTokenKind::Keyword) do: {
+            let keywordToken := state next.
+            selectorValue := selectorValue -- keywordToken value.
+
+            let argument := self parseAssociationExpression: state.
+            arguments add: argument
+        }.
+
+        let selectorLiteral := ASTLiteralNode new
+            sourcePosition: (state sourcePositionFrom: startingPosition);
+            value: selectorValue asSymbol;
+            yourself.
+        ASTMessageSendNode new
+            sourcePosition: (state sourcePositionFrom: startingPosition);
+            receiver: receiver;
+            selector: selectorLiteral;
+            arguments: arguments asArray;
+            yourself.
+    }.
+
+    private method parseCascadedMessage: (state: SysmelParserState) ::=> ASTNode := {
+        let startingPosition := state position.
+        let token := state peek.
+        if: (state peekKind = SysmelTokenKind::Identifier) then: {
+            state advance.
+
+            let selector := ASTLiteralNode new
+                sourcePosition: token sourcePosition;
+                value: token value asSymbol;
+                yourself.
+            
+            let cascadedMessage := ASTMessageChainMessageNode new
+                sourcePosition: (state sourcePositionFrom: startingPosition);
+                selector: selector;
+                arguments: #();
+                yourself.
+            return: cascadedMessage
+        }.
+        
+        state makeErrorAtCurrentPosition: "Expected a cascaded message."
     }.
 
     private method parseMessageCascade: (state: SysmelParserState) ::=> ASTNode := {
-        self parseTerm: state
+        let startingPosition := state position.
+        let firstMessage := self parseKeywordMessageSend: state.
+        if: (state peekKind ~= SysmelTokenKind::Semicolon)
+            then: (return: firstMessage).
+
+        let messageCascade := firstMessage asMessageChain.
+        let chainMessages := OrderedCollection new. 
+        chainMessages addAll: messageCascade messages.
+
+        while: (state peekKind = SysmelTokenKind::Semicolon) do: {
+            let nextMessage := self parseCascadedMessage: state.
+            chainMessages add: nextMessage
+        }.
+
+        messageCascade messages: chainMessages asArray.
+        return: messageCascade
     }.
 
     private method parseLowPrecedenceExpression: (state: SysmelParserState) ::=> ASTNode := {
@@ -214,7 +471,7 @@ public class SysmelParser superclass: Object; definition: {
     private method parseExpression: (state: SysmelParserState) ::=> ASTNode
         := self parseCommaExpression: state.
 
-    private method parseExpressionList: (state: SysmelParserState) untilEndOrDelimiter: (delimiter: Int32) ::=> Array := {
+    private method parseExpressionList: (state: SysmelParserState) untilEndOrDelimiter: (delimiter: Int32) ::=> OrderedCollection := {
         let elements := OrderedCollection new.
 
         ## Leading dots.
@@ -223,13 +480,14 @@ public class SysmelParser superclass: Object; definition: {
         }.
 
         let expectsExpression mutable := true.
-        while: (state atEnd not && state peekKind ~= delimiter) do: {
+        while: (state atEnd not && (state peekKind ~= delimiter)) do: {
             if: expectsExpression not then: {
                 elements add: (state makeErrorAtCurrentPosition: "Expected dot before expression.")
             }.
 
             let expression := self parseExpression: state.
             elements add: expression.
+            expectsExpression := false.
 
             ## Trailing dots
             while: (state peekKind = SysmelTokenKind::Dot) do: {
@@ -238,19 +496,20 @@ public class SysmelParser superclass: Object; definition: {
             }
         }.
 
-        elements asArray
+        elements
     }.
 
     private method parseSequence: (state: SysmelParserState) untilEndOrDelimiter: (delimiter: Int32) ::=> ASTNode := {
         let initialPosition := state position.
-        let expressions := self parseExpressionList: state untilEndOrDelimiter: delimiter.
+        let expressions := (self parseExpressionList: state untilEndOrDelimiter: delimiter) asArray.
         if: expressions size = 1sz then: {
             return: expressions first
         }.
 
         ASTSequenceNode new
             sourcePosition: (state sourcePositionFrom: initialPosition);
-            expressions: expressions asArray;
+            pragmas: #();
+            expressions: expressions;
             yourself
     }.
 
@@ -265,6 +524,9 @@ public class SysmelParser superclass: Object; definition: {
             sourceCode: sourceCode;
             position: 0sz;
             yourself.
-        self parseTopLevelExpression: parseState
+        ##printLine(tokens printString).
+        let result := self parseTopLevelExpression: parseState.
+        ##printLine("Result").
+        result
     }.
 }

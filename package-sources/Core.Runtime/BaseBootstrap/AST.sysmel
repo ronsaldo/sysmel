@@ -1,3 +1,19 @@
+SourcePosition
+    withSelector: #to: addMethod: {:(SourcePosition)self :(SourcePosition)endSourcePosition :: SourcePosition |
+        SourcePosition new
+            sourceCode: self sourceCode;
+            startIndex: self startIndex;
+            endIndex: endSourcePosition endIndex;
+            yourself
+    };
+    withSelector: #until: addMethod: {:(SourcePosition)self :(SourcePosition)endSourcePosition :: SourcePosition |
+        SourcePosition new
+            sourceCode: self sourceCode;
+            startIndex: self startIndex;
+            endIndex: endSourcePosition endIndex;
+            yourself
+    }.
+
 ASTNode
     withSelector: #analyzeWithEnvironment: addMethod: {:(ASTNode)self :(AnalysisAndEvaluationEnvironment)environment :: ASTNode | self subclassResponsibility } makeAbstract;
     withSelector: #analyzeAndEvaluateWithEnvironment: addMethod: {:(ASTNode)self :(Environment)environment :: Untyped| self subclassResponsibility } makeAbstract;
@@ -59,8 +75,13 @@ ASTNode
     withSelector: #isWhileContinueWithNode addMethod: {:(ASTNode)self :: Boolean | false } makeVirtual;
     
     withSelector: #literalFunctionPrimitiveName addMethod: {:(ASTNode)self :: Symbol | nil } makeVirtual;
-    withSelector: #copyWithNewReceiverOrFunction: addMethod: {:(ASTNode)self :(ASTNode)newReceiverOrFunction :: ASTNode | self subclassResponsibility } makeVirtual.
-
+    withSelector: #copyWithNewReceiverOrFunction: addMethod: {:(ASTNode)self :(ASTNode)newReceiverOrFunction :: ASTNode | self subclassResponsibility } makeVirtual;
+    withSelector: #asMessageChain addMethod: {:(ASTNode) self :: ASTMessageChainNode |
+        ASTMessageChainNode new
+            sourcePosition: self sourcePosition;
+            receiver: self;
+            yourself
+        } makeVirtual.
 ASTArgumentNode
     withSelector: #isArgumentNode addMethod: {:(ASTNode)self :: Boolean | true } makeOverride;
 
@@ -368,6 +389,17 @@ ASTMessageSendNode
         if: (self receiverLookupType isNotNil) then: (self receiverLookupType: aBlock(self receiverLookupType)).
         if: (self selector isNotNil) then: (self selector: aBlock(self selector)).
         self arguments: (self arguments collect: aBlock)
+    } makeOverride;
+    withSelector: #asMessageChain addMethod: {:(ASTMessageSendNode) self :: ASTMessageChainNode |
+        ASTMessageChainNode new
+            sourcePosition: self sourcePosition;
+            receiver: self receiver;
+            receiverLookupType: self receiverLookupType;
+            messages: (Array with: (ASTMessageChainMessageNode new
+                selector: self selector;
+                arguments: self arguments;
+                yourself));
+            yourself
     } makeOverride.
 
 ASTMessageChainNode
