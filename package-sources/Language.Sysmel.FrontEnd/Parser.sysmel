@@ -407,6 +407,78 @@ public class SysmelParser superclass: Object; definition: {
             yourself.
     }.
 
+    private method isLiteralArraySymbolElement: (kind: Int32) ::=> Boolean := {
+        switch: kind withCases: #{
+            SysmelTokenKind::Identifier : true.
+            SysmelTokenKind::Ellipsis : true.
+            SysmelTokenKind::Operator : true.
+            SysmelTokenKind::Bar : true.
+            SysmelTokenKind::Star : true.
+            SysmelTokenKind::LessThan : true.
+            SysmelTokenKind::GreaterThan : true.
+            SysmelTokenKind::Keyword : true.
+            SysmelTokenKind::MultiKeyword : true.
+            SysmelTokenKind::Dot : true.
+            SysmelTokenKind::Colon : true.
+            SysmelTokenKind::ColonColon : true.
+            SysmelTokenKind::Ellipsis : true.
+            SysmelTokenKind::LiteralArrayStart : true.
+            SysmelTokenKind::LeftParent : true.
+            _: false
+        }
+    }.
+
+    private method isLiteralArrayElement: (kind: Int32) ::=> Boolean := {
+        (self isLiteralArraySymbolElement: kind)
+        || SysmelTokenKind::Integer = kind
+        || SysmelTokenKind::Float = kind
+        || SysmelTokenKind::Character = kind
+        || SysmelTokenKind::String = kind
+
+    }.
+
+    private method parseLiteralArray: (state: SysmelParserState) ::=> ASTNode := {
+        let startPosition := state position.
+        self assert: (state peekKind = SysmelTokenKind::LiteralArrayStart) ||
+            (state peekKind = SysmelTokenKind::LeftParent).
+        state advance.
+        
+        let elements := OrderedCollection new.
+        while: (state atEnd not && self isLiteralArrayElement: state peekKind) do: {
+            if: (state peekKind = SysmelTokenKind::LiteralArrayStart) ||
+            (state peekKind = SysmelTokenKind::LeftParent) then: {
+                let element := self parseLiteralArray: state.
+                elements add: element
+            } else: {
+                let token := state next.
+                if: (self isLiteralArraySymbolElement: token kind) then: {
+                    let symbolElement := ASTLiteralNode new
+                        sourcePosition: token sourcePosition;
+                        value: token value asSymbol;
+                        yourself.
+                    elements add: symbolElement
+                } else: {
+                    let element := ASTLiteralNode new
+                        sourcePosition: token sourcePosition;
+                        value: token value;
+                        yourself.
+                    elements add: element
+                }
+            }
+        }.
+
+        if: (state peekKind = SysmelTokenKind::RightParent) then: {
+            state advance
+        } else: {
+            elements add: (state makeErrorAtCurrentPosition: "Expected a right parent." )
+        }.
+
+        ASTMakeArrayNode new
+            sourcePosition: (state sourcePositionFrom: startPosition);
+            elements: elements asArray;
+            yourself
+    }.
+
     private method parseTerm: (state: SysmelParserState) ::=> ASTNode := {
         switch: state peekKind withCases: #{
             SysmelTokenKind::Identifier        : self parseIdentifier: state.
@@ -415,6 +487,7 @@ public class SysmelParser superclass: Object; definition: {
             SysmelTokenKind::LeftBracket       : self parseArray: state.
             SysmelTokenKind::ByteArrayStart    : self parseByteArray: state.
             SysmelTokenKind::DictionaryStart   : self parseDictionary: state.
+            SysmelTokenKind::LiteralArrayStart : self parseLiteralArray: state.
             _: (self parseLiteral: state).
         }
     }.
@@ -427,6 +500,7 @@ public class SysmelParser superclass: Object; definition: {
             SysmelTokenKind::LeftCurlyBracket : true.
             SysmelTokenKind::ByteArrayStart : true.
             SysmelTokenKind::DictionaryStart : true.
+            SysmelTokenKind::LiteralArrayStart : true.
             _: false
         }
     }.
@@ -519,6 +593,18 @@ public class SysmelParser superclass: Object; definition: {
                     arguments: (Array with: dictionary);
                     yourself.
             }.
+            if: token kind = SysmelTokenKind::LiteralArrayStart then: {
+                let literalArray := self parseLiteralArray: state.
+                receiver := ASTMessageSendNode new
+                    sourcePosition: (state sourcePositionFrom: startPosition);
+                    receiver: receiver;
+                    selector: (ASTLiteralNode new
+                        sourcePosition: (state sourcePositionFrom: startPosition);
+                        value: #"#():";
+                        yourself);
+                    arguments: (Array with: literalArray);
+                    yourself.
+            }.
         }.
         receiver
     }.
@@ -596,7 +682,7 @@ public class SysmelParser superclass: Object; definition: {
             let operatorToken := state next.
             elements add: (ASTLiteralNode new
                 sourcePosition: operatorToken sourcePosition;
-                value: operatorToken value asSymbol;
+                value: operatorToken value;
                 yourself).
 
             let nextOperand := self parseUnaryPrefix: state.
@@ -738,7 +824,7 @@ public class SysmelParser superclass: Object; definition: {
             let assignedValue := self parseAssignmentExpression: state.
             let selectorNode := ASTLiteralNode new
                 sourcePosition: token sourcePosition;
-                value: token value asSymbol;
+                value: token value;
                 yourself.
             ASTMessageSendNode new
                 receiver: assignedStore;
@@ -760,7 +846,8 @@ public class SysmelParser superclass: Object; definition: {
         }.
 
         let elements := OrderedCollection new.
-        while: (state peekKind = SysmelTokenKind::Comma) do: {
+        elements add: element.
+        while: (state atEnd not && (state peekKind = SysmelTokenKind::Comma)) do: {
             state advance.
             let nextElement := self parseAssignmentExpression: state.
             elements add: nextElement
