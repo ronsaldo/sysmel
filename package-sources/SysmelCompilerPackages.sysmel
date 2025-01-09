@@ -6,5 +6,6 @@
     loadPackageNamed: each
 }.
 
-##TestCase runWithAllSubclasses.
-SysmelParserTestCase runWithoutParachute
+TestCase runWithAllSubclasses.
+##SysmelParserTestCase runWithoutParachute
+##SysmelInterpreterTestCase runWithoutParachute

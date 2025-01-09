@@ -51,6 +51,6 @@ public class SysmelInterpreterTestCase superclass: TestCase; definition: {
 
     public method testArgument => Void := {
         self assert: (self evaluateString: "{:x | x + 1} (2)") equals: 3.
-        self assert: (self evaluateString: "{:x :y | x * y} (2, 3)") equals: 6.
+        self assert: (self evaluateString: "{:x :y | x * y} (2. 3)") equals: 6.
     }.
 }.

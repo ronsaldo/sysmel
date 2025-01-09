@@ -302,7 +302,7 @@ public class SysmelParser superclass: Object; definition: {
         }
     }.
 
-    private method parseArray: (state: SysmelParserState) ::=> ASTNode := {
+    private method parseArray: (state: SysmelParserState) ::=> ASTMakeArrayNode := {
         let startPosition := state position.
         self assert: state peekKind = SysmelTokenKind::LeftBracket.
         state advance.
@@ -510,6 +510,7 @@ public class SysmelParser superclass: Object; definition: {
             SysmelTokenKind::ByteArrayStart : true.
             SysmelTokenKind::DictionaryStart : true.
             SysmelTokenKind::LiteralArrayStart : true.
+            SysmelTokenKind::QuasiUnquote : true.
             _: false
         }
     }.
@@ -521,6 +522,17 @@ public class SysmelParser superclass: Object; definition: {
         
         while: (self isUnaryPostfixTokenKind: state peekKind) do: {
             let token := state peek.
+            if: token kind = SysmelTokenKind::QuasiUnquote then: {
+                let unquote := self parseQuasiUnquote: state.
+
+                let message := ASTMessageSendNode new
+                    receiver: receiver;
+                    selector: unquote;
+                    arguments: #();
+                    yourself.
+                
+                receiver := message
+            }.
             if: token kind = SysmelTokenKind::Identifier then: {
                 state advance.
 
@@ -567,15 +579,17 @@ public class SysmelParser superclass: Object; definition: {
                     yourself.
             }.
             if: token kind = SysmelTokenKind::LeftBracket then: {
-                let array := self parseArray: state.
+                let arrayNode := self parseArray: state.
+                let selector := ASTLiteralNode new
+                        sourcePosition: (state sourcePositionFrom: startPosition);
+                        value: (if: arrayNode elements isEmpty then: #"[]" else: #"[]:");
+                        yourself.
+
                 receiver := ASTMessageSendNode new
                     sourcePosition: (state sourcePositionFrom: startPosition);
                     receiver: receiver;
-                    selector: (ASTLiteralNode new
-                        sourcePosition: (state sourcePositionFrom: startPosition);
-                        value: #"[]:";
-                        yourself);
-                    arguments: (Array with: array);
+                    selector: selector;
+                    arguments: arrayNode elements;
                     yourself.
             }.
             if: token kind = SysmelTokenKind::ByteArrayStart then: {
