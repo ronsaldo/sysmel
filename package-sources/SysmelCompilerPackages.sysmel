@@ -1,4 +1,6 @@
 ## Primitive definitions.
+loadSourceNamed: "BootstrapPackages.sysmel".
+
 #(
     "Language.Sysmel.FrontEnd"
     "Language.Sysmel.FrontEnd.Test"
