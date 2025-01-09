@@ -127,12 +127,10 @@ ASTBinaryExpressionSequenceNode
     } makeOverride;
 
     withSelector: #childrenDo: addMethod: {:(ASTBinaryExpressionSequenceNode)self :aBlock :: Void |
-        self operands do: aBlock.
-        self operators do: aBlock.
+        self elements do: aBlock.
     } makeOverride;
     withSelector: #transformWith: addMethod: {:(ASTBinaryExpressionSequenceNode)self :aBlock :: Void |
-        self operands: (self operands collect: aBlock).
-        self operators: (self operators collect: aBlock).
+        self elements: (self elements collect: aBlock).
     } makeOverride.
 
 ASTBreakNode

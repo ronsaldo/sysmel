@@ -1,14 +1,19 @@
 ## Primitive definitions.
 loadSourceNamed: "BootstrapPackages.sysmel".
 
+## Primitive definitions.
 #(
     "Language.Sysmel.FrontEnd"
     "Language.Sysmel.FrontEnd.Test"
+    "Compiler.MiddleEnd"
+    "Compiler.MiddleEnd.Test"
+    "Compiler.BackEnd"
+    "Compiler.BackEnd.Test"
     "Program.CLI-Compiler"
 ) do: {:each |
     loadPackageNamed: each
 }.
 
-##TestCase runWithAllSubclasses.
+TestCase runWithAllSubclasses.
 ##SysmelParserTestCase runWithoutParachute
 ##SysmelInterpreterTestCase runWithoutParachute

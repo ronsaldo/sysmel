@@ -1,0 +1,4 @@
+public function Main(argc: Int32, argv: Char8 const pointer pointer) => Int32 := {
+    printLine("Hello World").
+    0i32
+}.
