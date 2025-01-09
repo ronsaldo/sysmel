@@ -720,32 +720,31 @@ static sysbvm_tuple_t sysbvm_parser_parseBinaryExpression(sysbvm_context_t *cont
     sysbvm_tuple_t firstOperand = sysbvm_parser_parseUnaryExpression(context, state);
     if(sysbvm_parser_isBinaryExpressionOperator(sysbvm_parser_lookKindAt(state, 0)))
     {
-        sysbvm_tuple_t operands = sysbvm_orderedCollection_create(context);
-        sysbvm_tuple_t operators = sysbvm_orderedCollection_create(context);
-        sysbvm_orderedCollection_add(context, operands, firstOperand);
+        sysbvm_tuple_t elements = sysbvm_orderedCollection_create(context);
+        sysbvm_orderedCollection_add(context, elements, firstOperand);
 
         while(sysbvm_parser_isBinaryExpressionOperator(sysbvm_parser_lookKindAt(state, 0)))
         {
             sysbvm_tuple_t binaryOperator = sysbvm_parser_parseLiteralTokenValue(context, state);
-            sysbvm_orderedCollection_add(context, operators, binaryOperator);
+            sysbvm_orderedCollection_add(context, elements, binaryOperator);
 
             sysbvm_tuple_t nextOperand = sysbvm_parser_parseUnaryExpression(context, state);
-            sysbvm_orderedCollection_add(context, operands, nextOperand);
+            sysbvm_orderedCollection_add(context, elements, nextOperand);
         }
 
         size_t endPosition = state->tokenPosition;
         sysbvm_tuple_t sourcePosition = sysbvm_parser_makeSourcePositionForTokenRange(context, state->sourceCode, state->tokenSequence, startPosition, endPosition);
 
         // Collapse single binary operation into a message send here.
-        if(sysbvm_orderedCollection_getSize(operators) == 1)
+        if(sysbvm_orderedCollection_getSize(elements) == 3)
         {
-            sysbvm_tuple_t receiver = sysbvm_orderedCollection_at(operands, 0);
-            sysbvm_tuple_t selector = sysbvm_orderedCollection_at(operators, 0);
-            sysbvm_tuple_t argument = sysbvm_orderedCollection_at(operands, 1);
+            sysbvm_tuple_t receiver = sysbvm_orderedCollection_at(elements, 0);
+            sysbvm_tuple_t selector = sysbvm_orderedCollection_at(elements, 1);
+            sysbvm_tuple_t argument = sysbvm_orderedCollection_at(elements, 2);
             return sysbvm_parser_makeBinaryMessageSend(context, sourcePosition, receiver, selector, argument);
         }
 
-        return sysbvm_astBinaryExpressionSequenceNode_create(context, sourcePosition, sysbvm_orderedCollection_asArray(context, operands), sysbvm_orderedCollection_asArray(context, operators));
+        return sysbvm_astBinaryExpressionSequenceNode_create(context, sourcePosition, sysbvm_orderedCollection_asArray(context, elements));
     }
     else
     {

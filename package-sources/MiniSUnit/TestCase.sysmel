@@ -17,6 +17,12 @@ public abstract class TestCase superclass: TestAsserter; definition: {
             printLine(metrics).
         }.
 
+        public method runWithoutParachute ::=> Void := {
+            let metrics := TestMetrics new.
+            self runWithoutParachuteAndWithMetrics: metrics.
+            printLine(metrics).
+        }.
+
         public method runWithMetrics: (metrics: TestMetrics) ::=> Void := {
             let testSelectors := self testSelectors.
             testSelectors isNotEmpty ifTrue: {
@@ -25,6 +31,31 @@ public abstract class TestCase superclass: TestAsserter; definition: {
                     self run: eachTestSelector withMetrics: metrics.
                 }
             }.
+        }.
+
+        public method runWithoutParachuteAndWithMetrics: (metrics: TestMetrics) ::=> Void := {
+            let testSelectors := self testSelectors.
+            testSelectors isNotEmpty ifTrue: {
+                printLine("Running tests in ", self).
+                testSelectors do: {:(Symbol)eachTestSelector :: Void |
+                    self runWithoutParachute: eachTestSelector withMetrics: metrics.
+                }
+            }.
+        }.
+
+        public method runWithoutParachute: (testSelector: Symbol) withMetrics: (metrics: TestMetrics) ::=> Void := {
+            print("-- ", testSelector asString).
+
+            let testTime := {|
+                self new
+                    setUp;
+                    perform: testSelector;
+                    tearDown.
+                metrics countPassingTest.
+            } timeToRunInMicroseconds.
+
+            printLine(" ", testTime asFloat64 * 0.001, " ms").
+            metrics countTestWithRunningTime: testTime.
         }.
 
         public method run: (testSelector: Symbol) withMetrics: (metrics: TestMetrics) ::=> Void := {

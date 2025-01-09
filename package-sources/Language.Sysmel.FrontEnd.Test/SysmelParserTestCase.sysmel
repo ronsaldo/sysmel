@@ -54,28 +54,18 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testLiteralSymbol => Void := {
         let ast := self parseString: "#test".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isLiteralNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isLiteralNode.
-        let literalNode => ASTLiteralNode := sequenceNode expressions first.
+        let literalNode := ast downCastTo: ASTLiteralNode.
         self assert: literalNode value equals: #test.
     }.
 
     public method testParentheses => Void := {
         let ast := self parseString: "(1234)".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isLiteralNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isLiteralNode.
-        let literalNode => ASTLiteralNode := sequenceNode expressions first.
+        let literalNode := ast downCastTo: ASTLiteralNode.
         self assert: literalNode value equals: 1234.
     }.
 
@@ -84,12 +74,7 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
         self assert: ast isNotNil.
         self assert: ast isSequenceNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isSequenceNode.
-        let subsequenceNode => ASTSequenceNode := sequenceNode expressions first.
+        let subsequenceNode := ast downCastTo: ASTSequenceNode.
         self assert: subsequenceNode pragmas size equals: 0sz.
         self assert: subsequenceNode expressions size equals: 2sz.
 
@@ -147,14 +132,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testApplyBlock => Void := {
         let ast := self parseString: "42 {}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMessageSendNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMessageSendNode.
-        let sendNode => ASTMessageSendNode := sequenceNode expressions first.
+        let sendNode := ast downCastTo: ASTMessageSendNode.
         self assert: sendNode receiver isLiteralNode.
         self assert: (sendNode receiver downCastTo: ASTLiteralNode) value equals: 42.
 
@@ -168,14 +148,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testApplyByteArray => Void := {
         let ast := self parseString: "42 #[]".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMessageSendNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMessageSendNode.
-        let sendNode => ASTMessageSendNode := sequenceNode expressions first.
+        let sendNode := ast downCastTo: ASTMessageSendNode.
         self assert: sendNode receiver isLiteralNode.
         self assert: (sendNode receiver downCastTo: ASTLiteralNode) value equals: 42.
 
@@ -189,14 +164,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testApplyDictionary => Void := {
         let ast := self parseString: "42 #{}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMessageSendNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMessageSendNode.
-        let sendNode => ASTMessageSendNode := sequenceNode expressions first.
+        let sendNode := ast downCastTo: ASTMessageSendNode.
         self assert: sendNode receiver isLiteralNode.
         self assert: (sendNode receiver downCastTo: ASTLiteralNode) value equals: 42.
 
@@ -210,14 +180,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testApplyLiteralArray => Void := {
         let ast := self parseString: "42 #()".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMessageSendNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMessageSendNode.
-        let sendNode => ASTMessageSendNode := sequenceNode expressions first.
+        let sendNode := ast downCastTo: ASTMessageSendNode.
         self assert: sendNode receiver isLiteralNode.
         self assert: (sendNode receiver downCastTo: ASTLiteralNode) value equals: 42.
 
@@ -231,14 +196,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testSubscript => Void := {
         let ast := self parseString: "42 [1]".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMessageSendNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMessageSendNode.
-        let sendNode => ASTMessageSendNode := sequenceNode expressions first.
+        let sendNode := ast downCastTo: ASTMessageSendNode.
         self assert: sendNode receiver isLiteralNode.
         self assert: (sendNode receiver downCastTo: ASTLiteralNode) value equals: 42.
 
@@ -254,14 +214,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testSubscript2 => Void := {
         let ast := self parseString: "42 []".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMessageSendNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMessageSendNode.
-        let sendNode => ASTMessageSendNode := sequenceNode expressions first.
+        let sendNode := ast downCastTo: ASTMessageSendNode.
         self assert: sendNode receiver isLiteralNode.
         self assert: (sendNode receiver downCastTo: ASTLiteralNode) value equals: 42.
 
@@ -274,14 +229,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testAssignment => Void := {
         let ast := self parseString: "a := 2".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMessageSendNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMessageSendNode.
-        let sendNode => ASTMessageSendNode := sequenceNode expressions first.
+        let sendNode := ast downCastTo: ASTMessageSendNode.
         self assert: sendNode receiver isIdentifierReferenceNode.
         self assert: (sendNode receiver downCastTo: ASTIdentifierReferenceNode) value equals: #a.
 
@@ -296,14 +246,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testBinaryExpression => Void := {
         let ast := self parseString: "1 + 2".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMessageSendNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMessageSendNode.
-        let sendNode => ASTMessageSendNode := sequenceNode expressions first.
+        let sendNode := ast downCastTo: ASTMessageSendNode.
         self assert: sendNode receiver isLiteralNode.
         self assert: (sendNode receiver downCastTo: ASTLiteralNode) value equals: 1.
 
@@ -318,14 +263,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testMessageWithoutReceiver => Void := {
         let ast := self parseString: "if: true then: 1".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isUnexpandedSExpressionNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isUnexpandedSExpressionNode.
-        let unexpandedSExpression => ASTUnexpandedSExpressionNode := sequenceNode expressions first.
+        let unexpandedSExpression := ast downCastTo: ASTUnexpandedSExpressionNode.
         self assert: unexpandedSExpression elements size equals: 3sz.
 
         self assert: unexpandedSExpression elements first isIdentifierReferenceNode.
@@ -341,14 +281,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testKeywordMessage => Void := {
         let ast := self parseString: "Array with: 1".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMessageSendNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMessageSendNode.
-        let sendNode => ASTMessageSendNode := sequenceNode expressions first.
+        let sendNode := ast downCastTo: ASTMessageSendNode.
         self assert: sendNode receiver isIdentifierReferenceNode.
         self assert: (sendNode receiver downCastTo: ASTIdentifierReferenceNode) value equals: #Array.
 
@@ -363,44 +298,33 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testBinaryExpression2 => Void := {
         let ast := self parseString: "1 + 2 - 3".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isBinaryExpressionSequenceNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
+        let binaryExpressionSequence := ast downCastTo: ASTBinaryExpressionSequenceNode.
+        self assert: binaryExpressionSequence elements size equals: 5sz.
 
-        self assert: sequenceNode expressions first isBinaryExpressionSequenceNode.
-        let binaryExpressionSequence => ASTBinaryExpressionSequenceNode := sequenceNode expressions first.
-        self assert: binaryExpressionSequence operands size equals: 3sz.
-        self assert: binaryExpressionSequence operators size equals: 2sz.
+        self assert: binaryExpressionSequence elements first isLiteralNode.
+        self assert: (binaryExpressionSequence elements first downCastTo: ASTLiteralNode) value equals: 1.
 
-        self assert: binaryExpressionSequence operands first isLiteralNode.
-        self assert: (binaryExpressionSequence operands first downCastTo: ASTLiteralNode) value equals: 1.
+        self assert: binaryExpressionSequence elements second isLiteralNode.
+        self assert: (binaryExpressionSequence elements second downCastTo: ASTLiteralNode) value equals: #+.
 
-        self assert: binaryExpressionSequence operands second isLiteralNode.
-        self assert: (binaryExpressionSequence operands second downCastTo: ASTLiteralNode) value equals: 2.
+        self assert: binaryExpressionSequence elements third isLiteralNode.
+        self assert: (binaryExpressionSequence elements third downCastTo: ASTLiteralNode) value equals: 2.
 
-        self assert: binaryExpressionSequence operands third isLiteralNode.
-        self assert: (binaryExpressionSequence operands third downCastTo: ASTLiteralNode) value equals: 3.
+        self assert: binaryExpressionSequence elements fourth isLiteralNode.
+        self assert: (binaryExpressionSequence elements fourth downCastTo: ASTLiteralNode) value equals: #-.
 
-        self assert: binaryExpressionSequence operators first isLiteralNode.
-        self assert: (binaryExpressionSequence operators first downCastTo: ASTLiteralNode) value equals: #+.
-
-        self assert: binaryExpressionSequence operators second isLiteralNode.
-        self assert: (binaryExpressionSequence operators second downCastTo: ASTLiteralNode) value equals: #-.
+        self assert: binaryExpressionSequence elements fifth isLiteralNode.
+        self assert: (binaryExpressionSequence elements fifth downCastTo: ASTLiteralNode) value equals: 3.
     }.
 
     public method testMessageChain => Void := {
         let ast := self parseString: "receiver begin; drawPointX: 1 y: 2; finish".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMessageChainNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMessageChainNode.
-        let messageChain => ASTMessageChainNode := sequenceNode expressions first.
+        let messageChain := ast downCastTo: ASTMessageChainNode.
         self assert: messageChain receiver isIdentifierReferenceNode.
         self assert: (messageChain receiver downCastTo: ASTIdentifierReferenceNode) value equals: #receiver.
 
@@ -446,14 +370,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testLowPrecedenceBinaryExpression => Void := {
         let ast := self parseString: "1 ::+ 2".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMessageSendNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMessageSendNode.
-        let sendNode => ASTMessageSendNode := sequenceNode expressions first.
+        let sendNode => ASTMessageSendNode := ast downCastTo: ASTMessageSendNode.
         self assert: sendNode receiver isLiteralNode.
         self assert: (sendNode receiver downCastTo: ASTLiteralNode) value equals: 1.
 
@@ -468,28 +387,18 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testMakeArray0 => Void := {
         let ast := self parseString: "()".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeArrayNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeArrayNode.
-        let makeArrayNode => ASTMakeArrayNode := sequenceNode expressions first.
+        let makeArrayNode := ast downCastTo: ASTMakeArrayNode.
         self assert: makeArrayNode elements isEmpty.
     }.
 
     public method testMakeArray1 => Void := {
         let ast := self parseString: "1,".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeArrayNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeArrayNode.
-        let makeArrayNode => ASTMakeArrayNode := sequenceNode expressions first.
+        let makeArrayNode := ast downCastTo: ASTMakeArrayNode.
         self assert: makeArrayNode elements size equals: 1sz.
 
         {
@@ -502,14 +411,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testMakeArray2 => Void := {
         let ast := self parseString: "1, 2".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeArrayNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeArrayNode.
-        let makeArrayNode => ASTMakeArrayNode := sequenceNode expressions first.
+        let makeArrayNode := ast downCastTo: ASTMakeArrayNode.
         self assert: makeArrayNode elements size equals: 2sz.
 
         {
@@ -528,28 +432,18 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testMakeLiteralArray0 => Void := {
         let ast := self parseString: "#()".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeArrayNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeArrayNode.
-        let makeArrayNode => ASTMakeArrayNode := sequenceNode expressions first.
+        let makeArrayNode := ast downCastTo: ASTMakeArrayNode.
         self assert: makeArrayNode elements isEmpty.
     }.
 
     public method testMakeLiteralArray1 => Void := {
         let ast := self parseString: "#(1)".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeArrayNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeArrayNode.
-        let makeArrayNode => ASTMakeArrayNode := sequenceNode expressions first.
+        let makeArrayNode := ast downCastTo: ASTMakeArrayNode.
         self assert: makeArrayNode elements size equals: 1sz.
 
         {
@@ -562,14 +456,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testMakeLiteralArray2 => Void := {
         let ast := self parseString: "#(1 2)".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeArrayNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeArrayNode.
-        let makeArrayNode => ASTMakeArrayNode := sequenceNode expressions first.
+        let makeArrayNode := ast downCastTo: ASTMakeArrayNode.
         self assert: makeArrayNode elements size equals: 2sz.
 
         {
@@ -588,14 +477,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testMakeLiteralArray3 => Void := {
         let ast := self parseString: "#(1 #() 2)".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeArrayNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeArrayNode.
-        let makeArrayNode => ASTMakeArrayNode := sequenceNode expressions first.
+        let makeArrayNode := ast downCastTo: ASTMakeArrayNode.
         self assert: makeArrayNode elements size equals: 3sz.
 
         {
@@ -620,28 +504,18 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testMakeByteArray0 => Void := {
         let ast := self parseString: "#[]".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeByteArrayNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeByteArrayNode.
-        let makeArrayNode => ASTMakeByteArrayNode := sequenceNode expressions first.
+        let makeArrayNode := ast downCastTo: ASTMakeByteArrayNode.
         self assert: makeArrayNode elements isEmpty.
     }.
 
     public method testMakeByteArray1 => Void := {
         let ast := self parseString: "#[1]".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeByteArrayNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeByteArrayNode.
-        let makeArrayNode => ASTMakeByteArrayNode := sequenceNode expressions first.
+        let makeArrayNode := ast downCastTo: ASTMakeByteArrayNode.
         self assert: makeArrayNode elements size equals: 1sz.
 
         {
@@ -654,14 +528,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testMakeByteArray2 => Void := {
         let ast := self parseString: "#[1 . 2]".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeByteArrayNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeByteArrayNode.
-        let makeArrayNode => ASTMakeByteArrayNode := sequenceNode expressions first.
+        let makeArrayNode := ast downCastTo: ASTMakeByteArrayNode.
         self assert: makeArrayNode elements size equals: 2sz.
 
         {
@@ -680,28 +549,18 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testMakeDictionary0 => Void := {
         let ast := self parseString: "#{}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeDictionaryNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeDictionaryNode.
-        let makeDictionaryNode => ASTMakeDictionaryNode := sequenceNode expressions first.
+        let makeDictionaryNode := ast downCastTo: ASTMakeDictionaryNode.
         self assert: makeDictionaryNode elements isEmpty.
     }.
 
     public method testMakeDictionary1 => Void := {
         let ast := self parseString: "#{first: 1}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeDictionaryNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeDictionaryNode.
-        let makeDictionaryNode => ASTMakeDictionaryNode := sequenceNode expressions first.
+        let makeDictionaryNode := ast downCastTo: ASTMakeDictionaryNode.
         self assert: makeDictionaryNode elements size equals: 1sz.
 
         {
@@ -717,14 +576,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testMakeDictionary2 => Void := {
         let ast := self parseString: "#{first: 1 . second:}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeDictionaryNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeDictionaryNode.
-        let makeDictionaryNode => ASTMakeDictionaryNode := sequenceNode expressions first.
+        let makeDictionaryNode := ast downCastTo: ASTMakeDictionaryNode.
         self assert: makeDictionaryNode elements size equals: 2sz.
 
         {
@@ -748,14 +602,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testMakeDictionary3 => Void := {
         let ast := self parseString: "#{first: 1 . second:. third : 3}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isMakeDictionaryNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isMakeDictionaryNode.
-        let makeDictionaryNode => ASTMakeDictionaryNode := sequenceNode expressions first.
+        let makeDictionaryNode := ast downCastTo: ASTMakeDictionaryNode..
         self assert: makeDictionaryNode elements size equals: 3sz.
 
         {
@@ -789,14 +638,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testEmptyBlock => Void := {
         let ast := self parseString: "{}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isLexicalBlockNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isLexicalBlockNode.
-        let lexicalBlockNode => ASTLexicalBlockNode := sequenceNode expressions first.
+        let lexicalBlockNode := ast downCastTo: ASTLexicalBlockNode.
         
         self assert: lexicalBlockNode body isSequenceNode.
         let blockSequenceNode => ASTSequenceNode := lexicalBlockNode body downCastTo: ASTSequenceNode.
@@ -807,14 +651,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testLambda => Void := {
         let ast := self parseString: "{|}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isLambdaNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isLambdaNode.
-        let lambdaNode => ASTLambdaNode := sequenceNode expressions first.
+        let lambdaNode := ast downCastTo: ASTLambdaNode.
         self assert: lambdaNode arguments isEmpty.
         self assert: lambdaNode resultType isNil.
         
@@ -827,14 +666,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testLambda2 => Void := {
         let ast := self parseString: "{:arg |}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isLambdaNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isLambdaNode.
-        let lambdaNode => ASTLambdaNode := sequenceNode expressions first.
+        let lambdaNode := ast downCastTo: ASTLambdaNode..
         self assert: lambdaNode arguments size equals: 1sz.
         self assert: lambdaNode resultType isNil.
 
@@ -856,14 +690,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testLambda3 => Void := {
         let ast := self parseString: "{:(Int32)arg :secondArg |}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isLambdaNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isLambdaNode.
-        let lambdaNode => ASTLambdaNode := sequenceNode expressions first.
+        let lambdaNode := ast downCastTo: ASTLambdaNode.
         self assert: lambdaNode arguments size equals: 2sz.
         self assert: lambdaNode resultType isNil.
 
@@ -895,14 +724,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testLambda4 => Void := {
         let ast := self parseString: "{:(Int32)arg :secondArg :: Void |}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isLambdaNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isLambdaNode.
-        let lambdaNode => ASTLambdaNode := sequenceNode expressions first.
+        let lambdaNode := ast downCastTo: ASTLambdaNode.
         self assert: lambdaNode arguments size equals: 2sz.
         self assert: lambdaNode resultType isIdentifierReferenceNode.
         self assert: (lambdaNode resultType downCastTo: ASTIdentifierReferenceNode) value equals: #Void.
@@ -936,14 +760,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testLambda5 => Void := {
         let ast := self parseString: "{ :: Void |}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isLambdaNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isLambdaNode.
-        let lambdaNode => ASTLambdaNode := sequenceNode expressions first.
+        let lambdaNode := ast downCastTo: ASTLambdaNode.
         self assert: lambdaNode arguments isEmpty.
         self assert: lambdaNode resultType isIdentifierReferenceNode.
         self assert: (lambdaNode resultType downCastTo: ASTIdentifierReferenceNode) value equals: #Void.
@@ -957,14 +776,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testBlockSingleExpression => Void := {
         let ast := self parseString: "{1234}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isLexicalBlockNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isLexicalBlockNode.
-        let lexicalBlockNode => ASTLexicalBlockNode := sequenceNode expressions first.
+        let lexicalBlockNode := ast downCastTo: ASTLexicalBlockNode.
         
         self assert: lexicalBlockNode body isSequenceNode.
         let blockSequenceNode => ASTSequenceNode := lexicalBlockNode body downCastTo: ASTSequenceNode.
@@ -979,14 +793,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testBlockUnaryPragma => Void := {
         let ast := self parseString: "{<unaryPragma> 1234}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isLexicalBlockNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isLexicalBlockNode.
-        let lexicalBlockNode => ASTLexicalBlockNode := sequenceNode expressions first.
+        let lexicalBlockNode := ast downCastTo: ASTLexicalBlockNode.
         
         self assert: lexicalBlockNode body isSequenceNode.
         let blockSequenceNode => ASTSequenceNode := lexicalBlockNode body downCastTo: ASTSequenceNode.
@@ -1009,14 +818,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testBlockKeywordPragma => Void := {
         let ast := self parseString: "{<testPragma: 1>}".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isLexicalBlockNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isLexicalBlockNode.
-        let lexicalBlockNode => ASTLexicalBlockNode := sequenceNode expressions first.
+        let lexicalBlockNode := ast downCastTo: ASTLexicalBlockNode.
         
         self assert: lexicalBlockNode body isSequenceNode.
         let blockSequenceNode => ASTSequenceNode := lexicalBlockNode body downCastTo: ASTSequenceNode.
@@ -1056,14 +860,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testQuasiQuote => Void := {
         let ast := self parseString: "``test".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isQuasiQuoteNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isQuasiQuoteNode.
-        let quasiQuoteNode => ASTQuasiQuoteNode := sequenceNode expressions first.
+        let quasiQuoteNode := ast downCastTo: ASTQuasiQuoteNode.
         self assert: quasiQuoteNode node isIdentifierReferenceNode.
         self assert: (quasiQuoteNode node downCastTo: ASTIdentifierReferenceNode) value equals: #test.
     }.
@@ -1071,14 +870,9 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testQuasiUnquote => Void := {
         let ast := self parseString: "`,test".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isQuasiUnquoteNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isQuasiUnquoteNode.
-        let quasiUnquoteNode => ASTQuasiUnquoteNode := sequenceNode expressions first.
+        let quasiUnquoteNode := ast downCastTo: ASTQuasiUnquoteNode.
         self assert: quasiUnquoteNode expression isIdentifierReferenceNode.
         self assert: (quasiUnquoteNode expression downCastTo: ASTIdentifierReferenceNode) value equals: #test.
     }.
@@ -1086,15 +880,10 @@ public class SysmelParserTestCase superclass: TestCase; definition: {
     public method testSpliceNode => Void := {
         let ast := self parseString: "`@test".
         self assert: ast isNotNil.
-        self assert: ast isSequenceNode.
+        self assert: ast isSpliceNode.
 
-        let sequenceNode := ast downCastTo: ASTSequenceNode.
-        self assert: sequenceNode pragmas size equals: 0sz.
-        self assert: sequenceNode expressions size equals: 1sz.
-
-        self assert: sequenceNode expressions first isSpliceNode.
-        let quasiUnquoteNode => ASTSpliceNode := sequenceNode expressions first.
-        self assert: quasiUnquoteNode expression isIdentifierReferenceNode.
-        self assert: (quasiUnquoteNode expression downCastTo: ASTIdentifierReferenceNode) value equals: #test.
+        let spliceNode := ast downCastTo: ASTSpliceNode.
+        self assert: spliceNode expression isIdentifierReferenceNode.
+        self assert: (spliceNode expression downCastTo: ASTIdentifierReferenceNode) value equals: #test.
     }.
 }.

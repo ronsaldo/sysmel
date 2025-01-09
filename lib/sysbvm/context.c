@@ -1241,8 +1241,6 @@ static void sysbvm_context_createBasicTypes(sysbvm_context_t *context)
         NULL);
     context->roots.astBinaryExpressionSequenceNodeType = sysbvm_context_createIntrinsicClass(context, "ASTBinaryExpressionSequenceNode", context->roots.astNodeType,
         "elements", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.arrayType,
-        "operands", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.arrayType,
-        "operators", SYSBVM_TYPE_SLOT_FLAG_PUBLIC, context->roots.arrayType,
         NULL);
     context->roots.astBreakNodeType = sysbvm_context_createIntrinsicClass(context, "ASTBreakNode", context->roots.astNodeType,
         NULL);

@@ -28,8 +28,6 @@ typedef struct sysbvm_astBinaryExpressionSequenceNode_s
 {
     sysbvm_astNode_t super;
     sysbvm_tuple_t elements;
-    sysbvm_tuple_t operands;
-    sysbvm_tuple_t operators;
 } sysbvm_astBinaryExpressionSequenceNode_t;
 
 typedef struct sysbvm_astBreakNode_s
@@ -564,7 +562,7 @@ SYSBVM_INLINE bool sysbvm_astArgumentNode_isForAll(sysbvm_tuple_t argumentNode)
 /**
  * Creates a binary expression sequence node.
  */ 
-SYSBVM_API sysbvm_tuple_t sysbvm_astBinaryExpressionSequenceNode_create(sysbvm_context_t *context, sysbvm_tuple_t sourcePosition, sysbvm_tuple_t operands, sysbvm_tuple_t operators);
+SYSBVM_API sysbvm_tuple_t sysbvm_astBinaryExpressionSequenceNode_create(sysbvm_context_t *context, sysbvm_tuple_t sourcePosition, sysbvm_tuple_t elements);
 
 /**
  * Creates a break node.

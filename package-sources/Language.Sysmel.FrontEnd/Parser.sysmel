@@ -170,12 +170,12 @@ public class SysmelParser superclass: Object; definition: {
         switch: state peekKind withCases: #{
             SysmelTokenKind::Identifier : {
                 let identifierToken := state next.
-                selector := identifierToken value
+                selector := identifierToken value asString
             }.
             SysmelTokenKind::Keyword : {
                 while: (state peekKind = SysmelTokenKind::Keyword) do: {
                     let keywordToken := state next.
-                    selector := selector -- keywordToken value.
+                    selector := selector -- keywordToken value asString.
                     
                     let argument := self parseUnaryPrefix: state.
                     arguments add: argument
@@ -220,7 +220,7 @@ public class SysmelParser superclass: Object; definition: {
         let identifier mutable => ASTNode := nil.
         if: state peekKind == SysmelTokenKind::Identifier then: {
             let identifierToken := state next.
-            let identifierSymbol := identifierToken value asSymbol.
+            let identifierSymbol := identifierToken value.
             identifier := ASTLiteralNode new
                 sourcePosition: (state sourcePositionFrom: startPosition);
                 value: identifierSymbol;
@@ -345,26 +345,34 @@ public class SysmelParser superclass: Object; definition: {
         if: state peekKind = SysmelTokenKind::Keyword then: {
             let keyToken := state next.
             let keyTokenValue := keyToken value.
-            ## TODO: remove the trailing :.
+            let tokenSymbol := (keyTokenValue asString withoutSuffix: ":") asSymbol.
 
             let keySymbol := ASTLiteralNode new
                 sourcePosition: (state sourcePositionFrom: startPosition);
-                value: keyTokenValue;
-                yourself
+                value: tokenSymbol;
+                yourself.
+            key := keySymbol.
+            if: (state peekKind ~= SysmelTokenKind::Dot) &&
+                (state peekKind ~= SysmelTokenKind::RightCurlyBracket) then: {
+                value := self parseAssociationExpression: state
+            }
         }
         else: {
             key := self parseBinaryExpressionSequence: state.
             if: state peekKind == SysmelTokenKind::Colon then: {
                 state advance.
-                value := self parseAssociationExpression: state
+                if: (state peekKind ~= SysmelTokenKind::Dot) &&
+                    (state peekKind ~= SysmelTokenKind::RightCurlyBracket) then: {
+                    value := self parseAssociationExpression: state
+                }
             }
         }.
 
         let dictAssociation := ASTMakeAssociationNode new
-                sourcePosition: (state sourcePositionFrom: startPosition);
-                key: key;
-                value: value;
-                yourself
+            sourcePosition: (state sourcePositionFrom: startPosition);
+            key: key;
+            value: value;
+            yourself
     }.
 
     private method parseDictionary: (state: SysmelParserState) ::=> ASTNode := {
@@ -379,13 +387,13 @@ public class SysmelParser superclass: Object; definition: {
 
         let expectsExpression mutable := true.
         let elements := OrderedCollection new.
-        while: (state atEnd not && (state peekKind = SysmelTokenKind::RightCurlyBracket)) do: {
+        while: (state atEnd not && (state peekKind ~= SysmelTokenKind::RightCurlyBracket)) do: {
             if: expectsExpression not then: {
                 elements add: (state makeErrorAtCurrentPosition: "Expected a dot before association").
             }.
 
-            let expression := self parseDictionaryAssociation: state.
-            elements add: expression.
+            let association := self parseDictionaryAssociation: state.
+            elements add: association.
 
             ## Skip trailing dots.
             expectsExpression := false.
@@ -429,12 +437,13 @@ public class SysmelParser superclass: Object; definition: {
     }.
 
     private method isLiteralArrayElement: (kind: Int32) ::=> Boolean := {
-        (self isLiteralArraySymbolElement: kind)
-        || SysmelTokenKind::Integer = kind
-        || SysmelTokenKind::Float = kind
-        || SysmelTokenKind::Character = kind
-        || SysmelTokenKind::String = kind
-
+        switch: kind withCases: #{
+            SysmelTokenKind::Integer : true.
+            SysmelTokenKind::Float : true.
+            SysmelTokenKind::Character : true.
+            SysmelTokenKind::String : true.
+            _: self isLiteralArraySymbolElement: kind
+        }
     }.
 
     private method parseLiteralArray: (state: SysmelParserState) ::=> ASTNode := {
@@ -517,7 +526,7 @@ public class SysmelParser superclass: Object; definition: {
 
                 let selector := ASTLiteralNode new
                     sourcePosition: token sourcePosition;
-                    value: token value asSymbol;
+                    value: token value;
                     yourself.
 
                 let message := ASTMessageSendNode new
@@ -689,6 +698,16 @@ public class SysmelParser superclass: Object; definition: {
             elements add: nextOperand
         }.
 
+        if: elements size = 3sz then: {
+            let message := ASTMessageSendNode new
+                sourcePosition: (state sourcePositionFrom: startingPosition);
+                receiver: elements first;
+                selector: elements second;
+                arguments: (Array with: elements third);
+                yourself.
+            return: message
+        }.
+
         ASTBinaryExpressionSequenceNode new
             sourcePosition: (state sourcePositionFrom: startingPosition);
             elements: elements asArray;
@@ -721,20 +740,20 @@ public class SysmelParser superclass: Object; definition: {
         let arguments := OrderedCollection new.
         while: (state peekKind = SysmelTokenKind::Keyword) do: {
             let token := state next.
-            symbolValue := symbolValue -- token value.
+            symbolValue := symbolValue -- token value asString.
 
             let argument := self parseAssociationExpression: state.
             arguments add: argument.
         }.
 
-        let identifier := ASTLiteralNode new
+        let identifier := ASTIdentifierReferenceNode new
             sourcePosition: (state sourcePositionFrom: startingPosition);
             value: symbolValue asSymbol;
             yourself.
-        ASTMessageSendNode new
+
+        ASTUnexpandedSExpressionNode new
             sourcePosition: (state sourcePositionFrom: startingPosition);
-            selector: identifier;
-            arguments: arguments asArray;
+            elements: (Array with: identifier) -- arguments asArray;
             yourself
     }.
 
@@ -751,7 +770,7 @@ public class SysmelParser superclass: Object; definition: {
 
         while: (state peekKind = SysmelTokenKind::Keyword) do: {
             let keywordToken := state next.
-            selectorValue := selectorValue -- keywordToken value.
+            selectorValue := selectorValue -- keywordToken value asString.
 
             let argument := self parseAssociationExpression: state.
             arguments add: argument
@@ -771,13 +790,12 @@ public class SysmelParser superclass: Object; definition: {
 
     private method parseCascadedMessage: (state: SysmelParserState) ::=> ASTNode := {
         let startingPosition := state position.
-        let token := state peek.
         if: (state peekKind = SysmelTokenKind::Identifier) then: {
-            state advance.
+            let token := state next.
 
             let selector := ASTLiteralNode new
                 sourcePosition: token sourcePosition;
-                value: token value asSymbol;
+                value: token value;
                 yourself.
             
             let cascadedMessage := ASTMessageChainMessageNode new
@@ -786,6 +804,33 @@ public class SysmelParser superclass: Object; definition: {
                 arguments: #();
                 yourself.
             return: cascadedMessage
+        }.
+        if: (state peekKind = SysmelTokenKind::Keyword) then: {
+            let selectorValue mutable := "".
+            let arguments := OrderedCollection new.
+
+            while: (state peekKind = SysmelTokenKind::Keyword) do: {
+                let keywordToken := state next.
+                selectorValue := selectorValue -- keywordToken value asString.
+
+                let argument := self parseAssociationExpression: state.
+                arguments add: argument
+            }.
+
+            let selectorLiteral := ASTLiteralNode new
+                sourcePosition: (state sourcePositionFrom: startingPosition);
+                value: selectorValue asSymbol;
+                yourself.
+
+            let cascadedMessage := ASTMessageChainMessageNode new
+                sourcePosition: (state sourcePositionFrom: startingPosition);
+                selector: selectorLiteral;
+                arguments: arguments asArray;
+                yourself.
+            return: cascadedMessage
+        }.
+        if: (self isBinaryOperator: state peekKind) then: {
+            printLine("Todo: cascade binary operator")
         }.
         
         state makeErrorAtCurrentPosition: "Expected a cascaded message."
@@ -802,6 +847,7 @@ public class SysmelParser superclass: Object; definition: {
         chainMessages addAll: messageCascade messages.
 
         while: (state peekKind = SysmelTokenKind::Semicolon) do: {
+            state advance.
             let nextMessage := self parseCascadedMessage: state.
             chainMessages add: nextMessage
         }.
@@ -810,10 +856,38 @@ public class SysmelParser superclass: Object; definition: {
         return: messageCascade
     }.
 
-    private method parseLowPrecedenceExpression: (state: SysmelParserState) ::=> ASTNode := {
+    private method parseLowPrecedenceTerm: (state: SysmelParserState) ::=> ASTNode := {
         if: (state peekKind = SysmelTokenKind::Keyword)
             then: (self parseKeywordApplication: state)
             else: (self parseMessageCascade: state)
+    }.
+
+    private method parseLowPrecedenceExpression: (state: SysmelParserState) ::=> ASTNode := {
+        let startingPosition := state position.
+        let receiver mutable := self parseLowPrecedenceTerm: state.
+
+        while: ((state peekKind = SysmelTokenKind::ColonColon) &&
+                (self isBinaryOperator: (state peekKindAtOffset: 1sz))) do: {
+            state advance.
+            let operatorToken := state next.
+            let nextOperand := self parseLowPrecedenceTerm: state.
+
+            let selectorNode := ASTLiteralNode new
+                sourcePosition: (state sourcePositionFrom: startingPosition);
+                value: operatorToken value;
+                yourself.
+            
+            let messageSend := ASTMessageSendNode new
+                sourcePosition: (state sourcePositionFrom: startingPosition);
+                receiver: receiver;
+                selector: selectorNode;
+                arguments: (Array with: nextOperand);
+                yourself.
+
+            receiver := messageSend
+        }.
+
+        receiver.
     }.
 
     private method parseAssignmentExpression: (state: SysmelParserState) ::=> ASTNode := {
@@ -849,8 +923,12 @@ public class SysmelParser superclass: Object; definition: {
         elements add: element.
         while: (state atEnd not && (state peekKind = SysmelTokenKind::Comma)) do: {
             state advance.
-            let nextElement := self parseAssignmentExpression: state.
-            elements add: nextElement
+            if: (state atEnd not
+                && (state peekKind ~= SysmelTokenKind::RightParent)
+                && (state peekKind ~= SysmelTokenKind::EndOfSource)) then: {
+                let nextElement := self parseAssignmentExpression: state.
+                elements add: nextElement
+            }
         }.
 
         ASTMakeArrayNode new
@@ -893,6 +971,8 @@ public class SysmelParser superclass: Object; definition: {
     private method parseSequence: (state: SysmelParserState) untilEndOrDelimiter: (delimiter: Int32) ::=> ASTNode := {
         let initialPosition := state position.
         let expressions := (self parseExpressionList: state untilEndOrDelimiter: delimiter) asArray.
+        expressions size = 1sz ifTrue: {return: expressions first}.
+
         ASTSequenceNode new
             sourcePosition: (state sourcePositionFrom: initialPosition);
             pragmas: #();

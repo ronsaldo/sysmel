@@ -99,19 +99,20 @@ ASTBinaryExpressionSequenceNode
 
     withSelector: #asExpandedNodeWithEnvironment: addMethod: {:(ASTBinaryExpressionSequenceNode)self :(Environment)environment :: ASTNode |
         ## TODO: perform proper operator precedence parsing.
-        let: #operands mutableWith: self operands.
-        let: #receiver mutableWith: operands first.
-        let: #nextOperandIndex mutableWith: 1sz.
-        self operators do: {:(ASTNode)operator :: Void |
-            let: #nextOperand with: (operands at: nextOperandIndex).
-            nextOperandIndex := nextOperandIndex + 1sz.
+        let: #index mutableWith: 1sz.
+        let: #receiver mutableWith: self elements first.
+        let: #elementCount with: self elements size.
+
+        while: ((index + 1sz) < elementCount) do: {
+            let: #operator with: (self elements at: index).
+            let: #nextOperand with: (self elements at: index + 1sz).
             receiver := ASTMessageSendNode new
                 sourcePosition: operator sourcePosition;
                 receiver: receiver;
                 selector: operator;
                 arguments: (Array with: nextOperand);
                 yourself
-        }.
+        } continueWith: (index := index + 2sz).
 
         receiver
     };

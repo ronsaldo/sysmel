@@ -217,12 +217,11 @@ SYSBVM_API sysbvm_tuple_t sysbvm_astArgumentNode_create(sysbvm_context_t *contex
     return (sysbvm_tuple_t)result;
 }
 
-SYSBVM_API sysbvm_tuple_t sysbvm_astBinaryExpressionSequenceNode_create(sysbvm_context_t *context, sysbvm_tuple_t sourcePosition, sysbvm_tuple_t operands, sysbvm_tuple_t operators)
+SYSBVM_API sysbvm_tuple_t sysbvm_astBinaryExpressionSequenceNode_create(sysbvm_context_t *context, sysbvm_tuple_t sourcePosition, sysbvm_tuple_t elements)
 {
     sysbvm_astBinaryExpressionSequenceNode_t *result = (sysbvm_astBinaryExpressionSequenceNode_t*)sysbvm_context_allocatePointerTuple(context, context->roots.astBinaryExpressionSequenceNodeType, SYSBVM_SLOT_COUNT_FOR_STRUCTURE_TYPE(sysbvm_astBinaryExpressionSequenceNode_t));
     result->super.sourcePosition = sourcePosition;
-    result->operands = operands;
-    result->operators = operators;
+    result->elements = elements;
     return (sysbvm_tuple_t)result;
 }
 
