@@ -49,11 +49,6 @@ public class CLISysmelInterpreter definition: {
                     printLine(self evaluateString: (arguments at: i)).
                     continue()
                 }.
-                argument = "-save-obj-file" ifTrue: {
-                    i := i + 1sz.
-                    self saveNativeImageObjectFile: (arguments at: i).
-                    continue()
-                }.
             } ifFalse: {
                 self evaluateFileNamed: argument
             }
@@ -64,10 +59,6 @@ public class CLISysmelInterpreter definition: {
         }.
 
         0i32
-    }.
-
-    public method saveNativeImageObjectFile: (fileName: String) ::=> Void := {
-        CLISysmelInterpreter buildNativeInterpreterImage saveTo: fileName
     }.
 
     public method evaluateFileNamed: (fileName: String) ::=> Void := {
@@ -114,17 +105,4 @@ public function CLISysmelInterpreter::nativeMain(argc: Int32, argv: Char8 const 
     } continueWith: (i := i + 1i32).
 
     CLISysmelInterpreter new main: arguments.
-}.
-
-public function CLISysmelInterpreter::nativeRuntimeMain(argc: Int32, argv: Char8 const pointer pointer) => Int32 := {
-    GarbageCollector::initialize().
-
-    ## FIXME: Remove this line after generating global variables with initial values.
-    FunctionBytecodeCompiler::Current := FunctionBytecodeDirectCompiler.
-    FunctionNativeCodeCompiler::Current := HIR_MIRFunctionNativeCodeCompiler.
-
-    let result := CLISysmelInterpreter::nativeMain(argc, argv).
-    AnalysisQueue current waitPendingAnalysis.
-    GarbageCollector::shutdown().
-    result
 }.

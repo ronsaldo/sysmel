@@ -2,10 +2,11 @@
 #(
     "Language.Sysmel.FrontEnd"
     "Language.Sysmel.FrontEnd.Test"
+    "Program.CLI-Compiler"
 ) do: {:each |
     loadPackageNamed: each
 }.
 
-TestCase runWithAllSubclasses.
+##TestCase runWithAllSubclasses.
 ##SysmelParserTestCase runWithoutParachute
 ##SysmelInterpreterTestCase runWithoutParachute

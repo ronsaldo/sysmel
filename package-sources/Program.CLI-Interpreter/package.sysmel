@@ -1,3 +1,2 @@
 loadSourceNamed: "Interpreter.sysmel".
-loadSourceNamed: "InterpreterImageBuildingScripts.sysmel".
 AnalysisQueue current waitPendingAnalysis.
